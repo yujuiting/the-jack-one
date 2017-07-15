@@ -1,0 +1,66 @@
+{
+  "name": "the-jake-one",
+  "version": "0.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build:client": "webpack",
+    "serve:client": "webpack-dev-server",
+    "test": "nyc mocha --ui mocha-typescript -r source-map-support/register -r tsconfig-paths/register --compilers ts:ts-node/register src/**/*.spec.ts",
+    "watch": "nyc mocha --ui mocha-typescript -r source-map-support/register -r tsconfig-paths/register --compilers ts:ts-node/register src/**/*.spec.ts --watch"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/chai": "^4.0.1",
+    "@types/copy-webpack-plugin": "^4.0.0",
+    "@types/glob": "^5.0.30",
+    "@types/html-webpack-plugin": "^2.28.0",
+    "@types/mocha": "^2.2.41",
+    "@types/node": "^8.0.8",
+    "@types/webpack": "^3.0.1",
+    "awesome-typescript-loader": "^3.2.1",
+    "chai": "^4.0.2",
+    "copy-webpack-plugin": "^4.0.1",
+    "html-webpack-plugin": "^2.29.0",
+    "mocha": "^3.4.2",
+    "mocha-typescript": "^1.1.7",
+    "nyc": "^11.0.3",
+    "source-map-support": "^0.4.15",
+    "ts-node": "^3.2.0",
+    "tsconfig-paths": "^2.2.0",
+    "tslint": "^5.5.0",
+    "tslint-eslint-rules": "^4.1.1",
+    "tslint-microsoft-contrib": "^5.0.1",
+    "typescript": "^2.4.1",
+    "webpack": "^3.1.0",
+    "webpack-dev-server": "^2.5.1"
+  },
+  "dependencies": {
+    "reflect-metadata": "^0.1.10",
+    "rxjs": "^5.4.2"
+  },
+  "nyc": {
+    "check-coverage": true,
+    "include": [
+      "src/**/*.ts"
+    ],
+    "extension": [
+      ".ts"
+    ],
+    "exclude": [
+      "src/**/*.spec.ts",
+      "**/*.d.ts"
+    ],
+    "reporter": [
+      "lcov",
+      "text-summary"
+    ],
+    "require": [
+      "ts-node/register"
+    ],
+    "all": true,
+    "sourceMap": true,
+    "instrument": true
+  }
+}
