@@ -6,6 +6,8 @@ That is what this project existed!!
 This is a game with its own engine named `The Jake`.
 Dedicated to Jake.
 
+## The Jake One
+`The Jake One` is an [ECS](https://en.wikipedia.org/wiki/Entity–component–system) game engine.
 This project focus on custom engine development, game is a side project for quick concept and function testing.
 
 ## Roadmap
@@ -33,3 +35,7 @@ This project focus on custom engine development, game is a side project for quic
 
 ### Design Pattern
 - [Game Programming Patterns](http://gameprogrammingpatterns.com/contents.html)
+
+### Respectable opponents
+- [Excalibur](http://github.com/excaliburjs/Excalibur)
+- [Unity](https://docs.unity3d.com/ScriptReference/)
