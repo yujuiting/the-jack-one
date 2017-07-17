@@ -11,7 +11,7 @@ import { RigidbodyComponent } from 'Engine/Physics/RigidbodyComponent';
 import { Vector } from 'Engine/Math/Vector';
 import { TransformComponent } from 'Engine/Display/TransformComponent';
 
-const texture = new Texture('Assets/jake.idle.png');
+const texture = new Texture('Assets/jack.idle.png');
 const spriteSheet = new SpriteSheet(texture, 1000 / 12, {
   idle: {
     width: 83,
@@ -20,7 +20,7 @@ const spriteSheet = new SpriteSheet(texture, 1000 / 12, {
   }
 });
 
-class Jake extends GameObject {
+class Jack extends GameObject {
 
   private rigidbody: RigidbodyComponent = this.addComponent(RigidbodyComponent);
 
@@ -78,7 +78,7 @@ sceneManager.add(mainScene);
 
 mainScene.resources.add(texture);
 
-const jake = new Jake();
-mainScene.add(jake);
+const jack = new Jack();
+mainScene.add(jack);
 
 engine.initialize(document.body);

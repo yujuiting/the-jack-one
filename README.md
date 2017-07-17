@@ -1,13 +1,13 @@
-# The Jake One
+# The Jack One
 
-I love game, love typescript and ______________Jake.
+I love game, love typescript and ______________Jack.
 That is what this project existed!!
 
-This is a game with its own engine named `The Jake`.
-Dedicated to Jake.
+This is a game with its own engine named `The Jack`.
+Dedicated to Jack.
 
-## The Jake One
-`The Jake One` is an [ECS](https://en.wikipedia.org/wiki/Entity–component–system) game engine.
+## The Jack One
+`The Jack One` is an [ECS](https://en.wikipedia.org/wiki/Entity–component–system) game engine.
 This project focus on custom engine development, game is a side project for quick concept and function testing.
 
 ## Roadmap
@@ -15,7 +15,7 @@ This project focus on custom engine development, game is a side project for quic
   - Physics: [WIP]
   - Camera Manipulation: Pending.
 - Game
-  - Design: Seems Jake like to play raiden-like genre. This infomation is helpful.
+  - Design: Seems Jack like to play raiden-like genre. This infomation is helpful.
   - Art: Doing research.
 
 ## Dependencies
