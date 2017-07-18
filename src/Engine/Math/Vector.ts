@@ -36,16 +36,28 @@ export class Vector implements Recyclable {
     // this.z = z;
   }
 
-  public add(other: Vector): void {
-    this.x += other.x;
-    this.y += other.y;
-    // this.z += other.z;
+  public add(other: Vector): void;
+  public add(x: number, y: number): void;
+  public add(otherOrX: Vector|number, y: number = 0): void {
+    if (otherOrX instanceof Vector) {
+      this.x += otherOrX.x;
+      this.y += otherOrX.y;
+    } else {
+      this.x += otherOrX;
+      this.y += y;
+    }
   }
 
-  public subtract(other: Vector): void {
-    this.x -= other.x;
-    this.y -= other.y;
-    // this.z -= other.z;
+  public subtract(other: Vector): void;
+  public subtract(x: number, y: number): void;
+  public subtract(otherOrX: Vector|number, y: number = 0): void {
+    if (otherOrX instanceof Vector) {
+      this.x -= otherOrX.x;
+      this.y -= otherOrX.y;
+    } else {
+      this.x -= otherOrX;
+      this.y -= y;
+    }
   }
 
   public scale(value: number): void {
@@ -60,12 +72,8 @@ export class Vector implements Recyclable {
         //  + this.z * other.z;
   }
 
-  public cross(other: Vector): Vector {
-    return Vector.Get(
-      this.y * other.z - this.z * other.y
-    , this.z * other.x - this.x * other.z
-  //, this.x * other.y - this.y * other.x
-    );
+  public cross(other: Vector): number {
+    return this.x * other.x - this.y - other.y;
   }
 
   public magnitude(): number {

@@ -5,6 +5,7 @@ import { SpriteSheet } from 'Engine/Display/SpriteSheet';
 import { Time } from 'Engine/Time/Time';
 import { UniqueComponent } from 'Engine/Utility/Decorator/UniqueComponent';
 import { RequireComponent } from 'Engine/Utility/Decorator/RequireComponent';
+import { Matrix2D } from 'Engine/Math/Matrix2D';
 
 @UniqueComponent()
 @RequireComponent([TransformComponent])
@@ -33,10 +34,7 @@ export class SpriteSheetRendererComponent extends RendererComponent {
     this.sprites = this.spriteSheet.getSprites(this.sheetKey);
   }
 
-  public render(ctx: CanvasRenderingContext2D): void {
-    // TransformComponent is required.
-    // Restriction come from metadata in future.
-    const transform = <TransformComponent>this.getComponent(TransformComponent);
+  public render(ctx: CanvasRenderingContext2D, toViewportMatrix: Matrix2D): void {
 
     this.accumulator += this.time.deltaTime;
 
@@ -50,16 +48,23 @@ export class SpriteSheetRendererComponent extends RendererComponent {
 
     const sprite = this.sprites[this.currentIndex];
 
+    const drawAt = this.transform.position.clone();
+    toViewportMatrix.multiplyToPoint(drawAt);
+    drawAt.subtract(
+      sprite.pivot.x * this.transform.width,
+      sprite.pivot.y * this.transform.height
+    );
+
     ctx.drawImage(
-      sprite.texture.source,
-      sprite.offsetX,
-      sprite.offsetY,
-      sprite.width,
-      sprite.height,
-      transform.position.x,
-      transform.position.y,
-      sprite.width,
-      sprite.height
+      sprite.imageBitmap,
+      sprite.rect.position.x,
+      sprite.rect.position.y,
+      sprite.rect.width,
+      sprite.rect.height,
+      drawAt.x,
+      drawAt.y,
+      this.transform.width,
+      this.transform.height
     );
   }
 

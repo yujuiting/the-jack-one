@@ -26,13 +26,11 @@ export class SpriteSheet {
       const cell = cellMap[key];
       const sprites: Sprite[] = [];
       for (let i = 0; i < cell.frameCount; i++) {
-        const sprite = new Sprite(
-          texture,
-          (cell.offsetX || 0) + cell.width * i,
-          cell.offsetY || 0,
-          cell.width,
-          cell.height
-        );
+        const sprite = new Sprite(texture);
+        sprite.textureRect.position.setTo(
+          (cell.offsetX || 0) + cell.width * i, cell.offsetY || 0);
+        sprite.textureRect.width = sprite.rect.width = cell.width;
+        sprite.textureRect.height = sprite.rect.height = cell.height;
         sprites.push(sprite);
       }
       this.sprites.set(key, sprites);

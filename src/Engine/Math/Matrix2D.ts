@@ -25,6 +25,14 @@ export class Matrix2D {
     }
   }
 
+  public reset(): void {
+    this._value = [
+    [1, 0, 0],
+    [0, 1, 0],
+    [0, 0, 1]
+  ];
+  }
+
   public setRotatation(radian: number): void {
     const rotation = new Matrix2D([
       [Math.cos(radian), -Math.sin(radian)],
@@ -33,19 +41,45 @@ export class Matrix2D {
     this.multiply(rotation);
   }
 
-  public setTranslation(position: Vector): void {
-    const translation = new Matrix2D([
-      [1, 0, -position.x],
-      [0, 1, -position.y]
-    ]);
+  public setTranslation(position: Vector): void;
+  public setTranslation(x: number, y: number): void;
+  public setTranslation(positionOrX: Vector|number, y?: number): void {
+    let translation: Matrix2D;
+    if (positionOrX instanceof Vector) {
+      translation = new Matrix2D([
+        [1, 0, -positionOrX.x],
+        [0, 1, -positionOrX.y]
+      ]);
+    } else if (y !== void 0) {
+      translation = new Matrix2D([
+        [1, 0, -positionOrX],
+        [0, 1, -y]
+      ]);
+    } else {
+      return;
+    }
+
     this.multiply(translation);
   }
 
-  public setScaling(magnification: Vector): void {
-    const scaling = new Matrix2D([
-      [magnification.x, 0],
-      [0, magnification.y]
-    ]);
+  public setScaling(magnification: Vector): void;
+  public setScaling(x: number, y: number): void;
+  public setScaling(magnificationOrX: Vector|number, y?: number): void {
+    let scaling: Matrix2D;
+    if (magnificationOrX instanceof Vector) {
+      scaling = new Matrix2D([
+        [magnificationOrX.x, 0],
+        [0, magnificationOrX.y]
+      ]);
+    } else if (y !== void 0) {
+      scaling = new Matrix2D([
+        [magnificationOrX, 0],
+        [0, y]
+      ]);
+    } else {
+      return;
+    }
+
     this.multiply(scaling);
   }
 

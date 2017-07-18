@@ -22,12 +22,12 @@ export class ReadonlyTree<T> {
     return this._children.indexOf(child) !== -1;
   }
 
-  public forEach(callback: (data: T) => void): void {
+  public forEachChildren(callback: (data: T) => void): void {
     /**
      * depth first search
      * TODO: optimization
      */
-    const stack: ReadonlyTree<T>[] = [this];
+    const stack: ReadonlyTree<T>[] = this._children.slice();
     let current: ReadonlyTree<T>|undefined = stack.pop();
     while (current) {
       for (let i = current.children.length - 1; i > -1; i--) {

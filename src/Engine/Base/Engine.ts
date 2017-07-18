@@ -103,8 +103,8 @@ export class Engine {
     /**
      * clamp it, aviod spiral of death.
      */
-    if (this.accumulator > 0.2) {
-      this.accumulator = 0.2;
+    if (this.accumulator > 200) {
+      this.accumulator = 200;
     }
 
     while (this.accumulator > this.time.fixedDeltaTime) {

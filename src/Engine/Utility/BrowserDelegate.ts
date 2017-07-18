@@ -51,4 +51,12 @@ export class BrowserDelegate {
     this.document.body.style.overflow = 'auto';
   }
 
+  public createCanvas(): HTMLCanvasElement {
+    return this.document.createElement('canvas');
+  }
+
+  public getContext(canvas: HTMLCanvasElement): CanvasRenderingContext2D {
+    return <CanvasRenderingContext2D>canvas.getContext('2d');
+  }
+
 }

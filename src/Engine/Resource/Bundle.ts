@@ -1,28 +1,25 @@
 import { Resource } from 'Engine/Resource/Resource';
 import { addToArray } from 'Engine/Utility/ArrayUtility';
 
-export class Bundle implements Resource {
+export class Bundle extends Resource {
 
-  private _isLoaded: boolean = false;
-
-  public get isLoaded(): boolean { return this._isLoaded; }
-
-  constructor(public readonly resources: ReadonlyArray<Resource> = []) {}
+  constructor(public readonly resources: ReadonlyArray<Resource> = []) {
+    super();
+  }
 
   public add(resource: Resource): void {
     if (addToArray(<Resource[]>this.resources, resource)) {
-      this._isLoaded = false;
+      this._isLoaded.next(false);
     }
   }
 
-  public load(): Promise<void> {
-    if (this._isLoaded) {
-      return Promise.resolve();
+  public async load(): Promise<void> {
+    if (this.isLoaded) {
+      return;
     }
 
-    return Promise.all(this.resources.map(resource => resource.load())).then(() => {
-      this._isLoaded = true;
-    });
+    await Promise.all(this.resources.map(resource => resource.load()));
+    this._isLoaded.next(true);
   }
 
 }

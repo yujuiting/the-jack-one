@@ -11,7 +11,7 @@ import { addToArray,
 /**
  * Scene manage game objects and resources.
  */
-export class Scene extends BaseObject implements Resource {
+export class Scene extends BaseObject {
 
   public readonly resources: Bundle = new Bundle();
 
@@ -32,6 +32,7 @@ export class Scene extends BaseObject implements Resource {
 
     if (gameObject instanceof Camera) {
       addToArray(this.cameras, gameObject);
+      return true;
     }
 
     return true;
@@ -55,15 +56,15 @@ export class Scene extends BaseObject implements Resource {
   }
 
   public fixedUpdate(alpha: number): void {
-    this.gameObjects.forEach(gameObject => gameObject.fixedUpdate(alpha));
+    this.gameObjects.forEachChildren(gameObject => gameObject.fixedUpdate(alpha));
   }
 
   public update(): void {
-    this.gameObjects.forEach(gameObject => gameObject.update());
+    this.gameObjects.forEachChildren(gameObject => gameObject.update());
   }
 
   public lateUpdate(): void {
-    this.gameObjects.forEach(gameObject => gameObject.lateUpdate());
+    this.gameObjects.forEachChildren(gameObject => gameObject.lateUpdate());
   }
 
   public render(ctx: CanvasRenderingContext2D): void {
@@ -74,7 +75,7 @@ export class Scene extends BaseObject implements Resource {
 
   public destroy(): void {
     super.destroy();
-    this.gameObjects.forEach(gameObject => gameObject.destroy());
+    this.gameObjects.forEachChildren(gameObject => gameObject.destroy());
   }
 
   public toString(): string {

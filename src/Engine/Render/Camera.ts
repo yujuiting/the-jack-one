@@ -20,17 +20,17 @@ export class Camera extends GameObject {
 
   public toWorldMatrix: Matrix2D = new Matrix2D();
 
+  public toViewportMatrix: Matrix2D = new Matrix2D();
+
   /**
-   * Default which layers should be render.
+   * Define which layers should be render.
    */
   public cullingMask: Layer = AllBuiltInLayer;
 
   /**
-   * Default which layers could trigger mouse event.
+   * Define which layers could trigger mouse event.
    */
   public eventMask: Layer = AllBuiltInLayer;
-
-  public fromWorldMatrix: Matrix2D = new Matrix2D();
 
   private canvas: HTMLCanvasElement = document.createElement('canvas');
 
@@ -41,27 +41,46 @@ export class Camera extends GameObject {
   constructor() {
     super();
     // TODO: how to manage camera size?
-    this.canvas.width = this.browser.window.innerWidth;
-    this.canvas.height = this.browser.window.innerHeight;
+    this.setSize(
+      this.browser.window.innerWidth,
+      this.browser.window.innerHeight
+    );
   }
 
   public setSize(width: number, height: number): void {
     // TODO: API
     this.canvas.width = width;
     this.canvas.height = height;
+    this.toViewportMatrix.reset();
+    /**
+     * Transform coordinate, reverse Y axis and set left-bottom as zero point..
+     */
+    this.toViewportMatrix.setTranslation(0, -height);
+    this.toViewportMatrix.setScaling(0, -1);
   }
 
   public render(ctx: CanvasRenderingContext2D, gameObjects: ReadonlyTree<GameObject>): void {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    gameObjects.forEach(gameObject => this.renderGameObject(gameObject));
+
+    /**
+     * TODO: optimization
+     * There should be some way to cahce which game object need to render
+     */
+    gameObjects.forEachChildren(gameObject => {
+      if (!(gameObject.layer & this.cullingMask)) {
+        return;
+      }
+
+      const renderer = <RendererComponent>gameObject.getComponent(<Class<RendererComponent>>RendererComponent);
+
+      if (!renderer) {
+        return;
+      }
+
+      renderer.render(this.ctx, this.toViewportMatrix);
+    });
 
     ctx.drawImage(this.canvas, 0, 0, this.canvas.width, this.canvas.height);
-  }
-
-  private renderGameObject(gameObject: GameObject): void {
-    // renderComponent of gameObject should be check before.
-    const renderComponent = <RendererComponent>gameObject.getComponent(<Class<RendererComponent>>RendererComponent);
-    renderComponent.render(this.ctx);
   }
 
 }

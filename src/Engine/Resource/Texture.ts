@@ -1,34 +1,85 @@
 import { Resource } from 'Engine/Resource/Resource';
 import { onceEvent } from 'Engine/Utility/DOM';
+import { BrowserDelegate } from 'Engine/Utility/BrowserDelegate';
 
 /**
  * Basic texture
  */
-export class Texture implements Resource {
+export class Texture extends Resource {
 
-  public readonly source: HTMLImageElement;
+  private source: HTMLImageElement;
 
-  private _isLoaded: boolean = false;
+  private browser: BrowserDelegate = BrowserDelegate.Get();
 
-  public get isLoaded(): boolean { return this._isLoaded; }
+  private canvas: HTMLCanvasElement = this.browser.document.createElement('canvas');
 
-  public get width(): number { return this.source.width; }
+  private ctx: CanvasRenderingContext2D = <CanvasRenderingContext2D>this.canvas.getContext('2d');
 
-  public get height(): number { return this.source.height; }
+  public get width(): number { return this.canvas.width; }
 
-  constructor(public readonly path: string) {
-    this.source = new Image();
-    this.source.src = path;
+  public get height(): number { return this.canvas.height; }
+
+  public get imageBitmap(): ImageBitmap|HTMLCanvasElement { return this.canvas; }
+
+  constructor(public readonly path: string,
+              imageData?: ImageData) {
+    super();
+    if (imageData) {
+      this.canvas.width = imageData.width;
+      this.canvas.height = imageData.height;
+      this.setImageData(imageData);
+    }
   }
 
   public load(): Promise<void> {
-    if (this._isLoaded) {
+    if (this.isLoaded) {
       return Promise.resolve();
     }
 
-    return onceEvent(this.source, 'load').then(e => {
-      this._isLoaded = true;
-    });
+    this.source = new Image();
+    this.source.src = this.path;
+    this.canvas.width = 0;
+    this.canvas.height = 0;
+
+    return onceEvent(this.source, 'load').then(e => this.onLoad());
+  }
+
+  public getImageData(sx: number = 0,
+                      sy: number = 0,
+                      sw: number = this.width,
+                      sh: number = this.height): ImageData {
+    return this.ctx.getImageData(sx, sy, sw, sh);
+  }
+
+  public setImageData(imageData: ImageData,
+                      dx: number = 0,
+                      dy: number = 0,
+                      dirtyX: number = 0,
+                      dirtyY: number = 0,
+                      dirtyWidth: number = imageData.width,
+                      dirtyHeight: number = imageData.height): void {
+    this.ctx.putImageData(
+      imageData,
+      dx, dy,
+      dirtyX, dirtyY,
+      dirtyWidth, dirtyHeight
+    );
+  }
+
+  public clone(): Texture {
+    return new Texture(this.path, this.getImageData());
+  }
+
+  private onLoad(): void {
+    this.canvas.width = this.source.width;
+    this.canvas.height = this.source.height;
+    this.ctx.drawImage(
+      this.source,
+      0, 0,
+      this.source.width,
+      this.source.height
+    );
+    this._isLoaded.next(true);
   }
 
 }
