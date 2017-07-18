@@ -71,13 +71,9 @@ export class Camera extends GameObject {
         return;
       }
 
-      const renderer = <RendererComponent>gameObject.getComponent(<Class<RendererComponent>>RendererComponent);
+      const renderers = gameObject.getComponents(<Class<RendererComponent>>RendererComponent);
 
-      if (!renderer) {
-        return;
-      }
-
-      renderer.render(this.ctx, this.toViewportMatrix);
+      renderers.forEach(renderer => renderer.render(this.ctx, this.toViewportMatrix));
     });
 
     ctx.drawImage(this.canvas, 0, 0, this.canvas.width, this.canvas.height);

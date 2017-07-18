@@ -127,7 +127,7 @@ export class Vector implements Recyclable {
   }
 
   public clone(): Vector {
-    return Vector.Get(this.x, this.y, this.z);
+    return new Vector(this.x, this.y, this.z);
   }
 
   public copy(other: Vector): void {

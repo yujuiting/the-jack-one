@@ -8,11 +8,23 @@ export class Bounds implements Recyclable {
 
   public extents: Vector = Vector.Get();
 
-  public readonly min: Vector = Vector.Get();
+  public get min(): Vector {
+    const min = this.center.clone();
+    min.subtract(this.extents);
+    return min;
+  }
 
-  public readonly max: Vector = Vector.Get();
+  public get max(): Vector {
+    const max = this.center.clone();
+    max.add(this.extents);
+    return max;
+  }
 
-  public readonly size: Vector = Vector.Get();
+  public get size(): Vector {
+    const size = this.extents.clone();
+    size.scale(2);
+    return size;
+  }
 
   private _canRecycle: boolean = false;
 
@@ -55,17 +67,6 @@ export class Bounds implements Recyclable {
     // TODO: handle border radius
 
     return true;
-  }
-
-  public calculate() {
-    this.min.copy(this.center);
-    this.min.subtract(this.extents);
-
-    this.max.copy(this.center);
-    this.max.subtract(this.extents);
-
-    this.size.copy(this.extents);
-    this.size.scale(2);
   }
 
   public destroy(): void {

@@ -1,4 +1,4 @@
-import { Screen } from 'Engine/Render/Screen';
+import { Screen } from 'Engine/Base/Screen';
 import { Scene } from 'Engine/Base/Scene';
 import { SceneManager } from 'Engine/Base/SceneManager';
 import { BrowserDelegate } from 'Engine/Utility/BrowserDelegate';

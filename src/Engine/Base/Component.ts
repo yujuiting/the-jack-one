@@ -9,6 +9,7 @@ export abstract class Component extends BaseObject {
 
   constructor(public host: GameObject) {
     super();
+    this.start();
   }
 
   public addComponent<T extends Component>(componentType: Class<T>): T {
@@ -25,6 +26,13 @@ export abstract class Component extends BaseObject {
 
   public getComponents<T extends Component>(componentType: Class<T>): T[] {
     return this.host.getComponents(componentType);
+  }
+
+  /**
+   * Call on component create.
+   */
+  public start(): void {
+    //
   }
 
   public toString(): string {

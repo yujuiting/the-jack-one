@@ -4,7 +4,7 @@ import { Tree, ReadonlyTree } from 'Engine/Utility/Tree';
 import { Pool } from 'Engine/Utility/Pool';
 import { Resource } from 'Engine/Resource/Resource';
 import { Bundle } from 'Engine/Resource/Bundle';
-import { Camera } from 'Engine/Render/Camera';
+import { Camera } from 'Engine/Base/Camera';
 import { addToArray,
          removeFromArray } from 'Engine/Utility/ArrayUtility';
 

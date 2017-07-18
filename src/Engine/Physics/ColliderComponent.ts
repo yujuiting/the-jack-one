@@ -6,18 +6,8 @@ import { RequireComponent } from 'Engine/Utility/Decorator/RequireComponent';
 @RequireComponent([RigidbodyComponent])
 export class ColliderComponent extends Component {
 
-  public bounds: Bounds;
+  public debug: boolean = false;
 
   protected rigidbody: RigidbodyComponent = <RigidbodyComponent>this.host.getComponent(RigidbodyComponent);
-
-  public reset(): void {
-    super.reset();
-    this.bounds = new Bounds();
-  }
-
-  public destroy(): void {
-    super.destroy();
-    this.bounds.destroy();
-  }
 
 }

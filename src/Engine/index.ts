@@ -9,7 +9,7 @@ import 'rxjs/add/operator/filter';
 import 'reflect-metadata';
 
 import { Engine } from 'Engine/Base/Engine';
-import { Screen } from 'Engine/Render/Screen';
+import { Screen } from 'Engine/Base/Screen';
 import { Time } from 'Engine/Time/Time';
 import { SceneManager } from 'Engine/Base/SceneManager';
 

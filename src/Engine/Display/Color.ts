@@ -91,7 +91,7 @@ export class Color {
   }
 
   public toString(): string {
-    return 'rgba(' + this.red + ',' + this.green + ',' + this.blue + ',' + this.alpha + ')';
+    return `rgba(${this.red},${this.green},${this.blue},${this.alpha})`;
   }
 
   public toHexString(): string {
@@ -100,19 +100,19 @@ export class Color {
     let b = this.blue.toString(16);
     let a = this.alpha.toString(16);
     if (r.length < 2) {
-      r = '0' + r;
+      r = `0${r}`;
     }
     if (g.length < 2) {
-      g = '0' + g;
+      g = `0${g}`;
     }
     if (b.length < 2) {
-      b = '0' + b;
+      b = `0${b}`;
     }
     if (a.length < 2) {
-      a = '0' + a;
+      a = `0${a}`;
     }
 
-    return '#' + r + g + b + a;
+    return `#${r}${g}${b}`;
   }
 
   public setAlpha(alpha: number): void {

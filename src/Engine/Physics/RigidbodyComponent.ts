@@ -36,7 +36,7 @@ export class RigidbodyComponent extends Component {
 
   public useGravity: boolean;
 
-  private forces: Vector[] = [];
+  private forces: Vector[];
 
   private engine: Engine = Engine.Get();
 
