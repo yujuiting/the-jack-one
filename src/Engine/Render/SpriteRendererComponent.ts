@@ -31,6 +31,8 @@ export class SpriteRendererComponent extends RendererComponent {
       this.transform.width,
       this.transform.height
     );
+
+    drawAt.destroy();
   }
 
 }

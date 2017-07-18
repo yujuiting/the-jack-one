@@ -66,6 +66,8 @@ export class SpriteSheetRendererComponent extends RendererComponent {
       this.transform.width,
       this.transform.height
     );
+
+    drawAt.destroy();
   }
 
 }
