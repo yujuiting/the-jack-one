@@ -34,7 +34,7 @@ export class SpriteSheetRendererComponent extends RendererComponent {
     this.sprites = this.spriteSheet.getSprites(this.sheetKey);
   }
 
-  public render(ctx: CanvasRenderingContext2D, toViewportMatrix: Matrix2D): void {
+  public render(ctx: CanvasRenderingContext2D, toScreenMatrix: Matrix2D): void {
 
     this.accumulator += this.time.deltaTime;
 
@@ -49,7 +49,7 @@ export class SpriteSheetRendererComponent extends RendererComponent {
     const sprite = this.sprites[this.currentIndex];
 
     const drawAt = this.transform.position.clone();
-    toViewportMatrix.multiplyToPoint(drawAt);
+    toScreenMatrix.multiplyToPoint(drawAt);
     drawAt.subtract(
       sprite.pivot.x * this.transform.width,
       sprite.pivot.y * this.transform.height

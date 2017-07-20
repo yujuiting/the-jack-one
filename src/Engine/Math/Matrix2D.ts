@@ -8,6 +8,8 @@ export class Matrix2D {
     [0, 0, 1]
   ];
 
+  private _save: number[][] = [];
+
   public get [0](): number[] { return this._value[0]; }
   public get [1](): number[] { return this._value[1]; }
   public get [2](): number[] { return this._value[2]; }
@@ -23,6 +25,22 @@ export class Matrix2D {
         }
       }
     }
+  }
+
+  public save(): void {
+    this._save = [
+      [this[0][0], this[0][1], this[0][2]],
+      [this[1][0], this[1][1], this[1][2]],
+      [this[2][0], this[2][1], this[2][2]]
+    ];
+  }
+
+  public restore(): void {
+    this._value = [
+      [this._save[0][0], this._save[0][1], this._save[0][2]],
+      [this._save[1][0], this._save[1][1], this._save[1][2]],
+      [this._save[2][0], this._save[2][1], this._save[2][2]]
+    ];
   }
 
   public reset(): void {
@@ -118,19 +136,16 @@ export class Matrix2D {
     const y = point.y;
     point.setTo(
       this[0][0] * x + this[0][1] * y + this[0][2] * 1,
-      this[1][0] * x + this[1][1] * y + this[1][2] * 1,
-      this[2][0] * x + this[2][1] * y + this[2][2] * 1
+      this[1][0] * x + this[1][1] * y + this[1][2] * 1
     );
   }
 
   public multiplyToVector(vector: Vector): void {
     const x = vector.x;
     const y = vector.y;
-    const z = vector.z;
     vector.setTo(
-      this[0][0] * x + this[0][1] * y + 0 * z,
-      this[1][0] * x + this[1][1] * y + 0 * z,
-      this[2][0] * x + this[2][1] * y + 1 * z
+      this[0][0] * x + this[0][1] * y + 0 * 0,
+      this[1][0] * x + this[1][1] * y + 0 * 0
     );
   }
 

@@ -6,6 +6,9 @@ import { RendererComponent } from 'Engine/Render/RendererComponent';
 import { Pool } from 'Engine/Utility/Pool';
 import { ReadonlyTree } from 'Engine/Utility/Tree';
 import { BrowserDelegate } from 'Engine/Utility/BrowserDelegate';
+import { Screen } from 'Engine/Base/Screen';
+import { Vector } from 'Engine/Math/Vector';
+import { Rect } from 'Engine/Math/Rect';
 
 /**
  * Camera
@@ -20,7 +23,7 @@ export class Camera extends GameObject {
 
   public toWorldMatrix: Matrix2D = new Matrix2D();
 
-  public toViewportMatrix: Matrix2D = new Matrix2D();
+  public toScreenMatrix: Matrix2D = new Matrix2D();
 
   /**
    * Define which layers should be render.
@@ -32,18 +35,22 @@ export class Camera extends GameObject {
    */
   public eventMask: Layer = AllBuiltInLayer;
 
+  public rect: Rect = new Rect();
+
   private canvas: HTMLCanvasElement = document.createElement('canvas');
 
   private ctx: CanvasRenderingContext2D = <CanvasRenderingContext2D>this.canvas.getContext('2d');
 
   private browser: BrowserDelegate = BrowserDelegate.Get();
 
+  private screen: Screen = Screen.Get();
+
   constructor() {
     super();
     // TODO: how to manage camera size?
     this.setSize(
-      this.browser.window.innerWidth,
-      this.browser.window.innerHeight
+      this.screen.width,
+      this.screen.height
     );
   }
 
@@ -51,16 +58,40 @@ export class Camera extends GameObject {
     // TODO: API
     this.canvas.width = width;
     this.canvas.height = height;
-    this.toViewportMatrix.reset();
+    this.toScreenMatrix.reset();
     /**
-     * Transform coordinate, reverse Y axis and set left-bottom as zero point..
+     * Transform coordinate, reverse Y axis and set center as zero point.
      */
-    this.toViewportMatrix.setTranslation(0, -height);
-    this.toViewportMatrix.setScaling(0, -1);
+    this.toScreenMatrix.setTranslation(-width / 2, -height / 2);
+    this.toScreenMatrix.setScaling(0, -1);
+    this.toScreenMatrix.save();
+
+    /**
+     * Set rect as size * 2, prevent remove target but its body still in camera.
+     */
+    this.rect.width = width * 2;
+    this.rect.height = height * 2;
+  }
+
+  public update(): void {
+    /**
+     * Perform camera movement.
+     */
+    const x = this.transform.position.x;
+    const y = this.transform.position.y;
+    this.rect.position.setTo(
+      x - this.rect.width / 2,
+      y - this.rect.height / 2
+    );
+    this.toScreenMatrix.restore();
+    this.toScreenMatrix.setTranslation(x, y);
   }
 
   public render(ctx: CanvasRenderingContext2D, gameObjects: ReadonlyTree<GameObject>): void {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+    const min = this.rect.min;
+    const max = this.rect.max;
 
     /**
      * TODO: optimization
@@ -71,12 +102,34 @@ export class Camera extends GameObject {
         return;
       }
 
+      /**
+       * Check object is in camera's view.
+       */
+      if (gameObject.transform.position.x < min.x ||
+          gameObject.transform.position.y < min.y ||
+          gameObject.transform.position.x > max.x ||
+          gameObject.transform.position.y > max.y) {
+        return;
+      }
+
       const renderers = gameObject.getComponents(<Class<RendererComponent>>RendererComponent);
 
-      renderers.forEach(renderer => renderer.render(this.ctx, this.toViewportMatrix));
+      renderers.forEach(renderer => renderer.render(this.ctx, this.toScreenMatrix));
     });
 
     ctx.drawImage(this.canvas, 0, 0, this.canvas.width, this.canvas.height);
+  }
+
+  public screenToWorld(point: Vector): Vector {
+    const result = point.clone();
+    this.toWorldMatrix.multiplyToPoint(result);
+    return result;
+  }
+
+  public worldToScreen(point: Vector): Vector {
+    const result = point.clone();
+    this.toScreenMatrix.multiplyToPoint(result);
+    return result;
   }
 
 }

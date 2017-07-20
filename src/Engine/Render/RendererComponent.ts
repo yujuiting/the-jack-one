@@ -12,7 +12,7 @@ export class RendererComponent extends Component {
 
   public readonly transform: TransformComponent = <TransformComponent>this.getComponent(TransformComponent);
 
-  public render(ctx: CanvasRenderingContext2D, toViewportMatrix: Matrix2D): void {
+  public render(ctx: CanvasRenderingContext2D, toScreenMatrix: Matrix2D): void {
     //
   }
 

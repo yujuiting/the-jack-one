@@ -7,9 +7,9 @@ export class Vector implements Recyclable {
 
   private static pool: Pool<Vector> = new Pool(Vector);
 
-  public static Get(x: number = 0, y: number = 0, z: number = 0): Vector {
+  public static Get(x: number = 0, y: number = 0): Vector {
     const vector = (<Vector>this.pool.get());
-    vector.setTo(x, y, z);
+    vector.setTo(x, y);
 
     return vector;
   }
@@ -27,13 +27,11 @@ export class Vector implements Recyclable {
   }
 
   constructor(public x: number = 0,
-              public y: number = 0,
-              public z: number = 0) {}
+              public y: number = 0) {}
 
-  public setTo(x: number, y: number, z: number = 0): void {
+  public setTo(x: number, y: number): void {
     this.x = x;
     this.y = y;
-    // this.z = z;
   }
 
   public add(other: Vector): void;
@@ -105,33 +103,30 @@ export class Vector implements Recyclable {
   }
 
   public reset(): void {
-    this.setTo(0, 0, 0);
+    this.setTo(0, 0);
   }
 
   public equalTo(other: Vector): boolean {
     return this.x === other.x
         && this.y === other.y;
-        // && this.z === other.z;
   }
 
   public greaterThan(other: Vector): boolean {
     return this.x > other.x
         && this.y > other.y;
-        // && this.z > other.z;
   }
 
   public lessThan(other: Vector): boolean {
     return this.x < other.x
         && this.y < other.y;
-        // && this.z < other.z;
   }
 
   public clone(): Vector {
-    return new Vector(this.x, this.y, this.z);
+    return new Vector(this.x, this.y);
   }
 
   public copy(other: Vector): void {
-    this.setTo(other.x, other.y, other.z);
+    this.setTo(other.x, other.y);
   }
 
   public destroy(): void {
@@ -139,7 +134,7 @@ export class Vector implements Recyclable {
   }
 
   public toString(): string {
-    return `Vector (${this.x},${this.y},${this.z})`;
+    return `Vector (${this.x},${this.y})`;
   }
 
 }

@@ -21,9 +21,14 @@ export class Scene extends BaseObject {
    */
   private readonly gameObjects: Tree<GameObject> = new Tree<GameObject>(<any>null);
 
-  private cameras: Camera[] = [Camera.MainCamera];
+  private cameras: Camera[] = [];
 
   public get isLoaded(): boolean { return this.resources.isLoaded; }
+
+  constructor() {
+    super();
+    this.add(Camera.MainCamera);
+  }
 
   public add(gameObject: GameObject): boolean {
     if (!this.gameObjects.add(gameObject.node)) {

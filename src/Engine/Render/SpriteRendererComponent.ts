@@ -8,13 +8,13 @@ export class SpriteRendererComponent extends RendererComponent {
 
   public sprite: Sprite|null;
 
-  public render(ctx: CanvasRenderingContext2D, toViewportMatrix: Matrix2D): void {
+  public render(ctx: CanvasRenderingContext2D, toScreenMatrix: Matrix2D): void {
     if (!this.sprite) {
       return;
     }
 
     const drawAt = this.transform.position.clone();
-    toViewportMatrix.multiplyToPoint(drawAt);
+    toScreenMatrix.multiplyToPoint(drawAt);
     drawAt.subtract(
       this.sprite.pivot.x * this.transform.width,
       this.sprite.pivot.y * this.transform.height
