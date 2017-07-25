@@ -6,8 +6,9 @@
   "scripts": {
     "build:client": "webpack",
     "serve:client": "webpack-dev-server",
-    "test": "nyc mocha --ui mocha-typescript -r source-map-support/register -r tsconfig-paths/register --compilers ts:ts-node/register src/**/*.spec.ts",
-    "watch": "nyc mocha --ui mocha-typescript -r source-map-support/register -r tsconfig-paths/register --compilers ts:ts-node/register src/**/*.spec.ts --watch"
+    "test": "nyc mocha --opts .mocha",
+    "watch": "nyc mocha --opts .mocha --watch",
+    "start": "npm run serve:client"
   },
   "author": "",
   "license": "ISC",

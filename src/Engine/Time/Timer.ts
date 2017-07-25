@@ -2,6 +2,7 @@ import { GameObject } from 'Engine/Base/GameObject';
 import { Time } from 'Engine/Time/Time';
 import { Subject } from 'rxjs/Subject';
 import { Observable } from 'rxjs/Observable';
+import { Inject } from 'Engine/Utility/Decorator/Inject';
 
 /**
  * Timer
@@ -14,7 +15,8 @@ export class Timer extends GameObject {
 
   private timeEvent: Subject<number> = new Subject<number>();
 
-  private time: Time = Time.Get();
+  @Inject(Time)
+  private time: Time;
 
   public get timeEvent$(): Observable<number> {
     return this.timeEvent.asObservable();

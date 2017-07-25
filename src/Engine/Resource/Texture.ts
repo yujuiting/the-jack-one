@@ -1,6 +1,7 @@
 import { Resource } from 'Engine/Resource/Resource';
 import { onceEvent } from 'Engine/Utility/DOM';
 import { BrowserDelegate } from 'Engine/Utility/BrowserDelegate';
+import { Inject } from 'Engine/Utility/Decorator/Inject';
 
 /**
  * Basic texture
@@ -9,7 +10,8 @@ export class Texture extends Resource {
 
   private source: HTMLImageElement;
 
-  private browser: BrowserDelegate = BrowserDelegate.Get();
+  @Inject(BrowserDelegate)
+  private browser: BrowserDelegate;
 
   private canvas: HTMLCanvasElement = this.browser.document.createElement('canvas');
 

@@ -3,6 +3,8 @@ import { MouseInput } from 'Engine/Input/MouseInput';
 import { TouchInput } from 'Engine/Input/TouchInput';
 import { listToArray } from 'Engine/Utility/DOM';
 import { Vector } from 'Engine/Math/Vector';
+import { Service } from 'Engine/Utility/Decorator/Service';
+import { Inject } from 'Engine/Utility/Decorator/Inject';
 
 // interface TouchEvent extends UIEvent {
 //     readonly altKey: boolean;
@@ -53,15 +55,8 @@ export interface PointerEvent {
   locations: ReadonlyArray<Vector>;
 }
 
+@Service()
 export class PointerInput {
-
-  public static Get(): PointerInput { return this.Singleton; }
-
-  private static Singleton: PointerInput = new PointerInput();
-
-  private mouseInput: MouseInput = MouseInput.Get();
-
-  private touchInput: TouchInput = TouchInput.Get();
 
   public get pointerStart$(): Observable<PointerEvent> {
     return Observable.merge(
@@ -84,11 +79,8 @@ export class PointerInput {
     );
   }
 
-  constructor() {
-    if (PointerInput.Get()) {
-      throw new Error('You should not instantiate PointerInput. Use `PointerInput.Get() instead of.`');
-    }
-  }
+  constructor(@Inject(MouseInput) private mouseInput: MouseInput,
+              @Inject(TouchInput) private touchInput: TouchInput) {}
 
   private parseMouseEvent(e: MouseEvent): PointerEvent {
     return {

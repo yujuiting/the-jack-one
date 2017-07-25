@@ -9,6 +9,7 @@ import { BrowserDelegate } from 'Engine/Utility/BrowserDelegate';
 import { Screen } from 'Engine/Base/Screen';
 import { Vector } from 'Engine/Math/Vector';
 import { Rect } from 'Engine/Math/Rect';
+import { Inject } from 'Engine/Utility/Decorator/Inject';
 
 /**
  * Camera
@@ -41,17 +42,19 @@ export class Camera extends GameObject {
 
   private ctx: CanvasRenderingContext2D = <CanvasRenderingContext2D>this.canvas.getContext('2d');
 
-  private browser: BrowserDelegate = BrowserDelegate.Get();
+  @Inject(BrowserDelegate)
+  private browser: BrowserDelegate;
 
-  private screen: Screen = Screen.Get();
+  @Inject(Screen)
+  private screen: Screen;
 
   constructor() {
     super();
     // TODO: how to manage camera size?
-    this.setSize(
+    setTimeout(() => this.setSize(
       this.screen.width,
       this.screen.height
-    );
+    ));
   }
 
   public setSize(width: number, height: number): void {

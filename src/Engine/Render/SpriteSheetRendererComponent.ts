@@ -6,6 +6,7 @@ import { Time } from 'Engine/Time/Time';
 import { UniqueComponent } from 'Engine/Utility/Decorator/UniqueComponent';
 import { RequireComponent } from 'Engine/Utility/Decorator/RequireComponent';
 import { Matrix2D } from 'Engine/Math/Matrix2D';
+import { Inject } from 'Engine/Utility/Decorator/Inject';
 
 @UniqueComponent()
 @RequireComponent([TransformComponent])
@@ -15,7 +16,8 @@ export class SpriteSheetRendererComponent extends RendererComponent {
 
   private sheetKey: string;
 
-  private time: Time = Time.Get();
+  @Inject(Time)
+  private time: Time;
 
   private currentIndex: number = 0;
 

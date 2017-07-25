@@ -6,6 +6,7 @@ import { Time } from 'Engine/Time/Time';
 import { ForceMode } from 'Engine/Physics/ForceMode';
 import { UniqueComponent } from 'Engine/Utility/Decorator/UniqueComponent';
 import { RequireComponent } from 'Engine/Utility/Decorator/RequireComponent';
+import { Inject } from 'Engine/Utility/Decorator/Inject';
 
 @UniqueComponent()
 @RequireComponent([TransformComponent])
@@ -38,9 +39,11 @@ export class RigidbodyComponent extends Component {
 
   private forces: Vector[];
 
-  private engine: Engine = Engine.Get();
+  @Inject(Engine)
+  private engine: Engine;
 
-  private time: Time = Time.Get();
+  @Inject(Time)
+  private time: Time;
 
   private transform: TransformComponent = <TransformComponent>this.getComponent(TransformComponent);
 

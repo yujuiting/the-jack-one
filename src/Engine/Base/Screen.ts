@@ -1,18 +1,15 @@
 import { BrowserDelegate } from 'Engine/Utility/BrowserDelegate';
+import { Service } from 'Engine/Utility/Decorator/Service';
+import { Inject } from 'Engine/Utility/Decorator/Inject';
 
+@Service()
 export class Screen {
 
-  public static Get(): Screen { return this.Singleton; }
+  private _width: number = 0;
 
-  private static Singleton: Screen = new Screen();
+  private _height: number = 0;
 
-  private _width: number;
-
-  private _height: number;
-
-  private _isFullScreen: boolean;
-
-  private browserDelegate: BrowserDelegate = BrowserDelegate.Get();
+  private _isFullScreen: boolean = false;
 
   get width(): number {
     return this._isFullScreen ?
@@ -28,13 +25,7 @@ export class Screen {
 
   get isFullScreen(): boolean { return this._isFullScreen; }
 
-  constructor() {
-    if (Screen.Get()) {
-      throw new Error('You should not instantiate Screen. Use `Screen.Get() instead of.`');
-    }
-
-    this.setFullScreen(false);
-  }
+  constructor(@Inject(BrowserDelegate) private browserDelegate: BrowserDelegate) {}
 
   public setFullScreen(enable: boolean = true): void {
     this._isFullScreen = enable;

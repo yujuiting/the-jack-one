@@ -52,15 +52,15 @@ export class GameObject extends BaseObject {
     return bucket;
   }
 
-  public readonly layer: Layer;
-
-  public readonly tags: Tag[];
+  public layer: Layer;
 
   public readonly transform: TransformComponent;
 
   public readonly node: Tree<GameObject>;
 
-  public readonly components: Component[];
+  private components: Component[];
+
+  private tags: Tag[];
 
   public get parent(): GameObject|null {
     return this.node.parent ? this.node.parent.data : null;
@@ -166,9 +166,9 @@ export class GameObject extends BaseObject {
 
   public reset(): void {
     super.reset();
-    (<any>this).components = [];
-    (<any>this).tags = [];
-    (<any>this).layer = BuiltInLayer.Default;
+    this.layer = BuiltInLayer.Default;
+    this.components = [];
+    this.tags = [];
     (<any>this).node = new Tree(this);
     (<any>this).transform = this.addComponent(TransformComponent);
   }

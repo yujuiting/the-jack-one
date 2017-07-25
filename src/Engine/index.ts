@@ -17,8 +17,4 @@ export * from 'Engine/Base/Component';
 export * from 'Engine/Base/Engine';
 export * from 'Engine/Base/GameObject';
 export * from 'Engine/Base/Scene';
-
-export const engine = Engine.Get();
-export const screen = Screen.Get();
-export const time = Time.Get();
-export const sceneManager = SceneManager.Get();
+export * from 'Engine/Base/Camera';

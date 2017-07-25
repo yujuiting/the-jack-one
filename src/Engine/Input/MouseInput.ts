@@ -1,13 +1,10 @@
 import { BrowserDelegate } from 'Engine/Utility/BrowserDelegate';
 import { Observable } from 'rxjs/Observable';
+import { Service } from 'Engine/Utility/Decorator/Service';
+import { Inject } from 'Engine/Utility/Decorator/Inject';
 
+@Service()
 export class MouseInput {
-
-  public static Get(): MouseInput { return this.Singleton; }
-
-  private static Singleton: MouseInput = new MouseInput();
-
-  private browserDelegate: BrowserDelegate = BrowserDelegate.Get();
 
   public get click$(): Observable<MouseEvent> { return this.browserDelegate.click$; }
 
@@ -19,10 +16,6 @@ export class MouseInput {
 
   public get wheel$(): Observable<MouseEvent> { return this.browserDelegate.wheel$; }
 
-  constructor() {
-    if (MouseInput.Get()) {
-      throw new Error('You should not instantiate MouseInput. Use `MouseInput.Get() instead of.`');
-    }
-  }
+  constructor(@Inject(BrowserDelegate) private browserDelegate: BrowserDelegate) {}
 
 }

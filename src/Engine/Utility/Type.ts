@@ -26,3 +26,9 @@ export const AllBuiltInLayer = BuiltInLayer.Background |
                                BuiltInLayer.UI;
 
 export type Pair<T> = [T, T];
+
+export type Token = Class<any> | Symbol | string;
+
+export function forward<T>(get: () => T): T {
+  return get();
+}
