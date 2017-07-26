@@ -1,14 +1,12 @@
 import { Observable } from 'rxjs/Observable';
 import { observeEvent } from 'Engine/Utility/DOM';
+import { Service } from 'Engine/Utility/Decorator/Service';
 
 /**
  * Browser API interface for internal usage.
  */
+@Service()
 export class BrowserDelegate {
-
-  public static Get(): BrowserDelegate { return this.Singleton; }
-
-  private static Singleton: BrowserDelegate = new BrowserDelegate();
 
   public readonly window: Window = window;
 
@@ -41,10 +39,6 @@ export class BrowserDelegate {
   public readonly touchMove$: Observable<TouchEvent> = observeEvent(this.window, 'touchmove');
 
   constructor() {
-    if (BrowserDelegate.Get()) {
-      throw new Error('You should not instantiate BrowserDelegate. Use `BrowserDelegate.Get() instead of.`');
-    }
-
     this.document.body.style.margin = '0';
     this.document.body.style.width = '100%';
     this.document.body.style.height = '100%';

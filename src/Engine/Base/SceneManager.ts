@@ -4,12 +4,10 @@ import { Scene } from 'Engine/Base/Scene';
 import { addToArray,
          removeFromArray,
          includeInArray } from 'Engine/Utility/ArrayUtility';
+import { Service } from 'Engine/Utility/Decorator/Service';
 
+@Service()
 export class SceneManager {
-
-  public static Get(): SceneManager { return this.Singleton; }
-
-  private static Singleton: SceneManager = new SceneManager();
 
   private readonly scenes: Scene[] = [];
 
@@ -48,12 +46,6 @@ export class SceneManager {
   public get sceneWillUnload$(): Observable<Scene> { return this.sceneWillUnload.asObservable(); }
 
   public get currentScene(): Scene { return this._currentScene; }
-
-  constructor() {
-    if (SceneManager.Get()) {
-      throw new Error('You should not instantiate sceneManager. Use `SceneManager.Get() instead of.`');
-    }
-  }
 
   public add(scene: Scene): boolean {
     if (!addToArray(this.scenes, scene)) {

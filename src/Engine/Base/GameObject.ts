@@ -6,6 +6,7 @@ import { addToArray,
          removeFromArray,
          includeInArray } from 'Engine/Utility/ArrayUtility';
 import { Tree } from 'Engine/Utility/Tree';
+import { runtime } from 'Engine/Base/runtime';
 
 /**
  * Basic class in engine
@@ -52,15 +53,15 @@ export class GameObject extends BaseObject {
     return bucket;
   }
 
-  public readonly layer: Layer;
-
-  public readonly tags: Tag[];
+  public layer: Layer;
 
   public readonly transform: TransformComponent;
 
   public readonly node: Tree<GameObject>;
 
-  public readonly components: Component[];
+  private components: Component[];
+
+  private tags: Tag[];
 
   public get parent(): GameObject|null {
     return this.node.parent ? this.node.parent.data : null;
@@ -100,8 +101,8 @@ export class GameObject extends BaseObject {
     }
   }
 
-  public addComponent<T extends Component>(componentType: Class<T>): T {
-    const component = new componentType(this);
+  public addComponent<T extends Component>(ComponentType: Class<T>): T {
+    const component = runtime.instantiate(ComponentType, this);
     this.components.push(component);
 
     return component;
@@ -166,9 +167,9 @@ export class GameObject extends BaseObject {
 
   public reset(): void {
     super.reset();
-    (<any>this).components = [];
-    (<any>this).tags = [];
-    (<any>this).layer = BuiltInLayer.Default;
+    this.layer = BuiltInLayer.Default;
+    this.components = [];
+    this.tags = [];
     (<any>this).node = new Tree(this);
     (<any>this).transform = this.addComponent(TransformComponent);
   }

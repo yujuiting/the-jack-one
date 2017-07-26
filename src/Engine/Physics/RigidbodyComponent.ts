@@ -1,3 +1,4 @@
+import { GameObject } from 'Engine/Base/GameObject';
 import { Component } from 'Engine/Base/Component';
 import { TransformComponent } from 'Engine/Display/TransformComponent';
 import { Vector } from 'Engine/Math/Vector';
@@ -6,6 +7,7 @@ import { Time } from 'Engine/Time/Time';
 import { ForceMode } from 'Engine/Physics/ForceMode';
 import { UniqueComponent } from 'Engine/Utility/Decorator/UniqueComponent';
 import { RequireComponent } from 'Engine/Utility/Decorator/RequireComponent';
+import { Inject } from 'Engine/Utility/Decorator/Inject';
 
 @UniqueComponent()
 @RequireComponent([TransformComponent])
@@ -38,11 +40,13 @@ export class RigidbodyComponent extends Component {
 
   private forces: Vector[];
 
-  private engine: Engine = Engine.Get();
-
-  private time: Time = Time.Get();
-
   private transform: TransformComponent = <TransformComponent>this.getComponent(TransformComponent);
+
+  constructor(host: GameObject,
+              @Inject(Engine) private engine: Engine,
+              @Inject(Time) private time: Time) {
+    super(host);
+  }
 
   public addForce(force: Vector, forceMode: ForceMode = ForceMode.Force): void {
     this.forces[forceMode].add(force);

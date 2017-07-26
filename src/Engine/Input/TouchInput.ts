@@ -1,13 +1,10 @@
 import { BrowserDelegate } from 'Engine/Utility/BrowserDelegate';
 import { Observable } from 'rxjs/Observable';
+import { Service } from 'Engine/Utility/Decorator/Service';
+import { Inject } from 'Engine/Utility/Decorator/Inject';
 
+@Service()
 export class TouchInput {
-
-  public static Get(): TouchInput { return this.Singleton; }
-
-  private static Singleton: TouchInput = new TouchInput();
-
-  private browserDelegate: BrowserDelegate = BrowserDelegate.Get();
 
   public get touchStart$(): Observable<TouchEvent> { return this.browserDelegate.touchStart$; }
 
@@ -17,10 +14,6 @@ export class TouchInput {
 
   public get touchMove$(): Observable<TouchEvent> { return this.browserDelegate.touchMove$; }
 
-  constructor() {
-    if (TouchInput.Get()) {
-      throw new Error('You should not instantiate TouchInput. Use `TouchInput.Get() instead of.`');
-    }
-  }
+  constructor(@Inject(BrowserDelegate) private browserDelegate: BrowserDelegate) {}
 
 }

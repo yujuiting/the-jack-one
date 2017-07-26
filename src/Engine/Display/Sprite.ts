@@ -3,6 +3,7 @@ import { Texture } from 'Engine/Resource/Texture';
 import { Vector } from 'Engine/Math/Vector';
 import { Rect } from 'Engine/Math/Rect';
 import { BrowserDelegate } from 'Engine/Utility/BrowserDelegate';
+import { Inject } from 'Engine/Utility/Decorator/Inject';
 
 export class Sprite {
 
@@ -21,7 +22,8 @@ export class Sprite {
    */
   public textureRect: Rect = new Rect();
 
-  private browser: BrowserDelegate = BrowserDelegate.Get();
+  @Inject(BrowserDelegate)
+  private browser: BrowserDelegate;
 
   private canvas: HTMLCanvasElement = this.browser.createCanvas();
 

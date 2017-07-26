@@ -1,3 +1,4 @@
+import { GameObject } from 'Engine/Base/GameObject';
 import { RendererComponent } from 'Engine/Render/RendererComponent';
 import { TransformComponent } from 'Engine/Display/TransformComponent';
 import { Sprite } from 'Engine/Display/Sprite';
@@ -6,6 +7,7 @@ import { Time } from 'Engine/Time/Time';
 import { UniqueComponent } from 'Engine/Utility/Decorator/UniqueComponent';
 import { RequireComponent } from 'Engine/Utility/Decorator/RequireComponent';
 import { Matrix2D } from 'Engine/Math/Matrix2D';
+import { Inject } from 'Engine/Utility/Decorator/Inject';
 
 @UniqueComponent()
 @RequireComponent([TransformComponent])
@@ -15,13 +17,16 @@ export class SpriteSheetRendererComponent extends RendererComponent {
 
   private sheetKey: string;
 
-  private time: Time = Time.Get();
-
   private currentIndex: number = 0;
 
   private sprites: ReadonlyArray<Sprite>;
 
   private accumulator: number = 0;
+
+  constructor(host: GameObject,
+              @Inject(Time) private time: Time) {
+    super(host);
+  }
 
   public setSpriteSheet(spriteSheet: SpriteSheet, defaultKey: string): void {
     this.spriteSheet = spriteSheet;

@@ -5,24 +5,11 @@ import { BrowserDelegate } from 'Engine/Utility/BrowserDelegate';
 import { Time } from 'Engine/Time/Time';
 import { ReadonlyTree } from 'Engine/Utility/Tree';
 import { Vector } from 'Engine/Math/Vector';
+import { Service } from 'Engine/Utility/Decorator/Service';
+import { Inject } from 'Engine/Utility/Decorator/Inject';
 
-/**
- * Engine
- * Singleton
- */
+@Service()
 export class Engine {
-
-  public static Get(): Engine { return this.Singleton; }
-
-  private static Singleton: Engine = new Engine();
-
-  public readonly screen: Screen = Screen.Get();
-
-  public readonly time: Time = Time.Get();
-
-  public readonly sceneManager: SceneManager = SceneManager.Get();
-
-  private readonly browser: BrowserDelegate = BrowserDelegate.Get();
 
   public readonly gravity: Vector = Vector.Get(0, 9.8);
 
@@ -44,10 +31,10 @@ export class Engine {
 
   public get isPaused(): boolean { return this._isPaused; }
 
-  constructor() {
-    if (Engine.Get()) {
-      throw new Error('You should not instantiate engine. Use `Engine.Get() instead of.`');
-    }
+  constructor(@Inject(Screen)           public readonly screen: Screen,
+              @Inject(Time)             public readonly time: Time,
+              @Inject(SceneManager)     public readonly sceneManager: SceneManager,
+              @Inject(BrowserDelegate)  private readonly browser: BrowserDelegate) {
   }
 
   public initialize(container: HTMLElement): Promise<void> {

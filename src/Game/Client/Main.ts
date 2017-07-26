@@ -1,15 +1,24 @@
 import { Subscription } from 'rxjs/Subscription';
-import { engine,
-         sceneManager,
-         GameObject,
-         Scene } from 'Engine';
+
+import { runtime } from 'Engine/Base/runtime';
+import { Engine } from 'Engine/Base/Engine';
+import { GameObject } from 'Engine/Base/GameObject';
+import { Camera, MainCamera } from 'Engine/Base/Camera';
+import { SceneManager } from 'Engine/Base/SceneManager';
+import { Scene } from 'Engine/Base/Scene';
 import { Texture } from 'Engine/Resource/Texture';
+import { Sprite } from 'Engine/Display/Sprite';
 import { SpriteSheet } from 'Engine/Display/SpriteSheet';
+import { SpriteRendererComponent } from 'Engine/Render/SpriteRendererComponent';
 import { SpriteSheetRendererComponent } from 'Engine/Render/SpriteSheetRendererComponent';
 import { KeyboardInput } from 'Engine/Input/KeyboardInput';
 import { RigidbodyComponent } from 'Engine/Physics/RigidbodyComponent';
 import { Vector } from 'Engine/Math/Vector';
 import { TransformComponent } from 'Engine/Display/TransformComponent';
+import { LineRendererComponent } from 'Engine/Render/LineRendererComponent';
+import { BoxColliderComponent } from 'Engine/Physics/BoxColliderComponent';
+import { CircleRendererComponent } from 'Engine/Render/CircleRendererComponent';
+import { Inject } from 'Engine/Utility/Decorator/Inject';
 
 const texture = new Texture('Assets/jack.idle.png');
 const spriteSheet = new SpriteSheet(texture, 1000 / 12, {
@@ -19,26 +28,42 @@ const spriteSheet = new SpriteSheet(texture, 1000 / 12, {
     frameCount: 22
   }
 });
+// const texture2 = new Texture('Assets/image.jpg');
+// const sprite = new Sprite(texture2);
 
 class Jack extends GameObject {
 
   private rigidbody: RigidbodyComponent = this.addComponent(RigidbodyComponent);
 
   private renderer: SpriteSheetRendererComponent = this.addComponent(SpriteSheetRendererComponent);
+  // private renderer: SpriteRendererComponent = this.addComponent(SpriteRendererComponent);
 
   private subscriptions: Subscription[] = [];
+
+  @Inject(KeyboardInput)
+  private keyboardInput: KeyboardInput;
+
+  @Inject(Engine)
+  private engine: Engine;
 
   constructor() {
     super();
 
+    this.transform.width = 83;
+    this.transform.height = 139;
+    this.transform.position.setTo(0, 0);
+
     this.renderer.setSpriteSheet(spriteSheet, 'idle');
+    // this.renderer.sprite = sprite;
 
-    const keyboardInput = KeyboardInput.Get();
+    const boxCollider = this.addComponent(BoxColliderComponent);
+    boxCollider.bounds.extents.setTo(40, 70);
+    boxCollider.debug = true;
 
-    const keydownSubscription = keyboardInput.keyDown$.subscribe(e =>
+    const keydownSubscription = this.keyboardInput.keyDown$.subscribe(e =>
       this.onKeydown(e));
 
-    const keyupSubscription = keyboardInput.keyUp$.subscribe(() =>
+    const keyupSubscription = this.keyboardInput.keyUp$.subscribe(() =>
       this.rigidbody.velocity.setTo(0, 0));
 
     this.subscriptions.push(keydownSubscription, keyupSubscription);
@@ -50,35 +75,42 @@ class Jack extends GameObject {
   }
 
   private onKeydown(e: KeyboardEvent): void {
+    const camera = <Camera>runtime.get(MainCamera);
+
     if (e.key === 'a') {
-      this.rigidbody.velocity.x = -100;
+      // this.rigidbody.velocity.x = -100;
+      camera.transform.position.x += -10;
     }
     if (e.key === 'd') {
-      this.rigidbody.velocity.x = 100;
+      // this.rigidbody.velocity.x = 100;
+      camera.transform.position.x += 10;
     }
     if (e.key === 'w') {
-      this.rigidbody.velocity.y = -100;
+      // this.rigidbody.velocity.y = 100;
+      camera.transform.position.y += 10;
     }
     if (e.key === 's') {
-      this.rigidbody.velocity.y = 100;
+      // this.rigidbody.velocity.y = -100;
+      camera.transform.position.y += -10;
     }
     if (e.key === ' ') {
-      if (engine.isPaused) {
-        engine.resume();
+      if (this.engine.isPaused) {
+        this.engine.resume();
       } else {
-        engine.pause();
+        this.engine.pause();
       }
     }
   }
 
 }
 
-const mainScene = new Scene();
-sceneManager.add(mainScene);
+const mainScene = runtime.instantiate(Scene);
+(<SceneManager>runtime.get(SceneManager)).add(mainScene);
 
 mainScene.resources.add(texture);
+// mainScene.resources.add(texture2);
 
-const jack = new Jack();
-mainScene.add(jack);
-
-engine.initialize(document.body);
+runtime.bootstrap(document.body).then(() => {
+  const jack = new Jack();
+  mainScene.add(jack);
+});

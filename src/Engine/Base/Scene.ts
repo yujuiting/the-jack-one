@@ -4,9 +4,10 @@ import { Tree, ReadonlyTree } from 'Engine/Utility/Tree';
 import { Pool } from 'Engine/Utility/Pool';
 import { Resource } from 'Engine/Resource/Resource';
 import { Bundle } from 'Engine/Resource/Bundle';
-import { Camera } from 'Engine/Base/Camera';
+import { Camera, MainCamera } from 'Engine/Base/Camera';
 import { addToArray,
          removeFromArray } from 'Engine/Utility/ArrayUtility';
+import { Inject } from 'Engine/Utility/Decorator/Inject';
 
 /**
  * Scene manage game objects and resources.
@@ -25,9 +26,9 @@ export class Scene extends BaseObject {
 
   public get isLoaded(): boolean { return this.resources.isLoaded; }
 
-  constructor() {
+  constructor(@Inject(MainCamera) mainCamera: Camera) {
     super();
-    this.add(Camera.MainCamera);
+    this.add(mainCamera);
   }
 
   public add(gameObject: GameObject): boolean {
