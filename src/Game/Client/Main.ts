@@ -1,9 +1,11 @@
 import { Subscription } from 'rxjs/Subscription';
-import { GameObject,
-         Scene,
-         Camera,
-         Engine } from 'Engine';
+
+import { runtime } from 'Engine/Base/runtime';
+import { Engine } from 'Engine/Base/Engine';
+import { GameObject } from 'Engine/Base/GameObject';
+import { Camera, MainCamera } from 'Engine/Base/Camera';
 import { SceneManager } from 'Engine/Base/SceneManager';
+import { Scene } from 'Engine/Base/Scene';
 import { Texture } from 'Engine/Resource/Texture';
 import { Sprite } from 'Engine/Display/Sprite';
 import { SpriteSheet } from 'Engine/Display/SpriteSheet';
@@ -17,7 +19,6 @@ import { LineRendererComponent } from 'Engine/Render/LineRendererComponent';
 import { BoxColliderComponent } from 'Engine/Physics/BoxColliderComponent';
 import { CircleRendererComponent } from 'Engine/Render/CircleRendererComponent';
 import { Inject } from 'Engine/Utility/Decorator/Inject';
-import { providerRegistry } from 'Engine/Utility/ProviderRegistry';
 
 const texture = new Texture('Assets/jack.idle.png');
 const spriteSheet = new SpriteSheet(texture, 1000 / 12, {
@@ -74,7 +75,7 @@ class Jack extends GameObject {
   }
 
   private onKeydown(e: KeyboardEvent): void {
-    const camera = Camera.MainCamera;
+    const camera = <Camera>runtime.get(MainCamera);
 
     if (e.key === 'a') {
       // this.rigidbody.velocity.x = -100;
@@ -103,13 +104,13 @@ class Jack extends GameObject {
 
 }
 
-const mainScene = new Scene();
-providerRegistry.get<SceneManager>(SceneManager).add(mainScene);
+const mainScene = runtime.instantiate(Scene);
+(<SceneManager>runtime.get(SceneManager)).add(mainScene);
 
 mainScene.resources.add(texture);
 // mainScene.resources.add(texture2);
 
-providerRegistry.get<Engine>(Engine).initialize(document.body);
-
-const jack = new Jack();
-mainScene.add(jack);
+runtime.bootstrap(document.body).then(() => {
+  const jack = new Jack();
+  mainScene.add(jack);
+});

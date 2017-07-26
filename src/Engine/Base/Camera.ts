@@ -10,14 +10,15 @@ import { Screen } from 'Engine/Base/Screen';
 import { Vector } from 'Engine/Math/Vector';
 import { Rect } from 'Engine/Math/Rect';
 import { Inject } from 'Engine/Utility/Decorator/Inject';
-import { providerRegistry } from 'Engine/Utility/ProviderRegistry';
+import { Service } from 'Engine/Utility/Decorator/Service';
+
+export const MainCamera = Symbol('MainCamera');
 
 /**
  * Camera
  */
+@Service(MainCamera)
 export class Camera extends GameObject {
-
-  public static readonly MainCamera: Camera = providerRegistry.instantiate(Camera);
 
   public aspect: number = 16 / 9;
 
