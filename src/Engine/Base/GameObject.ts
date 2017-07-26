@@ -6,6 +6,7 @@ import { addToArray,
          removeFromArray,
          includeInArray } from 'Engine/Utility/ArrayUtility';
 import { Tree } from 'Engine/Utility/Tree';
+import { providerRegistry } from 'Engine/Utility/ProviderRegistry';
 
 /**
  * Basic class in engine
@@ -100,8 +101,8 @@ export class GameObject extends BaseObject {
     }
   }
 
-  public addComponent<T extends Component>(componentType: Class<T>): T {
-    const component = new componentType(this);
+  public addComponent<T extends Component>(ComponentType: Class<T>): T {
+    const component = providerRegistry.instantiate(ComponentType, this);
     this.components.push(component);
 
     return component;

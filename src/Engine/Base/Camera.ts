@@ -10,13 +10,14 @@ import { Screen } from 'Engine/Base/Screen';
 import { Vector } from 'Engine/Math/Vector';
 import { Rect } from 'Engine/Math/Rect';
 import { Inject } from 'Engine/Utility/Decorator/Inject';
+import { providerRegistry } from 'Engine/Utility/ProviderRegistry';
 
 /**
  * Camera
  */
 export class Camera extends GameObject {
 
-  public static readonly MainCamera: Camera = new Camera();
+  public static readonly MainCamera: Camera = providerRegistry.instantiate(Camera);
 
   public aspect: number = 16 / 9;
 
@@ -42,13 +43,8 @@ export class Camera extends GameObject {
 
   private ctx: CanvasRenderingContext2D = <CanvasRenderingContext2D>this.canvas.getContext('2d');
 
-  @Inject(BrowserDelegate)
-  private browser: BrowserDelegate;
-
-  @Inject(Screen)
-  private screen: Screen;
-
-  constructor() {
+  constructor(@Inject(BrowserDelegate) private browser: BrowserDelegate,
+              @Inject(Screen) private screen: Screen) {
     super();
     // TODO: how to manage camera size?
     setTimeout(() => this.setSize(

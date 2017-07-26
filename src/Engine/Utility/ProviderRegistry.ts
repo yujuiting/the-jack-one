@@ -3,6 +3,8 @@ import { Class, Token } from 'Engine/Utility/Type';
 
 const DI_DEPENDENCIES = Symbol('DI_DEPENDENCIES');
 
+type DependencyDescriptor = { token: Token, index: number };
+
 export class ProviderRegistry {
 
   private readonly service: Map<Token, any> = new Map();
@@ -26,23 +28,24 @@ export class ProviderRegistry {
   }
 
   public registerDependency(target: Class<any>, token: Token, index: number): void {
-    const dependencies: Token[] = Reflect.getMetadata(DI_DEPENDENCIES, target) || [];
-    dependencies[index] = token;
+    const dependencies: DependencyDescriptor[] = Reflect.getMetadata(DI_DEPENDENCIES, target) || [];
+    dependencies.push({ token, index });
     Reflect.defineMetadata(DI_DEPENDENCIES, dependencies, target);
   }
 
-  public instantiate<T>(InstanceType: Class<T>): T {
-    const dependencies: Token[] =  Reflect.getMetadata(DI_DEPENDENCIES, InstanceType) || [];
-    const services: any[] = dependencies.map(dependency => {
-      const service = this.get(dependency);
+  public instantiate<T>(InstanceType: Class<T>, ...args: any[]): T {
+    const dependencies: DependencyDescriptor[] =  Reflect.getMetadata(DI_DEPENDENCIES, InstanceType) || [];
+    dependencies.sort((a, b) => a.index - b.index);
+    dependencies.forEach(dependency => {
+      const service = this.get(dependency.token);
 
       if (!service) {
-        console.warn(`Not found dependency ${dependency}`);
+        throw new Error(`Not found dependency ${dependency}`);
       }
 
-      return service;
+      args.splice(dependency.index, 0, service);
     });
-    return new InstanceType(...services);
+    return new InstanceType(...args);
   }
 
 }

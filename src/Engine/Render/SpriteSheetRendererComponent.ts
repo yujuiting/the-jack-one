@@ -1,3 +1,4 @@
+import { GameObject } from 'Engine/Base/GameObject';
 import { RendererComponent } from 'Engine/Render/RendererComponent';
 import { TransformComponent } from 'Engine/Display/TransformComponent';
 import { Sprite } from 'Engine/Display/Sprite';
@@ -16,14 +17,16 @@ export class SpriteSheetRendererComponent extends RendererComponent {
 
   private sheetKey: string;
 
-  @Inject(Time)
-  private time: Time;
-
   private currentIndex: number = 0;
 
   private sprites: ReadonlyArray<Sprite>;
 
   private accumulator: number = 0;
+
+  constructor(host: GameObject,
+              @Inject(Time) private time: Time) {
+    super(host);
+  }
 
   public setSpriteSheet(spriteSheet: SpriteSheet, defaultKey: string): void {
     this.spriteSheet = spriteSheet;

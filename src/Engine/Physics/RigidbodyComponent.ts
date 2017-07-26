@@ -1,3 +1,4 @@
+import { GameObject } from 'Engine/Base/GameObject';
 import { Component } from 'Engine/Base/Component';
 import { TransformComponent } from 'Engine/Display/TransformComponent';
 import { Vector } from 'Engine/Math/Vector';
@@ -39,13 +40,13 @@ export class RigidbodyComponent extends Component {
 
   private forces: Vector[];
 
-  @Inject(Engine)
-  private engine: Engine;
-
-  @Inject(Time)
-  private time: Time;
-
   private transform: TransformComponent = <TransformComponent>this.getComponent(TransformComponent);
+
+  constructor(host: GameObject,
+              @Inject(Engine) private engine: Engine,
+              @Inject(Time) private time: Time) {
+    super(host);
+  }
 
   public addForce(force: Vector, forceMode: ForceMode = ForceMode.Force): void {
     this.forces[forceMode].add(force);

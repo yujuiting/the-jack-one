@@ -8,8 +8,12 @@ class Foo { prop: string; }
 class Foo2 { prop: string; }
 
 class Bar {
-  prop: string;
   constructor(public foo: Foo) {}
+}
+
+class Lala {
+  constructor(public prop: string,
+              public foo: Foo) {}
 }
 
 @suite class ProviderRegistryTestSuite {
@@ -36,6 +40,15 @@ class Bar {
     const bar = this.serviceRegistry.instantiate(Bar);
     expect(bar).to.be.instanceOf(Bar);
     expect(bar.foo).to.be.instanceOf(Foo);
+  }
+
+  @test 'should pass arguments to constructor' () {
+    this.serviceRegistry.provide(Foo);
+    this.serviceRegistry.registerDependency(Lala, Foo, 1);
+    const lala = this.serviceRegistry.instantiate(Lala, 'my argument');
+    expect(lala).to.be.instanceOf(Lala);
+    expect(lala.foo).to.be.instanceOf(Foo);
+    expect(lala.prop).to.equal('my argument');
   }
 
 }
