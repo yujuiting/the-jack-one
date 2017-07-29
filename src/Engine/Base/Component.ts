@@ -20,7 +20,7 @@ export abstract class Component extends BaseObject {
     return this.host.removeComponent(component);
   }
 
-  public getComponent<T extends Component>(componentType: Class<T>): T|null {
+  public getComponent<T extends Component>(componentType: Class<T>): T|undefined {
     return this.host.getComponent(componentType);
   }
 

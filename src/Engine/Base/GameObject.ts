@@ -115,7 +115,7 @@ export class GameObject extends BaseObject {
     component.destroy();
   }
 
-  public getComponent<T extends Component>(componentType: Class<T>): T|null {
+  public getComponent<T extends Component>(componentType: Class<T>): T|undefined {
     return <T>this.components.find(component => component instanceof componentType);
   }
 
