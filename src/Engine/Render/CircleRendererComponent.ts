@@ -1,5 +1,5 @@
 import { RendererComponent } from 'Engine/Render/RendererComponent';
-import { Matrix2D } from 'Engine/Math/Matrix2D';
+import { Matrix } from 'Engine/Math/Matrix';
 import { Vector } from 'Engine/Math/Vector';
 import { Color } from 'Engine/Display/Color';
 
@@ -19,7 +19,7 @@ export class CircleRendererComponent extends RendererComponent {
 
   public anticlockwise: boolean = false;
 
-  public render(ctx: CanvasRenderingContext2D, toViewportMatrix: Matrix2D): void {
+  public render(ctx: CanvasRenderingContext2D, toViewportMatrix: Matrix): void {
     ctx.save();
 
     ctx.lineWidth = this.lineWidth;

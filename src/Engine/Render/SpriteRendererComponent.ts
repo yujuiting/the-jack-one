@@ -1,14 +1,14 @@
 import { RendererComponent } from 'Engine/Render/RendererComponent';
 import { Sprite } from 'Engine/Display/Sprite';
 import { UniqueComponent } from 'Engine/Utility/Decorator/UniqueComponent';
-import { Matrix2D } from 'Engine/Math/Matrix2D';
+import { Matrix } from 'Engine/Math/Matrix';
 
 @UniqueComponent()
 export class SpriteRendererComponent extends RendererComponent {
 
   public sprite: Sprite|null;
 
-  public render(ctx: CanvasRenderingContext2D, toScreenMatrix: Matrix2D): void {
+  public render(ctx: CanvasRenderingContext2D, toScreenMatrix: Matrix): void {
     if (!this.sprite) {
       return;
     }

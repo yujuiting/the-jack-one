@@ -1,5 +1,5 @@
 import { RendererComponent } from 'Engine/Render/RendererComponent';
-import { Matrix2D } from 'Engine/Math/Matrix2D';
+import { Matrix } from 'Engine/Math/Matrix';
 import { Vector } from 'Engine/Math/Vector';
 import { Color } from 'Engine/Display/Color';
 import { addToArray, removeFromArray } from 'Engine/Utility/ArrayUtility';
@@ -29,7 +29,7 @@ export class LineRendererComponent extends RendererComponent {
     this._points.splice(0, this._points.length);
   }
 
-  public render(ctx: CanvasRenderingContext2D, toScreenMatrix: Matrix2D): void {
+  public render(ctx: CanvasRenderingContext2D, toScreenMatrix: Matrix): void {
     const points = this._points.map(point => point.clone());
 
     points.forEach(point => point.add(this.transform.position));

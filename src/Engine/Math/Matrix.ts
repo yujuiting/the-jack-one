@@ -1,6 +1,6 @@
 import { Vector } from 'Engine/Math/Vector';
 
-export class Matrix2D {
+export class Matrix {
 
   private _value: number[][] = [
     [1, 0, 0],
@@ -52,7 +52,7 @@ export class Matrix2D {
   }
 
   public setRotatation(radian: number): void {
-    const rotation = new Matrix2D([
+    const rotation = new Matrix([
       [Math.cos(radian), -Math.sin(radian)],
       [Math.sin(radian),  Math.cos(radian)]
     ]);
@@ -62,14 +62,14 @@ export class Matrix2D {
   public setTranslation(position: Vector): void;
   public setTranslation(x: number, y: number): void;
   public setTranslation(positionOrX: Vector|number, y?: number): void {
-    let translation: Matrix2D;
+    let translation: Matrix;
     if (positionOrX instanceof Vector) {
-      translation = new Matrix2D([
+      translation = new Matrix([
         [1, 0, positionOrX.x],
         [0, 1, positionOrX.y]
       ]);
     } else if (y !== void 0) {
-      translation = new Matrix2D([
+      translation = new Matrix([
         [1, 0, positionOrX],
         [0, 1, y]
       ]);
@@ -83,14 +83,14 @@ export class Matrix2D {
   public setScaling(magnification: Vector): void;
   public setScaling(x: number, y: number): void;
   public setScaling(magnificationOrX: Vector|number, y?: number): void {
-    let scaling: Matrix2D;
+    let scaling: Matrix;
     if (magnificationOrX instanceof Vector) {
-      scaling = new Matrix2D([
+      scaling = new Matrix([
         [magnificationOrX.x, 0],
         [0, magnificationOrX.y]
       ]);
     } else if (y !== void 0) {
-      scaling = new Matrix2D([
+      scaling = new Matrix([
         [magnificationOrX, 0],
         [0, y]
       ]);
@@ -101,7 +101,7 @@ export class Matrix2D {
     this.multiply(scaling);
   }
 
-  public multiply(other: Matrix2D): void {
+  public multiply(other: Matrix): void {
     const a1 = this[0][0];
     const b1 = this[0][1];
     const c1 = this[0][2];
@@ -149,8 +149,8 @@ export class Matrix2D {
     );
   }
 
-  public clone(): Matrix2D {
-    return new Matrix2D(this._value);
+  public clone(): Matrix {
+    return new Matrix(this._value);
   }
 
   public toString(): string {

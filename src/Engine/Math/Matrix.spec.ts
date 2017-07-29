@@ -1,13 +1,13 @@
 // tslint:disable member-access
 import { expect } from 'chai';
 import { suite, test } from 'mocha-typescript';
-import { Matrix2D } from './Matrix2D';
+import { Matrix } from './Matrix';
 import { Vector } from './Vector';
 
-@suite class Matrix2DTestSuite {
+@suite class MatrixTestSuite {
 
   @test 'should has default value' () {
-    const m = new Matrix2D();
+    const m = new Matrix();
     expect(m[0][0]).to.equal(1);
     expect(m[0][1]).to.equal(0);
     expect(m[1][0]).to.equal(0);
@@ -15,7 +15,7 @@ import { Vector } from './Vector';
   }
 
   @test 'should write default value' () {
-    const m = new Matrix2D([
+    const m = new Matrix([
       [1, 2],
       [3, 4]
     ]);
@@ -26,7 +26,7 @@ import { Vector } from './Vector';
   }
 
   @test 'should set rotation' () {
-    const m = new Matrix2D();
+    const m = new Matrix();
     m.setRotatation(Math.PI); // rotate 180 degree
     expect(m[0][0]).to.equal(-1);
     expect(m[0][1]).to.closeTo(0, 1e-10);
@@ -35,7 +35,7 @@ import { Vector } from './Vector';
   }
 
   @test 'should set translation' () {
-    const m = new Matrix2D();
+    const m = new Matrix();
     const v = new Vector(10, 5);
     m.setTranslation(v);
     expect(m[0][0]).to.equal(1);
@@ -50,7 +50,7 @@ import { Vector } from './Vector';
   }
 
   @test 'should set scaling' () {
-    const m = new Matrix2D();
+    const m = new Matrix();
     const v = new Vector(2, 3);
     m.setScaling(v);
     expect(m[0][0]).to.equal(v.x);
@@ -60,11 +60,11 @@ import { Vector } from './Vector';
   }
 
   @test 'should multiply to self' () {
-    const m1 = new Matrix2D([
+    const m1 = new Matrix([
       [1, 2],
       [3, 4]
     ]);
-    const m2 = new Matrix2D([
+    const m2 = new Matrix([
       [5, 6],
       [7, 8]
     ]);
@@ -76,7 +76,7 @@ import { Vector } from './Vector';
   }
 
   @test 'should multiply to pointer' () {
-    const m = new Matrix2D();
+    const m = new Matrix();
     const p = new Vector(4, 4);
     m.setTranslation(new Vector(3, 3));
     m.setScaling(new Vector(2, 2));
@@ -86,7 +86,7 @@ import { Vector } from './Vector';
   }
 
   @test 'should multiply to vector' () {
-    const m = new Matrix2D();
+    const m = new Matrix();
     const v = new Vector(4, 0);
     m.setTranslation(new Vector(3, 3)); // should not perform translation
     m.setScaling(new Vector(2, 2));
@@ -97,7 +97,7 @@ import { Vector } from './Vector';
   }
 
   @test 'should clone' () {
-    const m1 = new Matrix2D([
+    const m1 = new Matrix([
       [1, 2],
       [3, 4]
     ]);
@@ -110,7 +110,7 @@ import { Vector } from './Vector';
   }
 
   @test 'should to string' () {
-    const m = new Matrix2D([
+    const m = new Matrix([
       [1, 2],
       [3, 4]
     ]);
