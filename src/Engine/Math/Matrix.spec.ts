@@ -118,7 +118,27 @@ import { Vector } from './Vector';
     expect(m1[1][1]).to.equal(m2[1][1]);
   }
 
-  @test 'should update inverse' () {
+  @test 'should invert from source' () {
+    const m = new Matrix([
+      [1, 2],
+      [3, 4]
+    ]);
+
+    m.setTranslation(new Vector(5, 6));
+
+    const i = new Matrix().invertFrom(m);
+
+    expect(i[0][0]).to.equal(-2);
+    expect(i[0][1]).to.equal(1);
+    expect(i[0][2]).to.equal(-5);
+    expect(i[1][0]).to.equal(1.5);
+    expect(i[1][1]).to.equal(-0.5);
+    expect(i[1][2]).to.equal(-6);
+
+    expect(m.clone().multiply(i).equalTo(Matrix.Identity)).to.be.true;
+  }
+
+  @test 'should get inverse' () {
     const m = new Matrix([
       [1, 2],
       [3, 4]

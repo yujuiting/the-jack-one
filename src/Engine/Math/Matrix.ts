@@ -157,41 +157,33 @@ export class Matrix {
            this[1][2] === another[1][2];
   }
 
-  public getInverse(): Matrix {
+  public invertFrom(source: Matrix): this {
     /**
      * [ a, b, c ]
      * [ d, e, f ]
      * [ g, h, i ]
      */
-    const a_minor = this[1][1] * 1 - this[1][2] * 0;
-    const b_minor = this[1][0] * 1 - this[1][2] * 0;
-    const c_minor = this[1][0] * 0 - this[1][1] * 0;
-    const d_minor = this[0][1] * 1 - this[0][2] * 0;
-    const e_minor = this[0][0] * 1 - this[0][2] * 0;
-    const f_minor = this[0][0] * 0 - this[0][1] * 0;
-    const g_minor = this[0][1] * this[1][2] - this[0][2] * this[1][1];
-    const h_minor = this[0][0] * this[1][2] - this[0][2] * this[1][0];
-    const i_minor = this[0][0] * this[1][1] - this[0][1] * this[1][0];
-    const inverseDeterminant = 1 / (this[0][0] * a_minor - this[0][1] * b_minor + this[0][2] * c_minor);
-    const matrixOfMinor = [
-      [
-        inverseDeterminant * a_minor,
-        inverseDeterminant * -d_minor,
-        inverseDeterminant * g_minor
-      ],
-      [
-        inverseDeterminant * -b_minor,
-        inverseDeterminant * e_minor,
-        inverseDeterminant * -h_minor
-      ],
-      [
-        inverseDeterminant * c_minor,
-        inverseDeterminant * -f_minor,
-        inverseDeterminant * i_minor
-      ]
-    ];
+    const a_minor = source[1][1] * 1 - source[1][2] * 0;
+    const b_minor = source[1][0] * 1 - source[1][2] * 0;
+    const c_minor = source[1][0] * 0 - source[1][1] * 0;
+    const d_minor = source[0][1] * 1 - source[0][2] * 0;
+    const e_minor = source[0][0] * 1 - source[0][2] * 0;
+    const f_minor = source[0][0] * 0 - source[0][1] * 0;
+    const g_minor = source[0][1] * source[1][2] - source[0][2] * source[1][1];
+    const h_minor = source[0][0] * source[1][2] - source[0][2] * source[1][0];
+    const i_minor = source[0][0] * source[1][1] - source[0][1] * source[1][0];
+    const inverseDeterminant = 1 / (source[0][0] * a_minor - source[0][1] * b_minor + source[0][2] * c_minor);
+    this[0][0] = inverseDeterminant * a_minor;
+    this[0][1] = inverseDeterminant * -d_minor;
+    this[0][2] = inverseDeterminant * g_minor;
+    this[1][0] = inverseDeterminant * -b_minor;
+    this[1][1] = inverseDeterminant * e_minor;
+    this[1][2] = inverseDeterminant * -h_minor;
+    return this;
+  }
 
-    return new Matrix(matrixOfMinor);
+  public getInverse(): Matrix {
+    return new Matrix().invertFrom(this);
   }
 
   public clone(): Matrix {
