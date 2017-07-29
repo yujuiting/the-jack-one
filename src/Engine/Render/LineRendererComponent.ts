@@ -2,6 +2,7 @@ import { RendererComponent } from 'Engine/Render/RendererComponent';
 import { Matrix2D } from 'Engine/Math/Matrix2D';
 import { Vector } from 'Engine/Math/Vector';
 import { Color } from 'Engine/Display/Color';
+import { addToArray, removeFromArray } from 'Engine/Utility/ArrayUtility';
 
 export class LineRendererComponent extends RendererComponent {
 
@@ -9,10 +10,27 @@ export class LineRendererComponent extends RendererComponent {
 
   public strokeColor: Color = Color.Red;
 
-  public points: Vector[] = [];
+  private _points: Vector[] = [];
 
-  public render(ctx: CanvasRenderingContext2D, toViewportMatrix: Matrix2D): void {
-    const points = this.points.map(point => point.clone());
+  public points(): ReadonlyArray<Vector> { return this._points; }
+
+  public addPoint(point: Vector, ...points: Vector[]): void {
+    addToArray(this._points, point);
+    points.forEach(p => addToArray(this._points, p));
+  }
+
+  public removePoint(point: Vector, ...points: Vector[]): void {
+    removeFromArray(this._points, point);
+    points.forEach(p => removeFromArray(this._points, p));
+  }
+
+  public clearPoints(): void {
+    this._points.forEach(point => point.destroy());
+    this._points.splice(0, this._points.length);
+  }
+
+  public render(ctx: CanvasRenderingContext2D, toScreenMatrix: Matrix2D): void {
+    const points = this._points.map(point => point.clone());
 
     points.forEach(point => point.add(this.transform.position));
 
@@ -20,7 +38,7 @@ export class LineRendererComponent extends RendererComponent {
       return;
     }
 
-    points.map(point => toViewportMatrix.multiplyToPoint(point));
+    points.map(point => toScreenMatrix.multiplyToPoint(point));
 
     ctx.save();
 

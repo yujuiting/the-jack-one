@@ -6,8 +6,18 @@ import { RequireComponent } from 'Engine/Utility/Decorator/RequireComponent';
 @RequireComponent([RigidbodyComponent])
 export class ColliderComponent extends Component {
 
+  /**
+   * AABB bounds for broadphase collition detection
+   */
+  public bounds: Bounds = new Bounds();
+
+  /**
+   * which layer collider should calculate collision.
+   */
+  public layer: number = 1;
+
   public debug: boolean = false;
 
-  protected rigidbody: RigidbodyComponent = <RigidbodyComponent>this.host.getComponent(RigidbodyComponent);
+  public readonly rigidbody: RigidbodyComponent = <RigidbodyComponent>this.host.getComponent(RigidbodyComponent);
 
 }
