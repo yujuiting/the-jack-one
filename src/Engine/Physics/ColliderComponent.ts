@@ -18,6 +18,10 @@ export class ColliderComponent extends Component {
 
   public debug: boolean = false;
 
+  public restitution: number;
+
+  public friction: number;
+
   public readonly rigidbody: RigidbodyComponent = <RigidbodyComponent>this.host.getComponent(RigidbodyComponent);
 
 }

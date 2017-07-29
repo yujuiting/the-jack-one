@@ -40,10 +40,6 @@ export class RigidbodyComponent extends Component {
 
   public useGravity: boolean;
 
-  public restitution: number;
-
-  public friction: number;
-
   private forces: Vector[];
 
   private transform: TransformComponent = <TransformComponent>this.getComponent(TransformComponent);
