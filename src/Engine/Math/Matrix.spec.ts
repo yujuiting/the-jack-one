@@ -44,9 +44,6 @@ import { Vector } from './Vector';
     expect(m[1][0]).to.equal(0);
     expect(m[1][1]).to.equal(1);
     expect(m[1][2]).to.equal(v.y);
-    expect(m[2][0]).to.equal(0);
-    expect(m[2][1]).to.equal(0);
-    expect(m[2][2]).to.equal(1);
   }
 
   @test 'should set scaling' () {
@@ -114,7 +111,7 @@ import { Vector } from './Vector';
       [1, 2],
       [3, 4]
     ]);
-    expect(m.toString()).to.equal('Matrix [1,2,0][3,4,0][0,0,1]');
+    expect(m.toString()).to.equal('Matrix [1,2,0][3,4,0]');
   }
 
 }

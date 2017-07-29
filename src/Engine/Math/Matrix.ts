@@ -4,15 +4,13 @@ export class Matrix {
 
   private _value: number[][] = [
     [1, 0, 0],
-    [0, 1, 0],
-    [0, 0, 1]
+    [0, 1, 0]
   ];
 
   private _save: number[][] = [];
 
   public get [0](): number[] { return this._value[0]; }
   public get [1](): number[] { return this._value[1]; }
-  public get [2](): number[] { return this._value[2]; }
 
   constructor(value?: number[][]) {
     if (value !== void 0) {
@@ -30,24 +28,21 @@ export class Matrix {
   public save(): void {
     this._save = [
       [this[0][0], this[0][1], this[0][2]],
-      [this[1][0], this[1][1], this[1][2]],
-      [this[2][0], this[2][1], this[2][2]]
+      [this[1][0], this[1][1], this[1][2]]
     ];
   }
 
   public restore(): void {
     this._value = [
       [this._save[0][0], this._save[0][1], this._save[0][2]],
-      [this._save[1][0], this._save[1][1], this._save[1][2]],
-      [this._save[2][0], this._save[2][1], this._save[2][2]]
+      [this._save[1][0], this._save[1][1], this._save[1][2]]
     ];
   }
 
   public reset(): void {
     this._value = [
     [1, 0, 0],
-    [0, 1, 0],
-    [0, 0, 1]
+    [0, 1, 0]
   ];
   }
 
@@ -108,27 +103,18 @@ export class Matrix {
     const d1 = this[1][0];
     const e1 = this[1][1];
     const f1 = this[1][2];
-    const g1 = this[2][0];
-    const h1 = this[2][1];
-    const i1 = this[2][2];
     const a2 = other[0][0];
     const b2 = other[0][1];
     const c2 = other[0][2];
     const d2 = other[1][0];
     const e2 = other[1][1];
     const f2 = other[1][2];
-    const g2 = other[2][0];
-    const h2 = other[2][1];
-    const i2 = other[2][2];
-    this[0][0] = a1 * a2 + b1 * d2 + c1 * g2;
-    this[0][1] = a1 * b2 + b1 * e2 + c1 * h2;
-    this[0][2] = a1 * c2 + b1 * f2 + c1 * i2;
-    this[1][0] = d1 * a2 + e1 * d2 + f1 * g2;
-    this[1][1] = d1 * b2 + e1 * e2 + f1 * h2;
-    this[1][2] = d1 * c2 + e1 * f2 + f1 * i2;
-    this[2][0] = g1 * a2 + h1 * d2 + i1 * g2;
-    this[2][1] = g1 * b2 + h1 * e2 + i1 * h2;
-    this[2][2] = g1 * c2 + h1 * f2 + i1 * i2;
+    this[0][0] = a1 * a2 + b1 * d2;
+    this[0][1] = a1 * b2 + b1 * e2;
+    this[0][2] = a1 * c2 + b1 * f2 + c1;
+    this[1][0] = d1 * a2 + e1 * d2;
+    this[1][1] = d1 * b2 + e1 * e2;
+    this[1][2] = d1 * c2 + e1 * f2 + f1;
   }
 
   public multiplyToPoint(point: Vector): void {
