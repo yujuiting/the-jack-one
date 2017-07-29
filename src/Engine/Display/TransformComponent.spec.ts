@@ -1,0 +1,42 @@
+// tslint:disable member-access no-unused-expression
+import { expect } from 'chai';
+import { suite, test } from 'mocha-typescript';
+import { TransformComponent } from 'Engine/Display/TransformComponent';
+import { GameObject } from 'Engine/Base/GameObject';
+import { Vector } from 'Engine/Math/Vector';
+
+@suite class TransformComponentTestSuite {
+
+  transform: TransformComponent;
+
+  before() {
+    this.transform = new GameObject().transform;
+  }
+
+  @test 'should calculate toWorldMatrix' () {
+    this.transform.position.setTo(10, 20);
+    this.transform.rotation = Math.PI / 2;
+    this.transform.scale.setTo(1, 2);
+    this.transform.calculate();
+
+    const p = new Vector(5, 10);
+    this.transform.toWorldMatrix.multiplyToPoint(p);
+
+    expect(p.x).to.closeTo(0, 1e-6);
+    expect(p.y).to.closeTo(30, 1e-6);
+  }
+
+  @test 'should calculate toLocalMatrix' () {
+    this.transform.position.setTo(10, 20);
+    this.transform.rotation = Math.PI / 2;
+    this.transform.scale.setTo(1, 2);
+    this.transform.calculate();
+
+    const p = new Vector(5, 10);
+    this.transform.toLocalMatrix.multiplyToPoint(p);
+
+    expect(p.x).to.closeTo(-5, 1e-6);
+    expect(p.y).to.closeTo(5, 1e-6);
+  }
+
+}
