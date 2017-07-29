@@ -40,10 +40,10 @@ import { Vector } from './Vector';
     m.setTranslation(v);
     expect(m[0][0]).to.equal(1);
     expect(m[0][1]).to.equal(0);
-    expect(m[0][2]).to.equal(-v.x);
+    expect(m[0][2]).to.equal(v.x);
     expect(m[1][0]).to.equal(0);
     expect(m[1][1]).to.equal(1);
-    expect(m[1][2]).to.equal(-v.y);
+    expect(m[1][2]).to.equal(v.y);
     expect(m[2][0]).to.equal(0);
     expect(m[2][1]).to.equal(0);
     expect(m[2][2]).to.equal(1);
@@ -81,8 +81,8 @@ import { Vector } from './Vector';
     m.setTranslation(new Vector(3, 3));
     m.setScaling(new Vector(2, 2));
     m.multiplyToPoint(p);
-    expect(p.x).to.equal(5);
-    expect(p.y).to.equal(5);
+    expect(p.x).to.equal(11);
+    expect(p.y).to.equal(11);
   }
 
   @test 'should multiply to vector' () {

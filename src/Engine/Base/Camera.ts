@@ -62,7 +62,7 @@ export class Camera extends GameObject {
     /**
      * Transform coordinate, reverse Y axis and set center as zero point.
      */
-    this.toScreenMatrix.setTranslation(-width / 2, -height / 2);
+    this.toScreenMatrix.setTranslation(width / 2, height / 2);
     this.toScreenMatrix.setScaling(0, -1);
     this.toScreenMatrix.save();
 
@@ -84,7 +84,7 @@ export class Camera extends GameObject {
       y - this.rect.height / 2
     );
     this.toScreenMatrix.restore();
-    this.toScreenMatrix.setTranslation(x, y);
+    this.toScreenMatrix.setTranslation(-x, -y);
   }
 
   public render(ctx: CanvasRenderingContext2D, gameObjects: ReadonlyTree<GameObject>): void {

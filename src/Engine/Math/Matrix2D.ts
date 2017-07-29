@@ -65,13 +65,13 @@ export class Matrix2D {
     let translation: Matrix2D;
     if (positionOrX instanceof Vector) {
       translation = new Matrix2D([
-        [1, 0, -positionOrX.x],
-        [0, 1, -positionOrX.y]
+        [1, 0, positionOrX.x],
+        [0, 1, positionOrX.y]
       ]);
     } else if (y !== void 0) {
       translation = new Matrix2D([
-        [1, 0, -positionOrX],
-        [0, 1, -y]
+        [1, 0, positionOrX],
+        [0, 1, y]
       ]);
     } else {
       return;
