@@ -1,4 +1,4 @@
-// tslint:disable member-access
+// tslint:disable member-access no-unused-expression
 import { expect } from 'chai';
 import { suite, test } from 'mocha-typescript';
 import { Matrix } from './Matrix';
@@ -93,6 +93,18 @@ import { Vector } from './Vector';
     expect(v.y).to.equal(8);
   }
 
+  @test 'should check equal' () {
+    const m1 = new Matrix([
+      [1, 2, 3],
+      [4, 5, 6]
+    ]);
+    const m2 = new Matrix([
+      [1, 2, 3],
+      [4, 5, 6]
+    ]);
+    expect(m1.equalTo(m2)).to.be.true;
+  }
+
   @test 'should clone' () {
     const m1 = new Matrix([
       [1, 2],
@@ -104,6 +116,19 @@ import { Vector } from './Vector';
     expect(m1[0][1]).to.equal(m2[0][1]);
     expect(m1[1][0]).to.equal(m2[1][0]);
     expect(m1[1][1]).to.equal(m2[1][1]);
+  }
+
+  @test 'should update inverse' () {
+    const m = new Matrix([
+      [1, 2],
+      [3, 4]
+    ]);
+
+    m.setTranslation(new Vector(5, 6));
+
+    const i = m.getInverse();
+
+    expect(m.clone().multiply(i).equalTo(Matrix.Identity)).to.be.true;
   }
 
   @test 'should to string' () {

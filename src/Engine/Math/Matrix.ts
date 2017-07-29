@@ -2,9 +2,16 @@ import { Vector } from 'Engine/Math/Vector';
 
 export class Matrix {
 
+  public static readonly Identity: Matrix = new Matrix();
+
+  /**
+   * for handle translation, assume matrix as 3x3
+   * but third row is always [0, 0, 1]
+   */
   private _value: number[][] = [
     [1, 0, 0],
     [0, 1, 0]
+    // [0, 0, 1]
   ];
 
   private _save: number[][] = [];
@@ -14,7 +21,7 @@ export class Matrix {
 
   constructor(value?: number[][]) {
     if (value !== void 0) {
-      for (let i = 0; i < 3; i++) {
+      for (let i = 0; i < 2; i++) {
         if (!value[i]) {
           continue;
         }
@@ -25,38 +32,41 @@ export class Matrix {
     }
   }
 
-  public save(): void {
+  public save(): this {
     this._save = [
       [this[0][0], this[0][1], this[0][2]],
       [this[1][0], this[1][1], this[1][2]]
     ];
+    return this;
   }
 
-  public restore(): void {
+  public restore(): this {
     this._value = [
       [this._save[0][0], this._save[0][1], this._save[0][2]],
       [this._save[1][0], this._save[1][1], this._save[1][2]]
     ];
+    return this;
   }
 
-  public reset(): void {
+  public reset(): this {
     this._value = [
-    [1, 0, 0],
-    [0, 1, 0]
-  ];
+      [1, 0, 0],
+      [0, 1, 0]
+    ];
+    return this;
   }
 
-  public setRotatation(radian: number): void {
+  public setRotatation(radian: number): this {
     const rotation = new Matrix([
       [Math.cos(radian), -Math.sin(radian)],
       [Math.sin(radian),  Math.cos(radian)]
     ]);
-    this.multiply(rotation);
+    return this.multiply(rotation);
   }
 
-  public setTranslation(position: Vector): void;
-  public setTranslation(x: number, y: number): void;
-  public setTranslation(positionOrX: Vector|number, y?: number): void {
+  public setTranslation(position: Vector): this;
+  public setTranslation(x: number, y: number): this;
+  public setTranslation(positionOrX: Vector|number, y?: number): this {
     let translation: Matrix;
     if (positionOrX instanceof Vector) {
       translation = new Matrix([
@@ -69,15 +79,15 @@ export class Matrix {
         [0, 1, y]
       ]);
     } else {
-      return;
+      return this;
     }
 
-    this.multiply(translation);
+    return this.multiply(translation);
   }
 
-  public setScaling(magnification: Vector): void;
-  public setScaling(x: number, y: number): void;
-  public setScaling(magnificationOrX: Vector|number, y?: number): void {
+  public setScaling(magnification: Vector): this;
+  public setScaling(x: number, y: number): this;
+  public setScaling(magnificationOrX: Vector|number, y?: number): this {
     let scaling: Matrix;
     if (magnificationOrX instanceof Vector) {
       scaling = new Matrix([
@@ -90,13 +100,13 @@ export class Matrix {
         [0, y]
       ]);
     } else {
-      return;
+      return this;
     }
 
-    this.multiply(scaling);
+    return this.multiply(scaling);
   }
 
-  public multiply(other: Matrix): void {
+  public multiply(other: Matrix): this {
     const a1 = this[0][0];
     const b1 = this[0][1];
     const c1 = this[0][2];
@@ -115,24 +125,73 @@ export class Matrix {
     this[1][0] = d1 * a2 + e1 * d2;
     this[1][1] = d1 * b2 + e1 * e2;
     this[1][2] = d1 * c2 + e1 * f2 + f1;
+    return this;
   }
 
-  public multiplyToPoint(point: Vector): void {
+  public multiplyToPoint(point: Vector): this {
     const x = point.x;
     const y = point.y;
     point.setTo(
       this[0][0] * x + this[0][1] * y + this[0][2] * 1,
       this[1][0] * x + this[1][1] * y + this[1][2] * 1
     );
+    return this;
   }
 
-  public multiplyToVector(vector: Vector): void {
+  public multiplyToVector(vector: Vector): this {
     const x = vector.x;
     const y = vector.y;
     vector.setTo(
       this[0][0] * x + this[0][1] * y + 0 * 0,
       this[1][0] * x + this[1][1] * y + 0 * 0
     );
+    return this;
+  }
+
+  public equalTo(another: Matrix): boolean {
+    return this[0][0] === another[0][0] &&
+           this[0][1] === another[0][1] &&
+           this[0][2] === another[0][2] &&
+           this[1][0] === another[1][0] &&
+           this[1][1] === another[1][1] &&
+           this[1][2] === another[1][2];
+  }
+
+  public getInverse(): Matrix {
+    /**
+     * [ a, b, c ]
+     * [ d, e, f ]
+     * [ g, h, i ]
+     */
+    const a_minor = this[1][1] * 1 - this[1][2] * 0;
+    const b_minor = this[1][0] * 1 - this[1][2] * 0;
+    const c_minor = this[1][0] * 0 - this[1][1] * 0;
+    const d_minor = this[0][1] * 1 - this[0][2] * 0;
+    const e_minor = this[0][0] * 1 - this[0][2] * 0;
+    const f_minor = this[0][0] * 0 - this[0][1] * 0;
+    const g_minor = this[0][1] * this[1][2] - this[0][2] * this[1][1];
+    const h_minor = this[0][0] * this[1][2] - this[0][2] * this[1][0];
+    const i_minor = this[0][0] * this[1][1] - this[0][1] * this[1][0];
+    const inverseDeterminant = 1 / (this[0][0] * a_minor - this[0][1] * b_minor + this[0][2] * c_minor);
+    const matrixOfMinor = [
+      [
+        inverseDeterminant * a_minor,
+        inverseDeterminant * -d_minor,
+        inverseDeterminant * g_minor
+      ],
+      [
+        inverseDeterminant * -b_minor,
+        inverseDeterminant * e_minor,
+        inverseDeterminant * -h_minor
+      ],
+      [
+        inverseDeterminant * c_minor,
+        inverseDeterminant * -f_minor,
+        inverseDeterminant * i_minor
+      ]
+    ];
+
+    return new Matrix(matrixOfMinor);
   }
 
   public clone(): Matrix {
