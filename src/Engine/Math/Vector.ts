@@ -5,6 +5,25 @@ import { Recyclable, Pool } from 'Engine/Utility/Pool';
  */
 export class Vector implements Recyclable {
 
+  public static Cross(v1: Vector, v2: Vector): number;
+  public static Cross(v1: Vector, v2: number): Vector;
+  public static Cross(v1: number, v2: Vector): Vector;
+  public static Cross(v1: Vector|number, v2: Vector|number): Vector|number|undefined {
+    if (v1 instanceof Vector) {
+      if (v2 instanceof Vector) {
+        return new Vector().copy(v1).cross(v2);
+      } else {
+        return new Vector().copy(v1).cross(v2);
+      }
+    } else {
+      if (v2 instanceof Vector) {
+        // return Vec2( -s * a.y, s * a.x );
+        return new Vector(-v1 * v2.y, v1 * v2.x);
+      }
+    }
+    return;
+  }
+
   private static pool: Pool<Vector> = new Pool(Vector);
 
   public static Get(x: number = 0, y: number = 0): Vector {
@@ -29,14 +48,15 @@ export class Vector implements Recyclable {
   constructor(public x: number = 0,
               public y: number = 0) {}
 
-  public setTo(x: number, y: number): void {
+  public setTo(x: number, y: number): this {
     this.x = x;
     this.y = y;
+    return this;
   }
 
-  public add(other: Vector): void;
-  public add(x: number, y: number): void;
-  public add(otherOrX: Vector|number, y: number = 0): void {
+  public add(other: Vector): this;
+  public add(x: number, y: number): this;
+  public add(otherOrX: Vector|number, y: number = 0): this {
     if (otherOrX instanceof Vector) {
       this.x += otherOrX.x;
       this.y += otherOrX.y;
@@ -44,11 +64,12 @@ export class Vector implements Recyclable {
       this.x += otherOrX;
       this.y += y;
     }
+    return this;
   }
 
-  public subtract(other: Vector): void;
-  public subtract(x: number, y: number): void;
-  public subtract(otherOrX: Vector|number, y: number = 0): void {
+  public subtract(other: Vector): this;
+  public subtract(x: number, y: number): this;
+  public subtract(otherOrX: Vector|number, y: number = 0): this {
     if (otherOrX instanceof Vector) {
       this.x -= otherOrX.x;
       this.y -= otherOrX.y;
@@ -56,22 +77,28 @@ export class Vector implements Recyclable {
       this.x -= otherOrX;
       this.y -= y;
     }
+    return this;
   }
 
-  public scale(value: number): void {
+  public scale(value: number): this {
     this.x *= value;
     this.y *= value;
-    // this.z *= value;
+    return this;
   }
 
   public dot(other: Vector): number {
     return this.x * other.x
          + this.y * other.y;
-        //  + this.z * other.z;
   }
 
-  public cross(other: Vector): number {
-    return this.x * other.x - this.y - other.y;
+  public cross(value: number): Vector;
+  public cross(value: Vector): number;
+  public cross(value: Vector|number): Vector|number {
+    if (value instanceof Vector) {
+      return this.x * value.x - this.y * value.y;
+    } else {
+      return new Vector(this.y * value, -this.x * value);
+    }
   }
 
   public magnitude(): number {
@@ -81,7 +108,6 @@ export class Vector implements Recyclable {
   public squareMagnitude(): number {
     return Math.pow(this.x, 2)
          + Math.pow(this.y, 2);
-      // + Math.pow(this.z, 2);
   }
 
   public distanceTo(other: Vector): number {
@@ -91,19 +117,27 @@ export class Vector implements Recyclable {
   public squareDistance(other: Vector): number {
     return  Math.pow(this.x - other.x, 2)
           + Math.pow(this.y - other.y, 2);
-        //+ Math.pow(this.z - other.z, 2);
   }
 
-  public normalize(): void {
-    this.scale(1 / this.magnitude());
+  public normalize(): this {
+    return this.scale(1 / this.magnitude());
   }
 
-  public translate(vector: Vector): void {
-    this.subtract(vector);
+  /**
+   * Get normal vector that is rotate 90 degree clockwise.
+   */
+  public normal(): Vector {
+    const normal = new Vector(this.y, -this.x);
+    normal.normalize();
+    return normal;
   }
 
-  public reset(): void {
-    this.setTo(0, 0);
+  public translate(vector: Vector): this {
+    return this.subtract(vector);
+  }
+
+  public reset(): this {
+    return this.setTo(0, 0);
   }
 
   public equalTo(other: Vector): boolean {
@@ -125,8 +159,8 @@ export class Vector implements Recyclable {
     return new Vector(this.x, this.y);
   }
 
-  public copy(other: Vector): void {
-    this.setTo(other.x, other.y);
+  public copy(other: Vector): this {
+    return this.setTo(other.x, other.y);
   }
 
   public destroy(): void {
