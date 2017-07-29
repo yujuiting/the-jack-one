@@ -1,41 +1,36 @@
-import { Vector } from 'Engine/Math/Vector';
 import { Recyclable } from 'Engine/Utility/Pool';
-import { CircleBounds } from 'Engine/Physics/CircleBounds';
+import { Vector } from 'Engine/Math/Vector';
 
 export class Bounds implements Recyclable {
 
+  /**
+   * position relative to body position.
+   */
   public center: Vector = Vector.Get();
 
   public extents: Vector = Vector.Get();
-
-  public get min(): Vector {
-    const min = this.center.clone();
-    min.subtract(this.extents);
-    return min;
-  }
-
-  public get max(): Vector {
-    const max = this.center.clone();
-    max.add(this.extents);
-    return max;
-  }
-
-  public get size(): Vector {
-    const size = this.extents.clone();
-    size.scale(2);
-    return size;
-  }
 
   private _canRecycle: boolean = false;
 
   public get canRecycle(): boolean { return this._canRecycle; }
 
-  public containPoint(point: Vector): boolean {
-    return point.greaterThan(this.min) &&
-           point.lessThan(this.max);
+  public get min(): Vector {
+    return this.center.clone().subtract(this.extents);
   }
 
-  public intersectWithBounds(bounds: Bounds): boolean {
+  public get max(): Vector {
+    return this.center.clone().add(this.extents);
+  }
+
+  public get size(): Vector {
+    return this.extents.clone().scale(2);
+  }
+
+  public containPoint(point: Vector): boolean {
+    return point.greaterThan(this.min) && point.lessThan(this.max);
+  }
+
+  public intersects(bounds: Bounds): boolean {
     if (this.max.lessThan(bounds.min)) {
       return false;
     }
@@ -43,28 +38,6 @@ export class Bounds implements Recyclable {
     if (this.min.greaterThan(bounds.max)) {
       return false;
     }
-
-    return true;
-  }
-
-  public intersectWithCircle(circle: CircleBounds): boolean {
-    const min = this.min.clone();
-    min.x -= circle.radius;
-    min.y -= circle.radius;
-
-    if (circle.center.lessThan(min)) {
-      return false;
-    }
-
-    const max = this.max.clone();
-    max.x += circle.radius;
-    max.y += circle.radius;
-
-    if (circle.center.greaterThan(max)) {
-      return false;
-    }
-
-    // TODO: handle border radius
 
     return true;
   }

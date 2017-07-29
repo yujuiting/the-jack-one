@@ -27,10 +27,7 @@ export class Vector implements Recyclable {
   private static pool: Pool<Vector> = new Pool(Vector);
 
   public static Get(x: number = 0, y: number = 0): Vector {
-    const vector = (<Vector>this.pool.get());
-    vector.setTo(x, y);
-
-    return vector;
+    return (<Vector>this.pool.get()).setTo(x, y);
   }
 
   public static Put(vector: Vector): void { this.pool.put(vector); }
