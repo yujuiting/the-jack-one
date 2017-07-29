@@ -8,6 +8,9 @@ import { Camera, MainCamera } from 'Engine/Base/Camera';
 import { addToArray,
          removeFromArray } from 'Engine/Utility/ArrayUtility';
 import { Inject } from 'Engine/Utility/Decorator/Inject';
+import { BroadPhaseCollisionResolver } from 'Engine/Physics/BroadPhaseCollisionResolver';
+import { NarrowPhaseCollisionResolver } from 'Engine/Physics/NarrowPhaseCollisionResolver';
+import { ColliderComponent } from 'Engine/Physics/ColliderComponent';
 
 /**
  * Scene manage game objects and resources.
@@ -26,7 +29,9 @@ export class Scene extends BaseObject {
 
   public get isLoaded(): boolean { return this.resources.isLoaded; }
 
-  constructor(@Inject(MainCamera) mainCamera: Camera) {
+  constructor(@Inject(MainCamera) mainCamera: Camera,
+              @Inject(BroadPhaseCollisionResolver) private broadPhaseCollisionResolver: BroadPhaseCollisionResolver,
+              @Inject(NarrowPhaseCollisionResolver) private narrowPhaseCollisionResolver: NarrowPhaseCollisionResolver) {
     super();
     this.add(mainCamera);
   }
@@ -38,7 +43,12 @@ export class Scene extends BaseObject {
 
     if (gameObject instanceof Camera) {
       addToArray(this.cameras, gameObject);
-      return true;
+    }
+
+    const collider = gameObject.getComponent(ColliderComponent);
+
+    if (collider) {
+      this.broadPhaseCollisionResolver.track(collider);
     }
 
     return true;
@@ -54,6 +64,12 @@ export class Scene extends BaseObject {
       removeFromArray(this.cameras, gameObject);
     }
 
+    const collider = gameObject.getComponent(ColliderComponent);
+
+    if (collider) {
+      this.broadPhaseCollisionResolver.untrack(collider);
+    }
+
     return true;
   }
 
@@ -63,6 +79,10 @@ export class Scene extends BaseObject {
 
   public fixedUpdate(alpha: number): void {
     this.gameObjects.forEachChildren(gameObject => gameObject.fixedUpdate(alpha));
+
+    this.broadPhaseCollisionResolver.update();
+
+    this.narrowPhaseCollisionResolver.resolve(this.broadPhaseCollisionResolver.pairs);
   }
 
   public update(): void {
