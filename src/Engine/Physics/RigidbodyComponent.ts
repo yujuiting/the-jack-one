@@ -29,6 +29,8 @@ export class RigidbodyComponent extends Component {
    */
   public mass: number;
 
+  public inverseMass: number;
+
   public maxAngularVelocity: number;
 
   /**
@@ -37,6 +39,10 @@ export class RigidbodyComponent extends Component {
   public velocity: Vector;
 
   public useGravity: boolean;
+
+  public restitution: number;
+
+  public friction: number;
 
   private forces: Vector[];
 
