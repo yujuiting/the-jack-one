@@ -149,8 +149,8 @@ import { Vector } from './Vector';
     const cross1 = v1.cross(v2);
     const cross2 = v2.cross(v1);
 
-    expect(cross1).to.equal(-14);
-    expect(cross2).to.equal(-14);
+    expect(cross1).to.equal(-2);
+    expect(cross2).to.equal(2);
 
     const cross3 = v1.cross(3);
     expect(cross3.x).to.equal(12);

@@ -92,7 +92,7 @@ export class Vector implements Recyclable {
   public cross(value: Vector): number;
   public cross(value: Vector|number): Vector|number {
     if (value instanceof Vector) {
-      return this.x * value.x - this.y * value.y;
+      return this.x * value.y - this.y * value.x;
     } else {
       return new Vector(this.y * value, -this.x * value);
     }
