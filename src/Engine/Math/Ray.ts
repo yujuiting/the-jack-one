@@ -13,11 +13,12 @@ export class Ray {
   }
 
   /**
-   * Aware, collinear will return nothing.
+   * Return distance (or times) from this ray to another
+   * Return -1 means no intersect
    * @see https://stackoverflow.com/questions/563198/how-do-you-detect-where-two-line-segments-intersect/565282#565282
    * @param another
    */
-  public intersect(another: Ray|Line): Vector|undefined {
+  public intersect(another: Ray|Line): number {
     const p = this.origin;
     const r = this.direction;
     let q: Vector;
@@ -35,34 +36,17 @@ export class Ray {
     const pq_x_r = pq.cross(r);
 
     if (r_x_s === 0) {
-      return;
+      return -1;
     } else {
-      // const pq_x_s = pq.cross(s);
-      // const t = pq_x_s / r_x_s;
       const u = pq_x_r / r_x_s;
-
-      // console.log(`
-      // p: ${p}
-      // r: ${r}
-      // q: ${q}
-      // s: ${s}
-      // r_x_s: ${r_x_s}
-      // pq_x_s: ${pq_x_s}
-      // pq_x_r: ${pq_x_r}
-      // t: ${t}
-      // u: ${u}
-
-      // p1: ${p.clone().add(r.clone().scale(t))}
-      // p2: ${q.clone().add(s.clone().scale(u))}
-      // `);
 
       // if u less than 0 means ray is going far way, cross at aother side
       if (u >= 0) {
-        return q.clone().add(s.clone().scale(u));
+        return pq.cross(s) / r_x_s;
       }
     }
 
-    return;
+    return -1;
   }
 
 }
