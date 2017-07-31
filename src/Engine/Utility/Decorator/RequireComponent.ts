@@ -10,7 +10,8 @@ export function RequireComponent<T extends Class<Component>>(RequireTypes: T[]):
         const target: GameObject = args[0];
         RequireTypes.forEach(RequireType => {
           if (!target.getComponent(RequireType)) {
-            throw new Error(`Component ${Type.name} require component ${RequireType.name}`);
+            // throw new Error(`Component ${Type.name} require component ${RequireType.name}`);
+            target.addComponent(RequireType);
           }
         });
       }

@@ -104,6 +104,7 @@ export class GameObject extends BaseObject {
   public addComponent<T extends Component>(ComponentType: Class<T>): T {
     const component = runtime.instantiate(ComponentType, this);
     this.components.push(component);
+    component.start();
 
     return component;
   }

@@ -9,7 +9,6 @@ export abstract class Component extends BaseObject {
 
   constructor(public host: GameObject) {
     super();
-    this.start();
   }
 
   public addComponent<T extends Component>(componentType: Class<T>): T {

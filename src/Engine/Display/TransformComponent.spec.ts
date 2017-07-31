@@ -22,8 +22,8 @@ import { Vector } from 'Engine/Math/Vector';
     const p = new Vector(5, 10);
     this.transform.toWorldMatrix.multiplyToPoint(p);
 
-    expect(p.x).to.closeTo(0, 1e-6);
-    expect(p.y).to.closeTo(30, 1e-6);
+    expect(p.x).to.closeTo(-10, 1e-6);
+    expect(p.y).to.closeTo(25, 1e-6);
   }
 
   @test 'should calculate toLocalMatrix' () {
@@ -35,8 +35,8 @@ import { Vector } from 'Engine/Math/Vector';
     const p = new Vector(5, 10);
     this.transform.toLocalMatrix.multiplyToPoint(p);
 
-    expect(p.x).to.closeTo(-5, 1e-6);
-    expect(p.y).to.closeTo(5, 1e-6);
+    expect(p.x).to.closeTo(-10, 1e-6);
+    expect(p.y).to.closeTo(2.5, 1e-6);
   }
 
 }

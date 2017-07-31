@@ -62,8 +62,6 @@ export class TransformComponent extends Component {
     this.scale = Vector.Get(1, 1);
     this.width = 0;
     this.height = 0;
-    this.toWorldMatrix.reset();
-    this.toLocalMatrix.invertFrom(this.toWorldMatrix);
   }
 
   public destroy(): void {
