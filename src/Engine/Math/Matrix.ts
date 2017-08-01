@@ -30,6 +30,7 @@ export class Matrix {
         }
       }
     }
+    this.save();
   }
 
   public save(): this {
@@ -138,6 +139,10 @@ export class Matrix {
     return this;
   }
 
+  /**
+   * Mutiply rotatation and scaling but not translation
+   * @param vector
+   */
   public multiplyToVector(vector: Vector): this {
     const x = vector.x;
     const y = vector.y;

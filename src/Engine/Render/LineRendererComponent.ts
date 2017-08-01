@@ -10,18 +10,18 @@ export class LineRendererComponent extends RendererComponent {
 
   public strokeColor: Color = Color.Red;
 
+  public closePath: boolean = false;
+
   private _points: Vector[] = [];
 
   public points(): ReadonlyArray<Vector> { return this._points; }
 
-  public addPoint(point: Vector, ...points: Vector[]): void {
-    addToArray(this._points, point);
-    points.forEach(p => addToArray(this._points, p));
+  public addPoint(...points: Vector[]): void {
+    points.forEach(point => addToArray(this._points, point));
   }
 
-  public removePoint(point: Vector, ...points: Vector[]): void {
-    removeFromArray(this._points, point);
-    points.forEach(p => removeFromArray(this._points, p));
+  public removePoint(...points: Vector[]): void {
+    points.forEach(point => removeFromArray(this._points, point));
   }
 
   public clearPoints(): void {
@@ -34,11 +34,13 @@ export class LineRendererComponent extends RendererComponent {
 
     points.forEach(point => point.add(this.transform.position));
 
-    if (points.length < 2) {
+    points.map(point => toScreenMatrix.multiplyToPoint(point));
+
+    const firstPoint = points.shift();
+
+    if (!firstPoint) {
       return;
     }
-
-    points.map(point => toScreenMatrix.multiplyToPoint(point));
 
     ctx.save();
 
@@ -48,13 +50,15 @@ export class LineRendererComponent extends RendererComponent {
 
     ctx.beginPath();
 
+    ctx.moveTo(firstPoint.x, firstPoint.y);
+
     points.forEach((point, index) => {
-      if (index === 0) {
-        ctx.moveTo(point.x, point.y);
-      } else {
-        ctx.lineTo(point.x, point.y);
-      }
+      ctx.lineTo(point.x, point.y);
     });
+
+    if (this.closePath) {
+      ctx.lineTo(firstPoint.x, firstPoint.y);
+    }
 
     ctx.stroke();
 

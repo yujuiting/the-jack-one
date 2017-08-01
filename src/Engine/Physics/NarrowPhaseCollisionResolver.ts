@@ -1,6 +1,8 @@
 import { ColliderComponent } from 'Engine/Physics/ColliderComponent';
 import { Pair } from 'Engine/Physics/Pair';
+import { Service } from 'Engine/Utility/Decorator/Service';
 
+@Service()
 export class NarrowPhaseCollisionResolver {
 
   public resolve(pairs: ReadonlyArray<Pair>): void {

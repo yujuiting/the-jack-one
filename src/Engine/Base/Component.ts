@@ -7,7 +7,7 @@ import { Class } from 'Engine/Utility/Type';
  */
 export abstract class Component extends BaseObject {
 
-  constructor(public host: GameObject) {
+  constructor(public readonly host: GameObject) {
     super();
   }
 

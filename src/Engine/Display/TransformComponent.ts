@@ -10,24 +10,21 @@ import { Matrix } from 'Engine/Math/Matrix';
 @UniqueComponent()
 export class TransformComponent extends Component {
 
-  public anchor: Vector;
-
+  /**
+   * position in world coordinate
+   */
   public position: Vector;
 
   public scale: Vector;
 
   /**
-   * is radian
+   * rotation in world coordinate
+   * it is radian
    */
   public rotation: number;
 
-  public width: number;
-
-  public height: number;
-
   /**
-   * calculate every update
-   * if you want a updated value in fixedUpdate, call `calculate` before.
+   * calculate every fixed update
    */
   public readonly toWorldMatrix: Matrix = new Matrix();
 
@@ -36,7 +33,7 @@ export class TransformComponent extends Component {
    */
   public readonly toLocalMatrix: Matrix = this.toWorldMatrix.getInverse();
 
-  public update(): void {
+  public fixedUpdate(): void {
     this.calculate();
   }
 
@@ -57,23 +54,17 @@ export class TransformComponent extends Component {
 
   public reset(): void {
     super.reset();
-    this.anchor = Vector.Get();
     this.position = Vector.Get();
     this.scale = Vector.Get(1, 1);
-    this.width = 0;
-    this.height = 0;
+    this.rotation = 0;
   }
 
   public destroy(): void {
     super.destroy();
-    this.anchor.destroy();
-    this.position.destroy();
-    this.scale.destroy();
-    delete this.anchor;
+    Vector.Put(this.position);
+    Vector.Put(this.scale);
     delete this.position;
     delete this.scale;
-    delete this.width;
-    delete this.height;
   }
 
 }

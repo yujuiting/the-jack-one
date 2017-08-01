@@ -16,7 +16,7 @@ export class CollisionContact implements Recyclable {
 
   constructor(public colliderA: ColliderComponent,
               public colliderB: ColliderComponent,
-              public penetration: number,
+              public mtv: Vector,
               public point: Vector,
               public normal: Vector) {}
 
@@ -25,11 +25,10 @@ export class CollisionContact implements Recyclable {
       return;
     }
 
-    const restitution = Math.min(this.colliderA.restitution, this.colliderB.restitution);
+    const bodyA = this.colliderA.rigidbody;
+    const bodyB = this.colliderB.rigidbody;
 
-    const relativeVelocity = new Vector();
-    relativeVelocity.copy(this.colliderB.rigidbody.velocity);
-    relativeVelocity.subtract(this.colliderA.rigidbody.velocity);
+    const relativeVelocity = bodyB.velocity.clone().subtract(bodyA.velocity);
 
     const rvDotNormal = relativeVelocity.dot(this.normal);
 
@@ -38,25 +37,24 @@ export class CollisionContact implements Recyclable {
       return;
     }
 
+    const restitution = Math.min(this.colliderA.restitution, this.colliderB.restitution);
+
     // Calculate impulse scalar
-    const j = -(1 + restitution) * rvDotNormal / (this.colliderA.rigidbody.inverseMass + this.colliderB.rigidbody.inverseMass);
+    const j = -(1 + restitution) * rvDotNormal / (bodyA.inverseMass + bodyB.inverseMass);
 
     const impulse = this.normal.clone();
     impulse.scale(j);
 
     // Apply impulse
-    this.colliderA.rigidbody.addForce(impulse, ForceMode.Impulse);
-    this.colliderB.rigidbody.addForce(impulse, ForceMode.Impulse);
+    bodyA.addForce(impulse, ForceMode.Impulse);
+    bodyB.addForce(impulse, ForceMode.Impulse);
 
     // Solve for the tangent vector
-    const tangent = relativeVelocity.clone();
-    const n = this.normal.clone();
-    n.scale(rvDotNormal);
-    tangent.subtract(n);
-    tangent.normalize();
+    const n = this.normal.clone().scale(rvDotNormal);
+    const tangent = relativeVelocity.clone().subtract(n).normalize();
 
     // Solve for magnitude to apply along the friction vector
-    const jt = -relativeVelocity.dot(tangent) / (this.colliderA.rigidbody.inverseMass + this.colliderB.rigidbody.inverseMass);
+    const jt = -relativeVelocity.dot(tangent) / (bodyA.inverseMass + bodyB.inverseMass);
 
     // PythagoreanSolve = A^2 + B^2 = C^2, solving for C given A and B
     // Use to approximate mu given friction coefficients of each body
@@ -72,8 +70,8 @@ export class CollisionContact implements Recyclable {
     }
 
     // Apply
-    this.colliderA.rigidbody.addForce(frictionImpulse, ForceMode.Impulse);
-    this.colliderB.rigidbody.addForce(frictionImpulse, ForceMode.Impulse);
+    bodyA.addForce(frictionImpulse, ForceMode.Impulse);
+    bodyB.addForce(frictionImpulse, ForceMode.Impulse);
   }
 
   public destroy(): void {

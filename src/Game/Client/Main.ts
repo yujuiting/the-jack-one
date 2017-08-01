@@ -1,6 +1,8 @@
 import { Subscription } from 'rxjs/Subscription';
 
-import { runtime } from 'Engine/Base/runtime';
+import { instantiate,
+         getService,
+         bootstrap } from 'Engine/Base/runtime';
 import { Engine } from 'Engine/Base/Engine';
 import { GameObject } from 'Engine/Base/GameObject';
 import { Camera, MainCamera } from 'Engine/Base/Camera';
@@ -19,98 +21,33 @@ import { LineRendererComponent } from 'Engine/Render/LineRendererComponent';
 import { BoxColliderComponent } from 'Engine/Physics/BoxColliderComponent';
 import { CircleRendererComponent } from 'Engine/Render/CircleRendererComponent';
 import { Inject } from 'Engine/Utility/Decorator/Inject';
+import { Time } from 'Engine/Time/Time';
 
-const texture = new Texture('Assets/jack.idle.png');
-const spriteSheet = new SpriteSheet(texture, 1000 / 12, {
-  idle: {
-    width: 83,
-    height: 139,
-    frameCount: 22
-  }
-});
-// const texture2 = new Texture('Assets/image.jpg');
-// const sprite = new Sprite(texture2);
+const mainScene = instantiate(Scene);
+(<SceneManager>getService(SceneManager)).add(mainScene);
 
-class Jack extends GameObject {
+class MyRect extends GameObject {
 
-  private rigidbody: RigidbodyComponent = this.addComponent(RigidbodyComponent);
+  private rigidbody: RigidbodyComponent;
 
-  private renderer: SpriteSheetRendererComponent = this.addComponent(SpriteSheetRendererComponent);
-  // private renderer: SpriteRendererComponent = this.addComponent(SpriteRendererComponent);
+  private collider: BoxColliderComponent;
 
-  private subscriptions: Subscription[] = [];
-
-  @Inject(KeyboardInput)
-  private keyboardInput: KeyboardInput;
-
-  @Inject(Engine)
-  private engine: Engine;
-
-  constructor() {
+  constructor(@Inject(Time) private time: Time) {
     super();
-
-    this.transform.width = 83;
-    this.transform.height = 139;
-    this.transform.position.setTo(0, 0);
-
-    this.renderer.setSpriteSheet(spriteSheet, 'idle');
-    // this.renderer.sprite = sprite;
-
-    const boxCollider = this.addComponent(BoxColliderComponent);
-    boxCollider.bounds.extents.setTo(40, 70);
-    boxCollider.debug = true;
-
-    const keydownSubscription = this.keyboardInput.keyDown$.subscribe(e =>
-      this.onKeydown(e));
-
-    const keyupSubscription = this.keyboardInput.keyUp$.subscribe(() =>
-      this.rigidbody.velocity.setTo(0, 0));
-
-    this.subscriptions.push(keydownSubscription, keyupSubscription);
+    this.rigidbody = this.addComponent(RigidbodyComponent);
+    this.collider = this.addComponent(BoxColliderComponent);
+    this.collider.size.setTo(100, 100);
+    this.collider.debug = true;
   }
 
-  public destroy(): void {
-    super.destroy();
-    this.subscriptions.forEach(subscription => subscription.unsubscribe());
-  }
-
-  private onKeydown(e: KeyboardEvent): void {
-    const camera = <Camera>runtime.get(MainCamera);
-
-    if (e.key === 'a') {
-      // this.rigidbody.velocity.x = -100;
-      camera.transform.position.x += -10;
-    }
-    if (e.key === 'd') {
-      // this.rigidbody.velocity.x = 100;
-      camera.transform.position.x += 10;
-    }
-    if (e.key === 'w') {
-      // this.rigidbody.velocity.y = 100;
-      camera.transform.position.y += 10;
-    }
-    if (e.key === 's') {
-      // this.rigidbody.velocity.y = -100;
-      camera.transform.position.y += -10;
-    }
-    if (e.key === ' ') {
-      if (this.engine.isPaused) {
-        this.engine.resume();
-      } else {
-        this.engine.pause();
-      }
-    }
+  public update() {
+    super.update();
+    this.transform.rotation += this.time.deltaTime / 6000;
   }
 
 }
 
-const mainScene = runtime.instantiate(Scene);
-(<SceneManager>runtime.get(SceneManager)).add(mainScene);
+const myRect = instantiate(MyRect);
+mainScene.add(myRect);
 
-mainScene.resources.add(texture);
-// mainScene.resources.add(texture2);
-
-runtime.bootstrap(document.body).then(() => {
-  const jack = new Jack();
-  mainScene.add(jack);
-});
+bootstrap(document.body);

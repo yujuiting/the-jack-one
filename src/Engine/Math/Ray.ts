@@ -23,12 +23,14 @@ export class Ray {
     const r = this.direction;
     let q: Vector;
     let s: Vector;
+    let l = 0;
     if (another instanceof Ray) {
       q = another.origin;
       s = another.direction;
     } else {
       q = another.begin;
       s = another.getDirection();
+      l = another.length;
     }
 
     const pq = q.clone().subtract(p);
@@ -38,11 +40,20 @@ export class Ray {
     if (r_x_s === 0) {
       return -1;
     } else {
+      const t = pq.cross(s) / r_x_s;
       const u = pq_x_r / r_x_s;
 
+      /**
+       * if another is a line, it may intersect at a point out of line
+       * check line's length
+       */
+      if (l && u > l) {
+        return -1;
+      }
+
       // if u less than 0 means ray is going far way, cross at aother side
-      if (u >= 0) {
-        return pq.cross(s) / r_x_s;
+      if (u >= 0 && t >= 0) {
+        return t;
       }
     }
 

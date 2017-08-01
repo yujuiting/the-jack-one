@@ -6,7 +6,7 @@ import { addToArray,
          removeFromArray,
          includeInArray } from 'Engine/Utility/ArrayUtility';
 import { Tree } from 'Engine/Utility/Tree';
-import { runtime } from 'Engine/Base/runtime';
+import { instantiate } from 'Engine/Base/runtime';
 
 /**
  * Basic class in engine
@@ -102,7 +102,7 @@ export class GameObject extends BaseObject {
   }
 
   public addComponent<T extends Component>(ComponentType: Class<T>): T {
-    const component = runtime.instantiate(ComponentType, this);
+    const component = instantiate(ComponentType, this);
     this.components.push(component);
     component.start();
 
@@ -154,7 +154,7 @@ export class GameObject extends BaseObject {
     this.node.hide();
   }
 
-  public fixedUpdate(alpha: number): void {
+  public fixedUpdate(alpha: number = 1): void {
     this.components.forEach(component => component.fixedUpdate(alpha));
   }
 

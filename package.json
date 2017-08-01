@@ -14,6 +14,7 @@
   "license": "ISC",
   "devDependencies": {
     "@types/chai": "^4.0.1",
+    "@types/chai-spies": "0.0.0",
     "@types/copy-webpack-plugin": "^4.0.0",
     "@types/glob": "^5.0.30",
     "@types/html-webpack-plugin": "^2.28.0",
@@ -24,6 +25,7 @@
     "awesome-typescript-loader": "^3.2.1",
     "canvas": "^1.6.5",
     "chai": "^4.0.2",
+    "chai-spies": "^0.7.1",
     "copy-webpack-plugin": "^4.0.1",
     "html-webpack-plugin": "^2.29.0",
     "jsdom": "^11.1.0",

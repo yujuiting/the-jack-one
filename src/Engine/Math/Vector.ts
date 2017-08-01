@@ -5,6 +5,16 @@ import { Recyclable, Pool } from 'Engine/Utility/Pool';
  */
 export class Vector implements Recyclable {
 
+  public static readonly Zero: Vector = new Vector();
+
+  public static readonly Right: Vector = new Vector(1, 0);
+
+  public static readonly Left: Vector = new Vector(-1, 0);
+
+  public static readonly Up: Vector = new Vector(0, 1);
+
+  public static readonly Down: Vector = new Vector(0, -1);
+
   public static Cross(v1: Vector, v2: Vector): number;
   public static Cross(v1: Vector, v2: number): Vector;
   public static Cross(v1: number, v2: Vector): Vector;

@@ -56,8 +56,8 @@ export class SpriteSheetRendererComponent extends RendererComponent {
     const drawAt = this.transform.position.clone();
     toScreenMatrix.multiplyToPoint(drawAt);
     drawAt.subtract(
-      sprite.pivot.x * this.transform.width,
-      sprite.pivot.y * this.transform.height
+      sprite.pivot.x * sprite.width,
+      sprite.pivot.y * sprite.height
     );
 
     ctx.drawImage(
@@ -68,8 +68,8 @@ export class SpriteSheetRendererComponent extends RendererComponent {
       sprite.rect.height,
       drawAt.x,
       drawAt.y,
-      this.transform.width,
-      this.transform.height
+      sprite.width,
+      sprite.height
     );
 
     drawAt.destroy();

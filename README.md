@@ -33,9 +33,14 @@ This project focus on custom engine development, game is a side project for quic
 - [How to create a custom 2d physics engine: friction, scene and jump table](http://gamedevelopment.tutsplus.com/tutorials/how-to-create-a-custom-2d-physics-engine-friction-scene-and-jump-table--gamedev-7756)
 - [How to create a custom 2d physics engine: oriented rigid bodies](http://gamedevelopment.tutsplus.com/tutorials/how-to-create-a-custom-2d-physics-engine-oriented-rigid-bodies--gamedev-8032)
 
+- [Use SAT to handle collision detection](http://www.dyn4j.org/2010/01/sat/)
+
 ### Design Pattern
 - [Game Programming Patterns](http://gameprogrammingpatterns.com/contents.html)
 
 ### Respectable opponents
 - [Excalibur](http://github.com/excaliburjs/Excalibur)
 - [Unity](https://docs.unity3d.com/ScriptReference/)
+
+### Requirements
+- Node.JS > 8

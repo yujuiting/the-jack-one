@@ -70,4 +70,8 @@ export class Line {
         this.end.y <= point.y && point.y <= this.begin.y;
     }
   }
+
+  public toString(): string {
+    return `Line (${this.begin} -> ${this.end})`;
+  }
 }

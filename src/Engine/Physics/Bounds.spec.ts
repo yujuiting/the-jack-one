@@ -14,6 +14,26 @@ import { Bounds } from 'Engine/Physics/Bounds';
     this.bounds.extents.setTo(20, 10);
   }
 
+  @test 'should create by center and extents' () {
+    const center = new Vector(3, 4);
+    const extents = new Vector(5, 6);
+    const bounds = new Bounds(center, extents);
+
+    expect(bounds.center.x).to.equal(3);
+    expect(bounds.center.y).to.equal(4);
+    expect(bounds.extents.x).to.equal(5);
+    expect(bounds.extents.y).to.equal(6);
+  }
+
+  @test 'should create by min and max' () {
+    const bounds = new Bounds(-2, -2, 4, 4);
+
+    expect(bounds.center.x).to.equal(1);
+    expect(bounds.center.y).to.equal(1);
+    expect(bounds.extents.x).to.equal(3);
+    expect(bounds.extents.y).to.equal(3);
+  }
+
   @test 'should return min' () {
     const min = this.bounds.min;
     expect(min.x).to.equal(-16);
