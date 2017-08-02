@@ -12,8 +12,11 @@ This project focus on custom engine development, game is a side project for quic
 
 ## Roadmap
 - Engine
-  - Physics: [WIP]
-  - Camera Manipulation: Pending.
+  - Physics
+    - PolygonCollider
+  - Camera Manipulation
+  - ParticleSystem
+  - Animation
 - Game
   - Design: Seems Jack like to play raiden-like genre. This infomation is helpful.
   - Art: Doing research.
