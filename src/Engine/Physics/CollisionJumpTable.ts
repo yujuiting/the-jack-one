@@ -30,8 +30,9 @@ export class CollisionJumpTable {
     return new CollisionContact(colliderA, colliderB, mtv, point, normal);
   }
 
-  // public circleBox(colliderA: CircleColliderComponent, colliderB: BoxColliderComponent): CollisionContact|undefined  {
-  // }
+  public circleBox(colliderA: CircleColliderComponent, colliderB: BoxColliderComponent): CollisionContact|undefined  {
+    return;
+  }
 
   public boxBox(colliderA: BoxColliderComponent, colliderB: BoxColliderComponent): CollisionContact|undefined  {
     const positionA = colliderA.bounds.center;

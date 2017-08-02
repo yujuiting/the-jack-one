@@ -6,12 +6,14 @@ import { Ray } from 'Engine/Math/Ray';
 import { Projection } from 'Engine/Math/Projection';
 import { CollisionJumpTable } from 'Engine/Physics/CollisionJumpTable';
 import { Inject } from 'Engine/Utility/Decorator/Inject';
-import { forward } from 'Engine/Utility/Type';
+import { forwardRef } from 'Engine/Utility/Type';
+import { BoxColliderComponent } from 'Engine/Physics/BoxColliderComponent';
+import { CollisionContact } from 'Engine/Physics/CollisionContact';
 
 /**
  * @see BoxColliderComponent
  */
-forward(() => GameObject);
+forwardRef(() => GameObject);
 
 export class CircleColliderComponent extends ColliderComponent {
 
@@ -48,14 +50,30 @@ export class CircleColliderComponent extends ColliderComponent {
     this.bounds.extents.setTo(this.radius, this.radius);
   }
 
+  /**
+   * @override
+   * @inheritdoc
+   */
+  public collide(another: ColliderComponent): CollisionContact|undefined {
+    if (another instanceof CircleColliderComponent) {
+      return this.collisionJumpTable.circleCircle(this, another);
+    } else if (another instanceof BoxColliderComponent) {
+      return this.collisionJumpTable.circleBox(this, another);
+    }
+  }
+
+  /**
+   * @override
+   * @inheritdoc
+   */
   public contains(point: Vector): boolean {
     return this.bounds.center.distanceTo(point) <= this.radius;
   }
 
   /**
    * @see https://en.wikipedia.org/wiki/Line–sphere_intersection
-   * @param ray
-   * @param maxDistance
+   * @override
+   * @inheritdoc
    */
   public rayCast(ray: Ray, max: number = Infinity): Vector|undefined {
     const c = this.bounds.center;
@@ -80,12 +98,20 @@ export class CircleColliderComponent extends ColliderComponent {
     return ray.getPoint(d);
   }
 
+  /**
+   * @override
+   * @inheritdoc
+   */
   public project(axis: Vector): Projection {
     const dot = this.bounds.center.dot(axis);
     const s = [dot, dot + this.radius, dot - this.radius];
     return new Projection(Math.min(...s), Math.max(...s));
   }
 
+  /**
+   * @override
+   * @inheritdoc
+   */
   public getFurthestPoint(direction: Vector): Vector {
     return this.bounds.center.clone().add(direction.normalize().scale(this.radius));
   }

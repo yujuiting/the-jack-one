@@ -10,7 +10,7 @@ import { CollisionJumpTable } from 'Engine/Physics/CollisionJumpTable';
 import { Inject } from 'Engine/Utility/Decorator/Inject';
 import { CollisionContact } from 'Engine/Physics/CollisionContact';
 import { CircleColliderComponent } from 'Engine/Physics/CircleColliderComponent';
-import { forward } from 'Engine/Utility/Type';
+import { forwardRef } from 'Engine/Utility/Type';
 
 /**
  * TODO:
@@ -19,7 +19,7 @@ import { forward } from 'Engine/Utility/Type';
  * Workaround via forward get temporarily
  * It should be a webpack relevant bug...
  */
-forward(() => GameObject);
+forwardRef(() => GameObject);
 
 export class BoxColliderComponent extends ColliderComponent {
 
@@ -115,18 +115,32 @@ export class BoxColliderComponent extends ColliderComponent {
     this.bounds.extents.setTo((maxX - minX) / 2, (maxY - minY) / 2);
   }
 
+  /**
+   * @override
+   * @inheritdoc
+   */
   public collide(another: ColliderComponent): CollisionContact|undefined {
     if (another instanceof BoxColliderComponent) {
       return this.collisionJumpTable.boxBox(this, another);
+    } else if (another instanceof CircleColliderComponent) {
+      return this.collisionJumpTable.circleBox(another, this);
     }
   }
 
+  /**
+   * @override
+   * @inheritdoc
+   */
   public contains(point: Vector): boolean {
     const ray = new Ray(point, Vector.Right);
     const count = this.cacheSides.reduce((acc, side) => ray.intersect(side) === -1 ? acc : ++acc, 0);
     return count % 2 !== 0;
   }
 
+  /**
+   * @override
+   * @inheritdoc
+   */
   public rayCast(ray: Ray): Vector|undefined {
     let minDistance = Number.MAX_VALUE;
     let noIntersect = true;
@@ -145,6 +159,10 @@ export class BoxColliderComponent extends ColliderComponent {
     return ray.getPoint(minDistance);
   }
 
+  /**
+   * @override
+   * @inheritdoc
+   */
   public project(axis: Vector): Projection {
     let min = Number.MAX_VALUE;
     let max = -Number.MAX_VALUE;
@@ -157,6 +175,10 @@ export class BoxColliderComponent extends ColliderComponent {
     return new Projection(min, max);
   }
 
+  /**
+   * @override
+   * @inheritdoc
+   */
   public getFurthestPoint(direction: Vector): Vector {
     let max = -Number.MAX_VALUE;
     let pointer = -1;
