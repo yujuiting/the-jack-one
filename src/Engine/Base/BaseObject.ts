@@ -41,6 +41,20 @@ export abstract class BaseObject implements Recyclable {
   }
 
   /**
+   * When object add to scene.
+   */
+  public start(): void {
+    //
+  }
+
+  /**
+   * When object remove from scene.
+   */
+  public end(): void {
+    //
+  }
+
+  /**
    * Guarantee update with 60 times per second.
    * In common case, alpha is always 1.
    */

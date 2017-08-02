@@ -6,7 +6,7 @@ import { SpriteSheet } from 'Engine/Display/SpriteSheet';
 import { Time } from 'Engine/Time/Time';
 import { UniqueComponent } from 'Engine/Utility/Decorator/UniqueComponent';
 import { RequireComponent } from 'Engine/Utility/Decorator/RequireComponent';
-import { Matrix2D } from 'Engine/Math/Matrix2D';
+import { Matrix } from 'Engine/Math/Matrix';
 import { Inject } from 'Engine/Utility/Decorator/Inject';
 
 @UniqueComponent()
@@ -39,7 +39,7 @@ export class SpriteSheetRendererComponent extends RendererComponent {
     this.sprites = this.spriteSheet.getSprites(this.sheetKey);
   }
 
-  public render(ctx: CanvasRenderingContext2D, toScreenMatrix: Matrix2D): void {
+  public render(ctx: CanvasRenderingContext2D, toScreenMatrix: Matrix): void {
 
     this.accumulator += this.time.deltaTime;
 
@@ -56,8 +56,8 @@ export class SpriteSheetRendererComponent extends RendererComponent {
     const drawAt = this.transform.position.clone();
     toScreenMatrix.multiplyToPoint(drawAt);
     drawAt.subtract(
-      sprite.pivot.x * this.transform.width,
-      sprite.pivot.y * this.transform.height
+      sprite.pivot.x * sprite.width,
+      sprite.pivot.y * sprite.height
     );
 
     ctx.drawImage(
@@ -68,8 +68,8 @@ export class SpriteSheetRendererComponent extends RendererComponent {
       sprite.rect.height,
       drawAt.x,
       drawAt.y,
-      this.transform.width,
-      this.transform.height
+      sprite.width,
+      sprite.height
     );
 
     drawAt.destroy();

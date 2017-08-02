@@ -18,8 +18,19 @@ export class ReadonlyTree<T> {
   constructor(public data: T,
               protected _children: Tree<T>[] = []) {}
 
-  public has(child: Tree<T>): boolean {
-    return this._children.indexOf(child) !== -1;
+  public hasChild(child: Tree<T>): boolean {
+    const stack: ReadonlyTree<T>[] = this._children.slice();
+    let current: ReadonlyTree<T>|undefined = stack.pop();
+    while (current) {
+      for (let i = current.children.length - 1; i > -1; i--) {
+        stack.push(current.children[i]);
+      }
+      if (current === child) {
+        return true;
+      }
+      current = stack.pop();
+    }
+    return false;
   }
 
   public forEachChildren(callback: (data: T) => void): void {

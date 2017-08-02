@@ -27,8 +27,22 @@ export const AllBuiltInLayer = BuiltInLayer.Background |
 
 export type Pair<T> = [T, T];
 
-export type Token = Class<any> | Symbol | string;
+export type Token = Class<any> | Symbol | string | ForwardRefFn<any>;
 
-export function forward<T>(get: () => T): T {
-  return get();
+export interface ForwardRefFn<T> {
+  (): T;
+  __forward_ref__?: ForwardRefFn<T>;
+}
+
+export function forwardRef<T>(get: ForwardRefFn<T>): ForwardRefFn<T> {
+  get.__forward_ref__ = get;
+  return get;
+}
+
+export function resolveForwardRef<T>(ref: T|ForwardRefFn<T>): T {
+  if (typeof ref === 'function' && ref.hasOwnProperty('__forward_ref__') && ref.__forward_ref__ === ref) {
+    return (<ForwardRefFn<T>>ref)();
+  } else {
+    return <T>ref;
+  }
 }

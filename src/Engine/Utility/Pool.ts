@@ -20,7 +20,7 @@ export class Pool<T extends Recyclable> {
   constructor(private type: Class<T>,
               public max: number = Infinity) {}
 
-  public get(): T|null {
+  public get(...args: any[]): T|null {
     if (this._inactives.length === 0) {
       this.recycle();
     }
@@ -29,7 +29,7 @@ export class Pool<T extends Recyclable> {
 
     if (!instance) {
       if (this._actives.length < this.max) {
-        instance = new this.type();
+        instance = new this.type(...args);
         this._actives.push(instance);
         addToArray(this._actives, instance);
       }

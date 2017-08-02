@@ -7,9 +7,8 @@ import { Class } from 'Engine/Utility/Type';
  */
 export abstract class Component extends BaseObject {
 
-  constructor(public host: GameObject) {
+  constructor(public readonly host: GameObject) {
     super();
-    this.start();
   }
 
   public addComponent<T extends Component>(componentType: Class<T>): T {
@@ -20,7 +19,7 @@ export abstract class Component extends BaseObject {
     return this.host.removeComponent(component);
   }
 
-  public getComponent<T extends Component>(componentType: Class<T>): T|null {
+  public getComponent<T extends Component>(componentType: Class<T>): T|undefined {
     return this.host.getComponent(componentType);
   }
 

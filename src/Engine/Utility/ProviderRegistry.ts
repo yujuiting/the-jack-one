@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import { Class, Token } from 'Engine/Utility/Type';
+import { Class, Token, resolveForwardRef } from 'Engine/Utility/Type';
 
 const DI_DEPENDENCIES = Symbol('DI_DEPENDENCIES');
 
@@ -46,18 +46,20 @@ export class ProviderRegistry {
    */
   public static RegisterDependency(target: Class<any>, token: Token, index: number): void {
     const dependencies: DependencyDescriptor[] = Reflect.getMetadata(DI_DEPENDENCIES, target) || [];
-    dependencies.push({ token, index });
+    dependencies.push({ token: resolveForwardRef<Token>(token), index });
     Reflect.defineMetadata(DI_DEPENDENCIES, dependencies, target);
   }
 
   private readonly service: Map<Token, any> = new Map();
 
   public get<T>(token: Token): T|undefined {
-    if (this.service.has(token)) {
-      return this.service.get(token);
+    const resolvedToken = resolveForwardRef<Token>(token);
+
+    if (this.service.has(resolvedToken)) {
+      return this.service.get(resolvedToken);
     }
 
-    const provider = ProviderRegistry.Resolve(token);
+    const provider = ProviderRegistry.Resolve(resolvedToken);
 
     if (!provider) {
       return;
@@ -78,7 +80,7 @@ export class ProviderRegistry {
     }
 
     if (service) {
-      this.service.set(token, service);
+      this.service.set(resolvedToken, service);
     }
 
     return service;

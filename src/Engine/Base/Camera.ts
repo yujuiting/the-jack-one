@@ -1,6 +1,6 @@
 import { GameObject } from 'Engine/Base/GameObject';
 import { Color } from 'Engine/Display/Color';
-import { Matrix2D } from 'Engine/Math/Matrix2D';
+import { Matrix } from 'Engine/Math/Matrix';
 import { Layer, AllBuiltInLayer, Class } from 'Engine/Utility/Type';
 import { RendererComponent } from 'Engine/Render/RendererComponent';
 import { Pool } from 'Engine/Utility/Pool';
@@ -24,9 +24,9 @@ export class Camera extends GameObject {
 
   public backgroundColor: Color = Color.Black;
 
-  public toWorldMatrix: Matrix2D = new Matrix2D();
+  public toWorldMatrix: Matrix = new Matrix();
 
-  public toScreenMatrix: Matrix2D = new Matrix2D();
+  public toScreenMatrix: Matrix = new Matrix();
 
   /**
    * Define which layers should be render.
@@ -40,13 +40,16 @@ export class Camera extends GameObject {
 
   public rect: Rect = new Rect();
 
-  private canvas: HTMLCanvasElement = document.createElement('canvas');
+  private canvas: HTMLCanvasElement;
 
-  private ctx: CanvasRenderingContext2D = <CanvasRenderingContext2D>this.canvas.getContext('2d');
+  private ctx: CanvasRenderingContext2D;
 
   constructor(@Inject(BrowserDelegate) private browser: BrowserDelegate,
               @Inject(Screen) private screen: Screen) {
     super();
+    this.canvas = browser.document.createElement('canvas');
+    this.ctx = <CanvasRenderingContext2D>this.canvas.getContext('2d');
+
     // TODO: how to manage camera size?
     setTimeout(() => this.setSize(
       this.screen.width,

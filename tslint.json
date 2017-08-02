@@ -28,6 +28,8 @@
     "no-import-side-effect": false,
     "no-suspicious-comment": false,
     "newline-before-return": false,
-    "no-function-expression": false
+    "no-function-expression": false,
+    "chai-vague-errors": false,
+    "no-require-imports": false
   }
 }

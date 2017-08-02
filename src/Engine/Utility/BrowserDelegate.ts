@@ -10,9 +10,9 @@ export class BrowserDelegate {
 
   public readonly window: Window = window;
 
-  public readonly document: Document = document;
+  public readonly document: Document = this.window.document;
 
-  public readonly screen: Screen = screen;
+  public readonly screen: Screen = window.screen;
 
   public readonly resize$: Observable<Event> = observeEvent(this.window, 'resize');
 
