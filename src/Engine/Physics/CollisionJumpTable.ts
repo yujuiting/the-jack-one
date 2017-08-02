@@ -31,7 +31,42 @@ export class CollisionJumpTable {
   }
 
   public circleBox(colliderA: CircleColliderComponent, colliderB: BoxColliderComponent): CollisionContact|undefined  {
-    return;
+    const positionA = colliderA.bounds.center;
+    const positionB = colliderB.bounds.center;
+
+    const minAxis = this.circleBoxSAT(colliderA, colliderB);
+
+    if (!minAxis) {
+      return;
+    }
+
+    const ab = positionB.clone().subtract(positionA);
+    const hasSameDirection = minAxis.dot(ab) >= 0;
+    if (!hasSameDirection) {
+      minAxis.scale(-1);
+    }
+
+    const normal = minAxis.clone().normalize();
+
+    const pointA = colliderA.getFurthestPoint(minAxis);
+    const pointB = colliderB.getFurthestPoint(minAxis);
+    const containsPointA = colliderB.contains(pointA);
+    const containsPointB = colliderA.contains(pointB);
+
+    let contactPoint: Vector;
+
+    if (containsPointA && containsPointB) {
+      contactPoint = pointA.clone().add(pointB).scale(0.5);
+    } else if (containsPointA) {
+      contactPoint = pointA.clone();
+    } else if (containsPointB) {
+      contactPoint = pointB.clone();
+    } else {
+      // I am not sure what is this condition...
+      contactPoint = pointA.clone().add(pointB).scale(0.5);
+    }
+
+    return new CollisionContact(colliderA, colliderB, minAxis, contactPoint, normal);
   }
 
   public boxBox(colliderA: BoxColliderComponent, colliderB: BoxColliderComponent): CollisionContact|undefined  {
@@ -45,7 +80,7 @@ export class CollisionJumpTable {
     }
 
     const ab = positionB.clone().subtract(positionA);
-    const hasSameDirection = minAxis.dot(ab) < 0;
+    const hasSameDirection = minAxis.dot(ab) >= 0;
     if (!hasSameDirection) {
       minAxis.scale(-1);
     }
@@ -76,11 +111,27 @@ export class CollisionJumpTable {
   /**
    * Helper for calculate mtv through SAT
    * @see http://www.dyn4j.org/2010/01/sat/
-   * @param colliderA
-   * @param colliderB
    */
   public boxBoxSAT(colliderA: BoxColliderComponent, colliderB: BoxColliderComponent): Vector|undefined {
-    const axes = [...colliderA.axes, ...colliderB.axes];
+    const axes = [...colliderA.axes, ...colliderB.axes].map(axis => axis.normal());
+    return this.findMTV(colliderA, colliderB, axes);
+  }
+
+  /**
+   * Helper for calculate mtv through SAT
+   * @see http://www.dyn4j.org/2010/01/sat/
+   */
+  public circleBoxSAT(colliderA: CircleColliderComponent, colliderB: BoxColliderComponent): Vector|undefined {
+    const positionA = colliderA.bounds.center;
+    const positionB = colliderB.bounds.center;
+    const ba = positionA.clone().subtract(positionB);
+    const closestPointOnPoly = colliderB.getFurthestPoint(ba);
+    const axes = [...colliderB.axes.map(axis => axis.normal()), positionA.clone().subtract(closestPointOnPoly).normalize()];
+
+    return this.findMTV(colliderA, colliderB, axes);
+  }
+
+  private findMTV(colliderA: ColliderComponent, colliderB: ColliderComponent, axes: ReadonlyArray<Vector>): Vector|undefined {
     const count = axes.length;
     let minOverlap = Number.MAX_VALUE;
     let minIndex = -1;
@@ -89,7 +140,7 @@ export class CollisionJumpTable {
       const projectionA = colliderA.project(axes[i]);
       const projectionB = colliderB.project(axes[i]);
       const overlap = projectionA.getOverlap(projectionB);
-      if (overlap < 0) {
+      if (overlap <= 0) {
         return;
       } else {
         if (overlap < minOverlap) {
@@ -103,14 +154,11 @@ export class CollisionJumpTable {
       return;
     }
 
+    if (axes[minIndex].isZero) {
+      return;
+    }
+
     return axes[minIndex].clone().normalize().scale(minOverlap);
   }
-
-  // public circleBoxSAT(colliderA: CircleColliderComponent, colliderB: BoxColliderComponent): Vector|undefined {
-  //   const positionA = colliderA.bounds.center;
-  //   const positionB = colliderB.bounds.center;
-  //   const ba = positionA.subtract(positionB);
-  //   const axes = [...colliderB.axes];
-  // }
 
 }

@@ -19,6 +19,8 @@ export class CircleRendererComponent extends RendererComponent {
 
   public anticlockwise: boolean = false;
 
+  public useLocalCoordinate: boolean = true;
+
   public render(ctx: CanvasRenderingContext2D, toViewportMatrix: Matrix): void {
     ctx.save();
 
@@ -30,7 +32,10 @@ export class CircleRendererComponent extends RendererComponent {
 
     const center = this.center.clone();
 
-    center.add(this.transform.position);
+    if (this.useLocalCoordinate) {
+      const toWorldTransform = this.transform.toWorldMatrix;
+      center.add(this.transform.position);
+    }
 
     toViewportMatrix.multiplyToPoint(center);
 

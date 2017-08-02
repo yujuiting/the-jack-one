@@ -51,16 +51,29 @@ export class Bounds implements Recyclable {
     return this.extents.clone().scale(2);
   }
 
+  public get top(): number { return this.center.y + this.extents.y; }
+
+  public get bottom(): number { return this.center.y - this.extents.y; }
+
+  public get right(): number { return this.center.x + this.extents.x; }
+
+  public get left(): number { return this.center.x - this.extents.x; }
+
   public containPoint(point: Vector): boolean {
-    return point.greaterThan(this.min) && point.lessThan(this.max);
+    return point.greaterThanEqual(this.min) && point.lessThanEqual(this.max);
   }
 
   public intersects(bounds: Bounds): boolean {
-    if (this.max.lessThan(bounds.min)) {
+    const minA = this.min;
+    const maxA = this.max;
+    const minB = bounds.min;
+    const maxB = bounds.max;
+
+    if (maxA.x < minB.x || minA.x > maxB.x) {
       return false;
     }
 
-    if (this.min.greaterThan(bounds.max)) {
+    if (maxA.y < minB.y || minA.y > maxB.y) {
       return false;
     }
 

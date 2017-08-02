@@ -27,8 +27,10 @@ export class CollisionContact implements Recyclable {
 
     const bodyA = this.colliderA.rigidbody;
     const bodyB = this.colliderB.rigidbody;
+    const velocityA = bodyA ? bodyA.velocity : Vector.Zero;
+    const velocityB = bodyB ? bodyB.velocity : Vector.Zero;
 
-    const relativeVelocity = bodyB.velocity.clone().subtract(bodyA.velocity);
+    const relativeVelocity = velocityB.clone().subtract(velocityA);
 
     const rvDotNormal = relativeVelocity.dot(this.normal);
 
@@ -38,23 +40,31 @@ export class CollisionContact implements Recyclable {
     }
 
     const restitution = Math.min(this.colliderA.restitution, this.colliderB.restitution);
+    const inverseMassA = bodyA ? bodyA.inverseMass : 0;
+    const inverseMassB = bodyB ? bodyB.inverseMass : 0;
+    const sumOfInverseMass = inverseMassA + inverseMassB;
 
     // Calculate impulse scalar
-    const j = -(1 + restitution) * rvDotNormal / (bodyA.inverseMass + bodyB.inverseMass);
+    const j = -(1 + restitution) * rvDotNormal / sumOfInverseMass;
 
-    const impulse = this.normal.clone();
-    impulse.scale(j);
+    const impulse = this.normal.clone().scale(j);
 
     // Apply impulse
-    bodyA.addForce(impulse, ForceMode.Impulse);
-    bodyB.addForce(impulse, ForceMode.Impulse);
+    if (bodyA) {
+      bodyA.addForce(impulse.clone().scale(-1), ForceMode.Impulse);
+    }
+
+    if (bodyB) {
+      bodyB.addForce(impulse, ForceMode.Impulse);
+    }
 
     // Solve for the tangent vector
-    const n = this.normal.clone().scale(rvDotNormal);
-    const tangent = relativeVelocity.clone().subtract(n).normalize();
+    // const n = this.normal.clone().scale(rvDotNormal);
+    // const tangent = relativeVelocity.clone().subtract(n).normalize();
+    const tangent = this.normal.clone().normal();
 
     // Solve for magnitude to apply along the friction vector
-    const jt = -relativeVelocity.dot(tangent) / (bodyA.inverseMass + bodyB.inverseMass);
+    const jt = -relativeVelocity.dot(tangent) / sumOfInverseMass;
 
     // PythagoreanSolve = A^2 + B^2 = C^2, solving for C given A and B
     // Use to approximate mu given friction coefficients of each body
@@ -70,8 +80,13 @@ export class CollisionContact implements Recyclable {
     }
 
     // Apply
-    bodyA.addForce(frictionImpulse, ForceMode.Impulse);
-    bodyB.addForce(frictionImpulse, ForceMode.Impulse);
+    if (bodyA) {
+      bodyA.addForce(frictionImpulse, ForceMode.Impulse);
+    }
+
+    if (bodyB) {
+      bodyB.addForce(frictionImpulse, ForceMode.Impulse);
+    }
   }
 
   public destroy(): void {

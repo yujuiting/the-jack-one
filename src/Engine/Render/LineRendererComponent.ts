@@ -12,6 +12,8 @@ export class LineRendererComponent extends RendererComponent {
 
   public closePath: boolean = false;
 
+  public useLocalCoordinate: boolean = true;
+
   private _points: Vector[] = [];
 
   public points(): ReadonlyArray<Vector> { return this._points; }
@@ -32,7 +34,10 @@ export class LineRendererComponent extends RendererComponent {
   public render(ctx: CanvasRenderingContext2D, toScreenMatrix: Matrix): void {
     const points = this._points.map(point => point.clone());
 
-    points.forEach(point => point.add(this.transform.position));
+    if (this.useLocalCoordinate) {
+      const toWorldTransform = this.transform.toWorldMatrix;
+      points.forEach(point => toWorldTransform.multiplyToPoint(point));
+    }
 
     points.map(point => toScreenMatrix.multiplyToPoint(point));
 

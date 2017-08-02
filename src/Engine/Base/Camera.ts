@@ -40,13 +40,16 @@ export class Camera extends GameObject {
 
   public rect: Rect = new Rect();
 
-  private canvas: HTMLCanvasElement = document.createElement('canvas');
+  private canvas: HTMLCanvasElement;
 
-  private ctx: CanvasRenderingContext2D = <CanvasRenderingContext2D>this.canvas.getContext('2d');
+  private ctx: CanvasRenderingContext2D;
 
   constructor(@Inject(BrowserDelegate) private browser: BrowserDelegate,
               @Inject(Screen) private screen: Screen) {
     super();
+    this.canvas = browser.document.createElement('canvas');
+    this.ctx = <CanvasRenderingContext2D>this.canvas.getContext('2d');
+
     // TODO: how to manage camera size?
     setTimeout(() => this.setSize(
       this.screen.width,

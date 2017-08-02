@@ -16,6 +16,7 @@ import { Ray } from 'Engine/Math/Ray';
     this.gameObject = new GameObject();
     this.collider = this.gameObject.addComponent(BoxColliderComponent);
     this.collider.size.setTo(10, 10);
+    this.gameObject.start();
     this.gameObject.fixedUpdate();
   }
 

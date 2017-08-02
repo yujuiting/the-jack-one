@@ -11,6 +11,7 @@ import { Inject } from 'Engine/Utility/Decorator/Inject';
 import { CollisionContact } from 'Engine/Physics/CollisionContact';
 import { CircleColliderComponent } from 'Engine/Physics/CircleColliderComponent';
 import { forwardRef } from 'Engine/Utility/Type';
+import { Color } from 'Engine/Display/Color';
 
 /**
  * TODO:
@@ -33,7 +34,9 @@ export class BoxColliderComponent extends ColliderComponent {
 
   private readonly cacheSides: Line[] = [];
 
-  private debugRenderer: LineRendererComponent|null = null;
+  private debugColliderRenderer: LineRendererComponent|null = null;
+
+  private debugBoundsRenderer: LineRendererComponent|null = null;
 
   constructor(host: GameObject,
               @Inject(CollisionJumpTable) private collisionJumpTable: CollisionJumpTable) {
@@ -47,6 +50,7 @@ export class BoxColliderComponent extends ColliderComponent {
   public get sides(): ReadonlyArray<Line> { return this.cacheSides; }
 
   public start(): void {
+    super.start();
     for (let i = 0; i < 4; i++) {
       this.cachePoints.push(new Vector());
       this.cacheAxes.push(new Vector());
@@ -60,20 +64,44 @@ export class BoxColliderComponent extends ColliderComponent {
 
   public update(): void {
     if (this.debug) {
-      if (!this.debugRenderer) {
-        this.debugRenderer = this.addComponent(LineRendererComponent);
-        this.debugRenderer.closePath = true;
+      if (!this.debugColliderRenderer) {
+        this.debugColliderRenderer = this.addComponent(LineRendererComponent);
+        this.debugColliderRenderer.useLocalCoordinate = false;
+        this.debugColliderRenderer.closePath = true;
       }
-      this.debugRenderer.clearPoints();
+
+      if (!this.debugBoundsRenderer) {
+        this.debugBoundsRenderer = this.addComponent(LineRendererComponent);
+        this.debugBoundsRenderer.useLocalCoordinate = false;
+        this.debugBoundsRenderer.closePath = true;
+        this.debugBoundsRenderer.strokeColor = Color.Cyan;
+      }
+
+      this.debugColliderRenderer.clearPoints();
       const points = this.cachePoints;
       if (points.length > 1) {
         // repeatly add last point to close path.
-        this.debugRenderer.addPoint(...points);
+        this.debugColliderRenderer.addPoint(...points);
       }
+
+      this.debugBoundsRenderer.clearPoints();
+      const min = this.bounds.min;
+      const max = this.bounds.max;
+      this.debugBoundsRenderer.addPoint(
+        new Vector(min.x, min.y),
+        new Vector(min.x, max.y),
+        new Vector(max.x, max.y),
+        new Vector(max.x, min.y)
+      );
+
     } else {
-      if (this.debugRenderer) {
-        this.removeComponent(this.debugRenderer);
-        this.debugRenderer = null;
+      if (this.debugColliderRenderer) {
+        this.removeComponent(this.debugColliderRenderer);
+        this.debugColliderRenderer = null;
+      }
+      if (this.debugBoundsRenderer) {
+        this.removeComponent(this.debugBoundsRenderer);
+        this.debugBoundsRenderer = null;
       }
     }
   }

@@ -51,6 +51,8 @@ export class Scene extends BaseObject {
       this.broadPhaseCollisionResolver.track(collider);
     }
 
+    gameObject.start();
+
     return true;
   }
 
@@ -70,7 +72,13 @@ export class Scene extends BaseObject {
       this.broadPhaseCollisionResolver.untrack(collider);
     }
 
+    gameObject.end();
+
     return true;
+  }
+
+  public has(gameObject: GameObject): boolean {
+    return this.gameObjects.hasChild(gameObject.node);
   }
 
   public load(): Promise<void> {

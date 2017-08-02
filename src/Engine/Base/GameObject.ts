@@ -104,7 +104,6 @@ export class GameObject extends BaseObject {
   public addComponent<T extends Component>(ComponentType: Class<T>): T {
     const component = instantiate(ComponentType, this);
     this.components.push(component);
-    component.start();
 
     return component;
   }
@@ -125,7 +124,7 @@ export class GameObject extends BaseObject {
   }
 
   public addChild(child: GameObject): void {
-    if (this.node.has(child.node)) {
+    if (this.node.hasChild(child.node)) {
       throw new Error(`Repeatly add child, ${child}`);
     }
 
@@ -137,7 +136,7 @@ export class GameObject extends BaseObject {
   }
 
   public removeChild(child: GameObject): void {
-    if (this.node.has(child.node)) {
+    if (this.node.hasChild(child.node)) {
       throw new Error(`Not found child, ${child}`);
     }
 
@@ -154,18 +153,46 @@ export class GameObject extends BaseObject {
     this.node.hide();
   }
 
+  /**
+   * @inheritdoc
+   */
+  public start(): void {
+    this.components.forEach(component => component.start());
+    this.children.forEach(child => child.start());
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public end(): void {
+    this.components.forEach(component => component.end());
+    this.children.forEach(child => child.end());
+  }
+
+  /**
+   * @inheritdoc
+   */
   public fixedUpdate(alpha: number = 1): void {
     this.components.forEach(component => component.fixedUpdate(alpha));
   }
 
+  /**
+   * @inheritdoc
+   */
   public update(): void {
     this.components.forEach(component => component.update());
   }
 
+  /**
+   * @inheritdoc
+   */
   public lateUpdate(): void {
     this.components.forEach(component => component.lateUpdate());
   }
 
+  /**
+   * @inheritdoc
+   */
   public reset(): void {
     super.reset();
     this.layer = BuiltInLayer.Default;
@@ -175,6 +202,9 @@ export class GameObject extends BaseObject {
     (<any>this).transform = this.addComponent(TransformComponent);
   }
 
+  /**
+   * @inheritdoc
+   */
   public destroy(): void {
     super.destroy();
     GameObject.RemoveTaggedGameObject(this);

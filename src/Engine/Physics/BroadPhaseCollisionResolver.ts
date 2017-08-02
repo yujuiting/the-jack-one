@@ -43,7 +43,7 @@ export class BroadPhaseCollisionResolver {
         if (colliderA.bounds.intersects(colliderB.bounds)) {
           const pair = Pair.Get(colliderA, colliderB);
           if (pair) {
-            this._pairs.push();
+            this._pairs.push(pair);
           }
         }
       }

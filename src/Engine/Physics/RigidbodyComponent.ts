@@ -27,9 +27,12 @@ export class RigidbodyComponent extends Component {
   /**
    * In kilogram
    */
-  public mass: number;
+  public mass: number = 1;
 
-  public inverseMass: number;
+  /**
+   * TODO: update after set mass
+   */
+  public inverseMass: number = 1;
 
   public maxAngularVelocity: number;
 
@@ -54,6 +57,10 @@ export class RigidbodyComponent extends Component {
     this.forces[forceMode].add(force);
   }
 
+  public clearForce(): void {
+    this.forces.forEach(force => force.reset());
+  }
+
   public fixedUpdate(alpha: number): void {
     super.fixedUpdate(alpha);
 
@@ -71,27 +78,27 @@ export class RigidbodyComponent extends Component {
      */
     this.forces[ForceMode.Force].scale(deltaTimeInSecond / this.mass);
     this.velocity.add(this.forces[ForceMode.Force]);
-    this.forces[ForceMode.Force].setTo(0, 0);
+    this.forces[ForceMode.Force].reset();
 
     /**
      * Acceleration ignore mass.
      */
     this.forces[ForceMode.Acceleration].scale(deltaTimeInSecond);
     this.velocity.add(this.forces[ForceMode.Acceleration]);
-    this.forces[ForceMode.Acceleration].setTo(0, 0);
+    this.forces[ForceMode.Acceleration].reset();
 
     /**
      * Impulse handle without delta time.
      */
     this.forces[ForceMode.Impulse].scale(1 / this.mass);
     this.velocity.add(this.forces[ForceMode.Impulse]);
-    this.forces[ForceMode.Impulse].setTo(0, 0);
+    this.forces[ForceMode.Impulse].reset();
 
     /**
      * VelocityChange without delta time and mass.
      */
     this.velocity.add(this.forces[ForceMode.VelocityChange]);
-    this.forces[ForceMode.VelocityChange].setTo(0, 0);
+    this.forces[ForceMode.VelocityChange].reset();
 
     if (!this.velocity.isZero) {
       this.velocity.scale(Math.max(0, 1 - this.drag * deltaTimeInSecond));
@@ -101,7 +108,7 @@ export class RigidbodyComponent extends Component {
       velocity.destroy();
     }
 
-    if (this.angularVelocity > 0e6) {
+    if (this.angularVelocity > 1e-6) {
       this.angularVelocity *= Math.max(0, 1 - this.angularDrag * deltaTimeInSecond);
       this.transform.rotation += this.angularVelocity * deltaTimeInSecond;
     }

@@ -47,9 +47,9 @@ export class Vector implements Recyclable {
   public get canRecycle(): boolean { return this._canRecycle; }
 
   public get isZero(): boolean {
-    return Math.abs(this.x) < 0e6 &&
-           Math.abs(this.y) < 0e6 &&
-           Math.abs(this.y) < 0e6;
+    return Math.abs(this.x) < 1e-6 &&
+           Math.abs(this.y) < 1e-6 &&
+           Math.abs(this.y) < 1e-6;
   }
 
   constructor(public x: number = 0,
@@ -157,9 +157,19 @@ export class Vector implements Recyclable {
         && this.y > other.y;
   }
 
+  public greaterThanEqual(other: Vector): boolean {
+    return this.x >= other.x
+        && this.y >= other.y;
+  }
+
   public lessThan(other: Vector): boolean {
     return this.x < other.x
         && this.y < other.y;
+  }
+
+  public lessThanEqual(other: Vector): boolean {
+    return this.x <= other.x
+        && this.y <= other.y;
   }
 
   public clone(): Vector {

@@ -1,13 +1,17 @@
 import { Bounds } from 'Engine/Physics/Bounds';
 import { Component } from 'Engine/Base/Component';
 import { RigidbodyComponent } from 'Engine/Physics/RigidbodyComponent';
-import { RequireComponent } from 'Engine/Utility/Decorator/RequireComponent';
 import { Vector } from 'Engine/Math/Vector';
 import { CollisionContact } from 'Engine/Physics/CollisionContact';
 import { Ray } from 'Engine/Math/Ray';
 import { Projection } from 'Engine/Math/Projection';
 
-@RequireComponent([RigidbodyComponent])
+export enum ColliderType {
+  Static,
+  Rigidbody,
+  Kinematic
+}
+
 export class ColliderComponent extends Component {
 
   /**
@@ -28,16 +32,18 @@ export class ColliderComponent extends Component {
 
   public debug: boolean = false;
 
-  public restitution: number;
+  public restitution: number = 0.2;
 
-  public friction: number;
+  public friction: number = 0.99;
+
+  public readonly type: ColliderType = ColliderType.Static;
 
   /**
    * There are at least two kinds of collider:
    * 1. static collider     : without rigidbody
    * 2. rigidbody collider  : with rigidbody
    */
-  public readonly rigidbody: RigidbodyComponent = <RigidbodyComponent>this.host.getComponent(RigidbodyComponent);
+  public readonly rigidbody: RigidbodyComponent|undefined;
 
   /**
    * Calculate collision contact if body collided.
@@ -63,5 +69,13 @@ export class ColliderComponent extends Component {
    * Get furthest point through given direction.
    */
   public getFurthestPoint(direction: Vector): Vector { return this.bounds.center.clone(); }
+
+  public start(): void {
+    super.start();
+    (<any>this).rigidbody = this.getComponent(RigidbodyComponent);
+    if (this.rigidbody) {
+      (<any>this).type = ColliderType.Rigidbody;
+    }
+  }
 
 }

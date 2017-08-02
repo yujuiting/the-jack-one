@@ -9,6 +9,8 @@ import { Inject } from 'Engine/Utility/Decorator/Inject';
 import { forwardRef } from 'Engine/Utility/Type';
 import { BoxColliderComponent } from 'Engine/Physics/BoxColliderComponent';
 import { CollisionContact } from 'Engine/Physics/CollisionContact';
+import { LineRendererComponent } from 'Engine/Render/LineRendererComponent';
+import { Color } from 'Engine/Display/Color';
 
 /**
  * @see BoxColliderComponent
@@ -19,7 +21,9 @@ export class CircleColliderComponent extends ColliderComponent {
 
   public radius: number = 0;
 
-  private debugRenderer: CircleRendererComponent|null = null;
+  private debugColliderRenderer: CircleRendererComponent|null = null;
+
+  private debugBoundsRenderer: LineRendererComponent|null = null;
 
   constructor(host: GameObject,
               @Inject(CollisionJumpTable) private collisionJumpTable: CollisionJumpTable) {
@@ -32,21 +36,46 @@ export class CircleColliderComponent extends ColliderComponent {
 
   public update(): void {
     if (this.debug) {
-      if (!this.debugRenderer) {
-        this.debugRenderer = this.addComponent(CircleRendererComponent);
+      if (!this.debugColliderRenderer) {
+        this.debugColliderRenderer = this.addComponent(CircleRendererComponent);
+        this.debugColliderRenderer.useLocalCoordinate = false;
       }
-      this.debugRenderer.center.copy(this.bounds.center);
-      this.debugRenderer.radius = this.radius;
+
+      if (!this.debugBoundsRenderer) {
+        this.debugBoundsRenderer = this.addComponent(LineRendererComponent);
+        this.debugBoundsRenderer.useLocalCoordinate = false;
+        this.debugBoundsRenderer.closePath = true;
+        this.debugBoundsRenderer.strokeColor = Color.Cyan;
+      }
+
+      this.debugColliderRenderer.center.copy(this.bounds.center);
+      this.debugColliderRenderer.radius = this.radius;
+
+      this.debugBoundsRenderer.clearPoints();
+      const min = this.bounds.min;
+      const max = this.bounds.max;
+      this.debugBoundsRenderer.addPoint(
+        new Vector(min.x, min.y),
+        new Vector(min.x, max.y),
+        new Vector(max.x, max.y),
+        new Vector(max.x, min.y)
+      );
+
     } else {
-      if (this.debugRenderer) {
-        this.removeComponent(this.debugRenderer);
-        this.debugRenderer = null;
+      if (this.debugColliderRenderer) {
+        this.removeComponent(this.debugColliderRenderer);
+        this.debugColliderRenderer = null;
+      }
+      if (this.debugBoundsRenderer) {
+        this.removeComponent(this.debugBoundsRenderer);
+        this.debugBoundsRenderer = null;
       }
     }
   }
 
   public calculate(): void {
     // update bounds
+    this.bounds.center.copy(this.host.transform.position);
     this.bounds.extents.setTo(this.radius, this.radius);
   }
 
