@@ -8,7 +8,8 @@
     "serve:client": "webpack-dev-server",
     "test": "nyc mocha --opts .mocha",
     "watch": "nyc mocha --opts .mocha --watch",
-    "start": "npm run serve:client"
+    "start": "npm run serve:client",
+    "coverage": "nyc report --reporter=text-lcov | coveralls"
   },
   "author": "",
   "license": "ISC",
@@ -27,6 +28,7 @@
     "canvas": "^1.6.5",
     "chai": "^4.0.2",
     "copy-webpack-plugin": "^4.0.1",
+    "coveralls": "^2.13.1",
     "html-webpack-plugin": "^2.29.0",
     "jsdom": "^11.1.0",
     "mocha": "^3.4.2",
