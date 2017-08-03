@@ -6,7 +6,7 @@
   "scripts": {
     "build:client": "webpack",
     "serve:client": "webpack-dev-server",
-    "test": "nyc mocha --opts .mocha",
+    "test": "nyc --check-coverage --lines 40 mocha --opts .mocha",
     "watch": "nyc mocha --opts .mocha --watch",
     "start": "npm run serve:client",
     "coverage": "nyc report --reporter=text-lcov | coveralls"
