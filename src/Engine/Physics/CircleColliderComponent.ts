@@ -168,7 +168,7 @@ export class CircleColliderComponent extends ColliderComponent {
    * @inheritdoc
    */
   public getFurthestPoint(direction: Vector): Vector {
-    return this.bounds.center.clone().add(direction.normalize().scale(this.radius));
+    return this.bounds.center.clone().add(direction.clone().normalize().scale(this.radius));
   }
 
 }
