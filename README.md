@@ -12,8 +12,9 @@ This project focus on custom engine development, game is a side project for quic
 
 ## Roadmap
 - Engine
-  - Physics
-    - PolygonCollider
+  - ~~Physics~~
+    - ~~PolygonCollider~~
+    - Oriented rigid bodies
   - Camera Manipulation
   - ParticleSystem
   - Animation

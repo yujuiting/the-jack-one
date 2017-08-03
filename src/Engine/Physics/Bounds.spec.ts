@@ -71,4 +71,12 @@ import { Bounds } from 'Engine/Physics/Bounds';
     expect(this.bounds.intersects(b2)).to.be.false;
   }
 
+  @test 'toString: should return formatted string' () {
+    const b = new Bounds();
+    b.center.setTo(20, 20);
+    b.extents.setTo(5, 5);
+
+    expect(b.toString()).to.equal('Bounds (center: Vector (20,20), extents: Vector (5,5))');
+  }
+
 }

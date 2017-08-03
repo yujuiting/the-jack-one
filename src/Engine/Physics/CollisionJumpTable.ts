@@ -1,5 +1,5 @@
 import { Service } from 'Engine/Utility/Decorator/Service';
-import { BoxColliderComponent } from 'Engine/Physics/BoxColliderComponent';
+import { PolygonColliderComponent } from 'Engine/Physics/PolygonColliderComponent';
 import { CircleColliderComponent } from 'Engine/Physics/CircleColliderComponent';
 import { CollisionContact } from 'Engine/Physics/CollisionContact';
 import { Vector } from 'Engine/Math/Vector';
@@ -30,7 +30,7 @@ export class CollisionJumpTable {
     return new CollisionContact(colliderA, colliderB, mtv, point, normal);
   }
 
-  public circleBox(colliderA: CircleColliderComponent, colliderB: BoxColliderComponent): CollisionContact|undefined  {
+  public circlePolygon(colliderA: CircleColliderComponent, colliderB: PolygonColliderComponent): CollisionContact|undefined  {
     const positionA = colliderA.bounds.center;
     const positionB = colliderB.bounds.center;
 
@@ -69,11 +69,11 @@ export class CollisionJumpTable {
     return new CollisionContact(colliderA, colliderB, minAxis, contactPoint, normal);
   }
 
-  public boxBox(colliderA: BoxColliderComponent, colliderB: BoxColliderComponent): CollisionContact|undefined  {
+  public polygonPolygon(colliderA: PolygonColliderComponent, colliderB: PolygonColliderComponent): CollisionContact|undefined  {
     const positionA = colliderA.bounds.center;
     const positionB = colliderB.bounds.center;
 
-    const minAxis = this.boxBoxSAT(colliderA, colliderB);
+    const minAxis = this.polygonPolygonSAT(colliderA, colliderB);
 
     if (!minAxis) {
       return;
@@ -112,8 +112,8 @@ export class CollisionJumpTable {
    * Helper for calculate mtv through SAT
    * @see http://www.dyn4j.org/2010/01/sat/
    */
-  public boxBoxSAT(colliderA: BoxColliderComponent, colliderB: BoxColliderComponent): Vector|undefined {
-    const axes = [...colliderA.axes, ...colliderB.axes].map(axis => axis.normal());
+  public polygonPolygonSAT(colliderA: PolygonColliderComponent, colliderB: PolygonColliderComponent): Vector|undefined {
+    const axes = [...colliderA.cachedAxes, ...colliderB.cachedAxes].map(axis => axis.normal());
     return this.findMTV(colliderA, colliderB, axes);
   }
 
@@ -121,12 +121,12 @@ export class CollisionJumpTable {
    * Helper for calculate mtv through SAT
    * @see http://www.dyn4j.org/2010/01/sat/
    */
-  public circleBoxSAT(colliderA: CircleColliderComponent, colliderB: BoxColliderComponent): Vector|undefined {
+  public circleBoxSAT(colliderA: CircleColliderComponent, colliderB: PolygonColliderComponent): Vector|undefined {
     const positionA = colliderA.bounds.center;
     const positionB = colliderB.bounds.center;
     const ba = positionA.clone().subtract(positionB);
     const closestPointOnPoly = colliderB.getFurthestPoint(ba);
-    const axes = [...colliderB.axes.map(axis => axis.normal()), positionA.clone().subtract(closestPointOnPoly).normalize()];
+    const axes = [...colliderB.cachedAxes.map(axis => axis.normal()), positionA.clone().subtract(closestPointOnPoly).normalize()];
 
     return this.findMTV(colliderA, colliderB, axes);
   }

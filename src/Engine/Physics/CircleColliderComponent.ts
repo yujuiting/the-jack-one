@@ -7,7 +7,7 @@ import { Projection } from 'Engine/Math/Projection';
 import { CollisionJumpTable } from 'Engine/Physics/CollisionJumpTable';
 import { Inject } from 'Engine/Utility/Decorator/Inject';
 import { forwardRef } from 'Engine/Utility/Type';
-import { BoxColliderComponent } from 'Engine/Physics/BoxColliderComponent';
+import { PolygonColliderComponent } from 'Engine/Physics/PolygonColliderComponent';
 import { CollisionContact } from 'Engine/Physics/CollisionContact';
 import { LineRendererComponent } from 'Engine/Render/LineRendererComponent';
 import { Color } from 'Engine/Display/Color';
@@ -21,9 +21,20 @@ export class CircleColliderComponent extends ColliderComponent {
 
   public radius: number = 0;
 
+  /**
+   * Debug draw collider shape
+   */
   private debugColliderRenderer: CircleRendererComponent|null = null;
 
+  /**
+   * Debug draw AABB
+   */
   private debugBoundsRenderer: LineRendererComponent|null = null;
+
+  /**
+   * Debug draw collider direction
+   */
+  protected debugDirectionRenderer: LineRendererComponent|null = null;
 
   constructor(host: GameObject,
               @Inject(CollisionJumpTable) private collisionJumpTable: CollisionJumpTable) {
@@ -48,6 +59,11 @@ export class CircleColliderComponent extends ColliderComponent {
         this.debugBoundsRenderer.strokeColor = Color.Cyan;
       }
 
+      if (!this.debugDirectionRenderer) {
+        this.debugDirectionRenderer = this.addComponent(LineRendererComponent);
+        this.debugDirectionRenderer.useLocalCoordinate = false;
+      }
+
       this.debugColliderRenderer.center.copy(this.bounds.center);
       this.debugColliderRenderer.radius = this.radius;
 
@@ -61,6 +77,12 @@ export class CircleColliderComponent extends ColliderComponent {
         new Vector(max.x, min.y)
       );
 
+      const rotation = this.host.transform.rotation;
+      const direction = new Vector(Math.cos(rotation), Math.sin(rotation));
+      const point = this.host.transform.position.clone().add(direction.scale(this.radius));
+      this.debugDirectionRenderer.clearPoints();
+      this.debugDirectionRenderer.addPoint(this.bounds.center, point);
+
     } else {
       if (this.debugColliderRenderer) {
         this.removeComponent(this.debugColliderRenderer);
@@ -69,6 +91,10 @@ export class CircleColliderComponent extends ColliderComponent {
       if (this.debugBoundsRenderer) {
         this.removeComponent(this.debugBoundsRenderer);
         this.debugBoundsRenderer = null;
+      }
+      if (this.debugDirectionRenderer) {
+        this.removeComponent(this.debugDirectionRenderer);
+        this.debugDirectionRenderer = null;
       }
     }
   }
@@ -86,8 +112,8 @@ export class CircleColliderComponent extends ColliderComponent {
   public collide(another: ColliderComponent): CollisionContact|undefined {
     if (another instanceof CircleColliderComponent) {
       return this.collisionJumpTable.circleCircle(this, another);
-    } else if (another instanceof BoxColliderComponent) {
-      return this.collisionJumpTable.circleBox(this, another);
+    } else if (another instanceof PolygonColliderComponent) {
+      return this.collisionJumpTable.circlePolygon(this, another);
     }
   }
 

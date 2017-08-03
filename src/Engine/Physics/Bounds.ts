@@ -89,4 +89,8 @@ export class Bounds implements Recyclable {
     this.size.destroy();
   }
 
+  public toString(): string {
+    return `Bounds (center: ${this.center}, extents: ${this.extents})`;
+  }
+
 }
