@@ -25,8 +25,16 @@ export class CollisionContact implements Recyclable {
       return;
     }
 
-    const bodyA = this.colliderA.rigidbody;
-    const bodyB = this.colliderB.rigidbody;
+    const a = this.colliderA;
+    const b = this.colliderB;
+
+    const bodyA = a.rigidbody;
+    const bodyB = b.rigidbody;
+
+    if (!bodyA && !bodyB) {
+      return;
+    }
+
     const velocityA = bodyA ? bodyA.velocity : Vector.Zero;
     const velocityB = bodyB ? bodyB.velocity : Vector.Zero;
 
@@ -49,18 +57,7 @@ export class CollisionContact implements Recyclable {
 
     const impulse = this.normal.clone().scale(j);
 
-    // Apply impulse
-    if (bodyA) {
-      bodyA.addForce(impulse.clone().scale(-1), ForceMode.Impulse);
-    }
-
-    if (bodyB) {
-      bodyB.addForce(impulse, ForceMode.Impulse);
-    }
-
     // Solve for the tangent vector
-    // const n = this.normal.clone().scale(rvDotNormal);
-    // const tangent = relativeVelocity.clone().subtract(n).normalize();
     const tangent = this.normal.clone().normal();
 
     // Solve for magnitude to apply along the friction vector
@@ -79,13 +76,22 @@ export class CollisionContact implements Recyclable {
       frictionImpulse.scale(-j * dynamicFriction);
     }
 
-    // Apply
-    if (bodyA) {
-      bodyA.addForce(frictionImpulse, ForceMode.Impulse);
-    }
-
-    if (bodyB) {
-      bodyB.addForce(frictionImpulse, ForceMode.Impulse);
+    if (bodyA && bodyB) {
+      this.mtv.scale(-0.5);
+      bodyA.host.transform.position.add(this.mtv);
+      bodyB.host.transform.position.add(this.mtv.scale(-1));
+      bodyA.addForce(impulse.clone().scale(-inverseMassA), ForceMode.Impulse);
+      bodyB.addForce(impulse.clone().scale(inverseMassB), ForceMode.Impulse);
+      bodyA.addForce(frictionImpulse.clone().scale(inverseMassA), ForceMode.Impulse);
+      bodyB.addForce(frictionImpulse.clone().scale(inverseMassB), ForceMode.Impulse);
+    } else if (bodyA) {
+      bodyA.host.transform.position.add(this.mtv.scale(-1));
+      bodyA.addForce(impulse.clone().scale(-inverseMassA), ForceMode.Impulse);
+      bodyA.addForce(frictionImpulse.clone().scale(inverseMassA), ForceMode.Impulse);
+    } else if (bodyB) {
+      bodyB.host.transform.position.add(this.mtv);
+      bodyB.addForce(impulse.clone().scale(inverseMassB), ForceMode.Impulse);
+      bodyB.addForce(frictionImpulse.clone().scale(inverseMassB), ForceMode.Impulse);
     }
   }
 
