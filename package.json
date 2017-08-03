@@ -9,7 +9,8 @@
     "test": "nyc --check-coverage --lines 40 mocha --opts .mocha",
     "watch": "nyc mocha --opts .mocha --watch",
     "start": "npm run serve:client",
-    "coverage": "nyc report --reporter=text-lcov | coveralls"
+    "coverage:coveralls": "nyc report --reporter=text-lcov | coveralls",
+    "coverage:codecov": "nyc report --reporter=text-lcov > coverage.lcov && codecov"
   },
   "author": "",
   "license": "ISC",
@@ -27,6 +28,7 @@
     "awesome-typescript-loader": "^3.2.1",
     "canvas": "^1.6.5",
     "chai": "^4.0.2",
+    "codecov": "^2.2.0",
     "copy-webpack-plugin": "^4.0.1",
     "coveralls": "^2.13.1",
     "html-webpack-plugin": "^2.29.0",
