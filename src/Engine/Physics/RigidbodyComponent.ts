@@ -16,7 +16,7 @@ export class RigidbodyComponent extends Component {
   public angularDrag: number;
 
   /**
-   * angle per second
+   * radians per second
    */
   public angularVelocity: number;
 
@@ -27,12 +27,24 @@ export class RigidbodyComponent extends Component {
   /**
    * In kilogram
    */
-  public mass: number = 1;
+  private _mass: number;
+
+  public get mass(): number { return this._mass; }
+
+  public set mass(value: number) { this._mass = value; this.inverseMass = 1 / value; }
+
+  public inverseMass: number;
 
   /**
-   * TODO: update after set mass
+   * moment of inertia
    */
-  public inverseMass: number = 1;
+  private _moi: number;
+
+  public get moi(): number { return this._moi; }
+
+  public set moi(value: number) { this._moi = value; this.inverseMoi = 1 / value; }
+
+  public inverseMoi: number;
 
   public maxAngularVelocity: number;
 
@@ -45,6 +57,8 @@ export class RigidbodyComponent extends Component {
 
   private forces: Vector[];
 
+  private torques: number[];
+
   private transform: TransformComponent = <TransformComponent>this.getComponent(TransformComponent);
 
   constructor(host: GameObject,
@@ -55,6 +69,10 @@ export class RigidbodyComponent extends Component {
 
   public addForce(force: Vector, forceMode: ForceMode = ForceMode.Force): void {
     this.forces[forceMode].add(force);
+  }
+
+  public addTorque(torque: number, forceMode: ForceMode = ForceMode.Force): void {
+    this.torques[forceMode] += torque;
   }
 
   public clearForce(): void {
@@ -100,6 +118,24 @@ export class RigidbodyComponent extends Component {
     this.velocity.add(this.forces[ForceMode.VelocityChange]);
     this.forces[ForceMode.VelocityChange].reset();
 
+    /**
+     * Torque
+     */
+    this.torques[ForceMode.Force] *= this.inverseMoi * deltaTimeInSecond;
+    this.angularVelocity += this.torques[ForceMode.Force];
+    this.torques[ForceMode.Force] = 0;
+
+    this.torques[ForceMode.Acceleration] *= deltaTimeInSecond;
+    this.angularVelocity += this.torques[ForceMode.Acceleration];
+    this.torques[ForceMode.Acceleration] = 0;
+
+    this.torques[ForceMode.Impulse] *= this.inverseMoi;
+    this.angularVelocity += this.torques[ForceMode.Impulse];
+    this.torques[ForceMode.Impulse] = 0;
+
+    this.angularVelocity += this.torques[ForceMode.VelocityChange];
+    this.torques[ForceMode.VelocityChange] = 0;
+
     if (!this.velocity.isZero) {
       this.velocity.scale(Math.max(0, 1 - this.drag * deltaTimeInSecond));
       const velocity = this.velocity.clone();
@@ -108,9 +144,13 @@ export class RigidbodyComponent extends Component {
       velocity.destroy();
     }
 
-    if (this.angularVelocity > 1e-6) {
-      this.angularVelocity *= Math.max(0, 1 - this.angularDrag * deltaTimeInSecond);
-      this.transform.rotation += this.angularVelocity * deltaTimeInSecond;
+    if (this.freezeRotation) {
+      this.angularVelocity = 0;
+    } else {
+      if (this.angularVelocity > 1e-6) {
+        this.angularVelocity *= Math.max(0, 1 - this.angularDrag * deltaTimeInSecond);
+        this.transform.rotation += this.angularVelocity * deltaTimeInSecond;
+      }
     }
   }
 
@@ -124,12 +164,15 @@ export class RigidbodyComponent extends Component {
     this.maxAngularVelocity = Infinity;
     this.velocity = Vector.Get();
     this.useGravity = false;
+    this.mass = 1;
+    this.moi = 1000;
     this.forces = [
       Vector.Get(),
       Vector.Get(),
       Vector.Get(),
       Vector.Get()
     ];
+    this.torques = [];
   }
 
   public destroy(): void {
