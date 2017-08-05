@@ -9,6 +9,8 @@ import { UniqueComponent } from 'Engine/Utility/Decorator/UniqueComponent';
 import { RequireComponent } from 'Engine/Utility/Decorator/RequireComponent';
 import { Inject } from 'Engine/Utility/Decorator/Inject';
 
+const DoublePI = Math.PI * 2;
+
 @UniqueComponent()
 @RequireComponent([TransformComponent])
 export class RigidbodyComponent extends Component {
@@ -54,6 +56,8 @@ export class RigidbodyComponent extends Component {
   public velocity: Vector;
 
   public useGravity: boolean;
+
+  public isSleeping: boolean;
 
   private forces: Vector[];
 
@@ -136,7 +140,9 @@ export class RigidbodyComponent extends Component {
     this.angularVelocity += this.torques[ForceMode.VelocityChange];
     this.torques[ForceMode.VelocityChange] = 0;
 
-    if (!this.velocity.isZero) {
+    const velocityIsZero = this.velocity.isZero;
+
+    if (!velocityIsZero) {
       this.velocity.scale(Math.max(0, 1 - this.drag * deltaTimeInSecond));
       const velocity = this.velocity.clone();
       velocity.scale(deltaTimeInSecond);
@@ -147,11 +153,20 @@ export class RigidbodyComponent extends Component {
     if (this.freezeRotation) {
       this.angularVelocity = 0;
     } else {
-      if (this.angularVelocity > 1e-6) {
+      if (Math.abs(this.angularVelocity) > 1e-6) {
         this.angularVelocity *= Math.max(0, 1 - this.angularDrag * deltaTimeInSecond);
+
+        if (this.angularVelocity > this.maxAngularVelocity) {
+          this.angularVelocity = this.maxAngularVelocity;
+        }
+
         this.transform.rotation += this.angularVelocity * deltaTimeInSecond;
+
+        this.transform.rotation = this.transform.rotation % DoublePI;
       }
     }
+
+    this.isSleeping = velocityIsZero && this.angularVelocity === 0;
   }
 
   public reset(): void {
@@ -166,13 +181,14 @@ export class RigidbodyComponent extends Component {
     this.useGravity = false;
     this.mass = 1;
     this.moi = 1000;
+    this.isSleeping = true;
     this.forces = [
       Vector.Get(),
       Vector.Get(),
       Vector.Get(),
       Vector.Get()
     ];
-    this.torques = [];
+    this.torques = [0, 0, 0, 0];
   }
 
   public destroy(): void {
