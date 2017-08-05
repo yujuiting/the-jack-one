@@ -74,7 +74,7 @@ export class CollisionContact implements Recyclable {
     const impulse = this.normal.clone().scale(j);
 
     if (bodyA && bodyB) {
-      this.mtv.scale(-0.5);
+      this.mtv.scale(0.5);
     }
 
     if (bodyA) {
