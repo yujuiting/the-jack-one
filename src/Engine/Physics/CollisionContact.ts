@@ -1,3 +1,4 @@
+// tslint:disable max-func-body-length
 import { RigidbodyComponent } from 'Engine/Physics/RigidbodyComponent';
 import { ColliderComponent } from 'Engine/Physics/ColliderComponent';
 import { Vector } from 'Engine/Math/Vector';
@@ -69,23 +70,27 @@ export class CollisionContact implements Recyclable {
 
     const impulse = this.normal.clone().scale(j);
 
-    // Solve for the tangent vector
-    const tangent = this.normal.clone().normal();
+    let frictionImpulse: Vector|undefined;
 
-    // Solve for magnitude to apply along the friction vector
-    const jt = -relativeVelocity.dot(tangent) / sumOfInverseMass;
+    // check relative velocity and tangent are not perpendicular
+    if (relativeVelocity.dot(this.normal.normal()) !== 0) {
+      // Solve for the tangent vector
+      const t = relativeVelocity.clone().subtract(this.normal.clone().scale(rvDotNormal)).normalize();
 
-    // PythagoreanSolve = A^2 + B^2 = C^2, solving for C given A and B
-    // Use to approximate mu given friction coefficients of each body
-    const mu = Math.sqrt(Math.pow(this.colliderA.friction, 2) + Math.pow(this.colliderB.friction, 2));
+      // Solve for magnitude to apply along the friction vector
+      const jt = -relativeVelocity.dot(t) / sumOfInverseMass;
 
-    // Clamp magnitude of friction and create impulse vector
-    const frictionImpulse = tangent.clone();
-    if (Math.abs( jt ) < j * mu) {
-      frictionImpulse.scale(jt);
-    } else {
-      const dynamicFriction = mu * 0.6;
-      frictionImpulse.scale(-j * dynamicFriction);
+      // PythagoreanSolve = A^2 + B^2 = C^2, solving for C given A and B
+      // Use to approximate mu given friction coefficients of each body
+      const mu = Math.sqrt(Math.pow(this.colliderA.friction, 2) + Math.pow(this.colliderB.friction, 2));
+
+      // Clamp magnitude of friction and create impulse vector
+      // const frictionImpulse = tangent.clone();
+      if (Math.abs( jt ) < j * mu) {
+        frictionImpulse = t.scale(jt);
+      } else {
+        frictionImpulse = t.scale(-j * mu);
+      }
     }
 
     if (bodyA && bodyB) {
@@ -96,8 +101,10 @@ export class CollisionContact implements Recyclable {
       bodyA.addForce(impulse.clone().scale(-inverseMassA), ForceMode.Impulse);
       bodyB.addForce(impulse.clone().scale(inverseMassB), ForceMode.Impulse);
       // friction
-      bodyA.addForce(frictionImpulse.clone().scale(inverseMassA), ForceMode.Impulse);
-      bodyB.addForce(frictionImpulse.clone().scale(inverseMassB), ForceMode.Impulse);
+      if (frictionImpulse) {
+        bodyA.addForce(frictionImpulse.clone().scale(-inverseMassA), ForceMode.Impulse);
+        bodyB.addForce(frictionImpulse.clone().scale(inverseMassB), ForceMode.Impulse);
+      }
       // torque
       bodyA.addTorque(j * -relativeA.cross(this.normal) , ForceMode.Impulse);
       bodyB.addTorque(j * relativeB.cross(this.normal) , ForceMode.Impulse);
@@ -106,7 +113,9 @@ export class CollisionContact implements Recyclable {
       // impulse
       bodyA.addForce(impulse.clone().scale(-inverseMassA), ForceMode.Impulse);
       // friction
-      bodyA.addForce(frictionImpulse.clone().scale(inverseMassA), ForceMode.Impulse);
+      if (frictionImpulse) {
+        bodyA.addForce(frictionImpulse.clone().scale(-inverseMassA), ForceMode.Impulse);
+      }
       // torque
       bodyA.addTorque(j * -relativeA.cross(this.normal) , ForceMode.Impulse);
     } else if (bodyB) {
@@ -114,7 +123,9 @@ export class CollisionContact implements Recyclable {
       // impulse
       bodyB.addForce(impulse.clone().scale(inverseMassB), ForceMode.Impulse);
       // friction
-      bodyB.addForce(frictionImpulse.clone().scale(inverseMassB), ForceMode.Impulse);
+      if (frictionImpulse) {
+        bodyB.addForce(frictionImpulse.clone().scale(inverseMassB), ForceMode.Impulse);
+      }
       // torque
       bodyB.addTorque(j * relativeB.cross(this.normal) , ForceMode.Impulse);
     }

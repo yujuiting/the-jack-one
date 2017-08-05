@@ -94,7 +94,7 @@ export class RigidbodyComponent extends Component {
      * ∆tf = m∆v
      * ∆v = ∆tf/m
      */
-    this.forces[ForceMode.Force].scale(deltaTimeInSecond / this.mass);
+    this.forces[ForceMode.Force].scale(deltaTimeInSecond * this.inverseMass);
     this.velocity.add(this.forces[ForceMode.Force]);
     this.forces[ForceMode.Force].reset();
 
@@ -108,7 +108,7 @@ export class RigidbodyComponent extends Component {
     /**
      * Impulse handle without delta time.
      */
-    this.forces[ForceMode.Impulse].scale(1 / this.mass);
+    this.forces[ForceMode.Impulse].scale(1 * this.inverseMass);
     this.velocity.add(this.forces[ForceMode.Impulse]);
     this.forces[ForceMode.Impulse].reset();
 
