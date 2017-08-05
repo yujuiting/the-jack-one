@@ -48,7 +48,6 @@ export class Vector implements Recyclable {
 
   public get isZero(): boolean {
     return Math.abs(this.x) < 1e-6 &&
-           Math.abs(this.y) < 1e-6 &&
            Math.abs(this.y) < 1e-6;
   }
 
