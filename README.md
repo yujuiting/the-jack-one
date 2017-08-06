@@ -14,7 +14,8 @@ This project focus on custom engine development, game is a side project for quic
 - Engine
   - ~~Physics~~
     - ~~PolygonCollider~~
-    - Oriented rigid bodies
+    - ~~Oriented rigid bodies~~
+    - Sleep mechanism
   - Camera Manipulation
   - ParticleSystem
   - Animation

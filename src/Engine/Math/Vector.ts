@@ -48,7 +48,6 @@ export class Vector implements Recyclable {
 
   public get isZero(): boolean {
     return Math.abs(this.x) < 1e-6 &&
-           Math.abs(this.y) < 1e-6 &&
            Math.abs(this.y) < 1e-6;
   }
 
@@ -127,7 +126,8 @@ export class Vector implements Recyclable {
   }
 
   public normalize(): this {
-    return this.scale(1 / this.magnitude());
+    const magnitude = this.magnitude();
+    return magnitude > 0 ? this.scale(1 / this.magnitude()) : this.setTo(0, 0);
   }
 
   /**

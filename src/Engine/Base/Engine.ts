@@ -11,7 +11,7 @@ import { Inject } from 'Engine/Utility/Decorator/Inject';
 @Service()
 export class Engine {
 
-  public readonly gravity: Vector = Vector.Get(0, -9.8);
+  public readonly gravity: Vector = Vector.Get(0, -200);
 
   private accumulator: number = 0;
 

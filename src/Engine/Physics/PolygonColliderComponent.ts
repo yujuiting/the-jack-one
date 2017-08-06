@@ -102,8 +102,9 @@ export class PolygonColliderComponent extends ColliderComponent {
       const direction = new Vector(Math.cos(rotation), Math.sin(rotation));
       const ray = new Ray(this.bounds.center.clone(), direction.clone());
       const point = this.rayCast(ray) || direction;
+      const center = this._cachedPoints.reduce((result, curr) => result.add(curr), new Vector()).scale(1 / this._cachedPoints.length);
       this.debugDirectionRenderer.clearPoints();
-      this.debugDirectionRenderer.addPoint(this.bounds.center, point);
+      this.debugDirectionRenderer.addPoint(center, point);
 
     } else {
       if (this.debugColliderRenderer) {
