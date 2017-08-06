@@ -80,8 +80,7 @@ export class CollisionContact implements Recyclable {
     if (bodyA) {
       bodyA.host.transform.position.add(this.mtv.clone().scale(-1));
       // impulse
-      // bodyA.addForce(impulse.clone().scale(-1), ForceMode.Impulse);
-      velocityA.add(impulse.clone().scale(-inverseMassA));
+      bodyA.addForce(impulse.clone().scale(-1), ForceMode.Impulse);
       // torque
       bodyA.addTorque(j * -relativeA.cross(this.normal) , ForceMode.Impulse);
     }
@@ -89,8 +88,7 @@ export class CollisionContact implements Recyclable {
     if (bodyB) {
       bodyB.host.transform.position.add(this.mtv);
       // impulse
-      // bodyB.addForce(impulse, ForceMode.Impulse);
-      velocityB.add(impulse.clone().scale(inverseMassB));
+      bodyB.addForce(impulse, ForceMode.Impulse);
       // torque
       bodyB.addTorque(j * relativeB.cross(this.normal) , ForceMode.Impulse);
     }
