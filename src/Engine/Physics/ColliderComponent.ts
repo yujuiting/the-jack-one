@@ -32,9 +32,9 @@ export class ColliderComponent extends Component {
 
   public debug: boolean = false;
 
-  public restitution: number = 0;
+  public restitution: number = 0.2;
 
-  public friction: number = 1;
+  public friction: number = 0.99;
 
   public isKinematic: boolean = false;
 

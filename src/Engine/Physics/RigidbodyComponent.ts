@@ -226,7 +226,7 @@ export class RigidbodyComponent extends Component {
     this.velocity = Vector.Get();
     this.useGravity = false;
     this.mass = 1;
-    this.moi = 5000;
+    this.moi = 1000;
     this.isSleeping = false;
     this.sleepThreshold = 0.2;
     this.sleepTimer = 0;

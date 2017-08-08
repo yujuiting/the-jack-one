@@ -45,7 +45,13 @@ export class CollisionContact implements Recyclable {
     const angularVelocityA = bodyA ? bodyA.angularVelocity : 0;
     const angularVelocityB = bodyB ? bodyB.angularVelocity : 0;
 
-    const relativeVelocity = velocityB.clone().subtract(velocityA);
+    const relativeA = this.point.clone().subtract(a.bounds.center);
+    const relativeB = this.point.clone().subtract(b.bounds.center);
+
+    const relativeVelocity = velocityB.clone()
+      .add(relativeB.cross(-angularVelocityB))
+      .subtract(velocityA)
+      .subtract(relativeA.cross(-angularVelocityA));
 
     const rvDotNormal = relativeVelocity.dot(this.normal);
 
@@ -62,9 +68,6 @@ export class CollisionContact implements Recyclable {
 
     const inverseMoiA = bodyA ? bodyA.inverseMoi : 0;
     const inverseMoiB = bodyB ? bodyB.inverseMoi : 0;
-
-    const relativeA = this.point.clone().subtract(a.bounds.center);
-    const relativeB = this.point.clone().subtract(b.bounds.center);
 
     const j_moi_a = Vector.Cross(relativeA.cross(this.normal), relativeA).scale(inverseMoiA);
     const j_moi_b = Vector.Cross(relativeB.cross(this.normal), relativeB).scale(inverseMoiB);
@@ -88,8 +91,10 @@ export class CollisionContact implements Recyclable {
       bodyA.host.transform.position.add(this.mtv.clone().scale(-1));
       // impulse
       bodyA.addForce(impulse.clone().scale(-1), ForceMode.Impulse);
+
+      // TODO: force at specific point should cause torque
       // torque
-      bodyA.addTorque(j * relativeA.cross(this.normal) , ForceMode.Impulse);
+      // bodyA.addTorque(j * relativeA.cross(this.normal) , ForceMode.Impulse);
     }
 
     if (bodyB) {
@@ -100,17 +105,13 @@ export class CollisionContact implements Recyclable {
       bodyB.host.transform.position.add(this.mtv);
       // impulse
       bodyB.addForce(impulse, ForceMode.Impulse);
+
+      // TODO: force at specific point should cause torque
       // torque
-      bodyB.addTorque(j * -relativeB.cross(this.normal) , ForceMode.Impulse);
+      // bodyB.addTorque(j * -relativeB.cross(this.normal) , ForceMode.Impulse);
     }
 
     const tangent = this.normal.normal();
-
-    // recalculate relative velocity including angular velocity
-    relativeVelocity.copy(velocityB)
-      .add(relativeB.cross(-angularVelocityB))
-      .subtract(velocityA)
-      .subtract(relativeA.cross(-angularVelocityA));
 
     let frictionImpulse: Vector;
 

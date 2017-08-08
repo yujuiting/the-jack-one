@@ -73,7 +73,7 @@ class Box extends Base {
     this.collider = this.addComponent(BoxColliderComponent);
     this.collider.debug = true;
     this.setSize(20, 20);
-    this.rigidbody.useGravity = true;
+    // this.rigidbody.useGravity = true;
   }
 
   public setSize(width: number, height: number): void {
@@ -210,8 +210,8 @@ class Circle extends Base {
 
 }
 
-for (let i = 0; i < 1; i++) {
-  for (let j = 0; j < 1; j++) {
+for (let i = 0; i < 3; i++) {
+  for (let j = 0; j < 3; j++) {
     const box = instantiate(Box);
     box.setPosition(i * 30, j * 30);
     mainScene.add(box);
@@ -235,12 +235,12 @@ mainScene.add(polygon);
 
 const plane1 = instantiate(Plane);
 plane1.transform.position.setTo(100, -160);
-// plane1.transform.rotation = Math.PI / 18;
+plane1.transform.rotation = Math.PI / 18;
 mainScene.add(plane1);
 
 const plane2 = instantiate(Plane);
 plane2.transform.position.setTo(-100, -160);
-// plane2.transform.rotation = -Math.PI / 18;
+plane2.transform.rotation = -Math.PI / 18;
 mainScene.add(plane2);
 
 bootstrap(document.body);
