@@ -31,21 +31,9 @@ export class BroadPhaseCollisionResolver {
     return removeFromArray(this.sleepingColliders, collider);
   }
 
-  public update(): void {
+  public fixedUpdate(): void {
     this._pairs.forEach(pair => Pair.Put(pair));
     this._pairs.splice(0, this._pairs.length);
-
-    const goToSleep = this.awakeColliders.filter(collider => collider.rigidbody && collider.rigidbody.isSleeping);
-    goToSleep.forEach(collider => {
-      removeFromArray(this.awakeColliders, collider);
-      addToArray(this.sleepingColliders, collider);
-    });
-
-    const goToAwake = this.sleepingColliders.filter(collider => collider.rigidbody && !collider.rigidbody.isSleeping);
-    goToAwake.forEach(collider => {
-      removeFromArray(this.sleepingColliders, collider);
-      addToArray(this.awakeColliders, collider);
-    });
 
     const awakeLength = this.awakeColliders.length;
     const sleepingLength = this.sleepingColliders.length;
@@ -71,6 +59,45 @@ export class BroadPhaseCollisionResolver {
       }
 
       for (let b = 0; b < sleepingLength; b++) {
+        colliderB = this.sleepingColliders[b];
+
+        if ((colliderA.layer & colliderB.layer) === 0) {
+          continue;
+        }
+
+        if (colliderA.bounds.intersects(colliderB.bounds)) {
+          const pair = Pair.Get(colliderA, colliderB);
+          if (pair) {
+            this._pairs.push(pair);
+          }
+        }
+      }
+    }
+  }
+
+  public update(): void {
+    const goToSleep = this.awakeColliders.filter(collider => collider.rigidbody && collider.rigidbody.isSleeping);
+    goToSleep.forEach(collider => {
+      removeFromArray(this.awakeColliders, collider);
+      addToArray(this.sleepingColliders, collider);
+    });
+
+    const goToAwake = this.sleepingColliders.filter(collider => collider.rigidbody && !collider.rigidbody.isSleeping);
+    goToAwake.forEach(collider => {
+      removeFromArray(this.sleepingColliders, collider);
+      addToArray(this.awakeColliders, collider);
+    });
+
+    this._pairs.forEach(pair => Pair.Put(pair));
+    this._pairs.splice(0, this._pairs.length);
+
+    const sleepingLength = this.sleepingColliders.length;
+    let colliderA: ColliderComponent;
+    let colliderB: ColliderComponent;
+
+    for (let a = 0; a < sleepingLength; a++) {
+      colliderA = this.sleepingColliders[a];
+      for (let b = a + 1; b < sleepingLength; b++) {
         colliderB = this.sleepingColliders[b];
 
         if ((colliderA.layer & colliderB.layer) === 0) {

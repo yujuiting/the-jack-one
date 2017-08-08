@@ -9,6 +9,12 @@ import { UniqueComponent } from 'Engine/Utility/Decorator/UniqueComponent';
 import { RequireComponent } from 'Engine/Utility/Decorator/RequireComponent';
 import { Inject } from 'Engine/Utility/Decorator/Inject';
 
+interface InternalRigidbodyComponent extends RigidbodyComponent {
+  motion: number;
+  inverseMass: number;
+  inverseMoi: number;
+}
+
 const DoublePI = Math.PI * 2;
 
 @UniqueComponent()
@@ -33,9 +39,9 @@ export class RigidbodyComponent extends Component {
 
   public get mass(): number { return this._mass; }
 
-  public set mass(value: number) { this._mass = value; this.inverseMass = 1 / value; }
+  public set mass(value: number) { this._mass = value; (<InternalRigidbodyComponent>this).inverseMass = 1 / value; }
 
-  public inverseMass: number;
+  public readonly inverseMass: number;
 
   /**
    * moment of inertia
@@ -44,9 +50,9 @@ export class RigidbodyComponent extends Component {
 
   public get moi(): number { return this._moi; }
 
-  public set moi(value: number) { this._moi = value; this.inverseMoi = 1 / value; }
+  public set moi(value: number) { this._moi = value; (<InternalRigidbodyComponent>this).inverseMoi = 1 / value; }
 
-  public inverseMoi: number;
+  public readonly inverseMoi: number;
 
   public maxAngularVelocity: number;
 
@@ -59,9 +65,15 @@ export class RigidbodyComponent extends Component {
 
   public isSleeping: boolean;
 
+  public sleepThreshold: number;
+
+  public readonly motion: number;
+
   private forces: Vector[];
 
   private torques: number[];
+
+  private sleepTimer: number;
 
   private transform: TransformComponent = <TransformComponent>this.getComponent(TransformComponent);
 
@@ -83,12 +95,31 @@ export class RigidbodyComponent extends Component {
     this.forces.forEach(force => force.reset());
   }
 
+  public clearTorque(): void {
+    for (let i = 0; i < this.torques.length; i++) {
+      this.torques[i] = 0;
+    }
+  }
+
+  public sleep(): void {
+    this.isSleeping = true;
+    this.velocity.reset();
+    this.angularVelocity = 0;
+    this.clearForce();
+    this.clearTorque();
+  }
+
+  public awake(): void {
+    this.isSleeping = false;
+    this.sleepTimer = 0;
+  }
+
   public fixedUpdate(alpha: number): void {
     super.fixedUpdate(alpha);
 
     const deltaTimeInSecond = this.time.fixedDeltaTimeInSecond * alpha;
 
-    if (this.useGravity) {
+    if (this.useGravity && !this.isSleeping) {
       this.addForce(this.engine.gravity, ForceMode.Acceleration);
     }
 
@@ -140,12 +171,29 @@ export class RigidbodyComponent extends Component {
     this.angularVelocity += this.torques[ForceMode.VelocityChange];
     this.torques[ForceMode.VelocityChange] = 0;
 
-    const velocityIsZero = this.velocity.isZero;
+    (<InternalRigidbodyComponent>this)
+      .motion = (this.velocity.squareMagnitude() + Math.pow(this.angularVelocity, 2)) * 0.5;
 
-    if (!velocityIsZero) {
+    if (!this.isSleeping && this.sleepThreshold >= 0) {
+      if (this.motion < this.sleepThreshold) {
+        this.sleepTimer += deltaTimeInSecond;
+
+        if (this.sleepTimer > 0.5) {
+          this.sleepTimer = 0;
+          this.sleep();
+        }
+      } else {
+        this.sleepTimer = 0;
+      }
+    } else {
+      if (this.motion >= this.sleepThreshold) {
+        this.awake();
+      }
+    }
+
+    if (!this.velocity.isZero) {
       this.velocity.scale(Math.max(0, 1 - this.drag * deltaTimeInSecond));
-      const velocity = this.velocity.clone();
-      velocity.scale(deltaTimeInSecond);
+      const velocity = this.velocity.clone().scale(deltaTimeInSecond);
       this.transform.position.add(velocity);
       velocity.destroy();
     }
@@ -165,8 +213,6 @@ export class RigidbodyComponent extends Component {
         this.transform.rotation = this.transform.rotation % DoublePI;
       }
     }
-
-    this.isSleeping = velocityIsZero && this.angularVelocity === 0;
   }
 
   public reset(): void {
@@ -180,8 +226,10 @@ export class RigidbodyComponent extends Component {
     this.velocity = Vector.Get();
     this.useGravity = false;
     this.mass = 1;
-    this.moi = 1000;
-    this.isSleeping = true;
+    this.moi = 5000;
+    this.isSleeping = false;
+    this.sleepThreshold = 0.2;
+    this.sleepTimer = 0;
     this.forces = [
       Vector.Get(),
       Vector.Get(),

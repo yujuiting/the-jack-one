@@ -47,6 +47,9 @@ export class CircleColliderComponent extends ColliderComponent {
 
   public update(): void {
     if (this.debug) {
+      const isSleep = this.rigidbody ? this.rigidbody.isSleeping : true;
+      const color = isSleep ? Color.Green : Color.Red;
+
       if (!this.debugColliderRenderer) {
         this.debugColliderRenderer = this.addComponent(CircleRendererComponent);
         this.debugColliderRenderer.useLocalCoordinate = false;
@@ -63,6 +66,9 @@ export class CircleColliderComponent extends ColliderComponent {
         this.debugDirectionRenderer = this.addComponent(LineRendererComponent);
         this.debugDirectionRenderer.useLocalCoordinate = false;
       }
+
+      this.debugColliderRenderer.strokeColor = color;
+      this.debugDirectionRenderer.strokeColor = color;
 
       this.debugColliderRenderer.center.copy(this.bounds.center);
       this.debugColliderRenderer.radius = this.radius;
