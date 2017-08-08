@@ -32,6 +32,9 @@ export class CollisionContact implements Recyclable {
     const bodyA = a.rigidbody;
     const bodyB = b.rigidbody;
 
+    const shouldAwakeBodyA = bodyB ? !bodyB.isSleeping : false;
+    const shouldAwakeBodyB = bodyA ? !bodyA.isSleeping : false;
+
     if (!bodyA && !bodyB) {
       return;
     }
@@ -42,7 +45,13 @@ export class CollisionContact implements Recyclable {
     const angularVelocityA = bodyA ? bodyA.angularVelocity : 0;
     const angularVelocityB = bodyB ? bodyB.angularVelocity : 0;
 
-    const relativeVelocity = velocityB.clone().subtract(velocityA);
+    const relativeA = this.point.clone().subtract(a.bounds.center);
+    const relativeB = this.point.clone().subtract(b.bounds.center);
+
+    const relativeVelocity = velocityB.clone()
+      .add(relativeB.cross(-angularVelocityB))
+      .subtract(velocityA)
+      .subtract(relativeA.cross(-angularVelocityA));
 
     const rvDotNormal = relativeVelocity.dot(this.normal);
 
@@ -60,9 +69,6 @@ export class CollisionContact implements Recyclable {
     const inverseMoiA = bodyA ? bodyA.inverseMoi : 0;
     const inverseMoiB = bodyB ? bodyB.inverseMoi : 0;
 
-    const relativeA = this.point.clone().subtract(a.bounds.center);
-    const relativeB = this.point.clone().subtract(b.bounds.center);
-
     const j_moi_a = Vector.Cross(relativeA.cross(this.normal), relativeA).scale(inverseMoiA);
     const j_moi_b = Vector.Cross(relativeB.cross(this.normal), relativeB).scale(inverseMoiB);
     const j_moi = j_moi_a.add(j_moi_b).dot(this.normal);
@@ -78,63 +84,67 @@ export class CollisionContact implements Recyclable {
     }
 
     if (bodyA) {
+      if (shouldAwakeBodyA && bodyA.isSleeping) {
+        bodyA.awake();
+      }
+
       bodyA.host.transform.position.add(this.mtv.clone().scale(-1));
       // impulse
       bodyA.addForce(impulse.clone().scale(-1), ForceMode.Impulse);
+
+      // TODO: force at specific point should cause torque
       // torque
-      bodyA.addTorque(j * -relativeA.cross(this.normal) , ForceMode.Impulse);
+      // bodyA.addTorque(j * relativeA.cross(this.normal) , ForceMode.Impulse);
     }
 
     if (bodyB) {
+      if (shouldAwakeBodyB && bodyB.isSleeping) {
+        bodyB.awake();
+      }
+
       bodyB.host.transform.position.add(this.mtv);
       // impulse
       bodyB.addForce(impulse, ForceMode.Impulse);
+
+      // TODO: force at specific point should cause torque
       // torque
-      bodyB.addTorque(j * relativeB.cross(this.normal) , ForceMode.Impulse);
+      // bodyB.addTorque(j * -relativeB.cross(this.normal) , ForceMode.Impulse);
     }
 
     const tangent = this.normal.normal();
-    // check relative velocity and tangent are not perpendicular
-    if (relativeVelocity.dot(tangent) !== 0) {
-      // recalculate relative velocity including angular velocity
-      relativeVelocity.copy(velocityB)
-        .add(relativeB.cross(-angularVelocityB))
-        .subtract(velocityA)
-        .subtract(relativeA.cross(-angularVelocityA));
 
-      let frictionImpulse: Vector;
+    let frictionImpulse: Vector;
 
-      const jt_moi_a = Vector.Cross(relativeA.cross(tangent), relativeA).scale(inverseMoiA);
-      const jt_moi_b = Vector.Cross(relativeB.cross(tangent), relativeB).scale(inverseMoiB);
-      const jt_moi = jt_moi_a.add(jt_moi_b).dot(tangent);
+    const jt_moi_a = Vector.Cross(relativeA.cross(tangent), relativeA).scale(inverseMoiA);
+    const jt_moi_b = Vector.Cross(relativeB.cross(tangent), relativeB).scale(inverseMoiB);
+    const jt_moi = jt_moi_a.add(jt_moi_b).dot(tangent);
 
-      // Solve for the tangent vector
-      const t = relativeVelocity.clone().subtract(this.normal.clone().scale(rvDotNormal)).normalize();
+    // Solve for the tangent vector
+    const t = relativeVelocity.clone().subtract(this.normal.clone().scale(rvDotNormal)).normalize();
 
-      // Solve for magnitude to apply along the friction vector
-      const jt = -relativeVelocity.dot(t) / (sumOfInverseMass + jt_moi);
+    // Solve for magnitude to apply along the friction vector
+    const jt = -relativeVelocity.dot(t) / (sumOfInverseMass + jt_moi);
 
-      // PythagoreanSolve = A^2 + B^2 = C^2, solving for C given A and B
-      // Use to approximate mu given friction coefficients of each body
-      const mu = Math.sqrt(Math.pow(this.colliderA.friction, 2) + Math.pow(this.colliderB.friction, 2));
+    // PythagoreanSolve = A^2 + B^2 = C^2, solving for C given A and B
+    // Use to approximate mu given friction coefficients of each body
+    const mu = Math.sqrt(Math.pow(this.colliderA.friction, 2) + Math.pow(this.colliderB.friction, 2));
 
-      // Clamp magnitude of friction and create impulse vector
-      // const frictionImpulse = tangent.clone();
-      if (Math.abs( jt ) < j * mu) {
-        frictionImpulse = t.clone().scale(jt);
-      } else {
-        frictionImpulse = t.clone().scale(-j * mu);
-      }
+    // Clamp magnitude of friction and create impulse vector
+    // const frictionImpulse = tangent.clone();
+    if (Math.abs( jt ) < j * mu) {
+      frictionImpulse = t.clone().scale(jt);
+    } else {
+      frictionImpulse = t.clone().scale(-j * mu);
+    }
 
-      if (bodyA) {
-        bodyA.addForce(frictionImpulse.clone().scale(-1), ForceMode.Impulse);
-        bodyA.addTorque(-frictionImpulse.dot(t) * relativeA.cross(t) , ForceMode.Impulse);
-      }
+    if (bodyA) {
+      bodyA.addForce(frictionImpulse.clone().scale(-1), ForceMode.Impulse);
+      bodyA.addTorque(-frictionImpulse.dot(t) * relativeA.cross(t) , ForceMode.Impulse);
+    }
 
-      if (bodyB) {
-        bodyB.addForce(frictionImpulse, ForceMode.Impulse);
-        bodyB.addTorque(frictionImpulse.dot(t) * relativeB.cross(t) , ForceMode.Impulse);
-      }
+    if (bodyB) {
+      bodyB.addForce(frictionImpulse, ForceMode.Impulse);
+      bodyB.addTorque(frictionImpulse.dot(t) * relativeB.cross(t) , ForceMode.Impulse);
     }
   }
 

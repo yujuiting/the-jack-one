@@ -5,11 +5,11 @@ import { Vector } from 'Engine/Math/Vector';
 import { CollisionContact } from 'Engine/Physics/CollisionContact';
 import { Ray } from 'Engine/Math/Ray';
 import { Projection } from 'Engine/Math/Projection';
+import { ColliderType } from 'Engine/Physics/ColliderType';
 
-export enum ColliderType {
-  Static,
-  Rigidbody,
-  Kinematic
+interface InternalColliderComponent {
+  rigidbody: RigidbodyComponent|undefined;
+  type: ColliderType;
 }
 
 export class ColliderComponent extends Component {
@@ -35,6 +35,8 @@ export class ColliderComponent extends Component {
   public restitution: number = 0.2;
 
   public friction: number = 0.99;
+
+  public isKinematic: boolean = false;
 
   public readonly type: ColliderType = ColliderType.Static;
 
@@ -72,9 +74,14 @@ export class ColliderComponent extends Component {
 
   public start(): void {
     super.start();
-    (<any>this).rigidbody = this.getComponent(RigidbodyComponent);
+    (<InternalColliderComponent>this).rigidbody = this.getComponent(RigidbodyComponent);
     if (this.rigidbody) {
-      (<any>this).type = ColliderType.Rigidbody;
+      if (this.isKinematic) {
+        (<InternalColliderComponent>this).type = ColliderType.Kinematic;
+        this.rigidbody.sleepThreshold = -1;
+      } else {
+        (<InternalColliderComponent>this).type = ColliderType.Rigidbody;
+      }
     }
   }
 

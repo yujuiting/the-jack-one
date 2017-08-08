@@ -87,14 +87,14 @@ export class Scene extends BaseObject {
 
   public fixedUpdate(alpha: number): void {
     this.gameObjects.forEachChildren(gameObject => gameObject.fixedUpdate(alpha));
-
-    this.broadPhaseCollisionResolver.update();
-
+    this.broadPhaseCollisionResolver.fixedUpdate();
     this.narrowPhaseCollisionResolver.resolve(this.broadPhaseCollisionResolver.pairs);
   }
 
   public update(): void {
     this.gameObjects.forEachChildren(gameObject => gameObject.update());
+    this.broadPhaseCollisionResolver.update();
+    this.narrowPhaseCollisionResolver.resolve(this.broadPhaseCollisionResolver.pairs);
   }
 
   public lateUpdate(): void {

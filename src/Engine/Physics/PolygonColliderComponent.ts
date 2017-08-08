@@ -64,6 +64,9 @@ export class PolygonColliderComponent extends ColliderComponent {
 
   public update(): void {
     if (this.debug) {
+      const isSleep = this.rigidbody ? this.rigidbody.isSleeping : true;
+      const color = isSleep ? Color.Green : Color.Red;
+
       if (!this.debugColliderRenderer) {
         this.debugColliderRenderer = this.addComponent(LineRendererComponent);
         this.debugColliderRenderer.useLocalCoordinate = false;
@@ -81,6 +84,9 @@ export class PolygonColliderComponent extends ColliderComponent {
         this.debugDirectionRenderer = this.addComponent(LineRendererComponent);
         this.debugDirectionRenderer.useLocalCoordinate = false;
       }
+
+      this.debugColliderRenderer.strokeColor = color;
+      this.debugDirectionRenderer.strokeColor = color;
 
       this.debugColliderRenderer.clearPoints();
       if (this._cachedPoints.length > 1) {
