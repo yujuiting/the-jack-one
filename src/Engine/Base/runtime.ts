@@ -1,6 +1,6 @@
 import 'Engine/imports';
 import { Engine } from 'Engine/Base/Engine';
-import { ProviderRegistry, Provider } from 'Engine/Utility/ProviderRegistry';
+import { ProviderRegistry, Provider } from 'Engine/Base/ProviderRegistry';
 import { Class, Token } from 'Engine/Utility/Type';
 
 const providerRegistry = new ProviderRegistry();

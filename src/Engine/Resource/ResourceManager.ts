@@ -1,6 +1,6 @@
 import { Bundle } from 'Engine/Resource/Bundle';
 import { Resource } from 'Engine/Resource/Resource';
-import { Service } from 'Engine/Utility/Decorator/Service';
+import { Service } from 'Engine/Decorator/Service';
 
 @Service()
 export class ResourceManager {

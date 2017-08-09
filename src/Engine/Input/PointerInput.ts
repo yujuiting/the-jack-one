@@ -3,8 +3,8 @@ import { MouseInput } from 'Engine/Input/MouseInput';
 import { TouchInput } from 'Engine/Input/TouchInput';
 import { listToArray } from 'Engine/Utility/DOM';
 import { Vector } from 'Engine/Math/Vector';
-import { Service } from 'Engine/Utility/Decorator/Service';
-import { Inject } from 'Engine/Utility/Decorator/Inject';
+import { Service } from 'Engine/Decorator/Service';
+import { Inject } from 'Engine/Decorator/Inject';
 
 // interface TouchEvent extends UIEvent {
 //     readonly altKey: boolean;

@@ -1,6 +1,6 @@
 import { BrowserDelegate } from 'Engine/Utility/BrowserDelegate';
-import { Service } from 'Engine/Utility/Decorator/Service';
-import { Inject } from 'Engine/Utility/Decorator/Inject';
+import { Service } from 'Engine/Decorator/Service';
+import { Inject } from 'Engine/Decorator/Inject';
 
 @Service()
 export class Screen {

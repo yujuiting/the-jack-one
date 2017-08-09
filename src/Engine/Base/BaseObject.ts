@@ -23,10 +23,6 @@ export abstract class BaseObject implements Recyclable {
 
   public get isDestroyed(): boolean { return this._destroyed; }
 
-  constructor() {
-    this.reset();
-  }
-
   public activate(): void {
     this._isActive = true;
   }

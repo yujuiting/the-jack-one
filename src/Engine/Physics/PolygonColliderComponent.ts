@@ -7,7 +7,7 @@ import { Line } from 'Engine/Math/Line';
 import { Ray } from 'Engine/Math/Ray';
 import { Projection } from 'Engine/Math/Projection';
 import { CollisionJumpTable } from 'Engine/Physics/CollisionJumpTable';
-import { Inject } from 'Engine/Utility/Decorator/Inject';
+import { Inject } from 'Engine/Decorator/Inject';
 import { CollisionContact } from 'Engine/Physics/CollisionContact';
 import { CircleColliderComponent } from 'Engine/Physics/CircleColliderComponent';
 import { forwardRef } from 'Engine/Utility/Type';

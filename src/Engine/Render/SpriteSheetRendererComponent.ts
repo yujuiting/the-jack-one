@@ -4,10 +4,10 @@ import { TransformComponent } from 'Engine/Display/TransformComponent';
 import { Sprite } from 'Engine/Display/Sprite';
 import { SpriteSheet } from 'Engine/Display/SpriteSheet';
 import { Time } from 'Engine/Time/Time';
-import { UniqueComponent } from 'Engine/Utility/Decorator/UniqueComponent';
-import { RequireComponent } from 'Engine/Utility/Decorator/RequireComponent';
+import { UniqueComponent } from 'Engine/Decorator/UniqueComponent';
+import { RequireComponent } from 'Engine/Decorator/RequireComponent';
 import { Matrix } from 'Engine/Math/Matrix';
-import { Inject } from 'Engine/Utility/Decorator/Inject';
+import { Inject } from 'Engine/Decorator/Inject';
 
 @UniqueComponent()
 @RequireComponent([TransformComponent])

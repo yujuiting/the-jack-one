@@ -4,7 +4,7 @@ import { Scene } from 'Engine/Base/Scene';
 import { addToArray,
          removeFromArray,
          includeInArray } from 'Engine/Utility/ArrayUtility';
-import { Service } from 'Engine/Utility/Decorator/Service';
+import { Service } from 'Engine/Decorator/Service';
 
 @Service()
 export class SceneManager {

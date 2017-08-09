@@ -7,10 +7,11 @@ import { Bundle } from 'Engine/Resource/Bundle';
 import { Camera, MainCamera } from 'Engine/Base/Camera';
 import { addToArray,
          removeFromArray } from 'Engine/Utility/ArrayUtility';
-import { Inject } from 'Engine/Utility/Decorator/Inject';
+import { Inject } from 'Engine/Decorator/Inject';
 import { BroadPhaseCollisionResolver } from 'Engine/Physics/BroadPhaseCollisionResolver';
 import { NarrowPhaseCollisionResolver } from 'Engine/Physics/NarrowPhaseCollisionResolver';
 import { ColliderComponent } from 'Engine/Physics/ColliderComponent';
+import { Vector } from 'Engine/Math/Vector';
 
 /**
  * Scene manage game objects and resources.
@@ -27,16 +28,23 @@ export class Scene extends BaseObject {
 
   private cameras: Camera[] = [];
 
+  @Inject(MainCamera)
+  public mainCamera: Camera;
+
+  @Inject(BroadPhaseCollisionResolver)
+  private broadPhaseCollisionResolver: BroadPhaseCollisionResolver;
+
+  @Inject(NarrowPhaseCollisionResolver)
+  private narrowPhaseCollisionResolver: NarrowPhaseCollisionResolver;
+
   public get isLoaded(): boolean { return this.resources.isLoaded; }
 
-  constructor(@Inject(MainCamera) mainCamera: Camera,
-              @Inject(BroadPhaseCollisionResolver) private broadPhaseCollisionResolver: BroadPhaseCollisionResolver,
-              @Inject(NarrowPhaseCollisionResolver) private narrowPhaseCollisionResolver: NarrowPhaseCollisionResolver) {
+  constructor() {
     super();
-    this.add(mainCamera);
+    this.add(this.mainCamera);
   }
 
-  public add(gameObject: GameObject): boolean {
+  public add(gameObject: GameObject, at?: Vector): boolean {
     if (!this.gameObjects.add(gameObject.node)) {
       return false;
     }
@@ -49,6 +57,10 @@ export class Scene extends BaseObject {
 
     if (collider) {
       this.broadPhaseCollisionResolver.track(collider);
+    }
+
+    if (at) {
+      gameObject.transform.position.copy(at);
     }
 
     gameObject.start();
@@ -81,8 +93,8 @@ export class Scene extends BaseObject {
     return this.gameObjects.hasChild(gameObject.node);
   }
 
-  public load(): Promise<void> {
-    return this.resources.load();
+  public async load(): Promise<void> {
+    await this.resources.load();
   }
 
   public fixedUpdate(alpha: number): void {

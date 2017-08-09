@@ -27,13 +27,6 @@ export abstract class Component extends BaseObject {
     return this.host.getComponents(componentType);
   }
 
-  /**
-   * Call on component create.
-   */
-  public start(): void {
-    //
-  }
-
   public toString(): string {
     return `GameComponent(${this.id})`;
   }

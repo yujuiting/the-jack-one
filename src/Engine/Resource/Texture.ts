@@ -1,7 +1,7 @@
 import { Resource } from 'Engine/Resource/Resource';
 import { onceEvent } from 'Engine/Utility/DOM';
 import { BrowserDelegate } from 'Engine/Utility/BrowserDelegate';
-import { Inject } from 'Engine/Utility/Decorator/Inject';
+import { Inject } from 'Engine/Decorator/Inject';
 
 /**
  * Basic texture
@@ -17,9 +17,21 @@ export class Texture extends Resource {
 
   private ctx: CanvasRenderingContext2D = <CanvasRenderingContext2D>this.canvas.getContext('2d');
 
+  private isDirty: boolean = false;
+
   public get width(): number { return this.canvas.width; }
 
+  public set width(value: number) {
+    this.canvas.width = value;
+    this.markAsDirty();
+  }
+
   public get height(): number { return this.canvas.height; }
+
+  public set height(value: number) {
+    this.canvas.height = value;
+    this.markAsDirty();
+  }
 
   public get imageBitmap(): ImageBitmap|HTMLCanvasElement { return this.canvas; }
 
@@ -30,6 +42,9 @@ export class Texture extends Resource {
       this.canvas.width = imageData.width;
       this.canvas.height = imageData.height;
       this.setImageData(imageData);
+    } else {
+      this.canvas.width = 0;
+      this.canvas.height = 0;
     }
   }
 
@@ -40,10 +55,8 @@ export class Texture extends Resource {
 
     this.source = new Image();
     this.source.src = this.path;
-    this.canvas.width = 0;
-    this.canvas.height = 0;
 
-    return onceEvent(this.source, 'load').then(e => this.onLoad());
+    return onceEvent(this.source, 'load').then(e => this.draw());
   }
 
   public getImageData(sx: number = 0,
@@ -72,16 +85,40 @@ export class Texture extends Resource {
     return new Texture(this.path, this.getImageData());
   }
 
-  private onLoad(): void {
-    this.canvas.width = this.source.width;
-    this.canvas.height = this.source.height;
+  public markAsDirty(): void {
+    if (this.isDirty) {
+      return;
+    }
+
+    this.isDirty = true;
+
+    if (!this.isLoaded) {
+      return;
+    }
+
+    setTimeout(() => this.draw());
+  }
+
+  private draw(): void {
+    if (this.width === 0 && this.height === 0) {
+      this.canvas.width = this.source.width;
+      this.canvas.height = this.source.height;
+    }
+
     this.ctx.drawImage(
       this.source,
       0, 0,
       this.source.width,
-      this.source.height
+      this.source.height,
+      0, 0,
+      this.width,
+      this.height
     );
-    this._isLoaded.next(true);
+
+    this.isDirty = false;
+    if (!this.isLoaded) {
+      this._isLoaded.next(true);
+    }
   }
 
 }

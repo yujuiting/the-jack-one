@@ -1,5 +1,5 @@
 import { Token, Class } from 'Engine/Utility/Type';
-import { ProviderRegistry } from 'Engine/Utility/ProviderRegistry';
+import { ProviderRegistry } from 'Engine/Base/ProviderRegistry';
 import { getService } from 'Engine/Base/runtime';
 
 export function Inject(token: Token): (target: Object, propertyKey: string | symbol, parameterIndex?: number) => void {

@@ -2,8 +2,25 @@ import { Observable } from 'rxjs/Observable';
 
 export function onceEvent<T extends Event>(node: Node,
                                            eventName: string): Promise<T> {
-  return new Promise<T>(resolve =>
-    node.addEventListener(eventName, e => resolve(<T>e)));
+  return new Promise<T>((resolve, reject) => {
+    const onEvent = (e: T) => {
+      resolve(e);
+      teardown();
+    };
+
+    const onError = (e: ErrorEvent) => {
+      reject(e);
+      teardown();
+    };
+
+    const teardown = () => {
+      node.removeEventListener(eventName, onEvent);
+      node.removeEventListener('error', onError);
+    };
+
+    node.addEventListener(eventName, onEvent);
+    node.addEventListener('error', onError);
+  });
 }
 
 /**

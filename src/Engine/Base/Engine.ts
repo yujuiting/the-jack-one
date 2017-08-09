@@ -5,8 +5,8 @@ import { BrowserDelegate } from 'Engine/Utility/BrowserDelegate';
 import { Time } from 'Engine/Time/Time';
 import { ReadonlyTree } from 'Engine/Utility/Tree';
 import { Vector } from 'Engine/Math/Vector';
-import { Service } from 'Engine/Utility/Decorator/Service';
-import { Inject } from 'Engine/Utility/Decorator/Inject';
+import { Service } from 'Engine/Decorator/Service';
+import { Inject } from 'Engine/Decorator/Inject';
 
 @Service()
 export class Engine {
@@ -37,7 +37,7 @@ export class Engine {
               @Inject(BrowserDelegate)  private readonly browser: BrowserDelegate) {
   }
 
-  public initialize(container: HTMLElement): Promise<void> {
+  public async initialize(container: HTMLElement): Promise<void> {
     if (this.isInitialized) {
       throw new Error('Repeated engine initialization.');
     }
@@ -55,10 +55,14 @@ export class Engine {
 
     this.sceneManager.sceneLoaded$.subscribe(s => this.onSceneLoaded(s));
 
-    return this.sceneManager.currentScene.load().then(() => {
-      this.currentScene = this.sceneManager.currentScene;
-      this.resume();
-    });
+    try {
+      await this.sceneManager.currentScene.load();
+    } catch (err) {
+      console.error(err);
+    }
+
+    this.currentScene = this.sceneManager.currentScene;
+    this.resume();
   }
 
   public pause() {

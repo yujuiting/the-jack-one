@@ -1,6 +1,6 @@
 import { Observable } from 'rxjs/Observable';
 import { observeEvent } from 'Engine/Utility/DOM';
-import { Service } from 'Engine/Utility/Decorator/Service';
+import { Service } from 'Engine/Decorator/Service';
 
 /**
  * Browser API interface for internal usage.

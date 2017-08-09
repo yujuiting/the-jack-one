@@ -9,8 +9,8 @@ import { BrowserDelegate } from 'Engine/Utility/BrowserDelegate';
 import { Screen } from 'Engine/Base/Screen';
 import { Vector } from 'Engine/Math/Vector';
 import { Rect } from 'Engine/Math/Rect';
-import { Inject } from 'Engine/Utility/Decorator/Inject';
-import { Service } from 'Engine/Utility/Decorator/Service';
+import { Inject } from 'Engine/Decorator/Inject';
+import { Service } from 'Engine/Decorator/Service';
 
 export const MainCamera = Symbol('MainCamera');
 

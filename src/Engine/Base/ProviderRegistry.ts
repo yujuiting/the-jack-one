@@ -47,6 +47,7 @@ export class ProviderRegistry {
   public static RegisterDependency(target: Class<any>, token: Token, index: number): void {
     const dependencies: DependencyDescriptor[] = Reflect.getMetadata(DI_DEPENDENCIES, target) || [];
     dependencies.push({ token: resolveForwardRef<Token>(token), index });
+    dependencies.sort((a, b) => a.index - b.index);
     Reflect.defineMetadata(DI_DEPENDENCIES, dependencies, target);
   }
 
@@ -72,7 +73,7 @@ export class ProviderRegistry {
     }
 
     if ((<FactoryProvider>provider).useFactory) {
-      service = (<FactoryProvider>provider).useFactory();
+      service = this.create((<FactoryProvider>provider).useFactory);
     }
 
     if ((<ValueProvider>provider).useValue) {
@@ -98,7 +99,6 @@ export class ProviderRegistry {
 
   private resolveDependencies(target: any, args: any[]): void {
     const dependencies: DependencyDescriptor[] =  Reflect.getMetadata(DI_DEPENDENCIES, target) || [];
-    dependencies.sort((a, b) => a.index - b.index);
     dependencies.forEach(dependency => {
       const service = this.get(dependency.token);
 

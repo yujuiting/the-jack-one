@@ -15,7 +15,8 @@ This project focus on custom engine development, game is a side project for quic
   - ~~Physics~~
     - ~~PolygonCollider~~
     - ~~Oriented rigid bodies~~
-    - Sleep mechanism
+      - Add force at specific point should cause torque.
+    - ~~Sleep mechanism~~
   - Camera Manipulation
   - ParticleSystem
   - Animation

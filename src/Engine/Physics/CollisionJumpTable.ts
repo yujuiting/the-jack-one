@@ -1,4 +1,4 @@
-import { Service } from 'Engine/Utility/Decorator/Service';
+import { Service } from 'Engine/Decorator/Service';
 import { PolygonColliderComponent } from 'Engine/Physics/PolygonColliderComponent';
 import { CircleColliderComponent } from 'Engine/Physics/CircleColliderComponent';
 import { CollisionContact } from 'Engine/Physics/CollisionContact';

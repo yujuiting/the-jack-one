@@ -1,5 +1,10 @@
 import { Engine } from 'Engine/Base/Engine';
-import { Service } from 'Engine/Utility/Decorator/Service';
+import { Service } from 'Engine/Decorator/Service';
+
+interface InternalTime extends Time {
+  deltaTime: number;
+  fixedDeltaTime: number;
+}
 
 @Service()
 export class Time {
@@ -19,7 +24,7 @@ export class Time {
   public readonly fixedDeltaTimeInSecond: number = 1 / 60;
 
   public tick(deltaTime: number): void {
-    (<any>this).deltaTime = deltaTime;
+    (<InternalTime>this).deltaTime = deltaTime;
   }
 
 }

@@ -2,7 +2,7 @@ import { ColliderComponent } from 'Engine/Physics/ColliderComponent';
 import { addToArray,
          removeFromArray } from 'Engine/Utility/ArrayUtility';
 import { Pair } from 'Engine/Physics/Pair';
-import { Service } from 'Engine/Utility/Decorator/Service';
+import { Service } from 'Engine/Decorator/Service';
 
 @Service()
 export class BroadPhaseCollisionResolver {

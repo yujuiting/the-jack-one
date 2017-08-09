@@ -3,7 +3,7 @@ import { Texture } from 'Engine/Resource/Texture';
 import { Vector } from 'Engine/Math/Vector';
 import { Rect } from 'Engine/Math/Rect';
 import { BrowserDelegate } from 'Engine/Utility/BrowserDelegate';
-import { Inject } from 'Engine/Utility/Decorator/Inject';
+import { Inject } from 'Engine/Decorator/Inject';
 
 export class Sprite {
 

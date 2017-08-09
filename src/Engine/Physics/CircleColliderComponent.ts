@@ -5,7 +5,7 @@ import { Vector } from 'Engine/Math/Vector';
 import { Ray } from 'Engine/Math/Ray';
 import { Projection } from 'Engine/Math/Projection';
 import { CollisionJumpTable } from 'Engine/Physics/CollisionJumpTable';
-import { Inject } from 'Engine/Utility/Decorator/Inject';
+import { Inject } from 'Engine/Decorator/Inject';
 import { forwardRef } from 'Engine/Utility/Type';
 import { PolygonColliderComponent } from 'Engine/Physics/PolygonColliderComponent';
 import { CollisionContact } from 'Engine/Physics/CollisionContact';

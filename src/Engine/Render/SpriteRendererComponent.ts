@@ -1,6 +1,6 @@
 import { RendererComponent } from 'Engine/Render/RendererComponent';
 import { Sprite } from 'Engine/Display/Sprite';
-import { UniqueComponent } from 'Engine/Utility/Decorator/UniqueComponent';
+import { UniqueComponent } from 'Engine/Decorator/UniqueComponent';
 import { Matrix } from 'Engine/Math/Matrix';
 
 @UniqueComponent()

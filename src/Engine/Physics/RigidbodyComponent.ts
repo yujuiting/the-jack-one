@@ -5,9 +5,9 @@ import { Vector } from 'Engine/Math/Vector';
 import { Engine } from 'Engine/Base/Engine';
 import { Time } from 'Engine/Time/Time';
 import { ForceMode } from 'Engine/Physics/ForceMode';
-import { UniqueComponent } from 'Engine/Utility/Decorator/UniqueComponent';
-import { RequireComponent } from 'Engine/Utility/Decorator/RequireComponent';
-import { Inject } from 'Engine/Utility/Decorator/Inject';
+import { UniqueComponent } from 'Engine/Decorator/UniqueComponent';
+import { RequireComponent } from 'Engine/Decorator/RequireComponent';
+import { Inject } from 'Engine/Decorator/Inject';
 
 interface InternalRigidbodyComponent extends RigidbodyComponent {
   motion: number;
@@ -26,61 +26,71 @@ export class RigidbodyComponent extends Component {
   /**
    * radians per second
    */
-  public angularVelocity: number;
+  public angularVelocity: number = 0;
 
-  public drag: number;
+  public drag: number = 0;
 
-  public freezeRotation: boolean;
+  public freezeRotation: boolean = false;
 
   /**
    * In kilogram
    */
-  private _mass: number;
+  private _mass: number = 1;
 
   public get mass(): number { return this._mass; }
 
   public set mass(value: number) { this._mass = value; (<InternalRigidbodyComponent>this).inverseMass = 1 / value; }
 
-  public readonly inverseMass: number;
+  public readonly inverseMass: number = 1;
 
   /**
    * moment of inertia
    */
-  private _moi: number;
+  private _moi: number = 1000;
 
   public get moi(): number { return this._moi; }
 
   public set moi(value: number) { this._moi = value; (<InternalRigidbodyComponent>this).inverseMoi = 1 / value; }
 
-  public readonly inverseMoi: number;
+  public readonly inverseMoi: number = 0.001;
 
-  public maxAngularVelocity: number;
+  public maxAngularVelocity: number = Infinity;
 
   /**
    * pixel per second
    */
-  public velocity: Vector;
+  public velocity: Vector = Vector.Get();
 
-  public useGravity: boolean;
+  public useGravity: boolean = false;
 
-  public isSleeping: boolean;
+  public isSleeping: boolean = false;
 
-  public sleepThreshold: number;
+  public sleepThreshold: number = 0.2;
 
-  public readonly motion: number;
+  public readonly motion: number = 0;
 
-  private forces: Vector[];
+  private forces: Vector[] = [
+    Vector.Get(),
+    Vector.Get(),
+    Vector.Get(),
+    Vector.Get()
+  ];
 
-  private torques: number[];
+  private torques: number[] = [0, 0, 0, 0];
 
-  private sleepTimer: number;
+  private sleepTimer: number = 0;
 
-  private transform: TransformComponent = <TransformComponent>this.getComponent(TransformComponent);
+  private transform: TransformComponent;
 
   constructor(host: GameObject,
               @Inject(Engine) private engine: Engine,
               @Inject(Time) private time: Time) {
     super(host);
+  }
+
+  public start(): void {
+    super.start();
+    this.transform = <TransformComponent>this.getComponent(TransformComponent);
   }
 
   public addForce(force: Vector, forceMode: ForceMode = ForceMode.Force): void {
