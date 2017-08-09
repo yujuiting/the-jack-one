@@ -36,8 +36,10 @@ export class CircleColliderComponent extends ColliderComponent {
    */
   protected debugDirectionRenderer: LineRendererComponent|null = null;
 
-  constructor(host: GameObject,
-              @Inject(CollisionJumpTable) private collisionJumpTable: CollisionJumpTable) {
+  @Inject(CollisionJumpTable)
+  private collisionJumpTable: CollisionJumpTable;
+
+  constructor(host: GameObject) {
     super(host);
   }
 

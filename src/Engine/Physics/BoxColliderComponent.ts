@@ -6,8 +6,6 @@ import { Vector } from 'Engine/Math/Vector';
 import { Line } from 'Engine/Math/Line';
 import { Ray } from 'Engine/Math/Ray';
 import { Projection } from 'Engine/Math/Projection';
-import { CollisionJumpTable } from 'Engine/Physics/CollisionJumpTable';
-import { Inject } from 'Engine/Decorator/Inject';
 import { CollisionContact } from 'Engine/Physics/CollisionContact';
 import { CircleColliderComponent } from 'Engine/Physics/CircleColliderComponent';
 import { forwardRef } from 'Engine/Utility/Type';
@@ -26,11 +24,6 @@ forwardRef(() => GameObject);
 export class BoxColliderComponent extends PolygonColliderComponent {
 
   public size: Vector = new Vector();
-
-  constructor(host: GameObject,
-              @Inject(CollisionJumpTable) collisionJumpTable: CollisionJumpTable) {
-    super(host, collisionJumpTable);
-  }
 
   public start(): void {
     super.start();

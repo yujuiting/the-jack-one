@@ -47,8 +47,10 @@ export class PolygonColliderComponent extends ColliderComponent {
    */
   protected debugDirectionRenderer: LineRendererComponent|null = null;
 
-  constructor(host: GameObject,
-              @Inject(CollisionJumpTable) protected collisionJumpTable: CollisionJumpTable) {
+  @Inject(CollisionJumpTable)
+  protected collisionJumpTable: CollisionJumpTable;
+
+  constructor(host: GameObject) {
     super(host);
   }
 

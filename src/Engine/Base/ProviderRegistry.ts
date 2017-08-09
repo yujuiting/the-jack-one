@@ -103,7 +103,7 @@ export class ProviderRegistry {
       const service = this.get(dependency.token);
 
       if (!service) {
-        throw new Error(`Not found dependency ${dependency}`);
+        throw new Error(`Not found dependency ${dependency.token}`);
       }
 
       args.splice(dependency.index, 0, service);

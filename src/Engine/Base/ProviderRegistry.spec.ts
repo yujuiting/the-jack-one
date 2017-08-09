@@ -1,7 +1,7 @@
 // tslint:disable member-access max-classes-per-file
 import { expect } from 'chai';
 import { suite, test } from 'mocha-typescript';
-import { ProviderRegistry } from 'Engine/Utility/ProviderRegistry';
+import { ProviderRegistry } from 'Engine/Base/ProviderRegistry';
 
 class Foo { prop: string; }
 
