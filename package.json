@@ -4,15 +4,24 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build:client": "webpack",
-    "serve:client": "webpack-dev-server",
-    "test": "nyc --check-coverage --lines 40 mocha --opts .mocha",
+    "prebuild": "rm -rf dist",
+    "build": "webpack",
+    "serve": "webpack-dev-server",
+    "test": "nyc mocha --opts .mocha",
     "watch": "nyc mocha --opts .mocha --watch",
-    "start": "npm run serve:client",
+    "start": "npm run serve",
     "coverage:coveralls": "nyc report --reporter=text-lcov | coveralls",
-    "coverage:codecov": "nyc report --reporter=text-lcov > coverage.lcov && codecov"
+    "coverage:codecov": "nyc report --reporter=text-lcov > coverage.lcov && codecov",
+    "docs": "typedoc --out dist/docs --module commonjs src/Engine",
+    "predeploy": "npm run docs && npm run build",
+    "deploy": "gh-pages -d dist",
+    "prepush": "npm run test"
   },
-  "author": "",
+  "author": "yujuiting <yujuiting@me.com> (https://github.com/yujuiting)",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yujuiting/the-jack-one.git"
+  },
   "license": "ISC",
   "devDependencies": {
     "@types/chai": "^4.0.1",
@@ -31,6 +40,7 @@
     "codecov": "^2.2.0",
     "copy-webpack-plugin": "^4.0.1",
     "coveralls": "^2.13.1",
+    "gh-pages": "^1.0.0",
     "html-webpack-plugin": "^2.29.0",
     "jsdom": "^11.1.0",
     "mocha": "^3.4.2",
@@ -41,9 +51,10 @@
     "source-map-support": "^0.4.15",
     "ts-node": "^3.2.0",
     "tsconfig-paths": "^2.2.0",
-    "tslint": "^5.5.0",
+    "tslint": "^5.6.0",
     "tslint-eslint-rules": "^4.1.1",
     "tslint-microsoft-contrib": "^5.0.1",
+    "typedoc": "^0.8.0",
     "typescript": "^2.4.1",
     "webpack": "^3.1.0",
     "webpack-dev-server": "^2.5.1"
