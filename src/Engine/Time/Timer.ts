@@ -4,12 +4,16 @@ import { Subject } from 'rxjs/Subject';
 import { Observable } from 'rxjs/Observable';
 import { Inject } from 'Engine/Decorator/Inject';
 
+interface InternalTimer {
+  timestamp: number;
+}
+
 /**
  * Timer
  */
 export class Timer extends GameObject {
 
-  private timestamp: number = 0;
+  public readonly timestamp: number = 0;
 
   private accumulation: number = 0;
 
@@ -39,18 +43,17 @@ export class Timer extends GameObject {
   }
 
   public update(): void {
-    this.timestamp += this.time.deltaTime;
+    (<InternalTimer>this).timestamp += this.time.deltaTime;
+    this.accumulation += this.time.deltaTime;
 
-    if (this.accumulation < this.interval) {
-      this.accumulation += this.time.deltaTime;
-    } else {
+    if (this.accumulation >= this.interval) {
       this.accumulation -= this.interval;
       this.timeEvent.next(this.timestamp - this.accumulation);
     }
   }
 
   public reset(): void {
-    this.timestamp = 0;
+    (<InternalTimer>this).timestamp = 0;
     this.accumulation = 0;
 
     /**

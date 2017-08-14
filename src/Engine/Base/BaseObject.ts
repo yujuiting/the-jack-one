@@ -37,16 +37,9 @@ export abstract class BaseObject implements Recyclable {
   }
 
   /**
-   * When object add to scene.
+   * When object initialized, all components are ready.
    */
   public start(): void {
-    //
-  }
-
-  /**
-   * When object remove from scene.
-   */
-  public end(): void {
     //
   }
 

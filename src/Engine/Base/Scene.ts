@@ -63,8 +63,6 @@ export class Scene extends BaseObject {
       gameObject.transform.position.copy(at);
     }
 
-    gameObject.start();
-
     return true;
   }
 
@@ -83,8 +81,6 @@ export class Scene extends BaseObject {
     if (collider) {
       this.broadPhaseCollisionResolver.untrack(collider);
     }
-
-    gameObject.end();
 
     return true;
   }

@@ -101,7 +101,7 @@ export class Camera extends GameObject {
      * There should be some way to cahce which game object need to render
      */
     gameObjects.forEachChildren(gameObject => {
-      if (!(gameObject.layer & this.cullingMask)) {
+      if ((gameObject.layer & this.cullingMask) === 0) {
         return;
       }
 

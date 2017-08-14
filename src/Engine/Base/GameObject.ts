@@ -141,11 +141,6 @@ export class GameObject extends BaseObject {
       throw new Error(`Not found components, ${component}`);
     }
 
-    if (this.hasStarted) {
-      // child is removed from scene earlier.
-      component.end();
-    }
-
     component.destroy();
   }
 
@@ -179,11 +174,6 @@ export class GameObject extends BaseObject {
       throw new Error(`Not found child, ${child}`);
     }
 
-    if (this.hasStarted) {
-      // child is removed from scene earlier.
-      child.end();
-    }
-
     this.node.remove(child.node);
   }
 
@@ -204,15 +194,6 @@ export class GameObject extends BaseObject {
     this.hasStarted = true;
     this.components.forEach(component => component.start());
     this.children.forEach(child => child.start());
-  }
-
-  /**
-   * @inheritdoc
-   */
-  public end(): void {
-    this.hasStarted = false;
-    this.components.forEach(component => component.end());
-    this.children.forEach(child => child.end());
   }
 
   /**
@@ -284,6 +265,7 @@ export class GameObject extends BaseObject {
       (<any>this)[propertyName] = this.addComponent(ComponentType);
       curr = entries.next();
     }
+    this.start();
   }
 
 }

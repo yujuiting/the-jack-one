@@ -27,36 +27,32 @@ export class Color {
     const rgbRegex = /rgb.?([0-9.]+),([0-9.]+),([0-9.]+)/;
     const rgbaRegex = /rgba.?([0-9.]+),([0-9.]+),([0-9.]+),([0-9.]+)/;
 
-    switch (true) {
-      case hexRegex.test(colorString): {
-        return Color.CreateByHexRgb(colorString);
-      }
+    if (hexRegex.test(colorString)) {
+      return Color.CreateByHexRgb(colorString);
+    }
 
-      case rgbaRegex.test(colorString): {
-        const match = colorString.match(rgbaRegex);
-        if (match) {
-          return new Color(
-            parseInt(match[1]),
-            parseInt(match[2]),
-            parseInt(match[3]),
-            parseFloat(match[4]));
-        }
-        break;
-      }
-
-      case rgbRegex.test(colorString): {
-        const match = colorString.match(rgbRegex);
-        if (match) {
-          return new Color(
-            parseInt(match[1]),
-            parseInt(match[2]),
-            parseInt(match[3]));
-        }
-        break;
+    if (rgbaRegex.test(colorString)) {
+      const match = colorString.match(rgbaRegex);
+      if (match !== null) {
+        return new Color(
+          parseInt(match[1], 10),
+          parseInt(match[2], 10),
+          parseInt(match[3], 10),
+          parseFloat(match[4]));
       }
     }
 
-    throw new TypeError('unknown color ' + colorString);
+    if (rgbRegex.test(colorString)) {
+      const match = colorString.match(rgbRegex);
+      if (match !== null) {
+        return new Color(
+          parseInt(match[1], 10),
+          parseInt(match[2], 10),
+          parseInt(match[3], 10));
+      }
+    }
+
+    throw new TypeError(`unknown color ${colorString}`);
   }
 
   public static CreateByHexRgb(hexColorString: string): Color {
@@ -83,10 +79,6 @@ export class Color {
               public green: number = 255,
               public blue: number = 255,
               public alpha: number = 1) {
-    if (typeof red === 'string') {
-      return Color.Parse(red);
-    }
-
     this.setAlpha(alpha);
   }
 
