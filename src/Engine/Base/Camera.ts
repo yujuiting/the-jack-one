@@ -1,7 +1,7 @@
 import { GameObject } from 'Engine/Base/GameObject';
 import { Color } from 'Engine/Display/Color';
 import { Matrix } from 'Engine/Math/Matrix';
-import { Layer, AllBuiltInLayer, Class } from 'Engine/Utility/Type';
+import { Layer, AllBuiltInLayer, Type } from 'Engine/Utility/Type';
 import { RendererComponent } from 'Engine/Render/RendererComponent';
 import { Pool } from 'Engine/Utility/Pool';
 import { ReadonlyTree } from 'Engine/Utility/Tree';
@@ -11,6 +11,7 @@ import { Vector } from 'Engine/Math/Vector';
 import { Rect } from 'Engine/Math/Rect';
 import { Inject } from 'Engine/Decorator/Inject';
 import { Service } from 'Engine/Decorator/Service';
+import { GameObjectInitializer } from 'Engine/Base/GameObjectInitializer';
 
 export const MainCamera = Symbol('MainCamera');
 
@@ -44,9 +45,10 @@ export class Camera extends GameObject {
 
   private ctx: CanvasRenderingContext2D;
 
-  constructor(@Inject(BrowserDelegate) private browser: BrowserDelegate,
-              @Inject(Screen) private screen: Screen) {
-    super();
+  constructor(private browser: BrowserDelegate,
+              private screen: Screen,
+              gameObjectInitializer: GameObjectInitializer) {
+    super(gameObjectInitializer);
     this.canvas = browser.document.createElement('canvas');
     this.ctx = <CanvasRenderingContext2D>this.canvas.getContext('2d');
 
@@ -115,7 +117,7 @@ export class Camera extends GameObject {
         return;
       }
 
-      const renderers = gameObject.getComponents(<Class<RendererComponent>>RendererComponent);
+      const renderers = gameObject.getComponents(<Type<RendererComponent>>RendererComponent);
 
       renderers.forEach(renderer => renderer.render(this.ctx, this.toScreenMatrix));
     });

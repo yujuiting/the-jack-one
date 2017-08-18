@@ -17,9 +17,9 @@ export class Engine {
 
   private _isPaused: boolean = true;
 
-  private canvas: HTMLCanvasElement = this.browser.document.createElement('canvas');
+  private canvas: HTMLCanvasElement;
 
-  private ctx: CanvasRenderingContext2D = <CanvasRenderingContext2D>this.canvas.getContext('2d');
+  private ctx: CanvasRenderingContext2D;
 
   private isInitialized: boolean = false;
 
@@ -31,10 +31,12 @@ export class Engine {
 
   public get isPaused(): boolean { return this._isPaused; }
 
-  constructor(@Inject(Screen)           public readonly screen: Screen,
-              @Inject(Time)             public readonly time: Time,
-              @Inject(SceneManager)     public readonly sceneManager: SceneManager,
-              @Inject(BrowserDelegate)  private readonly browser: BrowserDelegate) {
+  constructor(public readonly screen: Screen,
+              public readonly time: Time,
+              public readonly sceneManager: SceneManager,
+              private readonly browser: BrowserDelegate) {
+    this.canvas = this.browser.document.createElement('canvas');
+    this.ctx = <CanvasRenderingContext2D>this.canvas.getContext('2d');
   }
 
   public async initialize(container: HTMLElement): Promise<void> {
@@ -119,6 +121,8 @@ export class Engine {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
     this.currentScene.render(this.ctx);
+
+    this.currentScene.postRender();
 
     requestAnimationFrame(this.bindedmainloop);
   }

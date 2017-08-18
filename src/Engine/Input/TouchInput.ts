@@ -14,6 +14,6 @@ export class TouchInput {
 
   public get touchMove$(): Observable<TouchEvent> { return this.browserDelegate.touchMove$; }
 
-  constructor(@Inject(BrowserDelegate) private browserDelegate: BrowserDelegate) {}
+  constructor(private browserDelegate: BrowserDelegate) {}
 
 }

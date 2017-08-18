@@ -38,23 +38,6 @@ class Lala {
     expect(this.serviceRegistry.get(Foo)).to.be.instanceOf(Foo2);
   }
 
-  @test 'should resolve dependencies' () {
-    ProviderRegistry.Provide({ token: Foo, useClass: Foo });
-    ProviderRegistry.RegisterDependency(Bar, Foo, 0);
-    const bar = this.serviceRegistry.instantiate(Bar);
-    expect(bar).to.be.instanceOf(Bar);
-    expect(bar.foo).to.be.instanceOf(Foo);
-  }
-
-  @test 'should pass arguments to constructor' () {
-    ProviderRegistry.Provide({ token: Foo, useClass: Foo });
-    ProviderRegistry.RegisterDependency(Lala, Foo, 1);
-    const lala = this.serviceRegistry.instantiate(Lala, 'my argument');
-    expect(lala).to.be.instanceOf(Lala);
-    expect(lala.foo).to.be.instanceOf(Foo);
-    expect(lala.prop).to.equal('my argument');
-  }
-
   @test 'should override provider' () {
     ProviderRegistry.Provide({ token: Foo, useClass: Foo });
     ProviderRegistry.Provide({ token: Foo, useClass: Foo2 });

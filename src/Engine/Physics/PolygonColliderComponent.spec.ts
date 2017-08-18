@@ -4,6 +4,8 @@ import { suite, test } from 'mocha-typescript';
 import { Vector } from 'Engine/Math/Vector';
 import { PolygonColliderComponent } from 'Engine/Physics/PolygonColliderComponent';
 import { GameObject } from 'Engine/Base/GameObject';
+import { instantiate, getService } from 'Engine/Base/runtime';
+import { GameObjectInitializer } from 'Engine/Base/GameObjectInitializer';
 import { Line } from 'Engine/Math/Line';
 import { Ray } from 'Engine/Math/Ray';
 
@@ -13,7 +15,7 @@ import { Ray } from 'Engine/Math/Ray';
   collider: PolygonColliderComponent;
 
   before() {
-    this.gameObject = new GameObject();
+    this.gameObject = instantiate(GameObject);
     this.collider = this.gameObject.addComponent(PolygonColliderComponent);
     this.collider.points.push(
       new Vector(0, 0),
@@ -22,6 +24,10 @@ import { Ray } from 'Engine/Math/Ray';
       new Vector(-1, 5),
       new Vector(-2, 3)
     );
+
+    const initializer = <GameObjectInitializer>getService(GameObjectInitializer);
+    initializer.resolve();
+
     this.gameObject.start();
     this.gameObject.fixedUpdate();
   }

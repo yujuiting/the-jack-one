@@ -12,6 +12,7 @@ import { BroadPhaseCollisionResolver } from 'Engine/Physics/BroadPhaseCollisionR
 import { NarrowPhaseCollisionResolver } from 'Engine/Physics/NarrowPhaseCollisionResolver';
 import { ColliderComponent } from 'Engine/Physics/ColliderComponent';
 import { Vector } from 'Engine/Math/Vector';
+import { GameObjectInitializer } from 'Engine/Base/GameObjectInitializer';
 
 /**
  * Scene manage game objects and resources.
@@ -31,15 +32,11 @@ export class Scene extends BaseObject {
   @Inject(MainCamera)
   public mainCamera: Camera;
 
-  @Inject(BroadPhaseCollisionResolver)
-  private broadPhaseCollisionResolver: BroadPhaseCollisionResolver;
-
-  @Inject(NarrowPhaseCollisionResolver)
-  private narrowPhaseCollisionResolver: NarrowPhaseCollisionResolver;
-
   public get isLoaded(): boolean { return this.resources.isLoaded; }
 
-  constructor() {
+  constructor(private broadPhaseCollisionResolver: BroadPhaseCollisionResolver,
+              private narrowPhaseCollisionResolver: NarrowPhaseCollisionResolver,
+              private gameObjectInitializer: GameObjectInitializer) {
     super();
     this.add(this.mainCamera);
   }
@@ -113,6 +110,10 @@ export class Scene extends BaseObject {
     // render cameras
     // TODO: camera order is an issue
     this.cameras.forEach(camera => camera.render(ctx, this.gameObjects));
+  }
+
+  public postRender(): void {
+    this.gameObjectInitializer.resolve();
   }
 
   public destroy(): void {

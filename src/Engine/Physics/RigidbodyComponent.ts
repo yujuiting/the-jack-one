@@ -83,8 +83,8 @@ export class RigidbodyComponent extends Component {
   private transform: TransformComponent;
 
   constructor(host: GameObject,
-              @Inject(Engine) private engine: Engine,
-              @Inject(Time) private time: Time) {
+              private engine: Engine,
+              private time: Time) {
     super(host);
   }
 

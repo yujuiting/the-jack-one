@@ -1,15 +1,8 @@
-import { Token, Class } from 'Engine/Utility/Type';
-import { ProviderRegistry } from 'Engine/Base/ProviderRegistry';
+import { Token, Type } from 'Engine/Utility/Type';
 import { getService } from 'Engine/Base/runtime';
 
-export function Inject(token: Token): (target: Object, propertyKey: string | symbol, parameterIndex?: number) => void {
-  return function (target: Class<any>, propertyKey: string | symbol, index?: number) {
-    if (index === void 0) {
-      // property
-      (<any>target)[propertyKey] = getService(token);
-    } else {
-      // parameter
-      ProviderRegistry.RegisterDependency(target, token, index);
-    }
+export function Inject(token: Token): PropertyDecorator {
+  return function (target: Type<any>, propertyKey: string | symbol) {
+    (<any>target)[propertyKey] = getService(token);
   };
 }

@@ -39,10 +39,6 @@ export class CircleColliderComponent extends ColliderComponent {
   @Inject(CollisionJumpTable)
   private collisionJumpTable: CollisionJumpTable;
 
-  constructor(host: GameObject) {
-    super(host);
-  }
-
   public fixedUpdate(): void {
     this.calculate();
   }

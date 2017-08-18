@@ -23,10 +23,10 @@ export class SpriteSheetRendererComponent extends RendererComponent {
 
   private accumulator: number = 0;
 
-  constructor(host: GameObject,
-              @Inject(Time) private time: Time) {
-    super(host);
-  }
+    constructor(host: GameObject,
+                private time: Time) {
+      super(host);
+    }
 
   public setSpriteSheet(spriteSheet: SpriteSheet, defaultKey: string): void {
     this.spriteSheet = spriteSheet;

@@ -4,6 +4,8 @@ import { suite, test } from 'mocha-typescript';
 import { Vector } from 'Engine/Math/Vector';
 import { BoxColliderComponent } from 'Engine/Physics/BoxColliderComponent';
 import { GameObject } from 'Engine/Base/GameObject';
+import { instantiate, getService } from 'Engine/Base/runtime';
+import { GameObjectInitializer } from 'Engine/Base/GameObjectInitializer';
 import { Line } from 'Engine/Math/Line';
 import { Ray } from 'Engine/Math/Ray';
 
@@ -13,9 +15,13 @@ import { Ray } from 'Engine/Math/Ray';
   collider: BoxColliderComponent;
 
   before() {
-    this.gameObject = new GameObject();
+    this.gameObject = instantiate(GameObject);
     this.collider = this.gameObject.addComponent(BoxColliderComponent);
     this.collider.size.setTo(10, 10);
+
+    const initializer = <GameObjectInitializer>getService(GameObjectInitializer);
+    initializer.resolve();
+
     this.gameObject.start();
     this.gameObject.fixedUpdate();
   }

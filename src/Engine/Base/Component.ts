@@ -1,6 +1,6 @@
 import { BaseObject } from 'Engine/Base/BaseObject';
 import { GameObject } from 'Engine/Base/GameObject';
-import { Class } from 'Engine/Utility/Type';
+import { Type } from 'Engine/Utility/Type';
 
 /**
  *
@@ -11,7 +11,7 @@ export abstract class Component extends BaseObject {
     super();
   }
 
-  public addComponent<T extends Component>(componentType: Class<T>): T {
+  public addComponent<T extends Component>(componentType: Type<T>): T {
     return this.host.addComponent(componentType);
   }
 
@@ -19,11 +19,11 @@ export abstract class Component extends BaseObject {
     return this.host.removeComponent(component);
   }
 
-  public getComponent<T extends Component>(componentType: Class<T>): T|undefined {
+  public getComponent<T extends Component>(componentType: Type<T>): T|undefined {
     return this.host.getComponent(componentType);
   }
 
-  public getComponents<T extends Component>(componentType: Class<T>): T[] {
+  public getComponents<T extends Component>(componentType: Type<T>): T[] {
     return this.host.getComponents(componentType);
   }
 

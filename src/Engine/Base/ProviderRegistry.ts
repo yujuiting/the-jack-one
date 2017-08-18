@@ -1,13 +1,9 @@
 import 'reflect-metadata';
-import { Class, Token, resolveForwardRef } from 'Engine/Utility/Type';
-
-const DI_DEPENDENCIES = Symbol('DI_DEPENDENCIES');
-
-type DependencyDescriptor = { token: Token, index: number };
+import { Type, Token, resolveForwardRef } from 'Engine/Utility/Type';
 
 export interface ClassProvider {
   token: Token;
-  useClass: Class<any>;
+  useClass: Type<any>;
 }
 
 export interface ValueProvider {
@@ -36,19 +32,6 @@ export class ProviderRegistry {
 
   public static Clear(): void {
     this.providers.clear();
-  }
-
-  /**
-   * Register dependency from a class parameter
-   * @param target class or function
-   * @param token
-   * @param index of parameter of class
-   */
-  public static RegisterDependency(target: Class<any>, token: Token, index: number): void {
-    const dependencies: DependencyDescriptor[] = Reflect.getMetadata(DI_DEPENDENCIES, target) || [];
-    dependencies.push({ token: resolveForwardRef<Token>(token), index });
-    dependencies.sort((a, b) => a.index - b.index);
-    Reflect.defineMetadata(DI_DEPENDENCIES, dependencies, target);
   }
 
   private readonly service: Map<Token, any> = new Map();
@@ -87,7 +70,7 @@ export class ProviderRegistry {
     return service;
   }
 
-  public instantiate<T>(InstanceType: Class<T>, ...args: any[]): T {
+  public instantiate<T>(InstanceType: Type<T>, ...args: any[]): T {
     this.resolveDependencies(InstanceType, args);
     return new InstanceType(...args);
   }
@@ -98,15 +81,10 @@ export class ProviderRegistry {
   }
 
   private resolveDependencies(target: any, args: any[]): void {
-    const dependencies: DependencyDescriptor[] =  Reflect.getMetadata(DI_DEPENDENCIES, target) || [];
-    dependencies.forEach(dependency => {
-      const service = this.get(dependency.token);
-
-      if (!service) {
-        throw new Error(`Not found dependency ${dependency.token}`);
-      }
-
-      args.splice(dependency.index, 0, service);
+    const dependencies: Token[] =  Reflect.getMetadata('design:paramtypes', target) || [];
+    dependencies.forEach((dependency, index) => {
+      const service = this.get(dependency);
+      args.splice(index, 0, service);
     });
   }
 

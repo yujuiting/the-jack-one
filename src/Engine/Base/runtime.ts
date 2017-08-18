@@ -1,7 +1,7 @@
 import 'Engine/imports';
 import { Engine } from 'Engine/Base/Engine';
 import { ProviderRegistry, Provider } from 'Engine/Base/ProviderRegistry';
-import { Class, Token } from 'Engine/Utility/Type';
+import { Type, Token } from 'Engine/Utility/Type';
 
 const providerRegistry = new ProviderRegistry();
 let engine: Engine;
@@ -15,7 +15,7 @@ export function provide(providers: Provider[]): void {
   providers.forEach(provider => ProviderRegistry.Provide(provider));
 }
 
-export function instantiate<T>(InstanceType: Class<T>, ...args: any[]): T {
+export function instantiate<T>(InstanceType: Type<T>, ...args: any[]): T {
   return providerRegistry.instantiate(InstanceType, ...args);
 }
 

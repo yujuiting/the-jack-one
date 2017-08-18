@@ -10,6 +10,6 @@ export class KeyboardInput {
 
   public get keyUp$(): Observable<KeyboardEvent> { return this.browserDelegate.keyUp$; }
 
-  constructor(@Inject(BrowserDelegate) private browserDelegate: BrowserDelegate) {}
+  constructor(private browserDelegate: BrowserDelegate) {}
 
 }
