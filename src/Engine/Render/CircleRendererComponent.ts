@@ -21,8 +21,26 @@ export class CircleRendererComponent extends RendererComponent {
 
   public useLocalCoordinate: boolean = true;
 
-  public render(ctx: CanvasRenderingContext2D, toViewportMatrix: Matrix): void {
+  public render(ctx: CanvasRenderingContext2D, toScreenMatrix: Matrix): void {
+
     ctx.save();
+
+    const m = toScreenMatrix.clone();
+
+    if (this.useLocalCoordinate) {
+      m.multiply(this.transform.toWorldMatrix);
+    }
+
+    /**
+     * reverse first to correct y-axis and rotate direction
+     */
+    m.setScaling(-1, -1);
+
+    ctx.transform(
+      m[0][0], m[0][1],
+      m[1][0], m[1][1],
+      m[0][2], m[1][2]
+    );
 
     ctx.lineWidth = this.lineWidth;
 
@@ -31,13 +49,6 @@ export class CircleRendererComponent extends RendererComponent {
     ctx.beginPath();
 
     const center = this.center.clone();
-
-    if (this.useLocalCoordinate) {
-      const toWorldTransform = this.transform.toWorldMatrix;
-      center.add(this.transform.position);
-    }
-
-    toViewportMatrix.multiplyToPoint(center);
 
     ctx.arc(
       center.x,

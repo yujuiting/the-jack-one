@@ -13,26 +13,36 @@ export class SpriteRendererComponent extends RendererComponent {
       return;
     }
 
-    const drawAt = this.transform.position.clone();
-    toScreenMatrix.multiplyToPoint(drawAt);
-    drawAt.subtract(
-      this.sprite.pivot.x * this.sprite.width,
-      this.sprite.pivot.y * this.sprite.height
+    ctx.save();
+
+    const m = toScreenMatrix.clone().multiply(this.transform.toWorldMatrix);
+
+    /**
+     * reverse first to correct y-axis and rotate direction
+     */
+    m.setScaling(-1, -1);
+
+    ctx.transform(
+      m[0][0], m[0][1],
+      m[1][0], m[1][1],
+      m[0][2], m[1][2]
     );
 
     ctx.drawImage(
       this.sprite.imageBitmap,
+      // source rect
       this.sprite.rect.position.x,
       this.sprite.rect.position.y,
       this.sprite.rect.width,
       this.sprite.rect.height,
-      drawAt.x,
-      drawAt.y,
+      // destination rect
+      -this.sprite.pivot.x * this.sprite.width,
+      -this.sprite.pivot.y * this.sprite.height,
       this.sprite.width,
       this.sprite.height
     );
 
-    drawAt.destroy();
+    ctx.restore();
   }
 
 }
