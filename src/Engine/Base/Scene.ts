@@ -8,6 +8,7 @@ import { Camera, MainCamera } from 'Engine/Base/Camera';
 import { addToArray,
          removeFromArray } from 'Engine/Utility/ArrayUtility';
 import { Inject } from 'Engine/Decorator/Inject';
+import { Class } from 'Engine/Decorator/Class';
 import { BroadPhaseCollisionResolver } from 'Engine/Physics/BroadPhaseCollisionResolver';
 import { NarrowPhaseCollisionResolver } from 'Engine/Physics/NarrowPhaseCollisionResolver';
 import { ColliderComponent } from 'Engine/Physics/ColliderComponent';
@@ -17,6 +18,7 @@ import { GameObjectInitializer } from 'Engine/Base/GameObjectInitializer';
 /**
  * Scene manage game objects and resources.
  */
+@Class()
 export class Scene extends BaseObject {
 
   public readonly resources: Bundle = new Bundle();
@@ -50,12 +52,6 @@ export class Scene extends BaseObject {
       addToArray(this.cameras, gameObject);
     }
 
-    const collider = gameObject.getComponent(ColliderComponent);
-
-    if (collider) {
-      this.broadPhaseCollisionResolver.track(collider);
-    }
-
     if (at) {
       gameObject.transform.position.copy(at);
     }
@@ -71,12 +67,6 @@ export class Scene extends BaseObject {
 
     if (gameObject instanceof Camera) {
       removeFromArray(this.cameras, gameObject);
-    }
-
-    const collider = gameObject.getComponent(ColliderComponent);
-
-    if (collider) {
-      this.broadPhaseCollisionResolver.untrack(collider);
     }
 
     return true;

@@ -39,7 +39,7 @@ export class Engine {
     this.ctx = <CanvasRenderingContext2D>this.canvas.getContext('2d');
   }
 
-  public async initialize(container: HTMLElement): Promise<void> {
+  public async initialize(): Promise<void> {
     if (this.isInitialized) {
       throw new Error('Repeated engine initialization.');
     }
@@ -51,7 +51,7 @@ export class Engine {
     const { width, height } = this.screen;
     this.canvas.width = width;
     this.canvas.height = height;
-    container.appendChild(this.canvas);
+    this.browser.document.body.appendChild(this.canvas);
 
     this.browser.resize$.subscribe(e => this.onResize(e));
 
@@ -73,8 +73,8 @@ export class Engine {
 
   public resume() {
     this._isPaused = false;
-    this.lastTimestamp = this.browser.window.performance.now();
-    this.mainloop();
+    // this.lastTimestamp = this.browser.window.performance.now();
+    requestAnimationFrame(this.bindedmainloop);
   }
 
   private check(): void {
@@ -83,12 +83,12 @@ export class Engine {
     }
   }
 
-  private mainloop() {
+  private mainloop(timestamp: number) {
     if (this._isPaused) {
       return;
     }
 
-    const timestamp = this.browser.window.performance.now();
+    // const timestamp = this.browser.window.performance.now();
     const frameTime = timestamp - this.lastTimestamp;
     this.lastTimestamp = timestamp;
     this.accumulator += frameTime;

@@ -25,8 +25,8 @@ export class BoxColliderComponent extends PolygonColliderComponent {
 
   public size: Vector = new Vector();
 
-  public start(): void {
-    super.start();
+  constructor(host: GameObject) {
+    super(host);
     for (let i = 0; i < 4; i++) {
       this.points.push(new Vector());
       this._cachedPoints.push(new Vector());

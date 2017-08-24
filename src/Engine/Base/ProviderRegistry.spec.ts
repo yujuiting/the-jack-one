@@ -18,30 +18,26 @@ class Lala {
 
 @suite class ProviderRegistryTestSuite {
 
-  serviceRegistry: ProviderRegistry;
+  providerRegistry: ProviderRegistry;
 
   before() {
-    this.serviceRegistry = new ProviderRegistry();
-  }
-
-  after() {
-    ProviderRegistry.Clear();
+    this.providerRegistry = new ProviderRegistry();
   }
 
   @test 'should provide instance' () {
-    ProviderRegistry.Provide({ token: Foo, useClass: Foo });
-    expect(this.serviceRegistry.get(Foo)).to.be.instanceOf(Foo);
+    this.providerRegistry.provide({ token: Foo, useClass: Foo });
+    expect(this.providerRegistry.get(Foo)).to.be.instanceOf(Foo);
   }
 
   @test 'should provide value' () {
-    ProviderRegistry.Provide({ token: Foo, useValue: new Foo2() });
-    expect(this.serviceRegistry.get(Foo)).to.be.instanceOf(Foo2);
+    this.providerRegistry.provide({ token: Foo, useValue: new Foo2() });
+    expect(this.providerRegistry.get(Foo)).to.be.instanceOf(Foo2);
   }
 
   @test 'should override provider' () {
-    ProviderRegistry.Provide({ token: Foo, useClass: Foo });
-    ProviderRegistry.Provide({ token: Foo, useClass: Foo2 });
-    expect(this.serviceRegistry.get(Foo)).to.be.instanceOf(Foo2);
+    this.providerRegistry.provide({ token: Foo, useClass: Foo });
+    this.providerRegistry.provide({ token: Foo, useClass: Foo2 });
+    expect(this.providerRegistry.get(Foo)).to.be.instanceOf(Foo2);
   }
 
 }

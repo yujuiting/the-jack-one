@@ -90,10 +90,16 @@ export class Camera extends GameObject {
     );
     this.toScreenMatrix.restore();
     this.toScreenMatrix.setTranslation(-x, -y);
+    this.toWorldMatrix.invertFrom(this.toScreenMatrix);
   }
 
   public render(ctx: CanvasRenderingContext2D, gameObjects: ReadonlyTree<GameObject>): void {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+    this.ctx.save();
+    this.ctx.fillStyle = this.backgroundColor.toHexString();
+    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    this.ctx.restore();
 
     const min = this.rect.min;
     const max = this.rect.max;

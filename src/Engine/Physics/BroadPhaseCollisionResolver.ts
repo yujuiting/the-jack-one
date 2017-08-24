@@ -43,8 +43,16 @@ export class BroadPhaseCollisionResolver {
     for (let a = 0; a < awakeLength; a++) {
       colliderA = this.awakeColliders[a];
 
+      if (!colliderA.host.isActive) {
+        continue;
+      }
+
       for (let b = a + 1; b < awakeLength; b++) {
         colliderB = this.awakeColliders[b];
+
+        if (!colliderB.host.isActive) {
+          continue;
+        }
 
         if ((colliderA.layer & colliderB.layer) === 0) {
           continue;
@@ -60,6 +68,10 @@ export class BroadPhaseCollisionResolver {
 
       for (let b = 0; b < sleepingLength; b++) {
         colliderB = this.sleepingColliders[b];
+
+        if (!colliderB.host.isActive) {
+          continue;
+        }
 
         if ((colliderA.layer & colliderB.layer) === 0) {
           continue;
@@ -91,27 +103,27 @@ export class BroadPhaseCollisionResolver {
     this._pairs.forEach(pair => Pair.Put(pair));
     this._pairs.splice(0, this._pairs.length);
 
-    const sleepingLength = this.sleepingColliders.length;
-    let colliderA: ColliderComponent;
-    let colliderB: ColliderComponent;
+    // const sleepingLength = this.sleepingColliders.length;
+    // let colliderA: ColliderComponent;
+    // let colliderB: ColliderComponent;
 
-    for (let a = 0; a < sleepingLength; a++) {
-      colliderA = this.sleepingColliders[a];
-      for (let b = a + 1; b < sleepingLength; b++) {
-        colliderB = this.sleepingColliders[b];
+    // for (let a = 0; a < sleepingLength; a++) {
+    //   colliderA = this.sleepingColliders[a];
+    //   for (let b = a + 1; b < sleepingLength; b++) {
+    //     colliderB = this.sleepingColliders[b];
 
-        if ((colliderA.layer & colliderB.layer) === 0) {
-          continue;
-        }
+    //     if ((colliderA.layer & colliderB.layer) === 0) {
+    //       continue;
+    //     }
 
-        if (colliderA.bounds.intersects(colliderB.bounds)) {
-          const pair = Pair.Get(colliderA, colliderB);
-          if (pair) {
-            this._pairs.push(pair);
-          }
-        }
-      }
-    }
+    //     if (colliderA.bounds.intersects(colliderB.bounds)) {
+    //       const pair = Pair.Get(colliderA, colliderB);
+    //       if (pair) {
+    //         this._pairs.push(pair);
+    //       }
+    //     }
+    //   }
+    // }
   }
 
 }

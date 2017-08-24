@@ -1,18 +1,16 @@
-import 'Engine/imports';
 import { Engine } from 'Engine/Base/Engine';
-import { ProviderRegistry, Provider } from 'Engine/Base/ProviderRegistry';
+import { providerRegistry, Provider } from 'Engine/Base/ProviderRegistry';
 import { Type, Token } from 'Engine/Utility/Type';
 
-const providerRegistry = new ProviderRegistry();
 let engine: Engine;
 
-export function bootstrap(container: HTMLElement): Promise<void> {
+export function bootstrap(): Promise<void> {
   engine = <Engine>providerRegistry.get(Engine);
-  return engine.initialize(container);
+  return engine.initialize();
 }
 
 export function provide(providers: Provider[]): void {
-  providers.forEach(provider => ProviderRegistry.Provide(provider));
+  providers.forEach(provider => providerRegistry.provide(provider));
 }
 
 export function instantiate<T>(InstanceType: Type<T>, ...args: any[]): T {

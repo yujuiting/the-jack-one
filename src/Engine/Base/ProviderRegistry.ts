@@ -20,21 +20,17 @@ export type Provider = ClassProvider | ValueProvider | FactoryProvider;
 
 export class ProviderRegistry {
 
-  private static readonly providers: Map<Token, Provider> = new Map();
+  private readonly providers: Map<Token, Provider> = new Map();
 
-  public static Provide(provider: Provider): void {
+  private readonly service: Map<Token, any> = new Map();
+
+  public provide(provider: Provider): void {
     this.providers.set(provider.token, provider);
   }
 
-  public static Resolve(token: Token): Provider|undefined {
+  public resolve(token: Token): Provider|undefined {
     return this.providers.get(token);
   }
-
-  public static Clear(): void {
-    this.providers.clear();
-  }
-
-  private readonly service: Map<Token, any> = new Map();
 
   public get<T>(token: Token): T|undefined {
     const resolvedToken = resolveForwardRef<Token>(token);
@@ -43,7 +39,7 @@ export class ProviderRegistry {
       return this.service.get(resolvedToken);
     }
 
-    const provider = ProviderRegistry.Resolve(resolvedToken);
+    const provider = this.resolve(resolvedToken);
 
     if (!provider) {
       return;
@@ -83,9 +79,12 @@ export class ProviderRegistry {
   private resolveDependencies(target: any, args: any[]): void {
     const dependencies: Token[] =  Reflect.getMetadata('design:paramtypes', target) || [];
     dependencies.forEach((dependency, index) => {
-      const service = this.get(dependency);
-      args.splice(index, 0, service);
+      if (!args[index]) {
+        args[index] = this.get(dependency);
+      }
     });
   }
 
 }
+
+export const providerRegistry = new ProviderRegistry();

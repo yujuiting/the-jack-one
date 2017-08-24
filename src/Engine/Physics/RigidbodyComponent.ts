@@ -21,7 +21,7 @@ const DoublePI = Math.PI * 2;
 @RequireComponent([TransformComponent])
 export class RigidbodyComponent extends Component {
 
-  public angularDrag: number;
+  public angularDrag: number = 0;
 
   /**
    * radians per second

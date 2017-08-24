@@ -1,13 +1,12 @@
 import { BaseObject } from 'Engine/Base/BaseObject';
 import { Component } from 'Engine/Base/Component';
-import { Type, Tag, Layer, BuiltInLayer } from 'Engine/Utility/Type';
+import { Type, Tag, Layer, BuiltInLayer, getClass } from 'Engine/Utility/Type';
 import { TransformComponent } from 'Engine/Display/TransformComponent';
 import { addToArray,
          removeFromArray,
          includeInArray } from 'Engine/Utility/ArrayUtility';
 import { Tree } from 'Engine/Utility/Tree';
 import { instantiate } from 'Engine/Base/runtime';
-import { AddComponent } from 'Engine/Decorator/AddComponent';
 import { GameObjectInitializer } from 'Engine/Base/GameObjectInitializer';
 import { Class } from 'Engine/Decorator/Class';
 
@@ -79,7 +78,7 @@ export class GameObject extends BaseObject {
   }
 
   public get children(): ReadonlyArray<GameObject> {
-    return this.node.children.map(node => <GameObject>node.data);
+    return this.node.children.map(node => node.data);
   }
 
   public get isActive(): boolean {
@@ -165,10 +164,6 @@ export class GameObject extends BaseObject {
       child.node.parent.remove(child.node);
     }
 
-    if (this.hasStarted) {
-      child.start();
-    }
-
     this.node.add(child.node);
     child.transform.localPosition.copy(child.transform.position);
   }
@@ -198,7 +193,6 @@ export class GameObject extends BaseObject {
     this.activate();
     this.hasStarted = true;
     this.components.forEach(component => component.start());
-    this.children.forEach(child => child.start());
   }
 
   /**
@@ -261,15 +255,6 @@ export class GameObject extends BaseObject {
   }
 
   public initialize(): void {
-    // initialize required components
-    const componentMap: Map<string|symbol, Type<Component>> = Reflect.getMetadata('component:map', this) || new Map();
-    const entries = componentMap.entries();
-    let curr = entries.next();
-    while (!curr.done) {
-      const [propertyName, ComponentType] = curr.value;
-      (<any>this)[propertyName] = this.addComponent(ComponentType);
-      curr = entries.next();
-    }
     this.start();
   }
 

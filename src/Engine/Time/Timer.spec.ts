@@ -2,8 +2,8 @@
 import { suite, test } from 'mocha-typescript';
 import { expect, use } from 'chai';
 import { spy } from 'sinon';
-import { Timer } from 'Engine/Time/Timer';
 import { Time } from 'Engine/Time/Time';
+import { Timer } from 'Engine/Time/Timer';
 import { instantiate, getService } from 'Engine/Base/runtime';
 import { GameObjectInitializer } from 'Engine/Base/GameObjectInitializer';
 import * as sinonChai from 'sinon-chai';
@@ -20,10 +20,6 @@ use(sinonChai);
 
     const initializer = <GameObjectInitializer>getService(GameObjectInitializer);
     initializer.resolve();
-  }
-
-  @test 'it should pause by default' () {
-    expect(this.timer.isActive).to.be.false;
   }
 
   @test 'it should update timestamp' () {

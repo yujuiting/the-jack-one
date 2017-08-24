@@ -33,21 +33,24 @@ export class Sprite {
 
   private textureLoaded: Subscription;
 
-  get imageBitmap(): ImageBitmap|HTMLCanvasElement { return this.canvas; }
+  get imageBitmap(): ImageBitmap|HTMLCanvasElement {
+    this.update();
+    return this.canvas;
+  }
 
   get texture(): Texture { return this._texture; }
 
   set texture(texture: Texture) { this.setTexture(texture); }
 
-  get width(): number { return this._texture.width; }
+  get width(): number { return this.canvas.width; }
 
-  get height(): number { return this._texture.height; }
+  get height(): number { return this.canvas.height; }
 
   constructor(texture: Texture) {
     this.setTexture(texture);
   }
 
-  private setTexture(texture: Texture): void {
+  public setTexture(texture: Texture): void {
     this._texture = texture;
 
     if (this.textureLoaded) {
@@ -70,6 +73,11 @@ export class Sprite {
       this.textureRect.width = this._texture.width;
       this.textureRect.height = this._texture.height;
     }
+  }
+
+  private update(): void {
+    this.canvas.width = this.rect.width;
+    this.canvas.height = this.rect.height;
 
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 

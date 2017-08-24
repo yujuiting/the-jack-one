@@ -1,21 +1,35 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import * as HtmlWebpackPlugin from 'html-webpack-plugin';
-import { Configuration, HotModuleReplacementPlugin } from 'webpack';
+import { Configuration, HotModuleReplacementPlugin, optimize } from 'webpack';
 import { CheckerPlugin, TsConfigPathsPlugin } from 'awesome-typescript-loader';
 import * as CopyWebpackPlugin from 'copy-webpack-plugin';
 
 const context = path.join(__dirname, 'src');
 
+const games = {
+};
+
+const examples = {
+  'examples/physics': 'Examples/physics.ts',
+  'examples/test': 'Examples/test.ts'
+};
+
 const config: Configuration = {
 
   context,
 
-  entry: './Game/Client/Main.ts',
+  entry: {
+    // Web
+    index: 'Web/main.ts',
+    // Games
+    ...games,
+    ...examples
+  },
 
   output: {
-    path: path.join(__dirname, 'dist/client'),
-    filename: 'main.bundle.js'
+    path: path.join(__dirname, 'dist'),
+    filename: '[name].bundle.js'
   },
 
   resolve: {
@@ -38,16 +52,34 @@ const config: Configuration = {
   },
 
   plugins: [
+
     new CheckerPlugin(),
+
     new CopyWebpackPlugin([
       { from: 'Assets', to: 'Assets' }
     ]),
+
     new HotModuleReplacementPlugin(),
-    new HtmlWebpackPlugin()
+
+    new HtmlWebpackPlugin({ chunks: ['commons', 'index'] }),
+
+    ...Object.keys(games).map(name =>
+      new HtmlWebpackPlugin({ chunks: ['commons', name], filename: `${name}.html` })),
+
+    ...Object.keys(examples).map(name =>
+      new HtmlWebpackPlugin({ chunks: ['commons', name], filename: `${name}.html` })),
+
+    new optimize.CommonsChunkPlugin({
+      name: 'commons',
+      chunks: [
+        ...Object.keys(games),
+        ...Object.keys(examples)
+      ]
+    })
   ],
 
   devServer: {
-    contentBase: path.join(__dirname, 'dist/client'),
+    contentBase: path.join(__dirname, 'dist'),
     compress: true,
     port: 9000,
     hot: true,
