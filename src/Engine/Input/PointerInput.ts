@@ -79,8 +79,8 @@ export class PointerInput {
     );
   }
 
-  constructor(@Inject(MouseInput) private mouseInput: MouseInput,
-              @Inject(TouchInput) private touchInput: TouchInput) {}
+  constructor(private mouseInput: MouseInput,
+              private touchInput: TouchInput) {}
 
   private parseMouseEvent(e: MouseEvent): PointerEvent {
     return {

@@ -1,4 +1,4 @@
-import { Class } from 'Engine/Utility/Type';
+import { Type } from 'Engine/Utility/Type';
 import { addToArray,
          removeFromArray } from 'Engine/Utility/ArrayUtility';
 
@@ -17,7 +17,7 @@ export class Pool<T extends Recyclable> {
 
   get inactives(): ReadonlyArray<T> { return this._inactives; }
 
-  constructor(private type: Class<T>,
+  constructor(private type: Type<T>,
               public max: number = Infinity) {}
 
   public get(...args: any[]): T|null {

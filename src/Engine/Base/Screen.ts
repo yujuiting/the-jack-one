@@ -25,7 +25,7 @@ export class Screen {
 
   get isFullScreen(): boolean { return this._isFullScreen; }
 
-  constructor(@Inject(BrowserDelegate) private browserDelegate: BrowserDelegate) {}
+  constructor(private browserDelegate: BrowserDelegate) {}
 
   public setFullScreen(enable: boolean = true): void {
     this._isFullScreen = enable;

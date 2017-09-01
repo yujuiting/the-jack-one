@@ -50,10 +50,6 @@ export class PolygonColliderComponent extends ColliderComponent {
   @Inject(CollisionJumpTable)
   protected collisionJumpTable: CollisionJumpTable;
 
-  constructor(host: GameObject) {
-    super(host);
-  }
-
   public get cachedPoints(): ReadonlyArray<Vector> { return this._cachedPoints; }
 
   public get cachedAxes(): ReadonlyArray<Vector> { return this._cachedAxes; }

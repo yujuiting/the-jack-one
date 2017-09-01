@@ -4,6 +4,8 @@ import { suite, test } from 'mocha-typescript';
 import { Vector } from 'Engine/Math/Vector';
 import { CircleColliderComponent } from 'Engine/Physics/CircleColliderComponent';
 import { GameObject } from 'Engine/Base/GameObject';
+import { instantiate, getService } from 'Engine/Base/runtime';
+import { GameObjectInitializer } from 'Engine/Base/GameObjectInitializer';
 import { Line } from 'Engine/Math/Line';
 import { Ray } from 'Engine/Math/Ray';
 
@@ -13,9 +15,13 @@ import { Ray } from 'Engine/Math/Ray';
   collider: CircleColliderComponent;
 
   before() {
-    this.gameObject = new GameObject();
+    this.gameObject = instantiate(GameObject);
     this.collider = this.gameObject.addComponent(CircleColliderComponent);
     this.collider.radius = 10;
+
+    const initializer = <GameObjectInitializer>getService(GameObjectInitializer);
+    initializer.resolve();
+
     this.gameObject.fixedUpdate();
   }
 

@@ -1,8 +1,9 @@
-export interface Class<T> extends Function {
+export interface Type<T> extends Function {
   new (...args: any[]): T;
+  name: string;
 }
 
-export function getClass<T>(instance: T): Class<T> {
+export function getClass<T>(instance: T): Type<T> {
   return (<any>instance).constructor;
 }
 
@@ -27,7 +28,7 @@ export const AllBuiltInLayer = BuiltInLayer.Background |
 
 export type Pair<T> = [T, T];
 
-export type Token = Class<any> | Symbol | string | ForwardRefFn<any>;
+export type Token = Type<any> | Symbol | string | ForwardRefFn<any>;
 
 export interface ForwardRefFn<T> {
   (): T;

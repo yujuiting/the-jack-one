@@ -1,13 +1,14 @@
 import { BaseObject } from 'Engine/Base/BaseObject';
 import { Component } from 'Engine/Base/Component';
-import { Class, Tag, Layer, BuiltInLayer } from 'Engine/Utility/Type';
+import { Type, Tag, Layer, BuiltInLayer, getClass } from 'Engine/Utility/Type';
 import { TransformComponent } from 'Engine/Display/TransformComponent';
 import { addToArray,
          removeFromArray,
          includeInArray } from 'Engine/Utility/ArrayUtility';
 import { Tree } from 'Engine/Utility/Tree';
 import { instantiate } from 'Engine/Base/runtime';
-import { AddComponent } from 'Engine/Decorator/AddComponent';
+import { GameObjectInitializer } from 'Engine/Base/GameObjectInitializer';
+import { Class } from 'Engine/Decorator/Class';
 
 interface InternalGameObject extends GameObject {
   node: Tree<GameObject>;
@@ -17,6 +18,7 @@ interface InternalGameObject extends GameObject {
 /**
  * Basic class in engine
  */
+@Class()
 export class GameObject extends BaseObject {
 
   public static FindWithTag(tag: Tag): ReadonlyArray<GameObject> {
@@ -63,7 +65,6 @@ export class GameObject extends BaseObject {
 
   public readonly node: Tree<GameObject> = new Tree(this);
 
-  @AddComponent(TransformComponent)
   public readonly transform: TransformComponent;
 
   private components: Component[] = [];
@@ -77,7 +78,7 @@ export class GameObject extends BaseObject {
   }
 
   public get children(): ReadonlyArray<GameObject> {
-    return this.node.children.map(node => <GameObject>node.data);
+    return this.node.children.map(node => node.data);
   }
 
   public get isActive(): boolean {
@@ -89,9 +90,11 @@ export class GameObject extends BaseObject {
     return this._isActive;
   }
 
-  constructor() {
+  constructor(gameObjectInitializer: GameObjectInitializer) {
     super();
-    this.initialize();
+    this.deactivate();
+    this.transform = this.addComponent(TransformComponent);
+    gameObjectInitializer.push(this);
   }
 
   public hasTag(tag: Tag): boolean {
@@ -110,14 +113,14 @@ export class GameObject extends BaseObject {
     }
   }
 
-  public addComponent<T extends Component>(ComponentType: Class<T>): T {
+  public addComponent<T extends Component>(ComponentType: Type<T>): T {
     const isUnique = Reflect.getMetadata('component:unique', ComponentType) || false;
 
     if (isUnique && this.getComponent(ComponentType)) {
       throw new Error(`Unique component ${ComponentType}`);
     }
 
-    const RequireComponentTypes: Class<Component>[] = Reflect.getMetadata('component:require', ComponentType) || [];
+    const RequireComponentTypes: Type<Component>[] = Reflect.getMetadata('component:require', ComponentType) || [];
 
     RequireComponentTypes.forEach(RequireComponentType => {
       if (!this.getComponent(RequireComponentType)) {
@@ -141,19 +144,14 @@ export class GameObject extends BaseObject {
       throw new Error(`Not found components, ${component}`);
     }
 
-    if (this.hasStarted) {
-      // child is removed from scene earlier.
-      component.end();
-    }
-
     component.destroy();
   }
 
-  public getComponent<T extends Component>(componentType: Class<T>): T|undefined {
+  public getComponent<T extends Component>(componentType: Type<T>): T|undefined {
     return <T>this.components.find(component => component instanceof componentType);
   }
 
-  public getComponents<T extends Component>(componentType: Class<T>): T[] {
+  public getComponents<T extends Component>(componentType: Type<T>): T[] {
     return <T[]>this.components.filter(component => component instanceof componentType);
   }
 
@@ -166,10 +164,6 @@ export class GameObject extends BaseObject {
       child.node.parent.remove(child.node);
     }
 
-    if (this.hasStarted) {
-      child.start();
-    }
-
     this.node.add(child.node);
     child.transform.localPosition.copy(child.transform.position);
   }
@@ -177,11 +171,6 @@ export class GameObject extends BaseObject {
   public removeChild(child: GameObject): void {
     if (this.node.hasChild(child.node)) {
       throw new Error(`Not found child, ${child}`);
-    }
-
-    if (this.hasStarted) {
-      // child is removed from scene earlier.
-      child.end();
     }
 
     this.node.remove(child.node);
@@ -201,18 +190,9 @@ export class GameObject extends BaseObject {
    * @inheritdoc
    */
   public start(): void {
+    this.activate();
     this.hasStarted = true;
     this.components.forEach(component => component.start());
-    this.children.forEach(child => child.start());
-  }
-
-  /**
-   * @inheritdoc
-   */
-  public end(): void {
-    this.hasStarted = false;
-    this.components.forEach(component => component.end());
-    this.children.forEach(child => child.end());
   }
 
   /**
@@ -247,7 +227,7 @@ export class GameObject extends BaseObject {
     this.hasStarted = false;
 
     // reset required components
-    const componentMap: Map<string|symbol, Class<Component>> = Reflect.getMetadata('component:map', this) || new Map();
+    const componentMap: Map<string|symbol, Type<Component>> = Reflect.getMetadata('component:map', this) || new Map();
     const entries = componentMap.keys();
     let curr = entries.next();
     while (!curr.done) {
@@ -274,16 +254,8 @@ export class GameObject extends BaseObject {
     return `GameObject(${this.id})`;
   }
 
-  private initialize(): void {
-    // initialize required components
-    const componentMap: Map<string|symbol, Class<Component>> = Reflect.getMetadata('component:map', this) || new Map();
-    const entries = componentMap.entries();
-    let curr = entries.next();
-    while (!curr.done) {
-      const [propertyName, ComponentType] = curr.value;
-      (<any>this)[propertyName] = this.addComponent(ComponentType);
-      curr = entries.next();
-    }
+  public initialize(): void {
+    this.start();
   }
 
 }

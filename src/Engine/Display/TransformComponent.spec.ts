@@ -1,6 +1,8 @@
 // tslint:disable member-access no-unused-expression
 import { expect } from 'chai';
 import { suite, test } from 'mocha-typescript';
+import { instantiate, getService } from 'Engine/Base/runtime';
+import { GameObjectInitializer } from 'Engine/Base/GameObjectInitializer';
 import { TransformComponent } from 'Engine/Display/TransformComponent';
 import { GameObject } from 'Engine/Base/GameObject';
 import { Vector } from 'Engine/Math/Vector';
@@ -10,7 +12,10 @@ import { Vector } from 'Engine/Math/Vector';
   transform: TransformComponent;
 
   before() {
-    this.transform = new GameObject().transform;
+    const gameObject = instantiate(GameObject);
+    const initializer = <GameObjectInitializer>getService(GameObjectInitializer);
+    initializer.resolve();
+    this.transform = gameObject.transform;
   }
 
   @test 'should calculate toWorldMatrix' () {

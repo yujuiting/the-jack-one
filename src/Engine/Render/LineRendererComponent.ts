@@ -34,20 +34,30 @@ export class LineRendererComponent extends RendererComponent {
   public render(ctx: CanvasRenderingContext2D, toScreenMatrix: Matrix): void {
     const points = this._points.map(point => point.clone());
 
+    ctx.save();
+
+    const m = toScreenMatrix.clone();
+
     if (this.useLocalCoordinate) {
-      const toWorldTransform = this.transform.toWorldMatrix;
-      points.forEach(point => toWorldTransform.multiplyToPoint(point));
+      m.multiply(this.transform.toWorldMatrix);
     }
 
-    points.map(point => toScreenMatrix.multiplyToPoint(point));
+    /**
+     * reverse first to correct y-axis and rotate direction
+     */
+    m.setScaling(-1, -1);
+
+    ctx.transform(
+      m[0][0], m[0][1],
+      m[1][0], m[1][1],
+      m[0][2], m[1][2]
+    );
 
     const firstPoint = points.shift();
 
     if (!firstPoint) {
       return;
     }
-
-    ctx.save();
 
     ctx.lineWidth = this.lineWidth;
 

@@ -1,7 +1,7 @@
 import { GameObject } from 'Engine/Base/GameObject';
 import { Color } from 'Engine/Display/Color';
 import { Matrix } from 'Engine/Math/Matrix';
-import { Layer, AllBuiltInLayer, Class } from 'Engine/Utility/Type';
+import { Layer, AllBuiltInLayer, Type } from 'Engine/Utility/Type';
 import { RendererComponent } from 'Engine/Render/RendererComponent';
 import { Pool } from 'Engine/Utility/Pool';
 import { ReadonlyTree } from 'Engine/Utility/Tree';
@@ -11,6 +11,7 @@ import { Vector } from 'Engine/Math/Vector';
 import { Rect } from 'Engine/Math/Rect';
 import { Inject } from 'Engine/Decorator/Inject';
 import { Service } from 'Engine/Decorator/Service';
+import { GameObjectInitializer } from 'Engine/Base/GameObjectInitializer';
 
 export const MainCamera = Symbol('MainCamera');
 
@@ -44,9 +45,10 @@ export class Camera extends GameObject {
 
   private ctx: CanvasRenderingContext2D;
 
-  constructor(@Inject(BrowserDelegate) private browser: BrowserDelegate,
-              @Inject(Screen) private screen: Screen) {
-    super();
+  constructor(private browser: BrowserDelegate,
+              private screen: Screen,
+              gameObjectInitializer: GameObjectInitializer) {
+    super(gameObjectInitializer);
     this.canvas = browser.document.createElement('canvas');
     this.ctx = <CanvasRenderingContext2D>this.canvas.getContext('2d');
 
@@ -88,10 +90,16 @@ export class Camera extends GameObject {
     );
     this.toScreenMatrix.restore();
     this.toScreenMatrix.setTranslation(-x, -y);
+    this.toWorldMatrix.invertFrom(this.toScreenMatrix);
   }
 
   public render(ctx: CanvasRenderingContext2D, gameObjects: ReadonlyTree<GameObject>): void {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+    this.ctx.save();
+    this.ctx.fillStyle = this.backgroundColor.toHexString();
+    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    this.ctx.restore();
 
     const min = this.rect.min;
     const max = this.rect.max;
@@ -101,7 +109,7 @@ export class Camera extends GameObject {
      * There should be some way to cahce which game object need to render
      */
     gameObjects.forEachChildren(gameObject => {
-      if (!(gameObject.layer & this.cullingMask)) {
+      if ((gameObject.layer & this.cullingMask) === 0) {
         return;
       }
 
@@ -115,7 +123,7 @@ export class Camera extends GameObject {
         return;
       }
 
-      const renderers = gameObject.getComponents(<Class<RendererComponent>>RendererComponent);
+      const renderers = gameObject.getComponents(<Type<RendererComponent>>RendererComponent);
 
       renderers.forEach(renderer => renderer.render(this.ctx, this.toScreenMatrix));
     });

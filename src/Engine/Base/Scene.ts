@@ -8,14 +8,17 @@ import { Camera, MainCamera } from 'Engine/Base/Camera';
 import { addToArray,
          removeFromArray } from 'Engine/Utility/ArrayUtility';
 import { Inject } from 'Engine/Decorator/Inject';
+import { Class } from 'Engine/Decorator/Class';
 import { BroadPhaseCollisionResolver } from 'Engine/Physics/BroadPhaseCollisionResolver';
 import { NarrowPhaseCollisionResolver } from 'Engine/Physics/NarrowPhaseCollisionResolver';
 import { ColliderComponent } from 'Engine/Physics/ColliderComponent';
 import { Vector } from 'Engine/Math/Vector';
+import { GameObjectInitializer } from 'Engine/Base/GameObjectInitializer';
 
 /**
  * Scene manage game objects and resources.
  */
+@Class()
 export class Scene extends BaseObject {
 
   public readonly resources: Bundle = new Bundle();
@@ -31,15 +34,11 @@ export class Scene extends BaseObject {
   @Inject(MainCamera)
   public mainCamera: Camera;
 
-  @Inject(BroadPhaseCollisionResolver)
-  private broadPhaseCollisionResolver: BroadPhaseCollisionResolver;
-
-  @Inject(NarrowPhaseCollisionResolver)
-  private narrowPhaseCollisionResolver: NarrowPhaseCollisionResolver;
-
   public get isLoaded(): boolean { return this.resources.isLoaded; }
 
-  constructor() {
+  constructor(private broadPhaseCollisionResolver: BroadPhaseCollisionResolver,
+              private narrowPhaseCollisionResolver: NarrowPhaseCollisionResolver,
+              private gameObjectInitializer: GameObjectInitializer) {
     super();
     this.add(this.mainCamera);
   }
@@ -53,17 +52,9 @@ export class Scene extends BaseObject {
       addToArray(this.cameras, gameObject);
     }
 
-    const collider = gameObject.getComponent(ColliderComponent);
-
-    if (collider) {
-      this.broadPhaseCollisionResolver.track(collider);
-    }
-
     if (at) {
       gameObject.transform.position.copy(at);
     }
-
-    gameObject.start();
 
     return true;
   }
@@ -77,14 +68,6 @@ export class Scene extends BaseObject {
     if (gameObject instanceof Camera) {
       removeFromArray(this.cameras, gameObject);
     }
-
-    const collider = gameObject.getComponent(ColliderComponent);
-
-    if (collider) {
-      this.broadPhaseCollisionResolver.untrack(collider);
-    }
-
-    gameObject.end();
 
     return true;
   }
@@ -117,6 +100,10 @@ export class Scene extends BaseObject {
     // render cameras
     // TODO: camera order is an issue
     this.cameras.forEach(camera => camera.render(ctx, this.gameObjects));
+  }
+
+  public postRender(): void {
+    this.gameObjectInitializer.resolve();
   }
 
   public destroy(): void {

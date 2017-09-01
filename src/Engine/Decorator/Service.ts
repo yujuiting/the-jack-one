@@ -1,8 +1,8 @@
-import { Token, Class } from 'Engine/Utility/Type';
-import { ProviderRegistry } from 'Engine/Base/ProviderRegistry';
+import { Token, Type } from 'Engine/Utility/Type';
+import { providerRegistry } from 'Engine/Base/ProviderRegistry';
 
-export function Service<T>(token?: Token): (target: Class<T>) => void {
-  return function (target: Class<T>) {
-    ProviderRegistry.Provide({ token: token || target, useClass: target });
+export function Service<T>(token?: Token): ClassDecorator {
+  return <ClassDecorator>function (target: Type<T>) {
+    providerRegistry.provide({ token: token || target, useClass: target });
   };
 }

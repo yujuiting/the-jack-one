@@ -23,10 +23,10 @@ export class SpriteSheetRendererComponent extends RendererComponent {
 
   private accumulator: number = 0;
 
-  constructor(host: GameObject,
-              @Inject(Time) private time: Time) {
-    super(host);
-  }
+    constructor(host: GameObject,
+                private time: Time) {
+      super(host);
+    }
 
   public setSpriteSheet(spriteSheet: SpriteSheet, defaultKey: string): void {
     this.spriteSheet = spriteSheet;
@@ -53,11 +53,17 @@ export class SpriteSheetRendererComponent extends RendererComponent {
 
     const sprite = this.sprites[this.currentIndex];
 
-    const drawAt = this.transform.position.clone();
-    toScreenMatrix.multiplyToPoint(drawAt);
-    drawAt.subtract(
-      sprite.pivot.x * sprite.width,
-      sprite.pivot.y * sprite.height
+    const m = toScreenMatrix.clone().multiply(this.transform.toWorldMatrix);
+
+    /**
+     * reverse first to correct y-axis and rotate direction
+     */
+    m.setScaling(-1, -1);
+
+    ctx.transform(
+      m[0][0], m[0][1],
+      m[1][0], m[1][1],
+      m[0][2], m[1][2]
     );
 
     ctx.drawImage(
@@ -66,13 +72,13 @@ export class SpriteSheetRendererComponent extends RendererComponent {
       sprite.rect.position.y,
       sprite.rect.width,
       sprite.rect.height,
-      drawAt.x,
-      drawAt.y,
+      -sprite.pivot.x * sprite.width,
+      -sprite.pivot.y * sprite.height,
       sprite.width,
       sprite.height
     );
 
-    drawAt.destroy();
+    ctx.restore();
   }
 
 }

@@ -5,13 +5,12 @@ export class Matrix {
   public static readonly Identity: Matrix = new Matrix();
 
   /**
-   * for handle translation, assume matrix as 3x3
-   * but third row is always [0, 0, 1]
+   * [m11, m12, dx]
+   * [m21, m22m dy]
    */
   private _value: number[][] = [
     [1, 0, 0],
     [0, 1, 0]
-    // [0, 0, 1]
   ];
 
   private _save: number[][] = [];

@@ -1,4 +1,5 @@
 // tslint:disable
+import { Service } from 'Engine/Decorator/Service';
 /**
  * Pseudo-Random Utility
  * 
@@ -22,6 +23,7 @@ const BITMASK32: number = 0xFFFFFFFF;
  * 
  * Api inspired by http://chancejs.com/# https://github.com/chancejs/chancejs
  */
+@Service()
 export class Random {
 
    // Separation point of one one word, the number of bits in the lower bitmask 0 <= r <= w-1

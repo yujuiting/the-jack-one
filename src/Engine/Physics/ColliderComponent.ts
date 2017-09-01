@@ -1,3 +1,4 @@
+import { Inject } from 'Engine/Decorator/Inject';
 import { Bounds } from 'Engine/Physics/Bounds';
 import { Component } from 'Engine/Base/Component';
 import { RigidbodyComponent } from 'Engine/Physics/RigidbodyComponent';
@@ -6,6 +7,7 @@ import { CollisionContact } from 'Engine/Physics/CollisionContact';
 import { Ray } from 'Engine/Math/Ray';
 import { Projection } from 'Engine/Math/Projection';
 import { ColliderType } from 'Engine/Physics/ColliderType';
+import { BroadPhaseCollisionResolver } from 'Engine/Physics/BroadPhaseCollisionResolver';
 
 interface InternalColliderComponent {
   rigidbody: RigidbodyComponent|undefined;
@@ -47,6 +49,9 @@ export class ColliderComponent extends Component {
    */
   public readonly rigidbody: RigidbodyComponent|undefined;
 
+  @Inject(BroadPhaseCollisionResolver)
+  private broadPhaseCollisionResolver: BroadPhaseCollisionResolver;
+
   /**
    * Calculate collision contact if body collided.
    */
@@ -83,6 +88,8 @@ export class ColliderComponent extends Component {
         (<InternalColliderComponent>this).type = ColliderType.Rigidbody;
       }
     }
+
+    this.broadPhaseCollisionResolver.track(this);
   }
 
 }

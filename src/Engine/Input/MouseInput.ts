@@ -16,6 +16,6 @@ export class MouseInput {
 
   public get wheel$(): Observable<MouseEvent> { return this.browserDelegate.wheel$; }
 
-  constructor(@Inject(BrowserDelegate) private browserDelegate: BrowserDelegate) {}
+  constructor(private browserDelegate: BrowserDelegate) {}
 
 }
