@@ -11,8 +11,8 @@ const games = {
 };
 
 const examples = {
-  'examples/physics': 'Examples/physics.ts',
-  'examples/test': 'Examples/test.ts'
+  'examples/manage-cameras': 'Examples/manage-cameras.ts',
+  'examples/physics': 'Examples/physics.ts'
 };
 
 const config: Configuration = {

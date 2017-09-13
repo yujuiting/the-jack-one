@@ -31,8 +31,12 @@ export class LineRendererComponent extends RendererComponent {
     this._points.splice(0, this._points.length);
   }
 
-  public render(ctx: CanvasRenderingContext2D, toScreenMatrix: Matrix): void {
+  public update(): void {
+    super.update();
     this.calculateBounds();
+  }
+
+  public render(ctx: CanvasRenderingContext2D, toScreenMatrix: Matrix): void {
 
     const count = this._points.length;
 

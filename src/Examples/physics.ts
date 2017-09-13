@@ -5,7 +5,6 @@ import { GameObject } from 'Engine/Base/GameObject';
 import { Scene } from 'Engine/Base/Scene';
 import { Screen } from 'Engine/Base/Screen';
 import { SceneManager } from 'Engine/Base/SceneManager';
-import { GameObjectInitializer } from 'Engine/Base/GameObjectInitializer';
 import { instantiate, bootstrap } from 'Engine/Base/runtime';
 
 import { Type } from 'Engine/Utility/Type';

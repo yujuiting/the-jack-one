@@ -61,10 +61,6 @@ export class Camera extends GameObject {
     super(gameObjectInitializer);
     this.canvas = browser.document.createElement('canvas');
     this.ctx = <CanvasRenderingContext2D>this.canvas.getContext('2d');
-  }
-
-  public start(): void {
-    super.start();
     this.setSize(this.screen.width, this.screen.height);
   }
 
@@ -73,12 +69,8 @@ export class Camera extends GameObject {
     this.canvas.height = height;
     this.toScreenMatrix.reset();
 
-    /**
-     * TODO:
-     * Rect should update according camera mode. e.g. full screen mode.
-     */
-    this.rect.width = this.screen.width;
-    this.rect.height = this.screen.height;
+    this.rect.width = width;
+    this.rect.height = height;
 
     const halfWidth = width * 0.5;
     const halfHeight = height * 0.5;
@@ -94,11 +86,12 @@ export class Camera extends GameObject {
   }
 
   public update(): void {
+    super.update();
     /**
      * Perform camera movement.
      */
     this.toScreenMatrix.restore();
-    this.toScreenMatrix.setTranslation(this.transform.position);
+    this.toScreenMatrix.setTranslation(-this.transform.position.x, -this.transform.position.y);
     this.toScreenMatrix.setRotatation(this.transform.rotation);
     this.toScreenMatrix.setScaling(this.transform.scale);
 

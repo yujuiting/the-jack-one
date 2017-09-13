@@ -8,12 +8,20 @@ export class SpriteRendererComponent extends RendererComponent {
 
   public sprite: Sprite|null;
 
-  public render(ctx: CanvasRenderingContext2D, toScreenMatrix: Matrix): void {
+  public update(): void {
+    super.update();
+
     if (!this.sprite) {
       return;
     }
 
     this.calculateBounds(this.sprite.width, this.sprite.height);
+  }
+
+  public render(ctx: CanvasRenderingContext2D, toScreenMatrix: Matrix): void {
+    if (!this.sprite) {
+      return;
+    }
 
     this.bounds.extents.setTo(
       this.sprite.width * 0.5,
