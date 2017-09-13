@@ -21,6 +21,8 @@ export class SpriteSheetRendererComponent extends RendererComponent {
 
   private sprites: ReadonlyArray<Sprite>;
 
+  private currentSprite: Sprite|null;
+
   private accumulator: number = 0;
 
     constructor(host: GameObject,
@@ -39,6 +41,16 @@ export class SpriteSheetRendererComponent extends RendererComponent {
     this.sprites = this.spriteSheet.getSprites(this.sheetKey);
   }
 
+  public update(): void {
+    super.update();
+
+    if (!this.currentSprite) {
+      return;
+    }
+
+    this.calculateBounds(this.currentSprite.width, this.currentSprite.height);
+  }
+
   public render(ctx: CanvasRenderingContext2D, toScreenMatrix: Matrix): void {
 
     this.accumulator += this.time.deltaTime;
@@ -51,13 +63,11 @@ export class SpriteSheetRendererComponent extends RendererComponent {
       }
     }
 
-    const sprite = this.sprites[this.currentIndex];
-
-    this.calculateBounds(sprite.width, sprite.height);
+    this.currentSprite = this.sprites[this.currentIndex];
 
     this.bounds.extents.setTo(
-      sprite.width * 0.5,
-      sprite.height * 0.5
+      this.currentSprite.width * 0.5,
+      this.currentSprite.height * 0.5
     );
 
     const m = toScreenMatrix.clone().multiply(this.transform.toWorldMatrix);
@@ -76,15 +86,15 @@ export class SpriteSheetRendererComponent extends RendererComponent {
     );
 
     ctx.drawImage(
-      sprite.imageBitmap,
-      sprite.rect.position.x,
-      sprite.rect.position.y,
-      sprite.rect.width,
-      sprite.rect.height,
-      -sprite.pivot.x * sprite.width,
-      -sprite.pivot.y * sprite.height,
-      sprite.width,
-      sprite.height
+      this.currentSprite.imageBitmap,
+      this.currentSprite.rect.position.x,
+      this.currentSprite.rect.position.y,
+      this.currentSprite.rect.width,
+      this.currentSprite.rect.height,
+      -this.currentSprite.pivot.x * this.currentSprite.width,
+      -this.currentSprite.pivot.y * this.currentSprite.height,
+      this.currentSprite.width,
+      this.currentSprite.height
     );
 
     ctx.restore();

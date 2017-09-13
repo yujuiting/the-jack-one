@@ -18,7 +18,7 @@ export class Bounds implements Recyclable {
   constructor(...args: any[]) {
     if (args.length === 2) {
       this.reset(args[0], args[1]);
-    } else {
+    } else if (args.length === 4) {
       this.reset(args[0], args[1], args[2], args[3]);
     }
   }

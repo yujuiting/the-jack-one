@@ -21,9 +21,12 @@ export class CircleRendererComponent extends RendererComponent {
 
   public useLocalCoordinate: boolean = true;
 
-  public render(ctx: CanvasRenderingContext2D, toScreenMatrix: Matrix): void {
-
+  public update(): void {
+    super.update();
     this.calculateBounds();
+  }
+
+  public render(ctx: CanvasRenderingContext2D, toScreenMatrix: Matrix): void {
 
     ctx.save();
 
