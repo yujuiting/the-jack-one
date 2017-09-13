@@ -1,6 +1,6 @@
 import { GameObject } from 'Engine/Base/GameObject';
 import { ColliderComponent } from 'Engine/Physics/ColliderComponent';
-import { Bounds } from 'Engine/Physics/Bounds';
+import { Bounds } from 'Engine/Display/Bounds';
 import { LineRendererComponent } from 'Engine/Render/LineRendererComponent';
 import { Vector } from 'Engine/Math/Vector';
 import { Line } from 'Engine/Math/Line';

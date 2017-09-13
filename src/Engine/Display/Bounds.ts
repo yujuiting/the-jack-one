@@ -17,17 +17,9 @@ export class Bounds implements Recyclable {
   constructor(minX: number, minY: number, maxX: number, maxY: number);
   constructor(...args: any[]) {
     if (args.length === 2) {
-      this.center.copy(args[0]);
-      this.extents.copy(args[1]);
-    } else if (args.length === 4) {
-      this.center.setTo(
-        (args[2] + args[0]) / 2,
-        (args[3] + args[1]) / 2
-      );
-      this.extents.setTo(
-        (args[2] - args[0]) / 2,
-        (args[3] - args[1]) / 2
-      );
+      this.reset(args[0], args[1]);
+    } else {
+      this.reset(args[0], args[1], args[2], args[3]);
     }
   }
 
@@ -78,6 +70,24 @@ export class Bounds implements Recyclable {
     }
 
     return true;
+  }
+
+  public reset(center: Vector, extents: Vector): void;
+  public reset(minX: number, minY: number, maxX: number, maxY: number): void;
+  public reset(...args: any[]): void {
+    if (args.length === 2) {
+      this.center.copy(args[0]);
+      this.extents.copy(args[1]);
+    } else if (args.length === 4) {
+      this.center.setTo(
+        (args[2] + args[0]) / 2,
+        (args[3] + args[1]) / 2
+      );
+      this.extents.setTo(
+        (args[2] - args[0]) / 2,
+        (args[3] - args[1]) / 2
+      );
+    }
   }
 
   public destroy(): void {

@@ -1,24 +1,37 @@
 // tslint:disable max-classes-per-file
 import 'Engine/imports';
+
+import { GameObject } from 'Engine/Base/GameObject';
+import { Scene } from 'Engine/Base/Scene';
+import { Screen } from 'Engine/Base/Screen';
+import { SceneManager } from 'Engine/Base/SceneManager';
+import { GameObjectInitializer } from 'Engine/Base/GameObjectInitializer';
+import { instantiate, bootstrap } from 'Engine/Base/runtime';
+
 import { Type } from 'Engine/Utility/Type';
+import { BrowserDelegate } from 'Engine/Utility/BrowserDelegate';
+import { removeFromArray } from 'Engine/Utility/ArrayUtility';
+
 import { Class } from 'Engine/Decorator/Class';
 import { Inject } from 'Engine/Decorator/Inject';
-import { Scene } from 'Engine/Base/Scene';
-import { SceneManager } from 'Engine/Base/SceneManager';
+
 import { Texture } from 'Engine/Resource/Texture';
+
 import { Sprite } from 'Engine/Display/Sprite';
 import { Color } from 'Engine/Display/Color';
+
 import { Vector } from 'Engine/Math/Vector';
 import { Random } from 'Engine/Math/Random';
-import { GameObject } from 'Engine/Base/GameObject';
+
 import { SpriteRendererComponent } from 'Engine/Render/SpriteRendererComponent';
 import { LineRendererComponent } from 'Engine/Render/LineRendererComponent';
 import { CircleRendererComponent } from 'Engine/Render/CircleRendererComponent';
+
 import { RigidbodyComponent } from 'Engine/Physics/RigidbodyComponent';
 import { BoxColliderComponent } from 'Engine/Physics/BoxColliderComponent';
 import { CircleColliderComponent } from 'Engine/Physics/CircleColliderComponent';
+
 import { PointerInput, PointerEvent } from 'Engine/Input/PointerInput';
-import { instantiate, bootstrap } from 'Engine/Base/runtime';
 
 const rectTexture = new Texture('../Assets/rect.png');
 const circleTexture = new Texture('../Assets/circle.png');
@@ -28,12 +41,16 @@ class Shape extends GameObject {
 
   protected renderer: SpriteRendererComponent;
 
+  protected outline: LineRendererComponent | CircleRendererComponent;
+
   protected body: RigidbodyComponent;
 
   @Inject(Random)
   protected random: Random;
 
   protected size: number;
+
+  public get isVisible(): boolean { return this.outline && this.outline.isVisible; }
 
   public start(): void {
     super.start();
@@ -47,8 +64,6 @@ class Shape extends GameObject {
 
 @Class()
 class Box extends Shape {
-
-  private outline: LineRendererComponent;
 
   private collider: BoxColliderComponent;
 
@@ -75,15 +90,12 @@ class Box extends Shape {
     this.outline.strokeColor = Color.CreateByHexRgb('#94CFFF');
 
     this.collider.size.setTo(this.size, this.size);
-    // this.collider.debug = true;
   }
 
 }
 
 @Class()
 class Circle extends Shape {
-
-  private outline: CircleRendererComponent;
 
   private collider: CircleColliderComponent;
 
@@ -103,7 +115,6 @@ class Circle extends Shape {
     this.outline.strokeColor = Color.CreateByHexRgb('#94CFFF');
 
     this.collider.radius = halfSize;
-    // this.collider.debug = true;
   }
 
 }
@@ -124,21 +135,59 @@ class Wall extends GameObject {
 }
 
 @Class()
+class GameManager extends GameObject {
+
+  public scene: Scene;
+
+  private shapes: Shape[] = [];
+
+  @Inject(Random)
+  protected random: Random;
+
+  public postRender(): void {
+    super.postRender();
+
+    const invisibleShapes = this.shapes.filter(shape => shape.isActive && !shape.isVisible);
+    invisibleShapes.forEach(invisibleShape => this.destroyShape(invisibleShape));
+  }
+
+  public createShapeAt(position: Vector): void {
+    const type = this.random.pickOne(ShapeTypes);
+    const shape = instantiate(type);
+    this.scene.add(shape, position);
+    // push after 100ms prevent game object be remove before ready.
+    setTimeout(() => this.shapes.push(shape), 100);
+  }
+
+  public destroyShape(shape: Shape): void {
+    shape.destroy();
+    this.scene.remove(shape);
+    removeFromArray(this.shapes, shape);
+  }
+
+}
+
+const ShapeTypes: Type<Shape>[] = [Box, Circle];
+
+@Class()
 class Game {
 
   private scene: Scene;
 
-  private shapes: Type<Shape>[] = [
-    Box,
-    Circle
-  ];
+  private gameManager: GameManager;
 
-  constructor(sceneManager: SceneManager,
-              pointerInput: PointerInput,
-              private random: Random) {
+  private wallTop: Wall;
+  private wallBottom: Wall;
+  private wallRight: Wall;
+  private wallLeft: Wall;
+
+  constructor(private sceneManager: SceneManager,
+              private pointerInput: PointerInput,
+              private browserDelegate: BrowserDelegate,
+              private screen: Screen) {
     // create scene
     this.scene = instantiate(Scene);
-    sceneManager.add(this.scene);
+    this.sceneManager.add(this.scene);
 
     // setup background color
     this.scene.mainCamera.backgroundColor = Color.CreateByHexRgb('#4A687F');
@@ -148,38 +197,56 @@ class Game {
     this.scene.resources.add(circleTexture);
 
     // walls
-    const top = instantiate(Wall);
-    const bottom = instantiate(Wall);
-    const right = instantiate(Wall);
-    const left = instantiate(Wall);
-    top.transform.position.setTo(0, 200);
-    bottom.transform.position.setTo(0, -200);
-    right.transform.position.setTo(300, 0);
-    right.transform.rotation = Math.PI / 2;
-    left.transform.position.setTo(-300, 0);
-    left.transform.rotation = Math.PI / 2;
-    this.scene.add(top);
-    this.scene.add(bottom);
-    this.scene.add(right);
-    this.scene.add(left);
+    this.wallTop = instantiate(Wall);
+    this.scene.add(this.wallTop);
 
-    // this.scene.add(instantiate(Box));
-    // this.scene.add(instantiate(Circle));
+    this.wallBottom = instantiate(Wall);
+    this.scene.add(this.wallBottom);
 
-    pointerInput.pointerStart$.subscribe(e => this.onPointerStart(e));
+    this.wallRight = instantiate(Wall);
+    this.wallRight.transform.rotation = Math.PI / 2;
+    this.scene.add(this.wallRight);
+
+    this.wallLeft = instantiate(Wall);
+    this.wallLeft.transform.rotation = Math.PI / 2;
+    this.scene.add(this.wallLeft);
+
+    this.adjustWalls();
+
+    // game manager
+    this.gameManager = instantiate(GameManager);
+    this.gameManager.scene = this.scene;
+    this.scene.add(this.gameManager);
+
+    // pointer input event
+    this.pointerInput.pointerStart$.subscribe(e => this.onPointerStart(e));
+
+    // resize event
+    this.browserDelegate.resize$.subscribe(e => this.onResize(e));
   }
 
   private onPointerStart(e: PointerEvent): void {
     e.locations.forEach(location => {
       const worldPosition = this.scene.mainCamera.screenToWorld(location);
-      this.createShapeAt(worldPosition);
+      this.gameManager.createShapeAt(worldPosition);
     });
   }
 
-  private createShapeAt(position: Vector): void {
-    const type = this.random.pickOne(this.shapes);
-    const shape = instantiate(type);
-    this.scene.add(shape, position);
+  private adjustWalls(): void {
+    const halfWidth = this.screen.width * 0.5;
+    const halfHeight = this.screen.height * 0.5;
+    this.wallTop.transform.position.setTo(0, halfHeight);
+    this.wallBottom.transform.position.setTo(0, -halfHeight);
+    this.wallRight.transform.position.setTo(halfWidth, 0);
+    this.wallLeft.transform.position.setTo(-halfWidth, 0);
+  }
+
+  private onResize(e: Event): void {
+    this.scene.mainCamera.setSize(
+      this.screen.width,
+      this.screen.height
+    );
+    this.adjustWalls();
   }
 
 }

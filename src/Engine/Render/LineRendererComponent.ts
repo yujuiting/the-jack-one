@@ -32,7 +32,13 @@ export class LineRendererComponent extends RendererComponent {
   }
 
   public render(ctx: CanvasRenderingContext2D, toScreenMatrix: Matrix): void {
-    const points = this._points.map(point => point.clone());
+    this.calculateBounds();
+
+    const count = this._points.length;
+
+    if (count === 0) {
+      return;
+    }
 
     ctx.save();
 
@@ -53,11 +59,7 @@ export class LineRendererComponent extends RendererComponent {
       m[0][2], m[1][2]
     );
 
-    const firstPoint = points.shift();
-
-    if (!firstPoint) {
-      return;
-    }
+    const firstPoint = this._points[0];
 
     ctx.lineWidth = this.lineWidth;
 
@@ -67,12 +69,15 @@ export class LineRendererComponent extends RendererComponent {
 
     ctx.moveTo(firstPoint.x, firstPoint.y);
 
-    points.forEach((point, index) => {
-      ctx.lineTo(point.x, point.y);
-    });
+    if (count > 1) {
+      for (let i = 1; i < count; i++) {
+        const point = this._points[i];
+        ctx.lineTo(point.x, point.y);
+      }
 
-    if (this.closePath) {
-      ctx.lineTo(firstPoint.x, firstPoint.y);
+      if (this.closePath) {
+        ctx.lineTo(firstPoint.x, firstPoint.y);
+      }
     }
 
     ctx.stroke();
@@ -80,6 +85,33 @@ export class LineRendererComponent extends RendererComponent {
     ctx.closePath();
 
     ctx.restore();
+  }
+
+  private calculateBounds(): void {
+    let minX = Number.MAX_VALUE;
+    let maxX = -Number.MAX_VALUE;
+    let minY = Number.MAX_VALUE;
+    let maxY = -Number.MAX_VALUE;
+
+    this._points.forEach(point => {
+      if (point.x < minX) {
+        minX = point.x;
+      } else if (point.x > maxX) {
+        maxX = point.x;
+      }
+
+      if (point.y < minY) {
+        minY = point.y;
+      } else if (point.y > maxY) {
+        maxY = point.y;
+      }
+    });
+
+    this.bounds.reset(minX, minY, maxX, maxY);
+
+    if (this.useLocalCoordinate) {
+      this.bounds.center.add(this.transform.position);
+    }
   }
 
 }

@@ -53,12 +53,21 @@ export class SpriteSheetRendererComponent extends RendererComponent {
 
     const sprite = this.sprites[this.currentIndex];
 
+    this.calculateBounds(sprite.width, sprite.height);
+
+    this.bounds.extents.setTo(
+      sprite.width * 0.5,
+      sprite.height * 0.5
+    );
+
     const m = toScreenMatrix.clone().multiply(this.transform.toWorldMatrix);
 
     /**
      * reverse first to correct y-axis and rotate direction
      */
     m.setScaling(-1, -1);
+
+    ctx.save();
 
     ctx.transform(
       m[0][0], m[0][1],
@@ -79,6 +88,11 @@ export class SpriteSheetRendererComponent extends RendererComponent {
     );
 
     ctx.restore();
+  }
+
+  private calculateBounds(width: number, height: number): void {
+    this.bounds.center.copy(this.transform.position);
+    this.bounds.extents.setTo(width * 0.5, height * 0.5);
   }
 
 }

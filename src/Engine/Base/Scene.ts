@@ -104,6 +104,7 @@ export class Scene extends BaseObject {
 
   public postRender(): void {
     this.gameObjectInitializer.resolve();
+    this.gameObjects.forEachChildren(gameObject => gameObject.postRender());
   }
 
   public destroy(): void {

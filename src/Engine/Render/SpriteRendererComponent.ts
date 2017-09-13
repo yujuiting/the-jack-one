@@ -13,6 +13,13 @@ export class SpriteRendererComponent extends RendererComponent {
       return;
     }
 
+    this.calculateBounds(this.sprite.width, this.sprite.height);
+
+    this.bounds.extents.setTo(
+      this.sprite.width * 0.5,
+      this.sprite.height * 0.5
+    );
+
     ctx.save();
 
     const m = toScreenMatrix.clone().multiply(this.transform.toWorldMatrix);
@@ -43,6 +50,11 @@ export class SpriteRendererComponent extends RendererComponent {
     );
 
     ctx.restore();
+  }
+
+  private calculateBounds(width: number, height: number): void {
+    this.bounds.center.copy(this.transform.position);
+    this.bounds.extents.setTo(width * 0.5, height * 0.5);
   }
 
 }

@@ -13,7 +13,7 @@ export abstract class BaseObject implements Recyclable {
    */
   public name: string = '';
 
-  protected _isActive: boolean;
+  protected _isActive: boolean = false;
 
   protected _destroyed: boolean;
 
@@ -22,6 +22,8 @@ export abstract class BaseObject implements Recyclable {
   public get canRecycle(): boolean { return this._destroyed; }
 
   public get isDestroyed(): boolean { return this._destroyed; }
+
+  protected hasStarted: boolean = false;
 
   public activate(): void {
     this._isActive = true;
@@ -40,30 +42,30 @@ export abstract class BaseObject implements Recyclable {
    * When object initialized, all components are ready.
    */
   public start(): void {
-    //
+    this.activate();
+    this.hasStarted = true;
   }
 
   /**
    * Guarantee update with 60 times per second.
    * In common case, alpha is always 1.
    */
-  public fixedUpdate(alpha: number): void {
-    //
-  }
+  public fixedUpdate(alpha: number): void { return; }
 
   /**
    * Update per frame.
    */
-  public update(): void {
-    //
-  }
+  public update(): void { return; }
 
   /**
    * Guarantee called after all object updated.
    */
-  public lateUpdate(): void {
-    //
-  }
+  public lateUpdate(): void { return; }
+
+  /**
+   * Called after rendered.
+   */
+  public postRender(): void { return; }
 
   /**
    * This object should not be access anymore after destroyed.

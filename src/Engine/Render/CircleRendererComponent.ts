@@ -23,6 +23,8 @@ export class CircleRendererComponent extends RendererComponent {
 
   public render(ctx: CanvasRenderingContext2D, toScreenMatrix: Matrix): void {
 
+    this.calculateBounds();
+
     ctx.save();
 
     const m = toScreenMatrix.clone();
@@ -64,6 +66,15 @@ export class CircleRendererComponent extends RendererComponent {
     ctx.stroke();
 
     ctx.restore();
+  }
+
+  private calculateBounds(): void {
+    this.bounds.center.copy(this.center);
+    this.bounds.extents.setTo(this.radius, this.radius);
+
+    if (this.useLocalCoordinate) {
+      this.bounds.center.add(this.transform.position);
+    }
   }
 
 }

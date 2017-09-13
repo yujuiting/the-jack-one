@@ -71,8 +71,6 @@ export class GameObject extends BaseObject {
 
   private tags: Tag[] = [];
 
-  private hasStarted: boolean = false;
-
   public get parent(): GameObject|null {
     return this.node.parent ? this.node.parent.data : null;
   }
@@ -92,7 +90,6 @@ export class GameObject extends BaseObject {
 
   constructor(gameObjectInitializer: GameObjectInitializer) {
     super();
-    this.deactivate();
     this.transform = this.addComponent(TransformComponent);
     gameObjectInitializer.push(this);
   }
@@ -190,8 +187,7 @@ export class GameObject extends BaseObject {
    * @inheritdoc
    */
   public start(): void {
-    this.activate();
-    this.hasStarted = true;
+    super.start();
     this.components.forEach(component => component.start());
   }
 

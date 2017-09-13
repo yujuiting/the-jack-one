@@ -1,5 +1,5 @@
 import { Inject } from 'Engine/Decorator/Inject';
-import { Bounds } from 'Engine/Physics/Bounds';
+import { Bounds } from 'Engine/Display/Bounds';
 import { Component } from 'Engine/Base/Component';
 import { RigidbodyComponent } from 'Engine/Physics/RigidbodyComponent';
 import { Vector } from 'Engine/Math/Vector';
@@ -89,6 +89,9 @@ export class ColliderComponent extends Component {
       }
     }
 
+    /**
+     * TODO: track after checked target has been added to scene
+     */
     this.broadPhaseCollisionResolver.track(this);
   }
 

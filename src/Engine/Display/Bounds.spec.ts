@@ -2,7 +2,7 @@
 import { expect } from 'chai';
 import { suite, test } from 'mocha-typescript';
 import { Vector } from 'Engine/Math/Vector';
-import { Bounds } from 'Engine/Physics/Bounds';
+import { Bounds } from 'Engine/Display/Bounds';
 
 @suite class BoundsTestSuite {
 
