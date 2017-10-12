@@ -1,5 +1,10 @@
 # The Jack One
 
+[![CircleCI](https://circleci.com/gh/yujuiting/the-jack-one.svg?style=svg)](https://circleci.com/gh/yujuiting/the-jack-one)
+[![Build Status](https://travis-ci.org/yujuiting/the-jack-one.svg?branch=ci%2Fsetup-travis)](https://travis-ci.org/yujuiting/the-jack-one)
+[![Coverage Status](https://coveralls.io/repos/github/yujuiting/the-jack-one/badge.svg?branch=master)](https://coveralls.io/github/yujuiting/the-jack-one?branch=master)
+[![codecov](https://codecov.io/gh/yujuiting/the-jack-one/branch/master/graph/badge.svg)](https://codecov.io/gh/yujuiting/the-jack-one)
+
 I love game, love typescript and ______________Jack.
 That is what this project existed!!
 
@@ -17,6 +22,7 @@ This project focus on custom engine development, game is a side project for quic
     - ~~Oriented rigid bodies~~
       - Add force at specific point should cause torque.
     - ~~Sleep mechanism~~
+    - Constraints
   - Camera Manipulation
   - ParticleSystem
   - Animation
@@ -25,8 +31,8 @@ This project focus on custom engine development, game is a side project for quic
   - Art: Doing research.
 
 ## Dependencies
-- `rxjs`: For manipulate events.
-- `reflect-metadata`: For implement decorator functions.
+- `rxjs`: For events manipulation.
+- `reflect-metadata`: For decorator function implementment.
 
 ## Studies & References
 

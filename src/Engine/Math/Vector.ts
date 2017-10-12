@@ -127,7 +127,7 @@ export class Vector implements Recyclable {
 
   public normalize(): this {
     const magnitude = this.magnitude();
-    return magnitude > 0 ? this.scale(1 / this.magnitude()) : this.setTo(0, 0);
+    return magnitude > 0 ? this.scale(1 / magnitude) : this.setTo(0, 0);
   }
 
   /**

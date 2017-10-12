@@ -106,36 +106,6 @@ import { Vector } from './Vector';
     expect(v1.equalTo(v3)).to.be.true;
   }
 
-  @test 'should check greater' () {
-    const v1 = new Vector(2, 4);
-    const v2 = new Vector(3, 5);
-    const v3 = new Vector(2, 4);
-    const v4 = new Vector(1, 1);
-    const v5 = new Vector(1, 5);
-    const v6 = new Vector(6, 2);
-
-    expect(v1.greaterThan(v2)).to.be.false;
-    expect(v1.greaterThan(v3)).to.be.false;
-    expect(v1.greaterThan(v4)).to.be.true;
-    expect(v1.greaterThan(v5)).to.be.false;
-    expect(v1.greaterThan(v6)).to.be.false;
-  }
-
-  @test 'should check less' () {
-    const v1 = new Vector(2, 4);
-    const v2 = new Vector(3, 5);
-    const v3 = new Vector(2, 4);
-    const v4 = new Vector(1, 1);
-    const v5 = new Vector(1, 5);
-    const v6 = new Vector(6, 2);
-
-    expect(v1.lessThan(v2)).to.be.true;
-    expect(v1.lessThan(v3)).to.be.false;
-    expect(v1.lessThan(v4)).to.be.false;
-    expect(v1.lessThan(v5)).to.be.false;
-    expect(v1.lessThan(v6)).to.be.false;
-  }
-
   @test 'should calculate dot product' () {
     const v1 = new Vector(2, 4);
     const v2 = new Vector(3, 5);

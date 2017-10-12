@@ -11,6 +11,7 @@ const games = {
 };
 
 const examples = {
+  'examples/control-camera': 'Examples/control-camera.ts',
   'examples/manage-cameras': 'Examples/manage-cameras.ts',
   'examples/physics': 'Examples/physics.ts'
 };

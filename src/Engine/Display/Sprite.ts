@@ -42,9 +42,9 @@ export class Sprite {
 
   set texture(texture: Texture) { this.setTexture(texture); }
 
-  get width(): number { return this.canvas.width; }
+  get width(): number { return this.rect.width; }
 
-  get height(): number { return this.canvas.height; }
+  get height(): number { return this.rect.height; }
 
   constructor(texture: Texture) {
     this.setTexture(texture);

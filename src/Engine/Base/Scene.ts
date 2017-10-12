@@ -48,6 +48,10 @@ export class Scene extends BaseObject {
       return false;
     }
 
+    if (!gameObject.hasStarted) {
+      gameObject.node.hide();
+    }
+
     if (gameObject instanceof Camera) {
       addToArray(this.cameras, gameObject);
     }
@@ -60,6 +64,9 @@ export class Scene extends BaseObject {
   }
 
   public remove(gameObject: GameObject): boolean {
+    // ensure parent has visiblity to this node.
+    gameObject.node.show();
+
     if (!this.gameObjects.remove(gameObject.node)) {
       // It may return false if this game object's parent is not scene root.
       return false;

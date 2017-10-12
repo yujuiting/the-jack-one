@@ -127,7 +127,7 @@ export class GameObject extends BaseObject {
 
     const component = instantiate(ComponentType, this);
 
-    if (this.hasStarted) {
+    if (this._hasStarted) {
       component.start();
     }
 
@@ -220,7 +220,7 @@ export class GameObject extends BaseObject {
     this.layer = BuiltInLayer.Default;
     this.components = [];
     this.tags = [];
-    this.hasStarted = false;
+    this._hasStarted = false;
 
     // reset required components
     const componentMap: Map<string|symbol, Type<Component>> = Reflect.getMetadata('component:map', this) || new Map();

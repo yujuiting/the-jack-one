@@ -29,4 +29,35 @@ export class Rect {
               public width: number = 0,
               public height: number = 0) {}
 
+  public contains(point: Vector): boolean {
+    if (point.x < this.position.x) {
+      return false;
+    }
+
+    if (point.y < this.position.y) {
+      return false;
+    }
+
+    if (point.x > this.position.x + this.width) {
+      return false;
+    }
+
+    if (point.y > this.position.y + this.height) {
+      return false;
+    }
+
+    return true;
+  }
+
+  public overlap(another: Rect): boolean {
+    if (this.xMax < another.xMin || this.xMin > another.xMax) {
+      return false;
+    }
+
+    if (this.yMax < another.yMin || this.yMin > another.yMax) {
+      return false;
+    }
+
+    return true;
+  }
 }

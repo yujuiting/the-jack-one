@@ -15,7 +15,9 @@ export abstract class BaseObject implements Recyclable {
 
   protected _isActive: boolean = false;
 
-  protected _destroyed: boolean;
+  protected _destroyed: boolean = false;
+
+  protected _hasStarted: boolean = false;
 
   public get isActive(): boolean { return this._isActive; }
 
@@ -23,7 +25,7 @@ export abstract class BaseObject implements Recyclable {
 
   public get isDestroyed(): boolean { return this._destroyed; }
 
-  protected hasStarted: boolean = false;
+  public get hasStarted(): boolean { return this._hasStarted; }
 
   public activate(): void {
     this._isActive = true;
@@ -43,7 +45,7 @@ export abstract class BaseObject implements Recyclable {
    */
   public start(): void {
     this.activate();
-    this.hasStarted = true;
+    this._hasStarted = true;
   }
 
   /**
