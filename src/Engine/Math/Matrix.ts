@@ -21,9 +21,6 @@ export class Matrix {
   constructor(value?: number[][]) {
     if (value !== void 0) {
       for (let i = 0; i < 2; i++) {
-        if (!value[i]) {
-          continue;
-        }
         for (let j = 0; j < 3; j++) {
           this._value[i][j] = value[i][j] || this._value[i][j];
         }

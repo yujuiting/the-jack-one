@@ -48,7 +48,7 @@ export class Texture extends Resource {
     }
   }
 
-  public load(): Promise<void> {
+  public async load(): Promise<void> {
     if (this.isLoaded) {
       return Promise.resolve();
     }

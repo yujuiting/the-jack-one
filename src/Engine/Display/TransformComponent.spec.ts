@@ -12,7 +12,7 @@ import { Vector } from 'Engine/Math/Vector';
   transform: TransformComponent;
 
   before() {
-    const gameObject = instantiate(GameObject);
+    const gameObject: GameObject = instantiate(GameObject);
     const initializer = <GameObjectInitializer>getService(GameObjectInitializer);
     initializer.resolve();
     this.transform = gameObject.transform;

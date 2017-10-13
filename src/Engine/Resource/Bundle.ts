@@ -18,7 +18,9 @@ export class Bundle extends Resource {
       return;
     }
 
-    await Promise.all(this.resources.map(resource => resource.load()));
+    await Promise.all(
+      this.resources.map(async resource => resource.load())
+    );
     this._isLoaded.next(true);
   }
 

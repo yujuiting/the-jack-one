@@ -4,7 +4,7 @@ import { Type, Token } from 'Engine/Utility/Type';
 
 let engine: Engine;
 
-export function bootstrap(): Promise<void> {
+export async function bootstrap(): Promise<void> {
   engine = <Engine>providerRegistry.get(Engine);
   return engine.initialize();
 }

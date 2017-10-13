@@ -16,7 +16,7 @@ export abstract class Component extends BaseObject {
   }
 
   public removeComponent(component: Component): void {
-    return this.host.removeComponent(component);
+    this.host.removeComponent(component);
   }
 
   public getComponent<T extends Component>(componentType: Type<T>): T|undefined {

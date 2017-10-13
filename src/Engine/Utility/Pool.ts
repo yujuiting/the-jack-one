@@ -20,12 +20,12 @@ export class Pool<T extends Recyclable> {
   constructor(private type: Type<T>,
               public max: number = Infinity) {}
 
-  public get(...args: any[]): T|null {
+  public get(...args: any[]): T|undefined {
     if (this._inactives.length === 0) {
       this.recycle();
     }
 
-    let instance: T|null = this._inactives.shift() || null;
+    let instance: T|undefined = this._inactives.shift();
 
     if (!instance) {
       if (this._actives.length < this.max) {
@@ -45,13 +45,11 @@ export class Pool<T extends Recyclable> {
   }
 
   public recycle(): void {
-    for (let i = this._actives.length - 1; i > -1; i--) {
-      if (this._actives[i]) {
-        if (this._actives[i].canRecycle) {
-          const item = this._actives[i];
-          this._actives.splice(i, 1);
-          this._inactives.push(item);
-        }
+    for (let i = this._actives.length - 1; i >= 0; i--) {
+      if (this._actives[i].canRecycle) {
+        const item = this._actives[i];
+        this._actives.splice(i, 1);
+        this._inactives.push(item);
       }
     }
   }

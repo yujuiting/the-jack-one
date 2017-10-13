@@ -19,9 +19,10 @@
     "no-increment-decrement": false,
     "member-ordering": [false],
     "interface-name":[
-      "never-prefix"
+      false
     ],
     "no-any": false,
+    "no-unsafe-any": false,
     "no-bitwise": false,
     "ordered-imports": [false],
     "no-reserved-keywords": false,
@@ -30,6 +31,11 @@
     "newline-before-return": false,
     "no-function-expression": false,
     "chai-vague-errors": false,
-    "no-require-imports": false
+    "linebreak-style": false,
+    "completed-docs": false,
+    "strict-boolean-expressions": false,
+    "no-void-expression": false,
+    "no-use-before-declare": false,
+    "restrict-plus-operands": false
   }
 }

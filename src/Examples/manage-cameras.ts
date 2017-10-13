@@ -202,13 +202,13 @@ class Game {
 
     pointerInput.pointerStart$.subscribe(e => this.onPointerStart(e));
 
-    const mainCameraLabel = instantiate(Label);
+    const mainCameraLabel: Label = instantiate(Label);
     mainCameraLabel.text = 'Main Camera, click to move';
     mainCameraLabel.layer = 1 << 10;
     this.scene.add(mainCameraLabel);
     this.mainCamera.cullingMask = this.mainCamera.cullingMask | mainCameraLabel.layer;
 
-    const subCameraLabel = instantiate(Label);
+    const subCameraLabel: Label = instantiate(Label);
     subCameraLabel.text = 'Sub Camera';
     subCameraLabel.layer = 1 << 11;
     this.scene.add(subCameraLabel);
@@ -230,4 +230,4 @@ class Game {
 
 instantiate(Game);
 
-bootstrap();
+bootstrap().catch(console.error);

@@ -67,7 +67,7 @@ export class SceneManager {
     return removeFromArray(this.scenes, scene);
   }
 
-  public switchTo(scene: Scene): Promise<void> {
+  public async switchTo(scene: Scene): Promise<void> {
     if (!includeInArray(this.scenes, scene)) {
       this.add(scene);
     }

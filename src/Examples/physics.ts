@@ -252,4 +252,4 @@ class Game {
 
 instantiate(Game);
 
-bootstrap();
+bootstrap().catch(console.error);

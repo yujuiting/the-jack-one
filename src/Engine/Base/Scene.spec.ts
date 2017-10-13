@@ -17,14 +17,18 @@ use(sinonChai);
   }
 
   @test 'add: should add game object' () {
-    const g = instantiate(GameObject);
+    const g: GameObject = instantiate(GameObject);
 
     expect(this.scene.add(g)).to.be.true;
+
+    // game object will be hide from object tree until started.
+    g.start();
+
     expect(this.scene.has(g)).to.be.true;
   }
 
   @test 'remove: should remove game object' () {
-    const g = instantiate(GameObject);
+    const g: GameObject = instantiate(GameObject);
     this.scene.add(g);
 
     expect(this.scene.remove(g)).to.be.true;

@@ -1,7 +1,7 @@
 import { Observable } from 'rxjs/Observable';
 
-export function onceEvent<T extends Event>(node: Node,
-                                           eventName: string): Promise<T> {
+export async function onceEvent<T extends Event>(node: Node,
+                                                 eventName: string): Promise<T> {
   return new Promise<T>((resolve, reject) => {
     const onEvent = (e: T) => {
       resolve(e);
