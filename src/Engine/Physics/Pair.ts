@@ -5,7 +5,7 @@ export class Pair implements Recyclable {
 
   private static Instances: Pool<Pair> = new Pool(Pair);
 
-  public static Get(colliderA: ColliderComponent, colliderB: ColliderComponent): Pair|null {
+  public static Get(colliderA: ColliderComponent, colliderB: ColliderComponent): Pair|undefined {
     return this.Instances.get(colliderA, colliderB);
   }
 
