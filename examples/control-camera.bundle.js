@@ -87,7 +87,7 @@ exports.TextRendererComponent = TextRendererComponent;
 
 /***/ }),
 
-/***/ 67:
+/***/ 66:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -128,7 +128,7 @@ var TextRendererComponent_1 = __webpack_require__(34);
 var SpriteRendererComponent_1 = __webpack_require__(35);
 var LineRendererComponent_1 = __webpack_require__(15);
 var RigidbodyComponent_1 = __webpack_require__(20);
-var KeyboardInput_1 = __webpack_require__(97);
+var KeyboardInput_1 = __webpack_require__(96);
 var texture = new Texture_1.Texture('../Assets/circle.png');
 var CameraController = (function (_super) {
     __extends(CameraController, _super);
@@ -227,7 +227,7 @@ runtime_1.bootstrap().catch(console.error);
 
 /***/ }),
 
-/***/ 97:
+/***/ 96:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -269,5 +269,5 @@ exports.KeyboardInput = KeyboardInput;
 
 /***/ })
 
-},[67]);
+},[66]);
 //# sourceMappingURL=control-camera.bundle.js.map

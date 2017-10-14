@@ -5,173 +5,6 @@ webpackJsonp([0],{
 
 "use strict";
 
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __metadata = (this && this.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-var Service_1 = __webpack_require__(1);
-var BITMASK32 = 0xFFFFFFFF;
-var Random = (function () {
-    function Random(seed) {
-        if (seed === void 0) { seed = Date.now(); }
-        this.seed = seed;
-        this._lowerMask = 0x7FFFFFFF;
-        this._upperMask = 0x80000000;
-        this._w = 32;
-        this._n = 624;
-        this._m = 397;
-        this._a = 0x9908B0DF;
-        this._u = 11;
-        this._s = 7;
-        this._b = 0x9d2c5680;
-        this._t = 15;
-        this._c = 0xefc60000;
-        this._l = 18;
-        this._f = 1812433253;
-        this._mt = new Array(this._n);
-        this._mt[0] = seed >>> 0;
-        for (var i = 1; i < this._n; i++) {
-            var s = this._mt[i - 1] ^ (this._mt[i - 1] >>> (this._w - 2));
-            this._mt[i] = (((this._f * ((s & 0xFFFF0000) >>> 16)) << 16) + (this._f * (s & 0xFFFF)) + i) >>> 0;
-        }
-        this._index = this._n;
-    }
-    Random.prototype._twist = function () {
-        var mag01 = [0x0, this._a];
-        var y = 0;
-        for (var i = 0; i < this._n - this._m; i++) {
-            y = (this._mt[i] & this._upperMask) | (this._mt[i + 1] & this._lowerMask);
-            this._mt[i] = this._mt[i + this._m] ^ (y >>> 1) ^ mag01[y & 0x1] & BITMASK32;
-        }
-        for (; i < this._n - 1; i++) {
-            y = (this._mt[i] & this._upperMask) | (this._mt[i + 1] & this._lowerMask);
-            this._mt[i] = this._mt[i + (this._m - this._n)] ^ (y >>> 1) ^ mag01[y & 0x1] & BITMASK32;
-        }
-        y = (this._mt[this._n - 1] & this._upperMask) | (this._mt[0] & this._lowerMask);
-        this._mt[this._n - 1] = this._mt[this._m - 1] ^ (y >>> 1) ^ mag01[y & 0x1] & BITMASK32;
-        this._index = 0;
-    };
-    Random.prototype.nextInt = function () {
-        if (this._index >= this._n) {
-            this._twist();
-        }
-        var y = this._mt[this._index++];
-        y ^= y >>> this._u;
-        y ^= ((y << this._s) & this._b);
-        y ^= ((y << this._t) & this._c);
-        y ^= (y >>> this._l);
-        return y >>> 0;
-    };
-    Random.prototype.next = function () {
-        return this.nextInt() * (1.0 / 4294967296.0);
-    };
-    Random.prototype.floating = function (min, max) {
-        return (max - min) * this.next() + min;
-    };
-    Random.prototype.integer = function (min, max) {
-        return Math.floor((max - min + 1) * this.next() + min);
-    };
-    Random.prototype.bool = function (likelihood) {
-        if (likelihood === void 0) { likelihood = .5; }
-        return this.next() <= likelihood;
-    };
-    Random.prototype.pickOne = function (array) {
-        return array[this.integer(0, array.length - 1)];
-    };
-    Random.prototype.pickSet = function (array, numPicks, allowDuplicates) {
-        if (allowDuplicates === void 0) { allowDuplicates = false; }
-        if (allowDuplicates) {
-            return this._pickSetWithDuplicates(array, numPicks);
-        }
-        else {
-            return this._pickSetWithoutDuplicates(array, numPicks);
-        }
-    };
-    Random.prototype._pickSetWithoutDuplicates = function (array, numPicks) {
-        if (numPicks > array.length || numPicks < 0) {
-            throw new Error('Invalid number of elements to pick, must pick a value 0 < n <= length');
-        }
-        if (numPicks === array.length) {
-            return array;
-        }
-        var result = new Array(numPicks);
-        var currentPick = 0;
-        var tempArray = array.slice(0);
-        while (currentPick < numPicks) {
-            var index = this.integer(0, tempArray.length - 1);
-            result[currentPick++] = tempArray[index];
-            tempArray.splice(index, 1);
-        }
-        return result;
-    };
-    Random.prototype._pickSetWithDuplicates = function (array, numPicks) {
-        if (numPicks < 0) {
-            throw new Error('Invalid number of elements to pick, must pick a value 0 <= n < MAX_INT');
-        }
-        var result = new Array(numPicks);
-        for (var i = 0; i < numPicks; i++) {
-            result.push(this.pickOne(array));
-        }
-        return result;
-    };
-    Random.prototype.shuffle = function (array) {
-        var tempArray = array.slice(0);
-        var swap = null;
-        for (var i = 0; i < tempArray.length - 2; i++) {
-            var randomIndex = this.integer(i, tempArray.length - 1);
-            swap = tempArray[i];
-            tempArray[i] = tempArray[randomIndex];
-            tempArray[randomIndex] = swap;
-        }
-        return tempArray;
-    };
-    Random.prototype.range = function (length, min, max) {
-        var result = new Array(length);
-        for (var i = 0; i < length; i++) {
-            result[i] = this.integer(min, max);
-        }
-        return result;
-    };
-    Random.prototype.d4 = function () {
-        return this.integer(1, 4);
-    };
-    Random.prototype.d6 = function () {
-        return this.integer(1, 6);
-    };
-    Random.prototype.d8 = function () {
-        return this.integer(1, 8);
-    };
-    Random.prototype.d10 = function () {
-        return this.integer(1, 10);
-    };
-    Random.prototype.d12 = function () {
-        return this.integer(1, 12);
-    };
-    Random.prototype.d20 = function () {
-        return this.integer(1, 20);
-    };
-    Random = __decorate([
-        Service_1.Service(),
-        __metadata("design:paramtypes", [Number])
-    ], Random);
-    return Random;
-}());
-exports.Random = Random;
-
-
-/***/ }),
-
-/***/ 101:
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = Object.setPrototypeOf ||
         ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
@@ -240,7 +73,7 @@ exports.BoxColliderComponent = BoxColliderComponent;
 
 /***/ }),
 
-/***/ 102:
+/***/ 101:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -256,7 +89,7 @@ var ColliderType;
 
 /***/ }),
 
-/***/ 103:
+/***/ 102:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -314,7 +147,7 @@ exports.Ray = Ray;
 
 /***/ }),
 
-/***/ 104:
+/***/ 103:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -843,7 +676,7 @@ var ColliderComponent_1 = __webpack_require__(63);
 var LineRendererComponent_1 = __webpack_require__(15);
 var Vector_1 = __webpack_require__(0);
 var Line_1 = __webpack_require__(61);
-var Ray_1 = __webpack_require__(103);
+var Ray_1 = __webpack_require__(102);
 var Projection_1 = __webpack_require__(39);
 var CollisionJumpTable_1 = __webpack_require__(64);
 var Inject_1 = __webpack_require__(7);
@@ -1064,7 +897,7 @@ var Component_1 = __webpack_require__(11);
 var RigidbodyComponent_1 = __webpack_require__(20);
 var Vector_1 = __webpack_require__(0);
 var Projection_1 = __webpack_require__(39);
-var ColliderType_1 = __webpack_require__(102);
+var ColliderType_1 = __webpack_require__(101);
 var BroadPhaseCollisionResolver_1 = __webpack_require__(58);
 var ColliderComponent = (function (_super) {
     __extends(ColliderComponent, _super);
@@ -1123,7 +956,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var Service_1 = __webpack_require__(1);
-var CollisionContact_1 = __webpack_require__(104);
+var CollisionContact_1 = __webpack_require__(103);
 var CollisionJumpTable = (function () {
     function CollisionJumpTable() {
     }
@@ -1403,7 +1236,7 @@ exports.CircleColliderComponent = CircleColliderComponent;
 
 /***/ }),
 
-/***/ 99:
+/***/ 98:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1442,12 +1275,12 @@ var Texture_1 = __webpack_require__(31);
 var Sprite_1 = __webpack_require__(33);
 var Color_1 = __webpack_require__(6);
 var Vector_1 = __webpack_require__(0);
-var Random_1 = __webpack_require__(100);
+var Random_1 = __webpack_require__(99);
 var SpriteRendererComponent_1 = __webpack_require__(35);
 var LineRendererComponent_1 = __webpack_require__(15);
 var CircleRendererComponent_1 = __webpack_require__(60);
 var RigidbodyComponent_1 = __webpack_require__(20);
-var BoxColliderComponent_1 = __webpack_require__(101);
+var BoxColliderComponent_1 = __webpack_require__(100);
 var CircleColliderComponent_1 = __webpack_require__(65);
 var PointerInput_1 = __webpack_require__(36);
 var rectTexture = new Texture_1.Texture('../Assets/rect.png');
@@ -1635,7 +1468,174 @@ runtime_1.instantiate(Game);
 runtime_1.bootstrap().catch(console.error);
 
 
+/***/ }),
+
+/***/ 99:
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var Service_1 = __webpack_require__(1);
+var BITMASK32 = 0xFFFFFFFF;
+var Random = (function () {
+    function Random(seed) {
+        if (seed === void 0) { seed = Date.now(); }
+        this.seed = seed;
+        this._lowerMask = 0x7FFFFFFF;
+        this._upperMask = 0x80000000;
+        this._w = 32;
+        this._n = 624;
+        this._m = 397;
+        this._a = 0x9908B0DF;
+        this._u = 11;
+        this._s = 7;
+        this._b = 0x9d2c5680;
+        this._t = 15;
+        this._c = 0xefc60000;
+        this._l = 18;
+        this._f = 1812433253;
+        this._mt = new Array(this._n);
+        this._mt[0] = seed >>> 0;
+        for (var i = 1; i < this._n; i++) {
+            var s = this._mt[i - 1] ^ (this._mt[i - 1] >>> (this._w - 2));
+            this._mt[i] = (((this._f * ((s & 0xFFFF0000) >>> 16)) << 16) + (this._f * (s & 0xFFFF)) + i) >>> 0;
+        }
+        this._index = this._n;
+    }
+    Random.prototype._twist = function () {
+        var mag01 = [0x0, this._a];
+        var y = 0;
+        for (var i = 0; i < this._n - this._m; i++) {
+            y = (this._mt[i] & this._upperMask) | (this._mt[i + 1] & this._lowerMask);
+            this._mt[i] = this._mt[i + this._m] ^ (y >>> 1) ^ mag01[y & 0x1] & BITMASK32;
+        }
+        for (; i < this._n - 1; i++) {
+            y = (this._mt[i] & this._upperMask) | (this._mt[i + 1] & this._lowerMask);
+            this._mt[i] = this._mt[i + (this._m - this._n)] ^ (y >>> 1) ^ mag01[y & 0x1] & BITMASK32;
+        }
+        y = (this._mt[this._n - 1] & this._upperMask) | (this._mt[0] & this._lowerMask);
+        this._mt[this._n - 1] = this._mt[this._m - 1] ^ (y >>> 1) ^ mag01[y & 0x1] & BITMASK32;
+        this._index = 0;
+    };
+    Random.prototype.nextInt = function () {
+        if (this._index >= this._n) {
+            this._twist();
+        }
+        var y = this._mt[this._index++];
+        y ^= y >>> this._u;
+        y ^= ((y << this._s) & this._b);
+        y ^= ((y << this._t) & this._c);
+        y ^= (y >>> this._l);
+        return y >>> 0;
+    };
+    Random.prototype.next = function () {
+        return this.nextInt() * (1.0 / 4294967296.0);
+    };
+    Random.prototype.floating = function (min, max) {
+        return (max - min) * this.next() + min;
+    };
+    Random.prototype.integer = function (min, max) {
+        return Math.floor((max - min + 1) * this.next() + min);
+    };
+    Random.prototype.bool = function (likelihood) {
+        if (likelihood === void 0) { likelihood = .5; }
+        return this.next() <= likelihood;
+    };
+    Random.prototype.pickOne = function (array) {
+        return array[this.integer(0, array.length - 1)];
+    };
+    Random.prototype.pickSet = function (array, numPicks, allowDuplicates) {
+        if (allowDuplicates === void 0) { allowDuplicates = false; }
+        if (allowDuplicates) {
+            return this._pickSetWithDuplicates(array, numPicks);
+        }
+        else {
+            return this._pickSetWithoutDuplicates(array, numPicks);
+        }
+    };
+    Random.prototype._pickSetWithoutDuplicates = function (array, numPicks) {
+        if (numPicks > array.length || numPicks < 0) {
+            throw new Error('Invalid number of elements to pick, must pick a value 0 < n <= length');
+        }
+        if (numPicks === array.length) {
+            return array;
+        }
+        var result = new Array(numPicks);
+        var currentPick = 0;
+        var tempArray = array.slice(0);
+        while (currentPick < numPicks) {
+            var index = this.integer(0, tempArray.length - 1);
+            result[currentPick++] = tempArray[index];
+            tempArray.splice(index, 1);
+        }
+        return result;
+    };
+    Random.prototype._pickSetWithDuplicates = function (array, numPicks) {
+        if (numPicks < 0) {
+            throw new Error('Invalid number of elements to pick, must pick a value 0 <= n < MAX_INT');
+        }
+        var result = new Array(numPicks);
+        for (var i = 0; i < numPicks; i++) {
+            result.push(this.pickOne(array));
+        }
+        return result;
+    };
+    Random.prototype.shuffle = function (array) {
+        var tempArray = array.slice(0);
+        var swap = null;
+        for (var i = 0; i < tempArray.length - 2; i++) {
+            var randomIndex = this.integer(i, tempArray.length - 1);
+            swap = tempArray[i];
+            tempArray[i] = tempArray[randomIndex];
+            tempArray[randomIndex] = swap;
+        }
+        return tempArray;
+    };
+    Random.prototype.range = function (length, min, max) {
+        var result = new Array(length);
+        for (var i = 0; i < length; i++) {
+            result[i] = this.integer(min, max);
+        }
+        return result;
+    };
+    Random.prototype.d4 = function () {
+        return this.integer(1, 4);
+    };
+    Random.prototype.d6 = function () {
+        return this.integer(1, 6);
+    };
+    Random.prototype.d8 = function () {
+        return this.integer(1, 8);
+    };
+    Random.prototype.d10 = function () {
+        return this.integer(1, 10);
+    };
+    Random.prototype.d12 = function () {
+        return this.integer(1, 12);
+    };
+    Random.prototype.d20 = function () {
+        return this.integer(1, 20);
+    };
+    Random = __decorate([
+        Service_1.Service(),
+        __metadata("design:paramtypes", [Number])
+    ], Random);
+    return Random;
+}());
+exports.Random = Random;
+
+
 /***/ })
 
-},[99]);
+},[98]);
 //# sourceMappingURL=physics.bundle.js.map
