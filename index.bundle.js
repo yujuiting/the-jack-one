@@ -15,6 +15,7 @@
 /******/ 		script.type = "text/javascript";
 /******/ 		script.charset = "utf-8";
 /******/ 		script.src = __webpack_require__.p + "" + chunkId + "." + hotCurrentHash + ".hot-update.js";
+/******/ 		;
 /******/ 		head.appendChild(script);
 /******/ 	}
 /******/ 	
@@ -60,7 +61,7 @@
 /******/ 	
 /******/ 	
 /******/ 	var hotApplyOnUpdate = true;
-/******/ 	var hotCurrentHash = "1a9d1df25304bba67981"; // eslint-disable-line no-unused-vars
+/******/ 	var hotCurrentHash = "a03fb24d700c027ffee4"; // eslint-disable-line no-unused-vars
 /******/ 	var hotRequestTimeout = 10000;
 /******/ 	var hotCurrentModuleData = {};
 /******/ 	var hotCurrentChildModule; // eslint-disable-line no-unused-vars
@@ -240,7 +241,7 @@
 /******/ 				};
 /******/ 			});
 /******/ 			hotUpdate = {};
-/******/ 			var chunkId = 2;
+/******/ 			var chunkId = 4;
 /******/ 			{ // eslint-disable-line no-lone-blocks
 /******/ 				/*globals chunkId */
 /******/ 				hotEnsureUpdateChunk(chunkId);
@@ -516,6 +517,9 @@
 /******/ 			// remove module from cache
 /******/ 			delete installedModules[moduleId];
 /******/ 	
+/******/ 			// when disposing there is no need to call dispose handler
+/******/ 			delete outdatedDependencies[moduleId];
+/******/ 	
 /******/ 			// remove "parents" references from all children
 /******/ 			for(j = 0; j < module.children.length; j++) {
 /******/ 				var child = installedModules[module.children[j]];
@@ -561,30 +565,34 @@
 /******/ 		for(moduleId in outdatedDependencies) {
 /******/ 			if(Object.prototype.hasOwnProperty.call(outdatedDependencies, moduleId)) {
 /******/ 				module = installedModules[moduleId];
-/******/ 				moduleOutdatedDependencies = outdatedDependencies[moduleId];
-/******/ 				var callbacks = [];
-/******/ 				for(i = 0; i < moduleOutdatedDependencies.length; i++) {
-/******/ 					dependency = moduleOutdatedDependencies[i];
-/******/ 					cb = module.hot._acceptedDependencies[dependency];
-/******/ 					if(callbacks.indexOf(cb) >= 0) continue;
-/******/ 					callbacks.push(cb);
-/******/ 				}
-/******/ 				for(i = 0; i < callbacks.length; i++) {
-/******/ 					cb = callbacks[i];
-/******/ 					try {
-/******/ 						cb(moduleOutdatedDependencies);
-/******/ 					} catch(err) {
-/******/ 						if(options.onErrored) {
-/******/ 							options.onErrored({
-/******/ 								type: "accept-errored",
-/******/ 								moduleId: moduleId,
-/******/ 								dependencyId: moduleOutdatedDependencies[i],
-/******/ 								error: err
-/******/ 							});
+/******/ 				if(module) {
+/******/ 					moduleOutdatedDependencies = outdatedDependencies[moduleId];
+/******/ 					var callbacks = [];
+/******/ 					for(i = 0; i < moduleOutdatedDependencies.length; i++) {
+/******/ 						dependency = moduleOutdatedDependencies[i];
+/******/ 						cb = module.hot._acceptedDependencies[dependency];
+/******/ 						if(cb) {
+/******/ 							if(callbacks.indexOf(cb) >= 0) continue;
+/******/ 							callbacks.push(cb);
 /******/ 						}
-/******/ 						if(!options.ignoreErrored) {
-/******/ 							if(!error)
-/******/ 								error = err;
+/******/ 					}
+/******/ 					for(i = 0; i < callbacks.length; i++) {
+/******/ 						cb = callbacks[i];
+/******/ 						try {
+/******/ 							cb(moduleOutdatedDependencies);
+/******/ 						} catch(err) {
+/******/ 							if(options.onErrored) {
+/******/ 								options.onErrored({
+/******/ 									type: "accept-errored",
+/******/ 									moduleId: moduleId,
+/******/ 									dependencyId: moduleOutdatedDependencies[i],
+/******/ 									error: err
+/******/ 								});
+/******/ 							}
+/******/ 							if(!options.ignoreErrored) {
+/******/ 								if(!error)
+/******/ 									error = err;
+/******/ 							}
 /******/ 						}
 /******/ 					}
 /******/ 				}
@@ -608,7 +616,8 @@
 /******/ 								type: "self-accept-error-handler-errored",
 /******/ 								moduleId: moduleId,
 /******/ 								error: err2,
-/******/ 								orginalError: err
+/******/ 								orginalError: err, // TODO remove in webpack 4
+/******/ 								originalError: err
 /******/ 							});
 /******/ 						}
 /******/ 						if(!options.ignoreErrored) {
@@ -713,12 +722,12 @@
 /******/ 	__webpack_require__.h = function() { return hotCurrentHash; };
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return hotCreateRequire(55)(__webpack_require__.s = 55);
+/******/ 	return hotCreateRequire(66)(__webpack_require__.s = 66);
 /******/ })
 /************************************************************************/
 /******/ ({
 
-/***/ 55:
+/***/ 66:
 /***/ (function(module, exports) {
 
 
