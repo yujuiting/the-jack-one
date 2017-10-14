@@ -36,6 +36,7 @@
     "strict-boolean-expressions": false,
     "no-void-expression": false,
     "no-use-before-declare": false,
-    "restrict-plus-operands": false
+    "restrict-plus-operands": false,
+    "no-floating-promises": false
   }
 }

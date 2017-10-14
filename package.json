@@ -4,7 +4,6 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "prebuild": "rm -rf dist",
     "build": "webpack",
     "serve": "webpack-dev-server",
     "lint": "tslint --project .",
@@ -13,8 +12,8 @@
     "start": "npm run serve",
     "coverage:coveralls": "nyc report --reporter=text-lcov | coveralls",
     "coverage:codecov": "nyc report --reporter=text-lcov > coverage.lcov && codecov",
-    "docs": "typedoc --out dist/docs --module commonjs --exclude **/*.spec.ts src/Engine",
-    "predeploy": "npm run docs && npm run build",
+    "docs": "typedoc --out dist --module commonjs --exclude **/*.spec.ts src/Engine",
+    "predeploy": "rm -rf dist && npm run docs && npm run build",
     "deploy": "gh-pages -d dist",
     "precommit": "npm run lint",
     "prepush": "npm run test"
