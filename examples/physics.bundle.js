@@ -48,8 +48,8 @@ var RigidbodyComponent_1 = __webpack_require__(17);
 var BoxColliderComponent_1 = __webpack_require__(117);
 var CircleColliderComponent_1 = __webpack_require__(68);
 var PointerInput_1 = __webpack_require__(40);
-var rectTexture = new Texture_1.Texture('/Assets/rect.png');
-var circleTexture = new Texture_1.Texture('/Assets/circle.png');
+var rectTexture = new Texture_1.Texture('Assets/rect.png');
+var circleTexture = new Texture_1.Texture('Assets/circle.png');
 var Shape = (function (_super) {
     __extends(Shape, _super);
     function Shape() {
