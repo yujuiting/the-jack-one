@@ -90,10 +90,17 @@
 						<section class="tsd-index-section ">
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="_src_engine_display_spritesheet_.spritesheet.html#cellmap" class="tsd-kind-icon">cell<wbr>Map</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="_src_engine_display_spritesheet_.spritesheet.html#_fps" class="tsd-kind-icon">_fps</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="_src_engine_display_spritesheet_.spritesheet.html#cellmaporcells" class="tsd-kind-icon">cell<wbr>Map<wbr>OrCells</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_src_engine_display_spritesheet_.spritesheet.html#frametime" class="tsd-kind-icon">frame<wbr>Time</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="_src_engine_display_spritesheet_.spritesheet.html#sprites" class="tsd-kind-icon">sprites</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_src_engine_display_spritesheet_.spritesheet.html#texture" class="tsd-kind-icon">texture</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section ">
+							<h3>Accessors</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-accessor tsd-parent-kind-class"><a href="_src_engine_display_spritesheet_.spritesheet.html#fps" class="tsd-kind-icon">fps</a></li>
 							</ul>
 						</section>
 						<section class="tsd-index-section ">
@@ -101,6 +108,7 @@
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_src_engine_display_spritesheet_.spritesheet.html#getsprite" class="tsd-kind-icon">get<wbr>Sprite</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_src_engine_display_spritesheet_.spritesheet.html#getsprites" class="tsd-kind-icon">get<wbr>Sprites</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><a href="_src_engine_display_spritesheet_.spritesheet.html#makesprites" class="tsd-kind-icon">make<wbr>Sprites</a></li>
 							</ul>
 						</section>
 					</div>
@@ -112,13 +120,13 @@
 					<a name="constructor" class="tsd-anchor"></a>
 					<h3>constructor</h3>
 					<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">new <wbr>Sprite<wbr>Sheet<span class="tsd-signature-symbol">(</span>texture<span class="tsd-signature-symbol">: </span><a href="_src_engine_resource_texture_.texture.html" class="tsd-signature-type">Texture</a>, frameTime<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, cellMap<span class="tsd-signature-symbol">?: </span><a href="../interfaces/_src_engine_display_spritesheet_.spritesheetcellmap.html" class="tsd-signature-type">SpriteSheetCellMap</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_src_engine_display_spritesheet_.spritesheet.html" class="tsd-signature-type">SpriteSheet</a></li>
+						<li class="tsd-signature tsd-kind-icon">new <wbr>Sprite<wbr>Sheet<span class="tsd-signature-symbol">(</span>texture<span class="tsd-signature-symbol">: </span><a href="_src_engine_resource_texture_.texture.html" class="tsd-signature-type">Texture</a>, cellMapOrCells<span class="tsd-signature-symbol">: </span><a href="../interfaces/_src_engine_display_spritesheet_.spritesheetcellmap.html" class="tsd-signature-type">SpriteSheetCellMap</a><span class="tsd-signature-symbol"> | </span><a href="../modules/_src_engine_display_spritesheet_.html#spritesheetcells" class="tsd-signature-type">SpriteSheetCells</a>, _fps<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_src_engine_display_spritesheet_.spritesheet.html" class="tsd-signature-type">SpriteSheet</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Display/SpriteSheet.ts#L19">src/Engine/Display/SpriteSheet.ts:19</a></li>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Display/SpriteSheet.ts#L32">src/Engine/Display/SpriteSheet.ts:32</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -127,10 +135,10 @@
 									<h5>texture: <a href="_src_engine_resource_texture_.texture.html" class="tsd-signature-type">Texture</a></h5>
 								</li>
 								<li>
-									<h5>frameTime: <span class="tsd-signature-type">number</span></h5>
+									<h5>cellMapOrCells: <a href="../interfaces/_src_engine_display_spritesheet_.spritesheetcellmap.html" class="tsd-signature-type">SpriteSheetCellMap</a><span class="tsd-signature-symbol"> | </span><a href="../modules/_src_engine_display_spritesheet_.html#spritesheetcells" class="tsd-signature-type">SpriteSheetCells</a></h5>
 								</li>
 								<li>
-									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> cellMap: <a href="../interfaces/_src_engine_display_spritesheet_.spritesheetcellmap.html" class="tsd-signature-type">SpriteSheetCellMap</a><span class="tsd-signature-symbol"> =&nbsp;{}</span></h5>
+									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> _fps: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> =&nbsp;24</span></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <a href="_src_engine_display_spritesheet_.spritesheet.html" class="tsd-signature-type">SpriteSheet</a></h4>
@@ -141,12 +149,22 @@
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Properties</h2>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private">
-					<a name="cellmap" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagPrivate">Private</span> cell<wbr>Map</h3>
-					<div class="tsd-signature tsd-kind-icon">cell<wbr>Map<span class="tsd-signature-symbol">:</span> <a href="../interfaces/_src_engine_display_spritesheet_.spritesheetcellmap.html" class="tsd-signature-type">SpriteSheetCellMap</a></div>
+					<a name="_fps" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagPrivate">Private</span> _fps</h3>
+					<div class="tsd-signature tsd-kind-icon">_fps<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Display/SpriteSheet.ts#L23">src/Engine/Display/SpriteSheet.ts:23</a></li>
+							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Display/SpriteSheet.ts#L36">src/Engine/Display/SpriteSheet.ts:36</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private">
+					<a name="cellmaporcells" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagPrivate">Private</span> cell<wbr>Map<wbr>OrCells</h3>
+					<div class="tsd-signature tsd-kind-icon">cell<wbr>Map<wbr>OrCells<span class="tsd-signature-symbol">:</span> <a href="../interfaces/_src_engine_display_spritesheet_.spritesheetcellmap.html" class="tsd-signature-type">SpriteSheetCellMap</a><span class="tsd-signature-symbol"> | </span><a href="../modules/_src_engine_display_spritesheet_.html#spritesheetcells" class="tsd-signature-type">SpriteSheetCells</a></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Display/SpriteSheet.ts#L35">src/Engine/Display/SpriteSheet.ts:35</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -156,7 +174,7 @@
 					<div class="tsd-signature tsd-kind-icon">frame<wbr>Time<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Display/SpriteSheet.ts#L22">src/Engine/Display/SpriteSheet.ts:22</a></li>
+							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Display/SpriteSheet.ts#L25">src/Engine/Display/SpriteSheet.ts:25</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -166,7 +184,7 @@
 					<div class="tsd-signature tsd-kind-icon">sprites<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Map</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><a href="_src_engine_display_sprite_.sprite.html" class="tsd-signature-type">Sprite</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> =&nbsp;new Map()</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Display/SpriteSheet.ts#L19">src/Engine/Display/SpriteSheet.ts:19</a></li>
+							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Display/SpriteSheet.ts#L23">src/Engine/Display/SpriteSheet.ts:23</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -176,9 +194,44 @@
 					<div class="tsd-signature tsd-kind-icon">texture<span class="tsd-signature-symbol">:</span> <a href="_src_engine_resource_texture_.texture.html" class="tsd-signature-type">Texture</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Display/SpriteSheet.ts#L21">src/Engine/Display/SpriteSheet.ts:21</a></li>
+							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Display/SpriteSheet.ts#L34">src/Engine/Display/SpriteSheet.ts:34</a></li>
 						</ul>
 					</aside>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Accessors</h2>
+				<section class="tsd-panel tsd-member tsd-kind-accessor tsd-parent-kind-class">
+					<a name="fps" class="tsd-anchor"></a>
+					<h3>fps</h3>
+					<ul class="tsd-signatures tsd-kind-accessor tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">get</span> fps<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></li>
+						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">set</span> fps<span class="tsd-signature-symbol">(</span>value<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Display/SpriteSheet.ts#L27">src/Engine/Display/SpriteSheet.ts:27</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
+						</li>
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Display/SpriteSheet.ts#L29">src/Engine/Display/SpriteSheet.ts:29</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>value: <span class="tsd-signature-type">number</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
 				</section>
 			</section>
 			<section class="tsd-panel-group tsd-member-group ">
@@ -187,13 +240,13 @@
 					<a name="getsprite" class="tsd-anchor"></a>
 					<h3>get<wbr>Sprite</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">get<wbr>Sprite<span class="tsd-signature-symbol">(</span>key<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, index<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_src_engine_display_sprite_.sprite.html" class="tsd-signature-type">Sprite</a></li>
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Sprite<span class="tsd-signature-symbol">(</span>key<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, index<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_src_engine_display_sprite_.sprite.html" class="tsd-signature-type">Sprite</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">undefined</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Display/SpriteSheet.ts#L44">src/Engine/Display/SpriteSheet.ts:44</a></li>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Display/SpriteSheet.ts#L57">src/Engine/Display/SpriteSheet.ts:57</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -205,7 +258,10 @@
 									<h5>index: <span class="tsd-signature-type">number</span></h5>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <a href="_src_engine_display_sprite_.sprite.html" class="tsd-signature-type">Sprite</a></h4>
+							<h4 class="tsd-returns-title">Returns <a href="_src_engine_display_sprite_.sprite.html" class="tsd-signature-type">Sprite</a>
+								<span class="tsd-signature-symbol"> | </span>
+								<span class="tsd-signature-type">undefined</span>
+							</h4>
 						</li>
 					</ul>
 				</section>
@@ -219,7 +275,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Display/SpriteSheet.ts#L40">src/Engine/Display/SpriteSheet.ts:40</a></li>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Display/SpriteSheet.ts#L53">src/Engine/Display/SpriteSheet.ts:53</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -229,6 +285,32 @@
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">ReadonlyArray</span><span class="tsd-signature-symbol">&lt;</span><a href="_src_engine_display_sprite_.sprite.html" class="tsd-signature-type">Sprite</a><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-private">
+					<a name="makesprites" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagPrivate">Private</span> make<wbr>Sprites</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-private">
+						<li class="tsd-signature tsd-kind-icon">make<wbr>Sprites<span class="tsd-signature-symbol">(</span>texture<span class="tsd-signature-symbol">: </span><a href="_src_engine_resource_texture_.texture.html" class="tsd-signature-type">Texture</a>, cells<span class="tsd-signature-symbol">: </span><a href="../modules/_src_engine_display_spritesheet_.html#spritesheetcells" class="tsd-signature-type">SpriteSheetCells</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_src_engine_display_sprite_.sprite.html" class="tsd-signature-type">Sprite</a><span class="tsd-signature-symbol">[]</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Display/SpriteSheet.ts#L68">src/Engine/Display/SpriteSheet.ts:68</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>texture: <a href="_src_engine_resource_texture_.texture.html" class="tsd-signature-type">Texture</a></h5>
+								</li>
+								<li>
+									<h5>cells: <a href="../modules/_src_engine_display_spritesheet_.html#spritesheetcells" class="tsd-signature-type">SpriteSheetCells</a></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="_src_engine_display_sprite_.sprite.html" class="tsd-signature-type">Sprite</a><span class="tsd-signature-symbol">[]</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -256,7 +338,10 @@
 								<a href="_src_engine_display_spritesheet_.spritesheet.html#constructor" class="tsd-kind-icon">constructor</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
-								<a href="_src_engine_display_spritesheet_.spritesheet.html#cellmap" class="tsd-kind-icon">cell<wbr>Map</a>
+								<a href="_src_engine_display_spritesheet_.spritesheet.html#_fps" class="tsd-kind-icon">_fps</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
+								<a href="_src_engine_display_spritesheet_.spritesheet.html#cellmaporcells" class="tsd-kind-icon">cell<wbr>Map<wbr>OrCells</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class">
 								<a href="_src_engine_display_spritesheet_.spritesheet.html#frametime" class="tsd-kind-icon">frame<wbr>Time</a>
@@ -267,21 +352,33 @@
 							<li class=" tsd-kind-property tsd-parent-kind-class">
 								<a href="_src_engine_display_spritesheet_.spritesheet.html#texture" class="tsd-kind-icon">texture</a>
 							</li>
+							<li class=" tsd-kind-accessor tsd-parent-kind-class">
+								<a href="_src_engine_display_spritesheet_.spritesheet.html#fps" class="tsd-kind-icon">fps</a>
+							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="_src_engine_display_spritesheet_.spritesheet.html#getsprite" class="tsd-kind-icon">get<wbr>Sprite</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="_src_engine_display_spritesheet_.spritesheet.html#getsprites" class="tsd-kind-icon">get<wbr>Sprites</a>
 							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-private">
+								<a href="_src_engine_display_spritesheet_.spritesheet.html#makesprites" class="tsd-kind-icon">make<wbr>Sprites</a>
+							</li>
 						</ul>
 					</li>
 				</ul>
 				<ul class="after-current">
 					<li class=" tsd-kind-interface tsd-parent-kind-external-module tsd-is-not-exported">
+						<a href="../interfaces/_src_engine_display_spritesheet_.internalspritesheet.html" class="tsd-kind-icon">Internal<wbr>Sprite<wbr>Sheet</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-external-module">
 						<a href="../interfaces/_src_engine_display_spritesheet_.spritesheetcell.html" class="tsd-kind-icon">Sprite<wbr>Sheet<wbr>Cell</a>
 					</li>
-					<li class=" tsd-kind-interface tsd-parent-kind-external-module tsd-is-not-exported">
+					<li class=" tsd-kind-interface tsd-parent-kind-external-module">
 						<a href="../interfaces/_src_engine_display_spritesheet_.spritesheetcellmap.html" class="tsd-kind-icon">Sprite<wbr>Sheet<wbr>Cell<wbr>Map</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-parent-kind-external-module">
+						<a href="../modules/_src_engine_display_spritesheet_.html#spritesheetcells" class="tsd-kind-icon">Sprite<wbr>Sheet<wbr>Cells</a>
 					</li>
 				</ul>
 			</nav>

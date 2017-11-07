@@ -73,7 +73,7 @@
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
 					<li>
-						<a href="_src_engine_base_component_.component.html" class="tsd-signature-type">Component</a>
+						<a href="_src_engine_core_component_.component.html" class="tsd-signature-type">Component</a>
 						<ul class="tsd-hierarchy">
 							<li>
 								<span class="target">RigidbodyComponent</span>
@@ -122,6 +122,7 @@
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_src_engine_physics_rigidbodycomponent_.rigidbodycomponent.html#inversemass" class="tsd-kind-icon">inverse<wbr>Mass</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_src_engine_physics_rigidbodycomponent_.rigidbodycomponent.html#inversemoi" class="tsd-kind-icon">inverse<wbr>Moi</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_src_engine_physics_rigidbodycomponent_.rigidbodycomponent.html#issleeping" class="tsd-kind-icon">is<wbr>Sleeping</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="_src_engine_physics_rigidbodycomponent_.rigidbodycomponent.html#lastposition" class="tsd-kind-icon">last<wbr>Position</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_src_engine_physics_rigidbodycomponent_.rigidbodycomponent.html#maxangularvelocity" class="tsd-kind-icon">max<wbr>Angular<wbr>Velocity</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_src_engine_physics_rigidbodycomponent_.rigidbodycomponent.html#motion" class="tsd-kind-icon">motion</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><a href="_src_engine_physics_rigidbodycomponent_.rigidbodycomponent.html#name" class="tsd-kind-icon">name</a></li>
@@ -153,6 +154,7 @@
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_src_engine_physics_rigidbodycomponent_.rigidbodycomponent.html#addforce" class="tsd-kind-icon">add<wbr>Force</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_src_engine_physics_rigidbodycomponent_.rigidbodycomponent.html#addtorque" class="tsd-kind-icon">add<wbr>Torque</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_src_engine_physics_rigidbodycomponent_.rigidbodycomponent.html#awake" class="tsd-kind-icon">awake</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><a href="_src_engine_physics_rigidbodycomponent_.rigidbodycomponent.html#checksleep" class="tsd-kind-icon">check<wbr>Sleep</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_src_engine_physics_rigidbodycomponent_.rigidbodycomponent.html#clearforce" class="tsd-kind-icon">clear<wbr>Force</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_src_engine_physics_rigidbodycomponent_.rigidbodycomponent.html#cleartorque" class="tsd-kind-icon">clear<wbr>Torque</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="_src_engine_physics_rigidbodycomponent_.rigidbodycomponent.html#deactivate" class="tsd-kind-icon">deactivate</a></li>
@@ -162,6 +164,7 @@
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter tsd-is-inherited"><a href="_src_engine_physics_rigidbodycomponent_.rigidbodycomponent.html#getcomponents" class="tsd-kind-icon">get<wbr>Components</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="_src_engine_physics_rigidbodycomponent_.rigidbodycomponent.html#lateupdate" class="tsd-kind-icon">late<wbr>Update</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="_src_engine_physics_rigidbodycomponent_.rigidbodycomponent.html#postrender" class="tsd-kind-icon">post<wbr>Render</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="_src_engine_physics_rigidbodycomponent_.rigidbodycomponent.html#prerender" class="tsd-kind-icon">pre<wbr>Render</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="_src_engine_physics_rigidbodycomponent_.rigidbodycomponent.html#removecomponent" class="tsd-kind-icon">remove<wbr>Component</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-overwrite"><a href="_src_engine_physics_rigidbodycomponent_.rigidbodycomponent.html#reset" class="tsd-kind-icon">reset</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_src_engine_physics_rigidbodycomponent_.rigidbodycomponent.html#sleep" class="tsd-kind-icon">sleep</a></li>
@@ -179,26 +182,26 @@
 					<a name="constructor" class="tsd-anchor"></a>
 					<h3>constructor</h3>
 					<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class tsd-is-overwrite">
-						<li class="tsd-signature tsd-kind-icon">new <wbr>Rigidbody<wbr>Component<span class="tsd-signature-symbol">(</span>host<span class="tsd-signature-symbol">: </span><a href="_src_engine_base_gameobject_.gameobject.html" class="tsd-signature-type">GameObject</a>, engine<span class="tsd-signature-symbol">: </span><a href="_src_engine_base_engine_.engine.html" class="tsd-signature-type">Engine</a>, time<span class="tsd-signature-symbol">: </span><a href="_src_engine_time_time_.time.html" class="tsd-signature-type">Time</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_src_engine_physics_rigidbodycomponent_.rigidbodycomponent.html" class="tsd-signature-type">RigidbodyComponent</a></li>
+						<li class="tsd-signature tsd-kind-icon">new <wbr>Rigidbody<wbr>Component<span class="tsd-signature-symbol">(</span>host<span class="tsd-signature-symbol">: </span><a href="_src_engine_core_gameobject_.gameobject.html" class="tsd-signature-type">GameObject</a>, engine<span class="tsd-signature-symbol">: </span><a href="../interfaces/_src_engine_core_engine_.engine.html" class="tsd-signature-type">Engine</a>, time<span class="tsd-signature-symbol">: </span><a href="../interfaces/_src_engine_time_time_.time.html" class="tsd-signature-type">Time</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_src_engine_physics_rigidbodycomponent_.rigidbodycomponent.html" class="tsd-signature-type">RigidbodyComponent</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
-								<p>Overrides <a href="_src_engine_base_component_.component.html">Component</a>.<a href="_src_engine_base_component_.component.html#constructor">constructor</a></p>
+								<p>Overrides <a href="_src_engine_core_component_.component.html">Component</a>.<a href="_src_engine_core_component_.component.html#constructor">constructor</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Physics/RigidbodyComponent.ts#L83">src/Engine/Physics/RigidbodyComponent.ts:83</a></li>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Physics/RigidbodyComponent.ts#L85">src/Engine/Physics/RigidbodyComponent.ts:85</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>host: <a href="_src_engine_base_gameobject_.gameobject.html" class="tsd-signature-type">GameObject</a></h5>
+									<h5>host: <a href="_src_engine_core_gameobject_.gameobject.html" class="tsd-signature-type">GameObject</a></h5>
 								</li>
 								<li>
-									<h5>engine: <a href="_src_engine_base_engine_.engine.html" class="tsd-signature-type">Engine</a></h5>
+									<h5>engine: <a href="../interfaces/_src_engine_core_engine_.engine.html" class="tsd-signature-type">Engine</a></h5>
 								</li>
 								<li>
-									<h5>time: <a href="_src_engine_time_time_.time.html" class="tsd-signature-type">Time</a></h5>
+									<h5>time: <a href="../interfaces/_src_engine_time_time_.time.html" class="tsd-signature-type">Time</a></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <a href="_src_engine_physics_rigidbodycomponent_.rigidbodycomponent.html" class="tsd-signature-type">RigidbodyComponent</a></h4>
@@ -213,9 +216,9 @@
 					<h3><span class="tsd-flag ts-flagProtected">Protected</span> _destroyed</h3>
 					<div class="tsd-signature tsd-kind-icon">_destroyed<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> =&nbsp;false</span></div>
 					<aside class="tsd-sources">
-						<p>Inherited from <a href="_src_engine_base_baseobject_.baseobject.html">BaseObject</a>.<a href="_src_engine_base_baseobject_.baseobject.html#_destroyed">_destroyed</a></p>
+						<p>Inherited from <a href="_src_engine_core_baseobject_.baseobject.html">BaseObject</a>.<a href="_src_engine_core_baseobject_.baseobject.html#_destroyed">_destroyed</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Base/BaseObject.ts#L18">src/Engine/Base/BaseObject.ts:18</a></li>
+							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Core/BaseObject.ts#L20">src/Engine/Core/BaseObject.ts:20</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -224,9 +227,9 @@
 					<h3><span class="tsd-flag ts-flagProtected">Protected</span> _has<wbr>Started</h3>
 					<div class="tsd-signature tsd-kind-icon">_has<wbr>Started<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> =&nbsp;false</span></div>
 					<aside class="tsd-sources">
-						<p>Inherited from <a href="_src_engine_base_baseobject_.baseobject.html">BaseObject</a>.<a href="_src_engine_base_baseobject_.baseobject.html#_hasstarted">_hasStarted</a></p>
+						<p>Inherited from <a href="_src_engine_core_baseobject_.baseobject.html">BaseObject</a>.<a href="_src_engine_core_baseobject_.baseobject.html#_hasstarted">_hasStarted</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Base/BaseObject.ts#L20">src/Engine/Base/BaseObject.ts:20</a></li>
+							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Core/BaseObject.ts#L22">src/Engine/Core/BaseObject.ts:22</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -235,9 +238,9 @@
 					<h3><span class="tsd-flag ts-flagProtected">Protected</span> _is<wbr>Active</h3>
 					<div class="tsd-signature tsd-kind-icon">_is<wbr>Active<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> =&nbsp;false</span></div>
 					<aside class="tsd-sources">
-						<p>Inherited from <a href="_src_engine_base_baseobject_.baseobject.html">BaseObject</a>.<a href="_src_engine_base_baseobject_.baseobject.html#_isactive">_isActive</a></p>
+						<p>Inherited from <a href="_src_engine_core_baseobject_.baseobject.html">BaseObject</a>.<a href="_src_engine_core_baseobject_.baseobject.html#_isactive">_isActive</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Base/BaseObject.ts#L16">src/Engine/Base/BaseObject.ts:16</a></li>
+							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Core/BaseObject.ts#L18">src/Engine/Core/BaseObject.ts:18</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -247,7 +250,7 @@
 					<div class="tsd-signature tsd-kind-icon">_mass<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> =&nbsp;1</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Physics/RigidbodyComponent.ts#L38">src/Engine/Physics/RigidbodyComponent.ts:38</a></li>
+							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Physics/RigidbodyComponent.ts#L38">src/Engine/Physics/RigidbodyComponent.ts:38</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -262,7 +265,7 @@
 					<div class="tsd-signature tsd-kind-icon">_moi<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> =&nbsp;1000</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Physics/RigidbodyComponent.ts#L49">src/Engine/Physics/RigidbodyComponent.ts:49</a></li>
+							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Physics/RigidbodyComponent.ts#L49">src/Engine/Physics/RigidbodyComponent.ts:49</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -277,7 +280,7 @@
 					<div class="tsd-signature tsd-kind-icon">angular<wbr>Drag<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> =&nbsp;0</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Physics/RigidbodyComponent.ts#L24">src/Engine/Physics/RigidbodyComponent.ts:24</a></li>
+							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Physics/RigidbodyComponent.ts#L24">src/Engine/Physics/RigidbodyComponent.ts:24</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -287,7 +290,7 @@
 					<div class="tsd-signature tsd-kind-icon">angular<wbr>Velocity<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> =&nbsp;0</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Physics/RigidbodyComponent.ts#L29">src/Engine/Physics/RigidbodyComponent.ts:29</a></li>
+							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Physics/RigidbodyComponent.ts#L29">src/Engine/Physics/RigidbodyComponent.ts:29</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -302,17 +305,17 @@
 					<div class="tsd-signature tsd-kind-icon">drag<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> =&nbsp;0</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Physics/RigidbodyComponent.ts#L31">src/Engine/Physics/RigidbodyComponent.ts:31</a></li>
+							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Physics/RigidbodyComponent.ts#L31">src/Engine/Physics/RigidbodyComponent.ts:31</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private">
 					<a name="engine" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagPrivate">Private</span> engine</h3>
-					<div class="tsd-signature tsd-kind-icon">engine<span class="tsd-signature-symbol">:</span> <a href="_src_engine_base_engine_.engine.html" class="tsd-signature-type">Engine</a></div>
+					<div class="tsd-signature tsd-kind-icon">engine<span class="tsd-signature-symbol">:</span> <a href="../interfaces/_src_engine_core_engine_.engine.html" class="tsd-signature-type">Engine</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Physics/RigidbodyComponent.ts#L86">src/Engine/Physics/RigidbodyComponent.ts:86</a></li>
+							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Physics/RigidbodyComponent.ts#L88">src/Engine/Physics/RigidbodyComponent.ts:88</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -322,7 +325,7 @@
 					<div class="tsd-signature tsd-kind-icon">forces<span class="tsd-signature-symbol">:</span> <a href="_src_engine_math_vector_.vector.html" class="tsd-signature-type">Vector</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> =&nbsp;[Vector.Get(),Vector.Get(),Vector.Get(),Vector.Get()]</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Physics/RigidbodyComponent.ts#L72">src/Engine/Physics/RigidbodyComponent.ts:72</a></li>
+							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Physics/RigidbodyComponent.ts#L72">src/Engine/Physics/RigidbodyComponent.ts:72</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -332,18 +335,18 @@
 					<div class="tsd-signature tsd-kind-icon">freeze<wbr>Rotation<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> =&nbsp;false</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Physics/RigidbodyComponent.ts#L33">src/Engine/Physics/RigidbodyComponent.ts:33</a></li>
+							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Physics/RigidbodyComponent.ts#L33">src/Engine/Physics/RigidbodyComponent.ts:33</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
 					<a name="host" class="tsd-anchor"></a>
 					<h3>host</h3>
-					<div class="tsd-signature tsd-kind-icon">host<span class="tsd-signature-symbol">:</span> <a href="_src_engine_base_gameobject_.gameobject.html" class="tsd-signature-type">GameObject</a></div>
+					<div class="tsd-signature tsd-kind-icon">host<span class="tsd-signature-symbol">:</span> <a href="_src_engine_core_gameobject_.gameobject.html" class="tsd-signature-type">GameObject</a></div>
 					<aside class="tsd-sources">
-						<p>Inherited from <a href="_src_engine_base_component_.component.html">Component</a>.<a href="_src_engine_base_component_.component.html#host">host</a></p>
+						<p>Inherited from <a href="_src_engine_core_component_.component.html">Component</a>.<a href="_src_engine_core_component_.component.html#host">host</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Base/Component.ts#L10">src/Engine/Base/Component.ts:10</a></li>
+							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Core/Component.ts#L10">src/Engine/Core/Component.ts:10</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -352,9 +355,9 @@
 					<h3>id</h3>
 					<div class="tsd-signature tsd-kind-icon">id<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
-						<p>Inherited from <a href="_src_engine_base_baseobject_.baseobject.html">BaseObject</a>.<a href="_src_engine_base_baseobject_.baseobject.html#id">id</a></p>
+						<p>Inherited from <a href="_src_engine_core_baseobject_.baseobject.html">BaseObject</a>.<a href="_src_engine_core_baseobject_.baseobject.html#id">id</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Base/BaseObject.ts#L9">src/Engine/Base/BaseObject.ts:9</a></li>
+							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Core/BaseObject.ts#L11">src/Engine/Core/BaseObject.ts:11</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -364,7 +367,7 @@
 					<div class="tsd-signature tsd-kind-icon">inverse<wbr>Mass<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> =&nbsp;1</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Physics/RigidbodyComponent.ts#L44">src/Engine/Physics/RigidbodyComponent.ts:44</a></li>
+							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Physics/RigidbodyComponent.ts#L44">src/Engine/Physics/RigidbodyComponent.ts:44</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -374,7 +377,7 @@
 					<div class="tsd-signature tsd-kind-icon">inverse<wbr>Moi<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> =&nbsp;0.001</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Physics/RigidbodyComponent.ts#L55">src/Engine/Physics/RigidbodyComponent.ts:55</a></li>
+							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Physics/RigidbodyComponent.ts#L55">src/Engine/Physics/RigidbodyComponent.ts:55</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -384,7 +387,17 @@
 					<div class="tsd-signature tsd-kind-icon">is<wbr>Sleeping<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> =&nbsp;false</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Physics/RigidbodyComponent.ts#L66">src/Engine/Physics/RigidbodyComponent.ts:66</a></li>
+							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Physics/RigidbodyComponent.ts#L66">src/Engine/Physics/RigidbodyComponent.ts:66</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private">
+					<a name="lastposition" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagPrivate">Private</span> last<wbr>Position</h3>
+					<div class="tsd-signature tsd-kind-icon">last<wbr>Position<span class="tsd-signature-symbol">:</span> <a href="_src_engine_math_vector_.vector.html" class="tsd-signature-type">Vector</a><span class="tsd-signature-symbol"> =&nbsp;Vector.Get()</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Physics/RigidbodyComponent.ts#L85">src/Engine/Physics/RigidbodyComponent.ts:85</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -394,7 +407,7 @@
 					<div class="tsd-signature tsd-kind-icon">max<wbr>Angular<wbr>Velocity<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> =&nbsp;Infinity</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Physics/RigidbodyComponent.ts#L57">src/Engine/Physics/RigidbodyComponent.ts:57</a></li>
+							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Physics/RigidbodyComponent.ts#L57">src/Engine/Physics/RigidbodyComponent.ts:57</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -404,7 +417,7 @@
 					<div class="tsd-signature tsd-kind-icon">motion<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> =&nbsp;0</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Physics/RigidbodyComponent.ts#L70">src/Engine/Physics/RigidbodyComponent.ts:70</a></li>
+							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Physics/RigidbodyComponent.ts#L70">src/Engine/Physics/RigidbodyComponent.ts:70</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -413,9 +426,9 @@
 					<h3>name</h3>
 					<div class="tsd-signature tsd-kind-icon">name<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> =&nbsp;&quot;&quot;</span></div>
 					<aside class="tsd-sources">
-						<p>Inherited from <a href="_src_engine_base_baseobject_.baseobject.html">BaseObject</a>.<a href="_src_engine_base_baseobject_.baseobject.html#name">name</a></p>
+						<p>Inherited from <a href="_src_engine_core_baseobject_.baseobject.html">BaseObject</a>.<a href="_src_engine_core_baseobject_.baseobject.html#name">name</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Base/BaseObject.ts#L14">src/Engine/Base/BaseObject.ts:14</a></li>
+							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Core/BaseObject.ts#L16">src/Engine/Core/BaseObject.ts:16</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -427,10 +440,10 @@
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
 					<a name="sleepthreshold" class="tsd-anchor"></a>
 					<h3>sleep<wbr>Threshold</h3>
-					<div class="tsd-signature tsd-kind-icon">sleep<wbr>Threshold<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> =&nbsp;0.2</span></div>
+					<div class="tsd-signature tsd-kind-icon">sleep<wbr>Threshold<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> =&nbsp;1</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Physics/RigidbodyComponent.ts#L68">src/Engine/Physics/RigidbodyComponent.ts:68</a></li>
+							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Physics/RigidbodyComponent.ts#L68">src/Engine/Physics/RigidbodyComponent.ts:68</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -440,17 +453,17 @@
 					<div class="tsd-signature tsd-kind-icon">sleep<wbr>Timer<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> =&nbsp;0</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Physics/RigidbodyComponent.ts#L81">src/Engine/Physics/RigidbodyComponent.ts:81</a></li>
+							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Physics/RigidbodyComponent.ts#L81">src/Engine/Physics/RigidbodyComponent.ts:81</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private">
 					<a name="time" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagPrivate">Private</span> time</h3>
-					<div class="tsd-signature tsd-kind-icon">time<span class="tsd-signature-symbol">:</span> <a href="_src_engine_time_time_.time.html" class="tsd-signature-type">Time</a></div>
+					<div class="tsd-signature tsd-kind-icon">time<span class="tsd-signature-symbol">:</span> <a href="../interfaces/_src_engine_time_time_.time.html" class="tsd-signature-type">Time</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Physics/RigidbodyComponent.ts#L87">src/Engine/Physics/RigidbodyComponent.ts:87</a></li>
+							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Physics/RigidbodyComponent.ts#L89">src/Engine/Physics/RigidbodyComponent.ts:89</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -460,7 +473,7 @@
 					<div class="tsd-signature tsd-kind-icon">torques<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> =&nbsp;[0, 0, 0, 0]</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Physics/RigidbodyComponent.ts#L79">src/Engine/Physics/RigidbodyComponent.ts:79</a></li>
+							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Physics/RigidbodyComponent.ts#L79">src/Engine/Physics/RigidbodyComponent.ts:79</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -470,7 +483,7 @@
 					<div class="tsd-signature tsd-kind-icon">transform<span class="tsd-signature-symbol">:</span> <a href="_src_engine_display_transformcomponent_.transformcomponent.html" class="tsd-signature-type">TransformComponent</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Physics/RigidbodyComponent.ts#L83">src/Engine/Physics/RigidbodyComponent.ts:83</a></li>
+							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Physics/RigidbodyComponent.ts#L83">src/Engine/Physics/RigidbodyComponent.ts:83</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -480,7 +493,7 @@
 					<div class="tsd-signature tsd-kind-icon">use<wbr>Gravity<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> =&nbsp;false</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Physics/RigidbodyComponent.ts#L64">src/Engine/Physics/RigidbodyComponent.ts:64</a></li>
+							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Physics/RigidbodyComponent.ts#L64">src/Engine/Physics/RigidbodyComponent.ts:64</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -490,7 +503,7 @@
 					<div class="tsd-signature tsd-kind-icon">velocity<span class="tsd-signature-symbol">:</span> <a href="_src_engine_math_vector_.vector.html" class="tsd-signature-type">Vector</a><span class="tsd-signature-symbol"> =&nbsp;Vector.Get()</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Physics/RigidbodyComponent.ts#L62">src/Engine/Physics/RigidbodyComponent.ts:62</a></li>
+							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Physics/RigidbodyComponent.ts#L62">src/Engine/Physics/RigidbodyComponent.ts:62</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -511,9 +524,9 @@
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
-								<p>Inherited from <a href="_src_engine_base_baseobject_.baseobject.html">BaseObject</a>.<a href="_src_engine_base_baseobject_.baseobject.html#canrecycle">canRecycle</a></p>
+								<p>Inherited from <a href="_src_engine_core_baseobject_.baseobject.html">BaseObject</a>.<a href="_src_engine_core_baseobject_.baseobject.html#canrecycle">canRecycle</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Base/BaseObject.ts#L24">src/Engine/Base/BaseObject.ts:24</a></li>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Core/BaseObject.ts#L26">src/Engine/Core/BaseObject.ts:26</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
@@ -529,9 +542,9 @@
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
-								<p>Inherited from <a href="_src_engine_base_baseobject_.baseobject.html">BaseObject</a>.<a href="_src_engine_base_baseobject_.baseobject.html#hasstarted">hasStarted</a></p>
+								<p>Inherited from <a href="_src_engine_core_baseobject_.baseobject.html">BaseObject</a>.<a href="_src_engine_core_baseobject_.baseobject.html#hasstarted">hasStarted</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Base/BaseObject.ts#L28">src/Engine/Base/BaseObject.ts:28</a></li>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Core/BaseObject.ts#L30">src/Engine/Core/BaseObject.ts:30</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
@@ -547,9 +560,9 @@
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
-								<p>Inherited from <a href="_src_engine_base_baseobject_.baseobject.html">BaseObject</a>.<a href="_src_engine_base_baseobject_.baseobject.html#isactive">isActive</a></p>
+								<p>Inherited from <a href="_src_engine_core_baseobject_.baseobject.html">BaseObject</a>.<a href="_src_engine_core_baseobject_.baseobject.html#isactive">isActive</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Base/BaseObject.ts#L22">src/Engine/Base/BaseObject.ts:22</a></li>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Core/BaseObject.ts#L24">src/Engine/Core/BaseObject.ts:24</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
@@ -565,9 +578,9 @@
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
-								<p>Inherited from <a href="_src_engine_base_baseobject_.baseobject.html">BaseObject</a>.<a href="_src_engine_base_baseobject_.baseobject.html#isdestroyed">isDestroyed</a></p>
+								<p>Inherited from <a href="_src_engine_core_baseobject_.baseobject.html">BaseObject</a>.<a href="_src_engine_core_baseobject_.baseobject.html#isdestroyed">isDestroyed</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Base/BaseObject.ts#L26">src/Engine/Base/BaseObject.ts:26</a></li>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Core/BaseObject.ts#L28">src/Engine/Core/BaseObject.ts:28</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
@@ -585,7 +598,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Physics/RigidbodyComponent.ts#L40">src/Engine/Physics/RigidbodyComponent.ts:40</a></li>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Physics/RigidbodyComponent.ts#L40">src/Engine/Physics/RigidbodyComponent.ts:40</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
@@ -593,7 +606,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Physics/RigidbodyComponent.ts#L42">src/Engine/Physics/RigidbodyComponent.ts:42</a></li>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Physics/RigidbodyComponent.ts#L42">src/Engine/Physics/RigidbodyComponent.ts:42</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -617,7 +630,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Physics/RigidbodyComponent.ts#L51">src/Engine/Physics/RigidbodyComponent.ts:51</a></li>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Physics/RigidbodyComponent.ts#L51">src/Engine/Physics/RigidbodyComponent.ts:51</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
@@ -625,7 +638,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Physics/RigidbodyComponent.ts#L53">src/Engine/Physics/RigidbodyComponent.ts:53</a></li>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Physics/RigidbodyComponent.ts#L53">src/Engine/Physics/RigidbodyComponent.ts:53</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -650,9 +663,9 @@
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
-								<p>Inherited from <a href="_src_engine_base_baseobject_.baseobject.html">BaseObject</a>.<a href="_src_engine_base_baseobject_.baseobject.html#activate">activate</a></p>
+								<p>Inherited from <a href="_src_engine_core_baseobject_.baseobject.html">BaseObject</a>.<a href="_src_engine_core_baseobject_.baseobject.html#activate">activate</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Base/BaseObject.ts#L30">src/Engine/Base/BaseObject.ts:30</a></li>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Core/BaseObject.ts#L36">src/Engine/Core/BaseObject.ts:36</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -668,15 +681,15 @@
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
-								<p>Inherited from <a href="_src_engine_base_component_.component.html">Component</a>.<a href="_src_engine_base_component_.component.html#addcomponent">addComponent</a></p>
+								<p>Inherited from <a href="_src_engine_core_component_.component.html">Component</a>.<a href="_src_engine_core_component_.component.html#addcomponent">addComponent</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Base/Component.ts#L14">src/Engine/Base/Component.ts:14</a></li>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Core/Component.ts#L14">src/Engine/Core/Component.ts:14</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-type-parameters-title">Type parameters</h4>
 							<ul class="tsd-type-parameters">
 								<li>
-									<h4>T<span class="tsd-signature-symbol">: </span><a href="_src_engine_base_component_.component.html" class="tsd-signature-type">Component</a></h4>
+									<h4>T<span class="tsd-signature-symbol">: </span><a href="_src_engine_core_component_.component.html" class="tsd-signature-type">Component</a></h4>
 								</li>
 							</ul>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -699,7 +712,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Physics/RigidbodyComponent.ts#L96">src/Engine/Physics/RigidbodyComponent.ts:96</a></li>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Physics/RigidbodyComponent.ts#L98">src/Engine/Physics/RigidbodyComponent.ts:98</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -725,7 +738,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Physics/RigidbodyComponent.ts#L100">src/Engine/Physics/RigidbodyComponent.ts:100</a></li>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Physics/RigidbodyComponent.ts#L102">src/Engine/Physics/RigidbodyComponent.ts:102</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -751,9 +764,32 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Physics/RigidbodyComponent.ts#L122">src/Engine/Physics/RigidbodyComponent.ts:122</a></li>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Physics/RigidbodyComponent.ts#L124">src/Engine/Physics/RigidbodyComponent.ts:124</a></li>
 								</ul>
 							</aside>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-private">
+					<a name="checksleep" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagPrivate">Private</span> check<wbr>Sleep</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-private">
+						<li class="tsd-signature tsd-kind-icon">check<wbr>Sleep<span class="tsd-signature-symbol">(</span>deltaTimeInSecond<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Physics/RigidbodyComponent.ts#L252">src/Engine/Physics/RigidbodyComponent.ts:252</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>deltaTimeInSecond: <span class="tsd-signature-type">number</span></h5>
+								</li>
+							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
 						</li>
 					</ul>
@@ -768,7 +804,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Physics/RigidbodyComponent.ts#L104">src/Engine/Physics/RigidbodyComponent.ts:104</a></li>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Physics/RigidbodyComponent.ts#L106">src/Engine/Physics/RigidbodyComponent.ts:106</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -785,7 +821,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Physics/RigidbodyComponent.ts#L108">src/Engine/Physics/RigidbodyComponent.ts:108</a></li>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Physics/RigidbodyComponent.ts#L110">src/Engine/Physics/RigidbodyComponent.ts:110</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -801,9 +837,9 @@
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
-								<p>Inherited from <a href="_src_engine_base_baseobject_.baseobject.html">BaseObject</a>.<a href="_src_engine_base_baseobject_.baseobject.html#deactivate">deactivate</a></p>
+								<p>Inherited from <a href="_src_engine_core_baseobject_.baseobject.html">BaseObject</a>.<a href="_src_engine_core_baseobject_.baseobject.html#deactivate">deactivate</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Base/BaseObject.ts#L34">src/Engine/Base/BaseObject.ts:34</a></li>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Core/BaseObject.ts#L40">src/Engine/Core/BaseObject.ts:40</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -820,9 +856,9 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<p>Implementation of <a href="../interfaces/_src_engine_utility_pool_.recyclable.html">Recyclable</a>.<a href="../interfaces/_src_engine_utility_pool_.recyclable.html#destroy">destroy</a></p>
-								<p>Overrides <a href="_src_engine_base_baseobject_.baseobject.html">BaseObject</a>.<a href="_src_engine_base_baseobject_.baseobject.html#destroy">destroy</a></p>
+								<p>Overrides <a href="_src_engine_core_baseobject_.baseobject.html">BaseObject</a>.<a href="_src_engine_core_baseobject_.baseobject.html#destroy">destroy</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Physics/RigidbodyComponent.ts#L252">src/Engine/Physics/RigidbodyComponent.ts:252</a></li>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Physics/RigidbodyComponent.ts#L243">src/Engine/Physics/RigidbodyComponent.ts:243</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -838,9 +874,9 @@
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
-								<p>Overrides <a href="_src_engine_base_baseobject_.baseobject.html">BaseObject</a>.<a href="_src_engine_base_baseobject_.baseobject.html#fixedupdate">fixedUpdate</a></p>
+								<p>Overrides <a href="_src_engine_core_baseobject_.baseobject.html">BaseObject</a>.<a href="_src_engine_core_baseobject_.baseobject.html#fixedupdate">fixedUpdate</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Physics/RigidbodyComponent.ts#L127">src/Engine/Physics/RigidbodyComponent.ts:127</a></li>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Physics/RigidbodyComponent.ts#L129">src/Engine/Physics/RigidbodyComponent.ts:129</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -862,15 +898,15 @@
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
-								<p>Inherited from <a href="_src_engine_base_component_.component.html">Component</a>.<a href="_src_engine_base_component_.component.html#getcomponent">getComponent</a></p>
+								<p>Inherited from <a href="_src_engine_core_component_.component.html">Component</a>.<a href="_src_engine_core_component_.component.html#getcomponent">getComponent</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Base/Component.ts#L22">src/Engine/Base/Component.ts:22</a></li>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Core/Component.ts#L22">src/Engine/Core/Component.ts:22</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-type-parameters-title">Type parameters</h4>
 							<ul class="tsd-type-parameters">
 								<li>
-									<h4>T<span class="tsd-signature-symbol">: </span><a href="_src_engine_base_component_.component.html" class="tsd-signature-type">Component</a></h4>
+									<h4>T<span class="tsd-signature-symbol">: </span><a href="_src_engine_core_component_.component.html" class="tsd-signature-type">Component</a></h4>
 								</li>
 							</ul>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -895,15 +931,15 @@
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
-								<p>Inherited from <a href="_src_engine_base_component_.component.html">Component</a>.<a href="_src_engine_base_component_.component.html#getcomponents">getComponents</a></p>
+								<p>Inherited from <a href="_src_engine_core_component_.component.html">Component</a>.<a href="_src_engine_core_component_.component.html#getcomponents">getComponents</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Base/Component.ts#L26">src/Engine/Base/Component.ts:26</a></li>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Core/Component.ts#L26">src/Engine/Core/Component.ts:26</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-type-parameters-title">Type parameters</h4>
 							<ul class="tsd-type-parameters">
 								<li>
-									<h4>T<span class="tsd-signature-symbol">: </span><a href="_src_engine_base_component_.component.html" class="tsd-signature-type">Component</a></h4>
+									<h4>T<span class="tsd-signature-symbol">: </span><a href="_src_engine_core_component_.component.html" class="tsd-signature-type">Component</a></h4>
 								</li>
 							</ul>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -925,9 +961,9 @@
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
-								<p>Inherited from <a href="_src_engine_base_baseobject_.baseobject.html">BaseObject</a>.<a href="_src_engine_base_baseobject_.baseobject.html#lateupdate">lateUpdate</a></p>
+								<p>Inherited from <a href="_src_engine_core_baseobject_.baseobject.html">BaseObject</a>.<a href="_src_engine_core_baseobject_.baseobject.html#lateupdate">lateUpdate</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Base/BaseObject.ts#L65">src/Engine/Base/BaseObject.ts:65</a></li>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Core/BaseObject.ts#L71">src/Engine/Core/BaseObject.ts:71</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -948,9 +984,9 @@
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
-								<p>Inherited from <a href="_src_engine_base_baseobject_.baseobject.html">BaseObject</a>.<a href="_src_engine_base_baseobject_.baseobject.html#postrender">postRender</a></p>
+								<p>Inherited from <a href="_src_engine_core_baseobject_.baseobject.html">BaseObject</a>.<a href="_src_engine_core_baseobject_.baseobject.html#postrender">postRender</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Base/BaseObject.ts#L70">src/Engine/Base/BaseObject.ts:70</a></li>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Core/BaseObject.ts#L78">src/Engine/Core/BaseObject.ts:78</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -963,23 +999,41 @@
 					</ul>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
-					<a name="removecomponent" class="tsd-anchor"></a>
-					<h3>remove<wbr>Component</h3>
+					<a name="prerender" class="tsd-anchor"></a>
+					<h3>pre<wbr>Render</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
-						<li class="tsd-signature tsd-kind-icon">remove<wbr>Component<span class="tsd-signature-symbol">(</span>component<span class="tsd-signature-symbol">: </span><a href="_src_engine_base_component_.component.html" class="tsd-signature-type">Component</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+						<li class="tsd-signature tsd-kind-icon">pre<wbr>Render<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
-								<p>Inherited from <a href="_src_engine_base_component_.component.html">Component</a>.<a href="_src_engine_base_component_.component.html#removecomponent">removeComponent</a></p>
+								<p>Inherited from <a href="_src_engine_core_baseobject_.baseobject.html">BaseObject</a>.<a href="_src_engine_core_baseobject_.baseobject.html#prerender">preRender</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Base/Component.ts#L18">src/Engine/Base/Component.ts:18</a></li>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Core/BaseObject.ts#L73">src/Engine/Core/BaseObject.ts:73</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+					<a name="removecomponent" class="tsd-anchor"></a>
+					<h3>remove<wbr>Component</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+						<li class="tsd-signature tsd-kind-icon">remove<wbr>Component<span class="tsd-signature-symbol">(</span>component<span class="tsd-signature-symbol">: </span><a href="_src_engine_core_component_.component.html" class="tsd-signature-type">Component</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="_src_engine_core_component_.component.html">Component</a>.<a href="_src_engine_core_component_.component.html#removecomponent">removeComponent</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Core/Component.ts#L18">src/Engine/Core/Component.ts:18</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>component: <a href="_src_engine_base_component_.component.html" class="tsd-signature-type">Component</a></h5>
+									<h5>component: <a href="_src_engine_core_component_.component.html" class="tsd-signature-type">Component</a></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -995,9 +1049,9 @@
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
-								<p>Overrides <a href="_src_engine_base_baseobject_.baseobject.html">BaseObject</a>.<a href="_src_engine_base_baseobject_.baseobject.html#reset">reset</a></p>
+								<p>Overrides <a href="_src_engine_core_baseobject_.baseobject.html">BaseObject</a>.<a href="_src_engine_core_baseobject_.baseobject.html#reset">reset</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Physics/RigidbodyComponent.ts#L228">src/Engine/Physics/RigidbodyComponent.ts:228</a></li>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Physics/RigidbodyComponent.ts#L218">src/Engine/Physics/RigidbodyComponent.ts:218</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -1014,7 +1068,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Physics/RigidbodyComponent.ts#L114">src/Engine/Physics/RigidbodyComponent.ts:114</a></li>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Physics/RigidbodyComponent.ts#L116">src/Engine/Physics/RigidbodyComponent.ts:116</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -1030,9 +1084,9 @@
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
-								<p>Overrides <a href="_src_engine_base_baseobject_.baseobject.html">BaseObject</a>.<a href="_src_engine_base_baseobject_.baseobject.html#start">start</a></p>
+								<p>Overrides <a href="_src_engine_core_baseobject_.baseobject.html">BaseObject</a>.<a href="_src_engine_core_baseobject_.baseobject.html#start">start</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Physics/RigidbodyComponent.ts#L91">src/Engine/Physics/RigidbodyComponent.ts:91</a></li>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Physics/RigidbodyComponent.ts#L93">src/Engine/Physics/RigidbodyComponent.ts:93</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -1048,10 +1102,10 @@
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
-								<p>Inherited from <a href="_src_engine_base_component_.component.html">Component</a>.<a href="_src_engine_base_component_.component.html#tostring">toString</a></p>
-								<p>Overrides <a href="_src_engine_base_baseobject_.baseobject.html">BaseObject</a>.<a href="_src_engine_base_baseobject_.baseobject.html#tostring">toString</a></p>
+								<p>Inherited from <a href="_src_engine_core_component_.component.html">Component</a>.<a href="_src_engine_core_component_.component.html#tostring">toString</a></p>
+								<p>Overrides <a href="_src_engine_core_baseobject_.baseobject.html">BaseObject</a>.<a href="_src_engine_core_baseobject_.baseobject.html#tostring">toString</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Base/Component.ts#L30">src/Engine/Base/Component.ts:30</a></li>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Core/Component.ts#L30">src/Engine/Core/Component.ts:30</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
@@ -1067,9 +1121,9 @@
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
-								<p>Inherited from <a href="_src_engine_base_baseobject_.baseobject.html">BaseObject</a>.<a href="_src_engine_base_baseobject_.baseobject.html#update">update</a></p>
+								<p>Inherited from <a href="_src_engine_core_baseobject_.baseobject.html">BaseObject</a>.<a href="_src_engine_core_baseobject_.baseobject.html#update">update</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Base/BaseObject.ts#L60">src/Engine/Base/BaseObject.ts:60</a></li>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Core/BaseObject.ts#L66">src/Engine/Core/BaseObject.ts:66</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1152,6 +1206,9 @@
 							<li class=" tsd-kind-property tsd-parent-kind-class">
 								<a href="_src_engine_physics_rigidbodycomponent_.rigidbodycomponent.html#issleeping" class="tsd-kind-icon">is<wbr>Sleeping</a>
 							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
+								<a href="_src_engine_physics_rigidbodycomponent_.rigidbodycomponent.html#lastposition" class="tsd-kind-icon">last<wbr>Position</a>
+							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class">
 								<a href="_src_engine_physics_rigidbodycomponent_.rigidbodycomponent.html#maxangularvelocity" class="tsd-kind-icon">max<wbr>Angular<wbr>Velocity</a>
 							</li>
@@ -1215,6 +1272,9 @@
 							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="_src_engine_physics_rigidbodycomponent_.rigidbodycomponent.html#awake" class="tsd-kind-icon">awake</a>
 							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-private">
+								<a href="_src_engine_physics_rigidbodycomponent_.rigidbodycomponent.html#checksleep" class="tsd-kind-icon">check<wbr>Sleep</a>
+							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="_src_engine_physics_rigidbodycomponent_.rigidbodycomponent.html#clearforce" class="tsd-kind-icon">clear<wbr>Force</a>
 							</li>
@@ -1241,6 +1301,9 @@
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
 								<a href="_src_engine_physics_rigidbodycomponent_.rigidbodycomponent.html#postrender" class="tsd-kind-icon">post<wbr>Render</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+								<a href="_src_engine_physics_rigidbodycomponent_.rigidbodycomponent.html#prerender" class="tsd-kind-icon">pre<wbr>Render</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
 								<a href="_src_engine_physics_rigidbodycomponent_.rigidbodycomponent.html#removecomponent" class="tsd-kind-icon">remove<wbr>Component</a>

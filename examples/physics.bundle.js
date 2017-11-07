@@ -1,652 +1,6 @@
 webpackJsonp([0],{
 
-/***/ 100:
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-Object.defineProperty(exports, "__esModule", { value: true });
-var GameObject_1 = __webpack_require__(4);
-var Vector_1 = __webpack_require__(0);
-var Line_1 = __webpack_require__(61);
-var Type_1 = __webpack_require__(10);
-var PolygonColliderComponent_1 = __webpack_require__(62);
-Type_1.forwardRef(function () { return GameObject_1.GameObject; });
-var BoxColliderComponent = (function (_super) {
-    __extends(BoxColliderComponent, _super);
-    function BoxColliderComponent(host) {
-        var _this = _super.call(this, host) || this;
-        _this.size = new Vector_1.Vector();
-        for (var i = 0; i < 4; i++) {
-            _this.points.push(new Vector_1.Vector());
-            _this._cachedPoints.push(new Vector_1.Vector());
-            _this._cachedAxes.push(new Vector_1.Vector());
-            _this._cachedSides.push(new Line_1.Line(new Vector_1.Vector(), new Vector_1.Vector()));
-        }
-        return _this;
-    }
-    BoxColliderComponent.prototype.calculate = function () {
-        var toWorldMatrix = this.host.transform.toWorldMatrix;
-        var halfSizeX = this.size.x / 2;
-        var halfSizeY = this.size.y / 2;
-        this.points[0].setTo(-halfSizeX, -halfSizeY);
-        this.points[1].setTo(halfSizeX, -halfSizeY);
-        this.points[2].setTo(halfSizeX, halfSizeY);
-        this.points[3].setTo(-halfSizeX, halfSizeY);
-        this._cachedPoints[0].setTo(-halfSizeX, -halfSizeY);
-        this._cachedPoints[1].setTo(halfSizeX, -halfSizeY);
-        this._cachedPoints[2].setTo(halfSizeX, halfSizeY);
-        this._cachedPoints[3].setTo(-halfSizeX, halfSizeY);
-        this._cachedPoints.forEach(function (point) { return toWorldMatrix.multiplyToPoint(point); });
-        for (var i = 0; i < 4; i++) {
-            var p1 = this._cachedPoints[i];
-            var p2 = this._cachedPoints[(i + 1) % 4];
-            var axis = this._cachedAxes[i];
-            var side = this._cachedSides[i];
-            axis.copy(p1).subtract(p2);
-            side.begin.copy(p1);
-            side.end.copy(p2);
-        }
-        var x = this._cachedPoints.map(function (p) { return p.x; });
-        var y = this._cachedPoints.map(function (p) { return p.y; });
-        var minX = Math.min.apply(Math, x);
-        var minY = Math.min.apply(Math, y);
-        var maxX = Math.max.apply(Math, x);
-        var maxY = Math.max.apply(Math, y);
-        this.bounds.center.setTo((maxX + minX) / 2, (maxY + minY) / 2);
-        this.bounds.extents.setTo((maxX - minX) / 2, (maxY - minY) / 2);
-    };
-    return BoxColliderComponent;
-}(PolygonColliderComponent_1.PolygonColliderComponent));
-exports.BoxColliderComponent = BoxColliderComponent;
-
-
-/***/ }),
-
-/***/ 101:
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-var ColliderType;
-(function (ColliderType) {
-    ColliderType[ColliderType["Static"] = 0] = "Static";
-    ColliderType[ColliderType["Rigidbody"] = 1] = "Rigidbody";
-    ColliderType[ColliderType["Kinematic"] = 2] = "Kinematic";
-})(ColliderType = exports.ColliderType || (exports.ColliderType = {}));
-
-
-/***/ }),
-
-/***/ 102:
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-var Vector_1 = __webpack_require__(0);
-var Ray = (function () {
-    function Ray(origin, direction) {
-        if (origin === void 0) { origin = new Vector_1.Vector(); }
-        if (direction === void 0) { direction = new Vector_1.Vector(); }
-        this.origin = origin;
-        this.direction = direction;
-        this.direction.normalize();
-    }
-    Ray.prototype.getPoint = function (distance) {
-        return this.direction.clone().scale(distance).add(this.origin);
-    };
-    Ray.prototype.intersect = function (another) {
-        var p = this.origin;
-        var r = this.direction;
-        var q;
-        var s;
-        var l = 0;
-        if (another instanceof Ray) {
-            q = another.origin;
-            s = another.direction;
-        }
-        else {
-            q = another.begin;
-            s = another.getDirection();
-            l = another.length;
-        }
-        var pq = q.clone().subtract(p);
-        var r_x_s = r.cross(s);
-        var pq_x_r = pq.cross(r);
-        if (r_x_s === 0) {
-            return -1;
-        }
-        else {
-            var t = pq.cross(s) / r_x_s;
-            var u = pq_x_r / r_x_s;
-            if (l && u > l) {
-                return -1;
-            }
-            if (u >= 0 && t >= 0) {
-                return t;
-            }
-        }
-        return -1;
-    };
-    return Ray;
-}());
-exports.Ray = Ray;
-
-
-/***/ }),
-
-/***/ 103:
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-var Vector_1 = __webpack_require__(0);
-var ForceMode_1 = __webpack_require__(59);
-var CollisionContact = (function () {
-    function CollisionContact(colliderA, colliderB, mtv, point, normal) {
-        this.colliderA = colliderA;
-        this.colliderB = colliderB;
-        this.mtv = mtv;
-        this.point = point;
-        this.normal = normal;
-        this._canRecycle = false;
-        this._resolved = false;
-    }
-    Object.defineProperty(CollisionContact.prototype, "canRecycle", {
-        get: function () { return this._canRecycle; },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(CollisionContact.prototype, "resolved", {
-        get: function () { return this._resolved; },
-        enumerable: true,
-        configurable: true
-    });
-    CollisionContact.prototype.resolve = function () {
-        if (this._resolved) {
-            return;
-        }
-        var a = this.colliderA;
-        var b = this.colliderB;
-        var bodyA = a.rigidbody;
-        var bodyB = b.rigidbody;
-        var shouldAwakeBodyA = bodyB ? !bodyB.isSleeping : false;
-        var shouldAwakeBodyB = bodyA ? !bodyA.isSleeping : false;
-        if (!bodyA && !bodyB) {
-            return;
-        }
-        var velocityA = bodyA ? bodyA.velocity : Vector_1.Vector.Zero;
-        var velocityB = bodyB ? bodyB.velocity : Vector_1.Vector.Zero;
-        var angularVelocityA = bodyA ? bodyA.angularVelocity : 0;
-        var angularVelocityB = bodyB ? bodyB.angularVelocity : 0;
-        var relativeA = this.point.clone().subtract(a.bounds.center);
-        var relativeB = this.point.clone().subtract(b.bounds.center);
-        var relativeVelocity = velocityB.clone()
-            .add(relativeB.cross(-angularVelocityB))
-            .subtract(velocityA)
-            .subtract(relativeA.cross(-angularVelocityA));
-        var rvDotNormal = relativeVelocity.dot(this.normal);
-        if (rvDotNormal > 0) {
-            return;
-        }
-        var restitution = Math.min(this.colliderA.restitution, this.colliderB.restitution);
-        var inverseMassA = bodyA ? bodyA.inverseMass : 0;
-        var inverseMassB = bodyB ? bodyB.inverseMass : 0;
-        var sumOfInverseMass = inverseMassA + inverseMassB;
-        var inverseMoiA = bodyA ? bodyA.inverseMoi : 0;
-        var inverseMoiB = bodyB ? bodyB.inverseMoi : 0;
-        var j_moi_a = Vector_1.Vector.Cross(relativeA.cross(this.normal), relativeA).scale(inverseMoiA);
-        var j_moi_b = Vector_1.Vector.Cross(relativeB.cross(this.normal), relativeB).scale(inverseMoiB);
-        var j_moi = j_moi_a.add(j_moi_b).dot(this.normal);
-        var j = -(1 + restitution) * rvDotNormal / (sumOfInverseMass + j_moi);
-        var impulse = this.normal.clone().scale(j);
-        if (bodyA && bodyB) {
-            this.mtv.scale(0.5);
-        }
-        if (bodyA) {
-            if (shouldAwakeBodyA && bodyA.isSleeping) {
-                bodyA.awake();
-            }
-            bodyA.host.transform.position.add(this.mtv.clone().scale(-1));
-            bodyA.addForce(impulse.clone().scale(-1), ForceMode_1.ForceMode.Impulse);
-        }
-        if (bodyB) {
-            if (shouldAwakeBodyB && bodyB.isSleeping) {
-                bodyB.awake();
-            }
-            bodyB.host.transform.position.add(this.mtv);
-            bodyB.addForce(impulse, ForceMode_1.ForceMode.Impulse);
-        }
-        var tangent = this.normal.normal();
-        var frictionImpulse;
-        var jt_moi_a = Vector_1.Vector.Cross(relativeA.cross(tangent), relativeA).scale(inverseMoiA);
-        var jt_moi_b = Vector_1.Vector.Cross(relativeB.cross(tangent), relativeB).scale(inverseMoiB);
-        var jt_moi = jt_moi_a.add(jt_moi_b).dot(tangent);
-        var t = relativeVelocity.clone().subtract(this.normal.clone().scale(rvDotNormal)).normalize();
-        var jt = -relativeVelocity.dot(t) / (sumOfInverseMass + jt_moi);
-        var mu = Math.sqrt(Math.pow(this.colliderA.friction, 2) + Math.pow(this.colliderB.friction, 2));
-        if (Math.abs(jt) < j * mu) {
-            frictionImpulse = t.clone().scale(jt);
-        }
-        else {
-            frictionImpulse = t.clone().scale(-j * mu);
-        }
-        if (bodyA) {
-            bodyA.addForce(frictionImpulse.clone().scale(-1), ForceMode_1.ForceMode.Impulse);
-            bodyA.addTorque(-frictionImpulse.dot(t) * relativeA.cross(t), ForceMode_1.ForceMode.Impulse);
-        }
-        if (bodyB) {
-            bodyB.addForce(frictionImpulse, ForceMode_1.ForceMode.Impulse);
-            bodyB.addTorque(frictionImpulse.dot(t) * relativeB.cross(t), ForceMode_1.ForceMode.Impulse);
-        }
-    };
-    CollisionContact.prototype.destroy = function () {
-        this._canRecycle = true;
-    };
-    return CollisionContact;
-}());
-exports.CollisionContact = CollisionContact;
-
-
-/***/ }),
-
-/***/ 36:
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __metadata = (this && this.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-var Observable_1 = __webpack_require__(2);
-var MouseInput_1 = __webpack_require__(37);
-var TouchInput_1 = __webpack_require__(38);
-var DOM_1 = __webpack_require__(32);
-var Vector_1 = __webpack_require__(0);
-var Service_1 = __webpack_require__(1);
-var PointerInput = (function () {
-    function PointerInput(mouseInput, touchInput) {
-        this.mouseInput = mouseInput;
-        this.touchInput = touchInput;
-    }
-    Object.defineProperty(PointerInput.prototype, "pointerStart$", {
-        get: function () {
-            var _this = this;
-            return Observable_1.Observable.merge(this.mouseInput.mouseDown$.map(function (e) { return _this.parseMouseEvent(e); }), this.touchInput.touchStart$.map(function (e) { return _this.parseTouchEvent(e); }));
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(PointerInput.prototype, "pointerEnd$", {
-        get: function () {
-            var _this = this;
-            return Observable_1.Observable.merge(this.mouseInput.mouseUp$.map(function (e) { return _this.parseMouseEvent(e); }), this.touchInput.touchEnd$.map(function (e) { return _this.parseTouchEvent(e); }));
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(PointerInput.prototype, "pointerMove$", {
-        get: function () {
-            var _this = this;
-            return Observable_1.Observable.merge(this.mouseInput.mouseMove$.map(function (e) { return _this.parseMouseEvent(e); }), this.touchInput.touchMove$.map(function (e) { return _this.parseTouchEvent(e); }));
-        },
-        enumerable: true,
-        configurable: true
-    });
-    PointerInput.prototype.parseMouseEvent = function (e) {
-        return {
-            altKey: e.altKey,
-            ctrlKey: e.ctrlKey,
-            shiftKey: e.shiftKey,
-            metaKey: e.metaKey,
-            locations: [Vector_1.Vector.Get(e.clientX, e.clientY)]
-        };
-    };
-    PointerInput.prototype.parseTouchEvent = function (e) {
-        var locations = [];
-        DOM_1.listToArray(e.touches).forEach(function (touch) {
-            if (touch) {
-                locations.push(Vector_1.Vector.Get(touch.clientX, touch.clientY));
-            }
-        });
-        return {
-            altKey: e.altKey,
-            ctrlKey: e.ctrlKey,
-            shiftKey: e.shiftKey,
-            metaKey: e.metaKey,
-            locations: locations
-        };
-    };
-    PointerInput = __decorate([
-        Service_1.Service(),
-        __metadata("design:paramtypes", [MouseInput_1.MouseInput,
-            TouchInput_1.TouchInput])
-    ], PointerInput);
-    return PointerInput;
-}());
-exports.PointerInput = PointerInput;
-
-
-/***/ }),
-
-/***/ 37:
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __metadata = (this && this.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-var BrowserDelegate_1 = __webpack_require__(3);
-var Service_1 = __webpack_require__(1);
-var MouseInput = (function () {
-    function MouseInput(browserDelegate) {
-        this.browserDelegate = browserDelegate;
-    }
-    Object.defineProperty(MouseInput.prototype, "click$", {
-        get: function () { return this.browserDelegate.click$; },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(MouseInput.prototype, "mouseMove$", {
-        get: function () { return this.browserDelegate.mouseMove$; },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(MouseInput.prototype, "mouseDown$", {
-        get: function () { return this.browserDelegate.mouseDown$; },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(MouseInput.prototype, "mouseUp$", {
-        get: function () { return this.browserDelegate.mouseUp$; },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(MouseInput.prototype, "wheel$", {
-        get: function () { return this.browserDelegate.wheel$; },
-        enumerable: true,
-        configurable: true
-    });
-    MouseInput = __decorate([
-        Service_1.Service(),
-        __metadata("design:paramtypes", [BrowserDelegate_1.BrowserDelegate])
-    ], MouseInput);
-    return MouseInput;
-}());
-exports.MouseInput = MouseInput;
-
-
-/***/ }),
-
-/***/ 38:
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __metadata = (this && this.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-var BrowserDelegate_1 = __webpack_require__(3);
-var Service_1 = __webpack_require__(1);
-var TouchInput = (function () {
-    function TouchInput(browserDelegate) {
-        this.browserDelegate = browserDelegate;
-    }
-    Object.defineProperty(TouchInput.prototype, "touchStart$", {
-        get: function () { return this.browserDelegate.touchStart$; },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(TouchInput.prototype, "touchEnd$", {
-        get: function () { return this.browserDelegate.touchEnd$; },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(TouchInput.prototype, "touchCancel$", {
-        get: function () { return this.browserDelegate.touchCancel$; },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(TouchInput.prototype, "touchMove$", {
-        get: function () { return this.browserDelegate.touchMove$; },
-        enumerable: true,
-        configurable: true
-    });
-    TouchInput = __decorate([
-        Service_1.Service(),
-        __metadata("design:paramtypes", [BrowserDelegate_1.BrowserDelegate])
-    ], TouchInput);
-    return TouchInput;
-}());
-exports.TouchInput = TouchInput;
-
-
-/***/ }),
-
-/***/ 39:
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-var Projection = (function () {
-    function Projection(min, max) {
-        this.min = min;
-        this.max = max;
-        this._canRecycle = false;
-    }
-    Object.defineProperty(Projection.prototype, "canRecycle", {
-        get: function () { return this._canRecycle; },
-        enumerable: true,
-        configurable: true
-    });
-    Projection.prototype.overlaps = function (another) {
-        return this.max > another.min && this.min < another.max;
-    };
-    Projection.prototype.getOverlap = function (another) {
-        if (!this.overlaps(another)) {
-            return 0;
-        }
-        return this.max > another.max ? another.max - this.min : this.max - another.min;
-    };
-    Projection.prototype.destroy = function () {
-        this._canRecycle = true;
-    };
-    Projection.prototype.toString = function () {
-        return "Projection (" + this.min + ", " + this.max + ")";
-    };
-    return Projection;
-}());
-exports.Projection = Projection;
-
-
-/***/ }),
-
-/***/ 60:
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-Object.defineProperty(exports, "__esModule", { value: true });
-var RendererComponent_1 = __webpack_require__(12);
-var Vector_1 = __webpack_require__(0);
-var Color_1 = __webpack_require__(6);
-var CircleRendererComponent = (function (_super) {
-    __extends(CircleRendererComponent, _super);
-    function CircleRendererComponent() {
-        var _this = _super !== null && _super.apply(this, arguments) || this;
-        _this.radius = 60;
-        _this.lineWidth = 1;
-        _this.strokeColor = Color_1.Color.Red;
-        _this.center = new Vector_1.Vector();
-        _this.startAngle = 0;
-        _this.endAngle = Math.PI * 2;
-        _this.anticlockwise = false;
-        _this.useLocalCoordinate = true;
-        return _this;
-    }
-    CircleRendererComponent.prototype.update = function () {
-        _super.prototype.update.call(this);
-        this.calculateBounds();
-    };
-    CircleRendererComponent.prototype.render = function (ctx, toScreenMatrix) {
-        ctx.save();
-        var m = toScreenMatrix.clone();
-        if (this.useLocalCoordinate) {
-            m.multiply(this.transform.toWorldMatrix);
-        }
-        m.setScaling(-1, -1);
-        ctx.transform(m[0][0], m[0][1], m[1][0], m[1][1], m[0][2], m[1][2]);
-        ctx.lineWidth = this.lineWidth;
-        ctx.strokeStyle = this.strokeColor.toHexString();
-        ctx.beginPath();
-        var center = this.center.clone();
-        ctx.arc(center.x, center.y, this.radius, this.startAngle, this.endAngle, this.anticlockwise);
-        ctx.closePath();
-        ctx.stroke();
-        ctx.restore();
-    };
-    CircleRendererComponent.prototype.calculateBounds = function () {
-        this.bounds.center.copy(this.center);
-        this.bounds.extents.setTo(this.radius, this.radius);
-        if (this.useLocalCoordinate) {
-            this.bounds.center.add(this.transform.position);
-        }
-    };
-    return CircleRendererComponent;
-}(RendererComponent_1.RendererComponent));
-exports.CircleRendererComponent = CircleRendererComponent;
-
-
-/***/ }),
-
-/***/ 61:
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-var Line = (function () {
-    function Line(begin, end) {
-        this.begin = begin;
-        this.end = end;
-    }
-    Object.defineProperty(Line.prototype, "slope", {
-        get: function () {
-            return (this.end.y - this.begin.y) / (this.end.x - this.begin.x);
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Line.prototype, "intercept", {
-        get: function () {
-            return this.begin.y - this.slope * this.begin.x;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Line.prototype, "length", {
-        get: function () {
-            return this.begin.distanceTo(this.end);
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Line.prototype.getLength = function () {
-        return this.begin.distanceTo(this.end);
-    };
-    Line.prototype.getDirection = function () {
-        return this.end.clone().subtract(this.begin).normalize();
-    };
-    Line.prototype.resolvePoint = function (point, axis) {
-        switch (axis) {
-            case 'x':
-                point.setTo(point.x, this.slope * point.x + this.intercept);
-                break;
-            case 'y':
-                point.setTo((point.y - this.intercept) / this.slope, point.y);
-                break;
-            default:
-                break;
-        }
-    };
-    Line.prototype.hasPoint = function (point, threshold) {
-        if (threshold === void 0) { threshold = 1e-6; }
-        var dxc = point.x - this.begin.x;
-        var dyc = point.y - this.begin.y;
-        var dxl = this.end.x - this.begin.x;
-        var dyl = this.end.y - this.begin.y;
-        var cross = dxc * dyl - dyc * dxl;
-        if (Math.abs(cross) > threshold) {
-            return false;
-        }
-        if (Math.abs(dxl) >= Math.abs(dyl)) {
-            return dxl > 0 ?
-                this.begin.x <= point.x && point.x <= this.end.x :
-                this.end.x <= point.x && point.x <= this.begin.x;
-        }
-        else {
-            return dyl > 0 ?
-                this.begin.y <= point.y && point.y <= this.end.y :
-                this.end.y <= point.y && point.y <= this.begin.y;
-        }
-    };
-    Line.prototype.toString = function () {
-        return "Line (" + this.begin + " -> " + this.end + ")";
-    };
-    return Line;
-}());
-exports.Line = Line;
-
-
-/***/ }),
-
-/***/ 62:
+/***/ 115:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -670,636 +24,48 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-Object.defineProperty(exports, "__esModule", { value: true });
-var GameObject_1 = __webpack_require__(4);
-var ColliderComponent_1 = __webpack_require__(63);
-var LineRendererComponent_1 = __webpack_require__(15);
-var Vector_1 = __webpack_require__(0);
-var Line_1 = __webpack_require__(61);
-var Ray_1 = __webpack_require__(102);
-var Projection_1 = __webpack_require__(39);
-var CollisionJumpTable_1 = __webpack_require__(64);
-var Inject_1 = __webpack_require__(7);
-var CircleColliderComponent_1 = __webpack_require__(65);
-var Type_1 = __webpack_require__(10);
-var Color_1 = __webpack_require__(6);
-Type_1.forwardRef(function () { return GameObject_1.GameObject; });
-var PolygonColliderComponent = (function (_super) {
-    __extends(PolygonColliderComponent, _super);
-    function PolygonColliderComponent() {
-        var _this = _super !== null && _super.apply(this, arguments) || this;
-        _this.points = [];
-        _this._cachedPoints = [];
-        _this._cachedAxes = [];
-        _this._cachedSides = [];
-        _this.debugColliderRenderer = null;
-        _this.debugBoundsRenderer = null;
-        _this.debugDirectionRenderer = null;
-        return _this;
-    }
-    Object.defineProperty(PolygonColliderComponent.prototype, "cachedPoints", {
-        get: function () { return this._cachedPoints; },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(PolygonColliderComponent.prototype, "cachedAxes", {
-        get: function () { return this._cachedAxes; },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(PolygonColliderComponent.prototype, "cachedSides", {
-        get: function () { return this._cachedSides; },
-        enumerable: true,
-        configurable: true
-    });
-    PolygonColliderComponent.prototype.fixedUpdate = function () {
-        this.calculate();
-    };
-    PolygonColliderComponent.prototype.update = function () {
-        if (this.debug) {
-            var isSleep = this.rigidbody ? this.rigidbody.isSleeping : true;
-            var color = isSleep ? Color_1.Color.Green : Color_1.Color.Red;
-            if (!this.debugColliderRenderer) {
-                this.debugColliderRenderer = this.addComponent(LineRendererComponent_1.LineRendererComponent);
-                this.debugColliderRenderer.useLocalCoordinate = false;
-                this.debugColliderRenderer.closePath = true;
-            }
-            if (!this.debugBoundsRenderer) {
-                this.debugBoundsRenderer = this.addComponent(LineRendererComponent_1.LineRendererComponent);
-                this.debugBoundsRenderer.useLocalCoordinate = false;
-                this.debugBoundsRenderer.closePath = true;
-                this.debugBoundsRenderer.strokeColor = Color_1.Color.Cyan;
-            }
-            if (!this.debugDirectionRenderer) {
-                this.debugDirectionRenderer = this.addComponent(LineRendererComponent_1.LineRendererComponent);
-                this.debugDirectionRenderer.useLocalCoordinate = false;
-            }
-            this.debugColliderRenderer.strokeColor = color;
-            this.debugDirectionRenderer.strokeColor = color;
-            this.debugColliderRenderer.clearPoints();
-            if (this._cachedPoints.length > 1) {
-                (_a = this.debugColliderRenderer).addPoint.apply(_a, this._cachedPoints);
-            }
-            var min = this.bounds.min;
-            var max = this.bounds.max;
-            this.debugBoundsRenderer.clearPoints();
-            this.debugBoundsRenderer.addPoint(new Vector_1.Vector(min.x, min.y), new Vector_1.Vector(min.x, max.y), new Vector_1.Vector(max.x, max.y), new Vector_1.Vector(max.x, min.y));
-            var rotation = this.host.transform.rotation;
-            var direction = new Vector_1.Vector(Math.cos(rotation), Math.sin(rotation));
-            var ray = new Ray_1.Ray(this.bounds.center.clone(), direction.clone());
-            var point = this.rayCast(ray) || direction;
-            var center = this._cachedPoints.reduce(function (result, curr) { return result.add(curr); }, new Vector_1.Vector()).scale(1 / this._cachedPoints.length);
-            this.debugDirectionRenderer.clearPoints();
-            this.debugDirectionRenderer.addPoint(center, point);
-        }
-        else {
-            if (this.debugColliderRenderer) {
-                this.removeComponent(this.debugColliderRenderer);
-                this.debugColliderRenderer = null;
-            }
-            if (this.debugBoundsRenderer) {
-                this.removeComponent(this.debugBoundsRenderer);
-                this.debugBoundsRenderer = null;
-            }
-            if (this.debugDirectionRenderer) {
-                this.removeComponent(this.debugDirectionRenderer);
-                this.debugDirectionRenderer = null;
-            }
-        }
-        var _a;
-    };
-    PolygonColliderComponent.prototype.calculate = function () {
-        var _this = this;
-        var toWorldMatrix = this.host.transform.toWorldMatrix;
-        var count = this.points.length;
-        var diff = count - this._cachedPoints.length;
-        if (diff > 0) {
-            for (var i = 0; i < diff; i++) {
-                this._cachedPoints.push(new Vector_1.Vector());
-                this._cachedAxes.push(new Vector_1.Vector());
-                this._cachedSides.push(new Line_1.Line(new Vector_1.Vector(), new Vector_1.Vector()));
-            }
-        }
-        else if (diff < 0) {
-            this._cachedPoints.splice(0, -diff);
-            this._cachedAxes.splice(0, -diff);
-            this._cachedSides.splice(0, -diff);
-        }
-        this._cachedPoints.forEach(function (point, index) { return point.copy(_this.points[index]); });
-        this._cachedPoints.forEach(function (point) { return toWorldMatrix.multiplyToPoint(point); });
-        for (var i = 0; i < count; i++) {
-            var p1 = this._cachedPoints[i];
-            var p2 = this._cachedPoints[(i + 1) % count];
-            var axis = this._cachedAxes[i];
-            var side = this._cachedSides[i];
-            axis.copy(p1).subtract(p2);
-            side.begin.copy(p1);
-            side.end.copy(p2);
-        }
-        var x = this._cachedPoints.map(function (p) { return p.x; });
-        var y = this._cachedPoints.map(function (p) { return p.y; });
-        var minX = Math.min.apply(Math, x);
-        var minY = Math.min.apply(Math, y);
-        var maxX = Math.max.apply(Math, x);
-        var maxY = Math.max.apply(Math, y);
-        this.bounds.center.setTo((maxX + minX) / 2, (maxY + minY) / 2);
-        this.bounds.extents.setTo((maxX - minX) / 2, (maxY - minY) / 2);
-    };
-    PolygonColliderComponent.prototype.collide = function (another) {
-        if (another instanceof PolygonColliderComponent) {
-            return this.collisionJumpTable.polygonPolygon(this, another);
-        }
-        else if (another instanceof CircleColliderComponent_1.CircleColliderComponent) {
-            return this.collisionJumpTable.circlePolygon(another, this);
-        }
-    };
-    PolygonColliderComponent.prototype.contains = function (point) {
-        var ray = new Ray_1.Ray(point, Vector_1.Vector.Right);
-        var count = this._cachedSides.reduce(function (acc, side) { return ray.intersect(side) === -1 ? acc : ++acc; }, 0);
-        return count % 2 !== 0;
-    };
-    PolygonColliderComponent.prototype.rayCast = function (ray) {
-        var minDistance = Number.MAX_VALUE;
-        var noIntersect = true;
-        this._cachedSides.forEach(function (side) {
-            var distance = ray.intersect(side);
-            if (distance > 0 && distance < minDistance) {
-                minDistance = distance;
-                noIntersect = false;
-            }
-        });
-        if (noIntersect) {
-            return;
-        }
-        return ray.getPoint(minDistance);
-    };
-    PolygonColliderComponent.prototype.project = function (axis) {
-        var min = Number.MAX_VALUE;
-        var max = -Number.MAX_VALUE;
-        this._cachedPoints.forEach(function (point) {
-            var s = point.dot(axis);
-            min = Math.min(min, s);
-            max = Math.max(max, s);
-        });
-        return new Projection_1.Projection(min, max);
-    };
-    PolygonColliderComponent.prototype.getFurthestPoint = function (direction) {
-        var max = -Number.MAX_VALUE;
-        var pointer = -1;
-        this._cachedPoints.forEach(function (point, index) {
-            var dot = point.dot(direction);
-            if (dot > max) {
-                max = dot;
-                pointer = index;
-            }
-        });
-        return this._cachedPoints[pointer].clone();
-    };
-    __decorate([
-        Inject_1.Inject(CollisionJumpTable_1.CollisionJumpTable),
-        __metadata("design:type", CollisionJumpTable_1.CollisionJumpTable)
-    ], PolygonColliderComponent.prototype, "collisionJumpTable", void 0);
-    return PolygonColliderComponent;
-}(ColliderComponent_1.ColliderComponent));
-exports.PolygonColliderComponent = PolygonColliderComponent;
-
-
-/***/ }),
-
-/***/ 63:
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __metadata = (this && this.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var Inject_1 = __webpack_require__(7);
-var Bounds_1 = __webpack_require__(19);
-var Component_1 = __webpack_require__(11);
-var RigidbodyComponent_1 = __webpack_require__(20);
-var Vector_1 = __webpack_require__(0);
-var Projection_1 = __webpack_require__(39);
-var ColliderType_1 = __webpack_require__(101);
-var BroadPhaseCollisionResolver_1 = __webpack_require__(58);
-var ColliderComponent = (function (_super) {
-    __extends(ColliderComponent, _super);
-    function ColliderComponent() {
-        var _this = _super !== null && _super.apply(this, arguments) || this;
-        _this.bounds = new Bounds_1.Bounds();
-        _this.offset = new Vector_1.Vector();
-        _this.layer = 1;
-        _this.debug = false;
-        _this.restitution = 0.2;
-        _this.friction = 0.99;
-        _this.isKinematic = false;
-        _this.type = ColliderType_1.ColliderType.Static;
-        return _this;
-    }
-    ColliderComponent.prototype.collide = function (another) { return; };
-    ColliderComponent.prototype.contains = function (point) { return false; };
-    ColliderComponent.prototype.rayCast = function (ray) { return; };
-    ColliderComponent.prototype.project = function (axis) { return new Projection_1.Projection(0, 0); };
-    ColliderComponent.prototype.getFurthestPoint = function (direction) { return this.bounds.center.clone(); };
-    ColliderComponent.prototype.start = function () {
-        _super.prototype.start.call(this);
-        this.rigidbody = this.getComponent(RigidbodyComponent_1.RigidbodyComponent);
-        if (this.rigidbody) {
-            if (this.isKinematic) {
-                this.type = ColliderType_1.ColliderType.Kinematic;
-                this.rigidbody.sleepThreshold = -1;
-            }
-            else {
-                this.type = ColliderType_1.ColliderType.Rigidbody;
-            }
-        }
-        this.broadPhaseCollisionResolver.track(this);
-    };
-    __decorate([
-        Inject_1.Inject(BroadPhaseCollisionResolver_1.BroadPhaseCollisionResolver),
-        __metadata("design:type", BroadPhaseCollisionResolver_1.BroadPhaseCollisionResolver)
-    ], ColliderComponent.prototype, "broadPhaseCollisionResolver", void 0);
-    return ColliderComponent;
-}(Component_1.Component));
-exports.ColliderComponent = ColliderComponent;
-
-
-/***/ }),
-
-/***/ 64:
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-var Service_1 = __webpack_require__(1);
-var CollisionContact_1 = __webpack_require__(103);
-var CollisionJumpTable = (function () {
-    function CollisionJumpTable() {
-    }
-    CollisionJumpTable.prototype.circleCircle = function (colliderA, colliderB) {
-        var maxDistance = colliderA.radius + colliderB.radius;
-        var positionA = colliderA.bounds.center;
-        var positionB = colliderB.bounds.center;
-        var distance = positionA.distanceTo(positionB);
-        if (distance > maxDistance) {
-            return;
-        }
-        var normal = positionB.clone().subtract(positionA).scale(colliderA.radius / distance);
-        var point = positionA.clone().add(normal);
-        normal.normalize();
-        var mtv = normal.clone().scale(maxDistance - distance);
-        return new CollisionContact_1.CollisionContact(colliderA, colliderB, mtv, point, normal);
-    };
-    CollisionJumpTable.prototype.circlePolygon = function (colliderA, colliderB) {
-        var positionA = colliderA.bounds.center;
-        var positionB = colliderB.bounds.center;
-        var minAxis = this.circleBoxSAT(colliderA, colliderB);
-        if (!minAxis) {
-            return;
-        }
-        var ab = positionB.clone().subtract(positionA);
-        var hasSameDirection = minAxis.dot(ab) >= 0;
-        if (!hasSameDirection) {
-            minAxis.scale(-1);
-        }
-        var normal = minAxis.clone().normalize();
-        var pointA = colliderA.getFurthestPoint(minAxis);
-        var pointB = colliderB.getFurthestPoint(minAxis);
-        var containsPointA = colliderB.contains(pointA);
-        var containsPointB = colliderA.contains(pointB);
-        var contactPoint;
-        if (containsPointA && containsPointB) {
-            contactPoint = pointA.clone().add(pointB).scale(0.5);
-        }
-        else if (containsPointA) {
-            contactPoint = pointA.clone();
-        }
-        else if (containsPointB) {
-            contactPoint = pointB.clone();
-        }
-        else {
-            contactPoint = pointA.clone().add(pointB).scale(0.5);
-        }
-        return new CollisionContact_1.CollisionContact(colliderA, colliderB, minAxis, contactPoint, normal);
-    };
-    CollisionJumpTable.prototype.polygonPolygon = function (colliderA, colliderB) {
-        var positionA = colliderA.bounds.center;
-        var positionB = colliderB.bounds.center;
-        var minAxis = this.polygonPolygonSAT(colliderA, colliderB);
-        if (!minAxis) {
-            return;
-        }
-        var ab = positionB.clone().subtract(positionA);
-        var hasSameDirection = minAxis.dot(ab) >= 0;
-        if (!hasSameDirection) {
-            minAxis.scale(-1);
-        }
-        var normal = minAxis.clone().normalize();
-        var pointA = colliderA.getFurthestPoint(minAxis);
-        var pointB = colliderB.getFurthestPoint(minAxis);
-        var containsPointA = colliderB.contains(pointA);
-        var containsPointB = colliderA.contains(pointB);
-        var contactPoint;
-        if (containsPointA && containsPointB) {
-            contactPoint = pointA.clone().add(pointB).scale(0.5);
-        }
-        else if (containsPointA) {
-            contactPoint = pointA.clone();
-        }
-        else if (containsPointB) {
-            contactPoint = pointB.clone();
-        }
-        else {
-            contactPoint = pointA.clone().add(pointB).scale(0.5);
-        }
-        return new CollisionContact_1.CollisionContact(colliderA, colliderB, minAxis, contactPoint, normal);
-    };
-    CollisionJumpTable.prototype.polygonPolygonSAT = function (colliderA, colliderB) {
-        var axes = colliderA.cachedAxes.concat(colliderB.cachedAxes).map(function (axis) { return axis.normal(); });
-        return this.findMTV(colliderA, colliderB, axes);
-    };
-    CollisionJumpTable.prototype.circleBoxSAT = function (colliderA, colliderB) {
-        var positionA = colliderA.bounds.center;
-        var positionB = colliderB.bounds.center;
-        var ba = positionA.clone().subtract(positionB);
-        var closestPointOnPoly = colliderB.getFurthestPoint(ba);
-        var axes = colliderB.cachedAxes.map(function (axis) { return axis.normal(); }).concat([positionA.clone().subtract(closestPointOnPoly).normalize()]);
-        return this.findMTV(colliderA, colliderB, axes);
-    };
-    CollisionJumpTable.prototype.findMTV = function (colliderA, colliderB, axes) {
-        var count = axes.length;
-        var minOverlap = Number.MAX_VALUE;
-        var minIndex = -1;
-        for (var i = 0; i < count; i++) {
-            var projectionA = colliderA.project(axes[i]);
-            var projectionB = colliderB.project(axes[i]);
-            var overlap = projectionA.getOverlap(projectionB);
-            if (overlap <= 0) {
-                return;
-            }
-            else {
-                if (overlap < minOverlap) {
-                    minOverlap = overlap;
-                    minIndex = i;
-                }
-            }
-        }
-        if (minIndex === -1) {
-            return;
-        }
-        if (axes[minIndex].isZero) {
-            return;
-        }
-        return axes[minIndex].clone().normalize().scale(minOverlap);
-    };
-    CollisionJumpTable = __decorate([
-        Service_1.Service()
-    ], CollisionJumpTable);
-    return CollisionJumpTable;
-}());
-exports.CollisionJumpTable = CollisionJumpTable;
-
-
-/***/ }),
-
-/***/ 65:
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __metadata = (this && this.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-var GameObject_1 = __webpack_require__(4);
-var ColliderComponent_1 = __webpack_require__(63);
-var CircleRendererComponent_1 = __webpack_require__(60);
-var Vector_1 = __webpack_require__(0);
-var Projection_1 = __webpack_require__(39);
-var CollisionJumpTable_1 = __webpack_require__(64);
-var Inject_1 = __webpack_require__(7);
-var Type_1 = __webpack_require__(10);
-var PolygonColliderComponent_1 = __webpack_require__(62);
-var LineRendererComponent_1 = __webpack_require__(15);
-var Color_1 = __webpack_require__(6);
-Type_1.forwardRef(function () { return GameObject_1.GameObject; });
-var CircleColliderComponent = (function (_super) {
-    __extends(CircleColliderComponent, _super);
-    function CircleColliderComponent() {
-        var _this = _super !== null && _super.apply(this, arguments) || this;
-        _this.radius = 0;
-        _this.debugColliderRenderer = null;
-        _this.debugBoundsRenderer = null;
-        _this.debugDirectionRenderer = null;
-        return _this;
-    }
-    CircleColliderComponent.prototype.fixedUpdate = function () {
-        this.calculate();
-    };
-    CircleColliderComponent.prototype.update = function () {
-        if (this.debug) {
-            var isSleep = this.rigidbody ? this.rigidbody.isSleeping : true;
-            var color = isSleep ? Color_1.Color.Green : Color_1.Color.Red;
-            if (!this.debugColliderRenderer) {
-                this.debugColliderRenderer = this.addComponent(CircleRendererComponent_1.CircleRendererComponent);
-                this.debugColliderRenderer.useLocalCoordinate = false;
-            }
-            if (!this.debugBoundsRenderer) {
-                this.debugBoundsRenderer = this.addComponent(LineRendererComponent_1.LineRendererComponent);
-                this.debugBoundsRenderer.useLocalCoordinate = false;
-                this.debugBoundsRenderer.closePath = true;
-                this.debugBoundsRenderer.strokeColor = Color_1.Color.Cyan;
-            }
-            if (!this.debugDirectionRenderer) {
-                this.debugDirectionRenderer = this.addComponent(LineRendererComponent_1.LineRendererComponent);
-                this.debugDirectionRenderer.useLocalCoordinate = false;
-            }
-            this.debugColliderRenderer.strokeColor = color;
-            this.debugDirectionRenderer.strokeColor = color;
-            this.debugColliderRenderer.center.copy(this.bounds.center);
-            this.debugColliderRenderer.radius = this.radius;
-            this.debugBoundsRenderer.clearPoints();
-            var min = this.bounds.min;
-            var max = this.bounds.max;
-            this.debugBoundsRenderer.addPoint(new Vector_1.Vector(min.x, min.y), new Vector_1.Vector(min.x, max.y), new Vector_1.Vector(max.x, max.y), new Vector_1.Vector(max.x, min.y));
-            var rotation = this.host.transform.rotation;
-            var direction = new Vector_1.Vector(Math.cos(rotation), Math.sin(rotation));
-            var point = this.host.transform.position.clone().add(direction.scale(this.radius));
-            this.debugDirectionRenderer.clearPoints();
-            this.debugDirectionRenderer.addPoint(this.bounds.center, point);
-        }
-        else {
-            if (this.debugColliderRenderer) {
-                this.removeComponent(this.debugColliderRenderer);
-                this.debugColliderRenderer = null;
-            }
-            if (this.debugBoundsRenderer) {
-                this.removeComponent(this.debugBoundsRenderer);
-                this.debugBoundsRenderer = null;
-            }
-            if (this.debugDirectionRenderer) {
-                this.removeComponent(this.debugDirectionRenderer);
-                this.debugDirectionRenderer = null;
-            }
-        }
-    };
-    CircleColliderComponent.prototype.calculate = function () {
-        this.bounds.center.copy(this.host.transform.position);
-        this.bounds.extents.setTo(this.radius, this.radius);
-    };
-    CircleColliderComponent.prototype.collide = function (another) {
-        if (another instanceof CircleColliderComponent) {
-            return this.collisionJumpTable.circleCircle(this, another);
-        }
-        else if (another instanceof PolygonColliderComponent_1.PolygonColliderComponent) {
-            return this.collisionJumpTable.circlePolygon(this, another);
-        }
-    };
-    CircleColliderComponent.prototype.contains = function (point) {
-        return this.bounds.center.distanceTo(point) <= this.radius;
-    };
-    CircleColliderComponent.prototype.rayCast = function (ray, max) {
-        if (max === void 0) { max = Infinity; }
-        var c = this.bounds.center;
-        var r = this.radius;
-        var o = ray.origin;
-        var l = ray.direction;
-        var co = o.clone().subtract(c);
-        var discriminant = Math.sqrt(Math.pow(l.dot(co), 2) - Math.pow(co.magnitude(), 2) + Math.pow(r, 2));
-        if (discriminant < 0) {
-            return;
-        }
-        var d = -l.dot(co);
-        if (discriminant > 0) {
-            var d1 = d + discriminant;
-            var d2 = d - discriminant;
-            d = Math.min(d1, d2);
-        }
-        return ray.getPoint(d);
-    };
-    CircleColliderComponent.prototype.project = function (axis) {
-        var dot = this.bounds.center.dot(axis);
-        var s = [dot, dot + this.radius, dot - this.radius];
-        return new Projection_1.Projection(Math.min.apply(Math, s), Math.max.apply(Math, s));
-    };
-    CircleColliderComponent.prototype.getFurthestPoint = function (direction) {
-        return this.bounds.center.clone().add(direction.clone().normalize().scale(this.radius));
-    };
-    __decorate([
-        Inject_1.Inject(CollisionJumpTable_1.CollisionJumpTable),
-        __metadata("design:type", CollisionJumpTable_1.CollisionJumpTable)
-    ], CircleColliderComponent.prototype, "collisionJumpTable", void 0);
-    return CircleColliderComponent;
-}(ColliderComponent_1.ColliderComponent));
-exports.CircleColliderComponent = CircleColliderComponent;
-
-
-/***/ }),
-
-/***/ 98:
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __metadata = (this && this.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-__webpack_require__(21);
-var GameObject_1 = __webpack_require__(4);
-var Scene_1 = __webpack_require__(30);
-var Screen_1 = __webpack_require__(17);
-var SceneManager_1 = __webpack_require__(18);
-var runtime_1 = __webpack_require__(14);
-var BrowserDelegate_1 = __webpack_require__(3);
+__webpack_require__(26);
+var runtime_1 = __webpack_require__(12);
+runtime_1.def(runtime_1.DEBUG_PHYSICS);
+var GameObject_1 = __webpack_require__(6);
+var Scene_1 = __webpack_require__(33);
+var Screen_1 = __webpack_require__(19);
+var SceneManager_1 = __webpack_require__(15);
+var BrowserDelegate_1 = __webpack_require__(4);
 var ArrayUtility_1 = __webpack_require__(5);
-var Class_1 = __webpack_require__(8);
-var Inject_1 = __webpack_require__(7);
-var Texture_1 = __webpack_require__(31);
-var Sprite_1 = __webpack_require__(33);
-var Color_1 = __webpack_require__(6);
-var Vector_1 = __webpack_require__(0);
-var Random_1 = __webpack_require__(99);
-var SpriteRendererComponent_1 = __webpack_require__(35);
-var LineRendererComponent_1 = __webpack_require__(15);
-var CircleRendererComponent_1 = __webpack_require__(60);
-var RigidbodyComponent_1 = __webpack_require__(20);
-var BoxColliderComponent_1 = __webpack_require__(100);
-var CircleColliderComponent_1 = __webpack_require__(65);
-var PointerInput_1 = __webpack_require__(36);
-var rectTexture = new Texture_1.Texture('../Assets/rect.png');
-var circleTexture = new Texture_1.Texture('../Assets/circle.png');
+var Class_1 = __webpack_require__(9);
+var Inject_1 = __webpack_require__(0);
+var Texture_1 = __webpack_require__(22);
+var Sprite_1 = __webpack_require__(23);
+var Color_1 = __webpack_require__(7);
+var Random_1 = __webpack_require__(116);
+var SpriteRendererComponent_1 = __webpack_require__(24);
+var RigidbodyComponent_1 = __webpack_require__(17);
+var BoxColliderComponent_1 = __webpack_require__(117);
+var CircleColliderComponent_1 = __webpack_require__(68);
+var PointerInput_1 = __webpack_require__(40);
+var rectTexture = new Texture_1.Texture('/Assets/rect.png');
+var circleTexture = new Texture_1.Texture('/Assets/circle.png');
 var Shape = (function (_super) {
     __extends(Shape, _super);
     function Shape() {
-        return _super !== null && _super.apply(this, arguments) || this;
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.isVisible = true;
+        return _this;
     }
-    Object.defineProperty(Shape.prototype, "isVisible", {
-        get: function () { return this.outline && this.outline.isVisible; },
-        enumerable: true,
-        configurable: true
-    });
     Shape.prototype.start = function () {
+        var _this = this;
         _super.prototype.start.call(this);
         this.renderer = this.addComponent(SpriteRendererComponent_1.SpriteRendererComponent);
+        this.renderer.onBecameVisible$.subscribe(function () { return _this.isVisible = true; });
+        this.renderer.onBecameInvisible$.subscribe(function () { return _this.isVisible = false; });
         this.body = this.addComponent(RigidbodyComponent_1.RigidbodyComponent);
-        this.size = this.random.integer(32, 128);
+        this.size = this.random.integer(64, 128);
+        this.transform.scale.setTo(this.size / 400);
         this.body.useGravity = true;
     };
     __decorate([
@@ -1318,16 +84,9 @@ var Box = (function (_super) {
     }
     Box.prototype.start = function () {
         _super.prototype.start.call(this);
-        this.outline = this.addComponent(LineRendererComponent_1.LineRendererComponent);
         this.collider = this.addComponent(BoxColliderComponent_1.BoxColliderComponent);
         this.renderer.sprite = new Sprite_1.Sprite(rectTexture);
-        var halfSize = this.size / 2;
-        this.renderer.sprite.rect.width = this.size;
-        this.renderer.sprite.rect.height = this.size;
-        this.outline.addPoint(new Vector_1.Vector(halfSize, halfSize), new Vector_1.Vector(halfSize, -halfSize), new Vector_1.Vector(-halfSize, -halfSize), new Vector_1.Vector(-halfSize, halfSize));
-        this.outline.closePath = true;
-        this.outline.strokeColor = Color_1.Color.CreateByHexRgb('#94CFFF');
-        this.collider.size.setTo(this.size, this.size);
+        this.collider.size.setTo(400);
     };
     Box = __decorate([
         Class_1.Class()
@@ -1341,15 +100,9 @@ var Circle = (function (_super) {
     }
     Circle.prototype.start = function () {
         _super.prototype.start.call(this);
-        this.outline = this.addComponent(CircleRendererComponent_1.CircleRendererComponent);
         this.collider = this.addComponent(CircleColliderComponent_1.CircleColliderComponent);
         this.renderer.sprite = new Sprite_1.Sprite(circleTexture);
-        var halfSize = this.size / 2;
-        this.renderer.sprite.rect.width = this.size;
-        this.renderer.sprite.rect.height = this.size;
-        this.outline.radius = halfSize;
-        this.outline.strokeColor = Color_1.Color.CreateByHexRgb('#94CFFF');
-        this.collider.radius = halfSize;
+        this.collider.radius = 200;
     };
     Circle = __decorate([
         Class_1.Class()
@@ -1365,7 +118,6 @@ var Wall = (function (_super) {
         _super.prototype.start.call(this);
         this.collider = this.addComponent(BoxColliderComponent_1.BoxColliderComponent);
         this.collider.size.setTo(3000, 2);
-        this.collider.debug = true;
     };
     Wall = __decorate([
         Class_1.Class()
@@ -1457,10 +209,11 @@ var Game = (function () {
     };
     Game = __decorate([
         Class_1.Class(),
-        __metadata("design:paramtypes", [SceneManager_1.SceneManager,
-            PointerInput_1.PointerInput,
-            BrowserDelegate_1.BrowserDelegate,
-            Screen_1.Screen])
+        __param(0, Inject_1.Inject(SceneManager_1.SceneManager)),
+        __param(1, Inject_1.Inject(PointerInput_1.PointerInput)),
+        __param(2, Inject_1.Inject(BrowserDelegate_1.BrowserDelegate)),
+        __param(3, Inject_1.Inject(Screen_1.Screen)),
+        __metadata("design:paramtypes", [Object, Object, Object, Object])
     ], Game);
     return Game;
 }());
@@ -1470,7 +223,7 @@ runtime_1.bootstrap().catch(console.error);
 
 /***/ }),
 
-/***/ 99:
+/***/ 116:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1485,7 +238,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var Service_1 = __webpack_require__(1);
+var Service_1 = __webpack_require__(2);
 var BITMASK32 = 0xFFFFFFFF;
 var Random = (function () {
     function Random(seed) {
@@ -1635,7 +388,869 @@ var Random = (function () {
 exports.Random = Random;
 
 
+/***/ }),
+
+/***/ 117:
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var GameObject_1 = __webpack_require__(6);
+var Vector_1 = __webpack_require__(1);
+var Line_1 = __webpack_require__(65);
+var Type_1 = __webpack_require__(14);
+var PolygonColliderComponent_1 = __webpack_require__(66);
+var Inject_1 = __webpack_require__(0);
+var CollisionJumpTable_1 = __webpack_require__(32);
+Type_1.forwardRef(function () { return GameObject_1.GameObject; });
+var BoxColliderComponent = (function (_super) {
+    __extends(BoxColliderComponent, _super);
+    function BoxColliderComponent(host, collisionJumpTable) {
+        var _this = _super.call(this, host, collisionJumpTable) || this;
+        _this.size = new Vector_1.Vector();
+        for (var i = 0; i < 4; i++) {
+            _this.points.push(new Vector_1.Vector());
+            _this._calculatedPoints.push(new Vector_1.Vector());
+            _this._calculatedAxes.push(new Vector_1.Vector());
+            _this._calculatedSides.push(new Line_1.Line(new Vector_1.Vector(), new Vector_1.Vector()));
+        }
+        return _this;
+    }
+    BoxColliderComponent.prototype.calculate = function () {
+        var toWorldMatrix = this.host.transform.toWorldMatrix;
+        var halfSizeX = this.size.x * 0.5;
+        var halfSizeY = this.size.y * 0.5;
+        this.points[0].setTo(-halfSizeX, -halfSizeY);
+        this.points[1].setTo(halfSizeX, -halfSizeY);
+        this.points[2].setTo(halfSizeX, halfSizeY);
+        this.points[3].setTo(-halfSizeX, halfSizeY);
+        this._calculatedPoints[0].setTo(-halfSizeX, -halfSizeY);
+        this._calculatedPoints[1].setTo(halfSizeX, -halfSizeY);
+        this._calculatedPoints[2].setTo(halfSizeX, halfSizeY);
+        this._calculatedPoints[3].setTo(-halfSizeX, halfSizeY);
+        this._calculatedPoints.forEach(function (point) { return toWorldMatrix.multiplyToPoint(point); });
+        for (var i = 0; i < 4; i++) {
+            var p1 = this._calculatedPoints[i];
+            var p2 = this._calculatedPoints[(i + 1) % 4];
+            var axis = this._calculatedAxes[i];
+            var side = this._calculatedSides[i];
+            axis.copy(p1).subtract(p2);
+            side.begin.copy(p1);
+            side.end.copy(p2);
+        }
+        var x = this._calculatedPoints.map(function (p) { return p.x; });
+        var y = this._calculatedPoints.map(function (p) { return p.y; });
+        var minX = Math.min.apply(Math, x);
+        var minY = Math.min.apply(Math, y);
+        var maxX = Math.max.apply(Math, x);
+        var maxY = Math.max.apply(Math, y);
+        this.bounds.center.setTo((maxX + minX) / 2, (maxY + minY) / 2);
+        this.bounds.extents.setTo((maxX - minX) / 2, (maxY - minY) / 2);
+    };
+    BoxColliderComponent = __decorate([
+        __param(1, Inject_1.Inject(CollisionJumpTable_1.CollisionJumpTable)),
+        __metadata("design:paramtypes", [GameObject_1.GameObject, Object])
+    ], BoxColliderComponent);
+    return BoxColliderComponent;
+}(PolygonColliderComponent_1.PolygonColliderComponent));
+exports.BoxColliderComponent = BoxColliderComponent;
+
+
+/***/ }),
+
+/***/ 118:
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var ColliderType;
+(function (ColliderType) {
+    ColliderType[ColliderType["Static"] = 0] = "Static";
+    ColliderType[ColliderType["Rigidbody"] = 1] = "Rigidbody";
+    ColliderType[ColliderType["Kinematic"] = 2] = "Kinematic";
+})(ColliderType = exports.ColliderType || (exports.ColliderType = {}));
+
+
+/***/ }),
+
+/***/ 17:
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var GameObject_1 = __webpack_require__(6);
+var Component_1 = __webpack_require__(10);
+var TransformComponent_1 = __webpack_require__(16);
+var Vector_1 = __webpack_require__(1);
+var Engine_1 = __webpack_require__(21);
+var Time_1 = __webpack_require__(20);
+var ForceMode_1 = __webpack_require__(31);
+var UniqueComponent_1 = __webpack_require__(11);
+var RequireComponent_1 = __webpack_require__(30);
+var Inject_1 = __webpack_require__(0);
+var DoublePI = Math.PI * 2;
+var RigidbodyComponent = (function (_super) {
+    __extends(RigidbodyComponent, _super);
+    function RigidbodyComponent(host, engine, time) {
+        var _this = _super.call(this, host) || this;
+        _this.engine = engine;
+        _this.time = time;
+        _this.angularDrag = 0;
+        _this.angularVelocity = 0;
+        _this.drag = 0;
+        _this.freezeRotation = false;
+        _this._mass = 1;
+        _this.inverseMass = 1;
+        _this._moi = 1000;
+        _this.inverseMoi = 0.001;
+        _this.maxAngularVelocity = Infinity;
+        _this.velocity = Vector_1.Vector.Get();
+        _this.useGravity = false;
+        _this.isSleeping = false;
+        _this.sleepThreshold = 1;
+        _this.motion = 0;
+        _this.forces = [
+            Vector_1.Vector.Get(),
+            Vector_1.Vector.Get(),
+            Vector_1.Vector.Get(),
+            Vector_1.Vector.Get()
+        ];
+        _this.torques = [0, 0, 0, 0];
+        _this.sleepTimer = 0;
+        _this.lastPosition = Vector_1.Vector.Get();
+        return _this;
+    }
+    Object.defineProperty(RigidbodyComponent.prototype, "mass", {
+        get: function () { return this._mass; },
+        set: function (value) { this._mass = value; this.inverseMass = 1 / value; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(RigidbodyComponent.prototype, "moi", {
+        get: function () { return this._moi; },
+        set: function (value) { this._moi = value; this.inverseMoi = 1 / value; },
+        enumerable: true,
+        configurable: true
+    });
+    RigidbodyComponent.prototype.start = function () {
+        _super.prototype.start.call(this);
+        this.transform = this.getComponent(TransformComponent_1.TransformComponent);
+    };
+    RigidbodyComponent.prototype.addForce = function (force, forceMode) {
+        if (forceMode === void 0) { forceMode = ForceMode_1.ForceMode.Force; }
+        this.forces[forceMode].add(force);
+    };
+    RigidbodyComponent.prototype.addTorque = function (torque, forceMode) {
+        if (forceMode === void 0) { forceMode = ForceMode_1.ForceMode.Force; }
+        this.torques[forceMode] += torque;
+    };
+    RigidbodyComponent.prototype.clearForce = function () {
+        this.forces.forEach(function (force) { return force.reset(); });
+    };
+    RigidbodyComponent.prototype.clearTorque = function () {
+        for (var i = 0; i < this.torques.length; i++) {
+            this.torques[i] = 0;
+        }
+    };
+    RigidbodyComponent.prototype.sleep = function () {
+        this.isSleeping = true;
+        this.velocity.reset();
+        this.angularVelocity = 0;
+        this.clearForce();
+        this.clearTorque();
+    };
+    RigidbodyComponent.prototype.awake = function () {
+        this.isSleeping = false;
+        this.sleepTimer = 0;
+    };
+    RigidbodyComponent.prototype.fixedUpdate = function (alpha) {
+        _super.prototype.fixedUpdate.call(this, alpha);
+        var deltaTimeInSecond = this.time.fixedDeltaTimeInSecond * alpha;
+        if (this.useGravity && !this.isSleeping) {
+            this.addForce(this.engine.gravity, ForceMode_1.ForceMode.Acceleration);
+        }
+        this.forces[ForceMode_1.ForceMode.Force].multiply(deltaTimeInSecond * this.inverseMass);
+        this.velocity.add(this.forces[ForceMode_1.ForceMode.Force]);
+        this.forces[ForceMode_1.ForceMode.Force].reset();
+        this.forces[ForceMode_1.ForceMode.Acceleration].multiply(deltaTimeInSecond);
+        this.velocity.add(this.forces[ForceMode_1.ForceMode.Acceleration]);
+        this.forces[ForceMode_1.ForceMode.Acceleration].reset();
+        this.forces[ForceMode_1.ForceMode.Impulse].multiply(1 * this.inverseMass);
+        this.velocity.add(this.forces[ForceMode_1.ForceMode.Impulse]);
+        this.forces[ForceMode_1.ForceMode.Impulse].reset();
+        this.velocity.add(this.forces[ForceMode_1.ForceMode.VelocityChange]);
+        this.forces[ForceMode_1.ForceMode.VelocityChange].reset();
+        this.torques[ForceMode_1.ForceMode.Force] *= this.inverseMoi * deltaTimeInSecond;
+        this.angularVelocity += this.torques[ForceMode_1.ForceMode.Force];
+        this.torques[ForceMode_1.ForceMode.Force] = 0;
+        this.torques[ForceMode_1.ForceMode.Acceleration] *= deltaTimeInSecond;
+        this.angularVelocity += this.torques[ForceMode_1.ForceMode.Acceleration];
+        this.torques[ForceMode_1.ForceMode.Acceleration] = 0;
+        this.torques[ForceMode_1.ForceMode.Impulse] *= this.inverseMoi;
+        this.angularVelocity += this.torques[ForceMode_1.ForceMode.Impulse];
+        this.torques[ForceMode_1.ForceMode.Impulse] = 0;
+        this.angularVelocity += this.torques[ForceMode_1.ForceMode.VelocityChange];
+        this.torques[ForceMode_1.ForceMode.VelocityChange] = 0;
+        this.checkSleep(deltaTimeInSecond);
+        if (!this.velocity.isZero) {
+            this.velocity.multiply(Math.max(0, 1 - this.drag * deltaTimeInSecond));
+            var velocity = this.velocity.clone().multiply(deltaTimeInSecond);
+            this.transform.position.add(velocity);
+            velocity.destroy();
+        }
+        if (this.freezeRotation) {
+            this.angularVelocity = 0;
+        }
+        else {
+            if (Math.abs(this.angularVelocity) > 1e-6) {
+                this.angularVelocity *= Math.max(0, 1 - this.angularDrag * deltaTimeInSecond);
+                if (this.angularVelocity > this.maxAngularVelocity) {
+                    this.angularVelocity = this.maxAngularVelocity;
+                }
+                this.transform.rotation += this.angularVelocity * deltaTimeInSecond;
+                this.transform.rotation = this.transform.rotation % DoublePI;
+            }
+        }
+        this.motion = (this.velocity.squareMagnitude() + Math.pow(this.angularVelocity, 2)) * 0.5;
+        this.lastPosition.copy(this.transform.position);
+    };
+    RigidbodyComponent.prototype.reset = function () {
+        _super.prototype.reset.call(this);
+        this.angularDrag = 0;
+        this.angularVelocity = 0;
+        this.drag = 0;
+        this.freezeRotation = false;
+        this.mass = 1;
+        this.maxAngularVelocity = Infinity;
+        this.velocity = Vector_1.Vector.Get();
+        this.useGravity = false;
+        this.mass = 1;
+        this.moi = 1000;
+        this.isSleeping = false;
+        this.sleepThreshold = 1;
+        this.sleepTimer = 0;
+        this.forces = [
+            Vector_1.Vector.Get(),
+            Vector_1.Vector.Get(),
+            Vector_1.Vector.Get(),
+            Vector_1.Vector.Get()
+        ];
+        this.torques = [0, 0, 0, 0];
+        this.lastPosition = Vector_1.Vector.Get();
+    };
+    RigidbodyComponent.prototype.destroy = function () {
+        _super.prototype.destroy.call(this);
+        this.velocity.destroy();
+        this.forces.forEach(function (force) { return force.destroy(); });
+        Vector_1.Vector.Put(this.velocity);
+        Vector_1.Vector.Put(this.lastPosition);
+        this.forces.forEach(function (force) { return Vector_1.Vector.Put(force); });
+    };
+    RigidbodyComponent.prototype.checkSleep = function (deltaTimeInSecond) {
+        if (!this.isSleeping && this.sleepThreshold >= 0) {
+            if (this.motion < this.sleepThreshold) {
+                this.sleepTimer += deltaTimeInSecond;
+                if (this.sleepTimer > 0.5) {
+                    this.sleepTimer = 0;
+                    this.sleep();
+                }
+            }
+            else {
+                this.sleepTimer = 0;
+            }
+        }
+        else {
+            if (this.motion >= this.sleepThreshold) {
+                this.awake();
+            }
+        }
+        if (!this.transform.position.equalTo(this.lastPosition, 1)) {
+            this.awake();
+        }
+    };
+    RigidbodyComponent = __decorate([
+        UniqueComponent_1.UniqueComponent(),
+        RequireComponent_1.RequireComponent([TransformComponent_1.TransformComponent]),
+        __param(1, Inject_1.Inject(Engine_1.Engine)),
+        __param(2, Inject_1.Inject(Time_1.Time)),
+        __metadata("design:paramtypes", [GameObject_1.GameObject, Object, Object])
+    ], RigidbodyComponent);
+    return RigidbodyComponent;
+}(Component_1.Component));
+exports.RigidbodyComponent = RigidbodyComponent;
+
+
+/***/ }),
+
+/***/ 24:
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var RendererComponent_1 = __webpack_require__(8);
+var UniqueComponent_1 = __webpack_require__(11);
+var SpriteRendererComponent = (function (_super) {
+    __extends(SpriteRendererComponent, _super);
+    function SpriteRendererComponent() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    SpriteRendererComponent.prototype.update = function () {
+        _super.prototype.update.call(this);
+        if (this.sprite) {
+            var _a = this.sprite, width = _a.width, height = _a.height;
+            this.canvas.width = width;
+            this.canvas.height = height;
+        }
+    };
+    SpriteRendererComponent.prototype.render = function () {
+        if (!this.sprite) {
+            return;
+        }
+        var ctx = this.ctx;
+        var _a = this.canvas, width = _a.width, height = _a.height;
+        ctx.clearRect(0, 0, width, height);
+        ctx.save();
+        ctx.drawImage(this.sprite.canvas, 0, 0);
+        ctx.restore();
+    };
+    SpriteRendererComponent = __decorate([
+        UniqueComponent_1.UniqueComponent()
+    ], SpriteRendererComponent);
+    return SpriteRendererComponent;
+}(RendererComponent_1.RendererComponent));
+exports.SpriteRendererComponent = SpriteRendererComponent;
+
+
+/***/ }),
+
+/***/ 44:
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var Projection = (function () {
+    function Projection(min, max) {
+        this.min = min;
+        this.max = max;
+        this._canRecycle = false;
+    }
+    Object.defineProperty(Projection.prototype, "canRecycle", {
+        get: function () { return this._canRecycle; },
+        enumerable: true,
+        configurable: true
+    });
+    Projection.prototype.overlaps = function (another) {
+        return this.max > another.min && this.min < another.max;
+    };
+    Projection.prototype.getOverlap = function (another) {
+        if (!this.overlaps(another)) {
+            return 0;
+        }
+        return this.max > another.max ? another.max - this.min : this.max - another.min;
+    };
+    Projection.prototype.destroy = function () {
+        this._canRecycle = true;
+    };
+    Projection.prototype.toString = function () {
+        return "Projection (" + this.min + ", " + this.max + ")";
+    };
+    return Projection;
+}());
+exports.Projection = Projection;
+
+
+/***/ }),
+
+/***/ 65:
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var Line = (function () {
+    function Line(begin, end) {
+        this.begin = begin;
+        this.end = end;
+    }
+    Object.defineProperty(Line.prototype, "slope", {
+        get: function () {
+            return (this.end.y - this.begin.y) / (this.end.x - this.begin.x);
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Line.prototype, "intercept", {
+        get: function () {
+            return this.begin.y - this.slope * this.begin.x;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Line.prototype, "length", {
+        get: function () {
+            return this.begin.distanceTo(this.end);
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Line.prototype.getLength = function () {
+        return this.begin.distanceTo(this.end);
+    };
+    Line.prototype.getDirection = function () {
+        return this.end.clone().subtract(this.begin).normalize();
+    };
+    Line.prototype.resolvePoint = function (point, axis) {
+        switch (axis) {
+            case 'x':
+                point.setTo(point.x, this.slope * point.x + this.intercept);
+                break;
+            case 'y':
+                point.setTo((point.y - this.intercept) / this.slope, point.y);
+                break;
+            default:
+                break;
+        }
+    };
+    Line.prototype.hasPoint = function (point, threshold) {
+        if (threshold === void 0) { threshold = 1e-6; }
+        var dxc = point.x - this.begin.x;
+        var dyc = point.y - this.begin.y;
+        var dxl = this.end.x - this.begin.x;
+        var dyl = this.end.y - this.begin.y;
+        var cross = dxc * dyl - dyc * dxl;
+        if (Math.abs(cross) > threshold) {
+            return false;
+        }
+        if (Math.abs(dxl) >= Math.abs(dyl)) {
+            return dxl > 0 ?
+                this.begin.x <= point.x && point.x <= this.end.x :
+                this.end.x <= point.x && point.x <= this.begin.x;
+        }
+        else {
+            return dyl > 0 ?
+                this.begin.y <= point.y && point.y <= this.end.y :
+                this.end.y <= point.y && point.y <= this.begin.y;
+        }
+    };
+    Line.prototype.toString = function () {
+        return "Line (" + this.begin + " -> " + this.end + ")";
+    };
+    return Line;
+}());
+exports.Line = Line;
+
+
+/***/ }),
+
+/***/ 66:
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var GameObject_1 = __webpack_require__(6);
+var ColliderComponent_1 = __webpack_require__(67);
+var Vector_1 = __webpack_require__(1);
+var Line_1 = __webpack_require__(65);
+var Ray_1 = __webpack_require__(60);
+var Projection_1 = __webpack_require__(44);
+var CollisionJumpTable_1 = __webpack_require__(32);
+var Inject_1 = __webpack_require__(0);
+var CircleColliderComponent_1 = __webpack_require__(68);
+var Type_1 = __webpack_require__(14);
+Type_1.forwardRef(function () { return GameObject_1.GameObject; });
+var PolygonColliderComponent = (function (_super) {
+    __extends(PolygonColliderComponent, _super);
+    function PolygonColliderComponent(host, collisionJumpTable) {
+        var _this = _super.call(this, host) || this;
+        _this.collisionJumpTable = collisionJumpTable;
+        _this.points = [];
+        _this._calculatedPoints = [];
+        _this._calculatedAxes = [];
+        _this._calculatedSides = [];
+        return _this;
+    }
+    Object.defineProperty(PolygonColliderComponent.prototype, "calculatedPoints", {
+        get: function () { return this._calculatedPoints; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(PolygonColliderComponent.prototype, "calculatedAxes", {
+        get: function () { return this._calculatedAxes; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(PolygonColliderComponent.prototype, "calculatedSides", {
+        get: function () { return this._calculatedSides; },
+        enumerable: true,
+        configurable: true
+    });
+    PolygonColliderComponent.prototype.fixedUpdate = function (alpha) {
+        _super.prototype.fixedUpdate.call(this, alpha);
+        this.calculate();
+    };
+    PolygonColliderComponent.prototype.calculate = function () {
+        var _this = this;
+        var toWorldMatrix = this.host.transform.toWorldMatrix;
+        var count = this.points.length;
+        var diff = count - this._calculatedPoints.length;
+        if (diff > 0) {
+            for (var i = 0; i < diff; i++) {
+                this._calculatedPoints.push(new Vector_1.Vector());
+                this._calculatedAxes.push(new Vector_1.Vector());
+                this._calculatedSides.push(new Line_1.Line(new Vector_1.Vector(), new Vector_1.Vector()));
+            }
+        }
+        else if (diff < 0) {
+            this._calculatedPoints.splice(0, -diff);
+            this._calculatedAxes.splice(0, -diff);
+            this._calculatedSides.splice(0, -diff);
+        }
+        this._calculatedPoints.forEach(function (point, index) { return point.copy(_this.points[index]); });
+        this._calculatedPoints.forEach(function (point) { return toWorldMatrix.multiplyToPoint(point); });
+        for (var i = 0; i < count; i++) {
+            var p1 = this._calculatedPoints[i];
+            var p2 = this._calculatedPoints[(i + 1) % count];
+            var axis = this._calculatedAxes[i];
+            var side = this._calculatedSides[i];
+            axis.copy(p1).subtract(p2);
+            side.begin.copy(p1);
+            side.end.copy(p2);
+        }
+        var x = this._calculatedPoints.map(function (p) { return p.x; });
+        var y = this._calculatedPoints.map(function (p) { return p.y; });
+        var minX = Math.min.apply(Math, x);
+        var minY = Math.min.apply(Math, y);
+        var maxX = Math.max.apply(Math, x);
+        var maxY = Math.max.apply(Math, y);
+        this.bounds.center.setTo((maxX + minX) / 2, (maxY + minY) / 2);
+        this.bounds.extents.setTo((maxX - minX) / 2, (maxY - minY) / 2);
+    };
+    PolygonColliderComponent.prototype.collide = function (another) {
+        if (another instanceof PolygonColliderComponent) {
+            return this.collisionJumpTable.polygonPolygon(this, another);
+        }
+        else if (another instanceof CircleColliderComponent_1.CircleColliderComponent) {
+            return this.collisionJumpTable.circlePolygon(another, this);
+        }
+    };
+    PolygonColliderComponent.prototype.contains = function (point) {
+        var ray = new Ray_1.Ray(point, Vector_1.Vector.Right);
+        var count = this._calculatedSides.reduce(function (acc, side) { return ray.intersect(side) === -1 ? acc : ++acc; }, 0);
+        return count % 2 !== 0;
+    };
+    PolygonColliderComponent.prototype.rayCast = function (ray) {
+        var minDistance = Number.MAX_VALUE;
+        var noIntersect = true;
+        this._calculatedSides.forEach(function (side) {
+            var distance = ray.intersect(side);
+            if (distance > 0 && distance < minDistance) {
+                minDistance = distance;
+                noIntersect = false;
+            }
+        });
+        if (noIntersect) {
+            return;
+        }
+        return ray.getPoint(minDistance);
+    };
+    PolygonColliderComponent.prototype.project = function (axis) {
+        var min = Number.MAX_VALUE;
+        var max = -Number.MAX_VALUE;
+        this._calculatedPoints.forEach(function (point) {
+            var s = point.dot(axis);
+            min = Math.min(min, s);
+            max = Math.max(max, s);
+        });
+        return new Projection_1.Projection(min, max);
+    };
+    PolygonColliderComponent.prototype.getFurthestPoint = function (direction) {
+        var max = -Number.MAX_VALUE;
+        var pointer = -1;
+        this._calculatedPoints.forEach(function (point, index) {
+            var dot = point.dot(direction);
+            if (dot > max) {
+                max = dot;
+                pointer = index;
+            }
+        });
+        return this._calculatedPoints[pointer].clone();
+    };
+    PolygonColliderComponent = __decorate([
+        __param(1, Inject_1.Inject(CollisionJumpTable_1.CollisionJumpTable)),
+        __metadata("design:paramtypes", [GameObject_1.GameObject, Object])
+    ], PolygonColliderComponent);
+    return PolygonColliderComponent;
+}(ColliderComponent_1.ColliderComponent));
+exports.PolygonColliderComponent = PolygonColliderComponent;
+
+
+/***/ }),
+
+/***/ 67:
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var Inject_1 = __webpack_require__(0);
+var Bounds_1 = __webpack_require__(29);
+var Component_1 = __webpack_require__(10);
+var RigidbodyComponent_1 = __webpack_require__(17);
+var Vector_1 = __webpack_require__(1);
+var Projection_1 = __webpack_require__(44);
+var ColliderType_1 = __webpack_require__(118);
+var BroadPhaseCollisionResolver_1 = __webpack_require__(42);
+var TransformComponent_1 = __webpack_require__(16);
+var ColliderComponent = (function (_super) {
+    __extends(ColliderComponent, _super);
+    function ColliderComponent() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.bounds = new Bounds_1.Bounds();
+        _this.offset = new Vector_1.Vector();
+        _this.layer = 1;
+        _this.restitution = 0.2;
+        _this.friction = 0.99;
+        _this.isKinematic = false;
+        _this.type = ColliderType_1.ColliderType.Static;
+        return _this;
+    }
+    ColliderComponent.prototype.collide = function (another) { return; };
+    ColliderComponent.prototype.contains = function (point) { return false; };
+    ColliderComponent.prototype.rayCast = function (ray) { return; };
+    ColliderComponent.prototype.project = function (axis) { return new Projection_1.Projection(0, 0); };
+    ColliderComponent.prototype.getFurthestPoint = function (direction) { return this.bounds.center.clone(); };
+    ColliderComponent.prototype.start = function () {
+        _super.prototype.start.call(this);
+        this.rigidbody = this.getComponent(RigidbodyComponent_1.RigidbodyComponent);
+        if (this.rigidbody) {
+            if (this.isKinematic) {
+                this.type = ColliderType_1.ColliderType.Kinematic;
+                this.rigidbody.sleepThreshold = -1;
+            }
+            else {
+                this.type = ColliderType_1.ColliderType.Rigidbody;
+            }
+        }
+        this.transform = this.getComponent(TransformComponent_1.TransformComponent);
+        this.broadPhaseCollisionResolver.track(this);
+    };
+    __decorate([
+        Inject_1.Inject(BroadPhaseCollisionResolver_1.BroadPhaseCollisionResolver),
+        __metadata("design:type", Object)
+    ], ColliderComponent.prototype, "broadPhaseCollisionResolver", void 0);
+    return ColliderComponent;
+}(Component_1.Component));
+exports.ColliderComponent = ColliderComponent;
+
+
+/***/ }),
+
+/***/ 68:
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var GameObject_1 = __webpack_require__(6);
+var ColliderComponent_1 = __webpack_require__(67);
+var Projection_1 = __webpack_require__(44);
+var CollisionJumpTable_1 = __webpack_require__(32);
+var Inject_1 = __webpack_require__(0);
+var Type_1 = __webpack_require__(14);
+var PolygonColliderComponent_1 = __webpack_require__(66);
+Type_1.forwardRef(function () { return GameObject_1.GameObject; });
+var CircleColliderComponent = (function (_super) {
+    __extends(CircleColliderComponent, _super);
+    function CircleColliderComponent(host, collisionJumpTable) {
+        var _this = _super.call(this, host) || this;
+        _this.collisionJumpTable = collisionJumpTable;
+        _this.radius = 0;
+        _this.calculatedRadius = 0;
+        return _this;
+    }
+    CircleColliderComponent.prototype.fixedUpdate = function (alpha) {
+        _super.prototype.fixedUpdate.call(this, alpha);
+        var scale = (this.transform.scale.x + this.transform.scale.y) * 0.5;
+        this.calculatedRadius = this.radius * scale;
+        this.bounds.center.copy(this.host.transform.position);
+        this.bounds.extents.setTo(this.calculatedRadius, this.calculatedRadius);
+    };
+    CircleColliderComponent.prototype.collide = function (another) {
+        if (another instanceof CircleColliderComponent) {
+            return this.collisionJumpTable.circleCircle(this, another);
+        }
+        else if (another instanceof PolygonColliderComponent_1.PolygonColliderComponent) {
+            return this.collisionJumpTable.circlePolygon(this, another);
+        }
+    };
+    CircleColliderComponent.prototype.contains = function (point) {
+        return this.bounds.center.distanceTo(point) <= this.calculatedRadius;
+    };
+    CircleColliderComponent.prototype.rayCast = function (ray) {
+        var c = this.bounds.center;
+        var r = this.calculatedRadius;
+        var o = ray.origin;
+        var l = ray.direction;
+        var co = o.clone().subtract(c);
+        var discriminant = Math.sqrt(Math.pow(l.dot(co), 2) - Math.pow(co.magnitude(), 2) + Math.pow(r, 2));
+        if (discriminant < 0) {
+            return;
+        }
+        var d = -l.dot(co);
+        if (discriminant > 0) {
+            var d1 = d + discriminant;
+            var d2 = d - discriminant;
+            d = Math.min(d1, d2);
+        }
+        return ray.getPoint(d);
+    };
+    CircleColliderComponent.prototype.project = function (axis) {
+        var dot = this.bounds.center.dot(axis);
+        var s = [dot, dot + this.calculatedRadius, dot - this.calculatedRadius];
+        return new Projection_1.Projection(Math.min.apply(Math, s), Math.max.apply(Math, s));
+    };
+    CircleColliderComponent.prototype.getFurthestPoint = function (direction) {
+        return this.bounds.center.clone().add(direction.clone().normalize().multiply(this.calculatedRadius));
+    };
+    CircleColliderComponent = __decorate([
+        __param(1, Inject_1.Inject(CollisionJumpTable_1.CollisionJumpTable)),
+        __metadata("design:paramtypes", [GameObject_1.GameObject, Object])
+    ], CircleColliderComponent);
+    return CircleColliderComponent;
+}(ColliderComponent_1.ColliderComponent));
+exports.CircleColliderComponent = CircleColliderComponent;
+
+
 /***/ })
 
-},[98]);
+},[115]);
 //# sourceMappingURL=physics.bundle.js.map

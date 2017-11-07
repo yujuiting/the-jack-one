@@ -73,7 +73,7 @@
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
 					<li>
-						<a href="_src_engine_base_gameobject_.gameobject.html" class="tsd-signature-type">GameObject</a>
+						<a href="_src_engine_core_gameobject_.gameobject.html" class="tsd-signature-type">GameObject</a>
 						<ul class="tsd-hierarchy">
 							<li>
 								<span class="target">GameManager</span>
@@ -95,7 +95,7 @@
 						<section class="tsd-index-section tsd-is-inherited tsd-is-not-exported">
 							<h3>Constructors</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-constructor tsd-parent-kind-class tsd-is-inherited tsd-is-not-exported"><a href="_src_examples_physics_.gamemanager.html#constructor" class="tsd-kind-icon">constructor</a></li>
+								<li class="tsd-kind-constructor tsd-parent-kind-class tsd-is-overwrite tsd-is-inherited tsd-is-not-exported"><a href="_src_examples_physics_.gamemanager.html#constructor" class="tsd-kind-icon">constructor</a></li>
 							</ul>
 						</section>
 						<section class="tsd-index-section tsd-is-not-exported">
@@ -143,6 +143,7 @@
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-not-exported"><a href="_src_examples_physics_.gamemanager.html#initialize" class="tsd-kind-icon">initialize</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-overwrite tsd-is-inherited tsd-is-not-exported"><a href="_src_examples_physics_.gamemanager.html#lateupdate" class="tsd-kind-icon">late<wbr>Update</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-overwrite tsd-is-not-exported"><a href="_src_examples_physics_.gamemanager.html#postrender" class="tsd-kind-icon">post<wbr>Render</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-overwrite tsd-is-inherited tsd-is-not-exported"><a href="_src_examples_physics_.gamemanager.html#prerender" class="tsd-kind-icon">pre<wbr>Render</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-not-exported"><a href="_src_examples_physics_.gamemanager.html#removechild" class="tsd-kind-icon">remove<wbr>Child</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-not-exported"><a href="_src_examples_physics_.gamemanager.html#removecomponent" class="tsd-kind-icon">remove<wbr>Component</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-not-exported"><a href="_src_examples_physics_.gamemanager.html#removetag" class="tsd-kind-icon">remove<wbr>Tag</a></li>
@@ -158,24 +159,25 @@
 			</section>
 			<section class="tsd-panel-group tsd-member-group tsd-is-inherited tsd-is-not-exported">
 				<h2>Constructors</h2>
-				<section class="tsd-panel tsd-member tsd-kind-constructor tsd-parent-kind-class tsd-is-inherited tsd-is-not-exported">
+				<section class="tsd-panel tsd-member tsd-kind-constructor tsd-parent-kind-class tsd-is-overwrite tsd-is-inherited tsd-is-not-exported">
 					<a name="constructor" class="tsd-anchor"></a>
 					<h3>constructor</h3>
-					<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class tsd-is-inherited tsd-is-not-exported">
-						<li class="tsd-signature tsd-kind-icon">new <wbr>Game<wbr>Manager<span class="tsd-signature-symbol">(</span>gameObjectInitializer<span class="tsd-signature-symbol">: </span><a href="_src_engine_base_gameobjectinitializer_.gameobjectinitializer.html" class="tsd-signature-type">GameObjectInitializer</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_src_examples_physics_.gamemanager.html" class="tsd-signature-type">GameManager</a></li>
+					<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class tsd-is-overwrite tsd-is-inherited tsd-is-not-exported">
+						<li class="tsd-signature tsd-kind-icon">new <wbr>Game<wbr>Manager<span class="tsd-signature-symbol">(</span>gameObjectInitializer<span class="tsd-signature-symbol">: </span><a href="../interfaces/_src_engine_core_gameobjectinitializer_.gameobjectinitializer.html" class="tsd-signature-type">GameObjectInitializer</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_src_examples_physics_.gamemanager.html" class="tsd-signature-type">GameManager</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
-								<p>Inherited from <a href="_src_engine_base_gameobject_.gameobject.html">GameObject</a>.<a href="_src_engine_base_gameobject_.gameobject.html#constructor">constructor</a></p>
+								<p>Inherited from <a href="_src_engine_core_gameobject_.gameobject.html">GameObject</a>.<a href="_src_engine_core_gameobject_.gameobject.html#constructor">constructor</a></p>
+								<p>Overrides <a href="_src_engine_core_baseobject_.baseobject.html">BaseObject</a>.<a href="_src_engine_core_baseobject_.baseobject.html#constructor">constructor</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Base/GameObject.ts#L89">src/Engine/Base/GameObject.ts:89</a></li>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Core/GameObject.ts#L85">src/Engine/Core/GameObject.ts:85</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>gameObjectInitializer: <a href="_src_engine_base_gameobjectinitializer_.gameobjectinitializer.html" class="tsd-signature-type">GameObjectInitializer</a></h5>
+									<h5>gameObjectInitializer: <a href="../interfaces/_src_engine_core_gameobjectinitializer_.gameobjectinitializer.html" class="tsd-signature-type">GameObjectInitializer</a></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <a href="_src_examples_physics_.gamemanager.html" class="tsd-signature-type">GameManager</a></h4>
@@ -190,9 +192,9 @@
 					<h3><span class="tsd-flag ts-flagProtected">Protected</span> _destroyed</h3>
 					<div class="tsd-signature tsd-kind-icon">_destroyed<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> =&nbsp;false</span></div>
 					<aside class="tsd-sources">
-						<p>Inherited from <a href="_src_engine_base_baseobject_.baseobject.html">BaseObject</a>.<a href="_src_engine_base_baseobject_.baseobject.html#_destroyed">_destroyed</a></p>
+						<p>Inherited from <a href="_src_engine_core_baseobject_.baseobject.html">BaseObject</a>.<a href="_src_engine_core_baseobject_.baseobject.html#_destroyed">_destroyed</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Base/BaseObject.ts#L18">src/Engine/Base/BaseObject.ts:18</a></li>
+							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Core/BaseObject.ts#L20">src/Engine/Core/BaseObject.ts:20</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -201,9 +203,9 @@
 					<h3><span class="tsd-flag ts-flagProtected">Protected</span> _has<wbr>Started</h3>
 					<div class="tsd-signature tsd-kind-icon">_has<wbr>Started<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> =&nbsp;false</span></div>
 					<aside class="tsd-sources">
-						<p>Inherited from <a href="_src_engine_base_baseobject_.baseobject.html">BaseObject</a>.<a href="_src_engine_base_baseobject_.baseobject.html#_hasstarted">_hasStarted</a></p>
+						<p>Inherited from <a href="_src_engine_core_baseobject_.baseobject.html">BaseObject</a>.<a href="_src_engine_core_baseobject_.baseobject.html#_hasstarted">_hasStarted</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Base/BaseObject.ts#L20">src/Engine/Base/BaseObject.ts:20</a></li>
+							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Core/BaseObject.ts#L22">src/Engine/Core/BaseObject.ts:22</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -212,9 +214,9 @@
 					<h3><span class="tsd-flag ts-flagProtected">Protected</span> _is<wbr>Active</h3>
 					<div class="tsd-signature tsd-kind-icon">_is<wbr>Active<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> =&nbsp;false</span></div>
 					<aside class="tsd-sources">
-						<p>Inherited from <a href="_src_engine_base_baseobject_.baseobject.html">BaseObject</a>.<a href="_src_engine_base_baseobject_.baseobject.html#_isactive">_isActive</a></p>
+						<p>Inherited from <a href="_src_engine_core_baseobject_.baseobject.html">BaseObject</a>.<a href="_src_engine_core_baseobject_.baseobject.html#_isactive">_isActive</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Base/BaseObject.ts#L16">src/Engine/Base/BaseObject.ts:16</a></li>
+							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Core/BaseObject.ts#L18">src/Engine/Core/BaseObject.ts:18</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -223,9 +225,9 @@
 					<h3>id</h3>
 					<div class="tsd-signature tsd-kind-icon">id<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
-						<p>Inherited from <a href="_src_engine_base_baseobject_.baseobject.html">BaseObject</a>.<a href="_src_engine_base_baseobject_.baseobject.html#id">id</a></p>
+						<p>Inherited from <a href="_src_engine_core_baseobject_.baseobject.html">BaseObject</a>.<a href="_src_engine_core_baseobject_.baseobject.html#id">id</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Base/BaseObject.ts#L9">src/Engine/Base/BaseObject.ts:9</a></li>
+							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Core/BaseObject.ts#L11">src/Engine/Core/BaseObject.ts:11</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -234,9 +236,9 @@
 					<h3>layer</h3>
 					<div class="tsd-signature tsd-kind-icon">layer<span class="tsd-signature-symbol">:</span> <a href="../modules/_src_engine_utility_type_.html#layer" class="tsd-signature-type">Layer</a><span class="tsd-signature-symbol"> =&nbsp;BuiltInLayer.Default</span></div>
 					<aside class="tsd-sources">
-						<p>Inherited from <a href="_src_engine_base_gameobject_.gameobject.html">GameObject</a>.<a href="_src_engine_base_gameobject_.gameobject.html#layer">layer</a></p>
+						<p>Inherited from <a href="_src_engine_core_gameobject_.gameobject.html">GameObject</a>.<a href="_src_engine_core_gameobject_.gameobject.html#layer">layer</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Base/GameObject.ts#L64">src/Engine/Base/GameObject.ts:64</a></li>
+							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Core/GameObject.ts#L60">src/Engine/Core/GameObject.ts:60</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -245,9 +247,9 @@
 					<h3>name</h3>
 					<div class="tsd-signature tsd-kind-icon">name<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> =&nbsp;&quot;&quot;</span></div>
 					<aside class="tsd-sources">
-						<p>Inherited from <a href="_src_engine_base_baseobject_.baseobject.html">BaseObject</a>.<a href="_src_engine_base_baseobject_.baseobject.html#name">name</a></p>
+						<p>Inherited from <a href="_src_engine_core_baseobject_.baseobject.html">BaseObject</a>.<a href="_src_engine_core_baseobject_.baseobject.html#name">name</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Base/BaseObject.ts#L14">src/Engine/Base/BaseObject.ts:14</a></li>
+							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Core/BaseObject.ts#L16">src/Engine/Core/BaseObject.ts:16</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -259,11 +261,11 @@
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-not-exported">
 					<a name="node" class="tsd-anchor"></a>
 					<h3>node</h3>
-					<div class="tsd-signature tsd-kind-icon">node<span class="tsd-signature-symbol">:</span> <a href="_src_engine_utility_tree_.tree.html" class="tsd-signature-type">Tree</a><span class="tsd-signature-symbol">&lt;</span><a href="_src_engine_base_gameobject_.gameobject.html" class="tsd-signature-type">GameObject</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> =&nbsp;new Tree(this)</span></div>
+					<div class="tsd-signature tsd-kind-icon">node<span class="tsd-signature-symbol">:</span> <a href="_src_engine_utility_tree_.tree.html" class="tsd-signature-type">Tree</a><span class="tsd-signature-symbol">&lt;</span><a href="_src_engine_core_gameobject_.gameobject.html" class="tsd-signature-type">GameObject</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> =&nbsp;new Tree(this)</span></div>
 					<aside class="tsd-sources">
-						<p>Inherited from <a href="_src_engine_base_gameobject_.gameobject.html">GameObject</a>.<a href="_src_engine_base_gameobject_.gameobject.html#node">node</a></p>
+						<p>Inherited from <a href="_src_engine_core_gameobject_.gameobject.html">GameObject</a>.<a href="_src_engine_core_gameobject_.gameobject.html#node">node</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Base/GameObject.ts#L66">src/Engine/Base/GameObject.ts:66</a></li>
+							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Core/GameObject.ts#L62">src/Engine/Core/GameObject.ts:62</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -273,17 +275,17 @@
 					<div class="tsd-signature tsd-kind-icon">random<span class="tsd-signature-symbol">:</span> <a href="_src_engine_math_random_.random.html" class="tsd-signature-type">Random</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Examples/physics.ts#L144">src/Examples/physics.ts:144</a></li>
+							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Examples/physics.ts#L114">src/Examples/physics.ts:114</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-not-exported">
 					<a name="scene" class="tsd-anchor"></a>
 					<h3>scene</h3>
-					<div class="tsd-signature tsd-kind-icon">scene<span class="tsd-signature-symbol">:</span> <a href="_src_engine_base_scene_.scene.html" class="tsd-signature-type">Scene</a></div>
+					<div class="tsd-signature tsd-kind-icon">scene<span class="tsd-signature-symbol">:</span> <a href="_src_engine_core_scene_.scene.html" class="tsd-signature-type">Scene</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Examples/physics.ts#L139">src/Examples/physics.ts:139</a></li>
+							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Examples/physics.ts#L109">src/Examples/physics.ts:109</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -293,7 +295,7 @@
 					<div class="tsd-signature tsd-kind-icon">shapes<span class="tsd-signature-symbol">:</span> <a href="_src_examples_physics_.shape.html" class="tsd-signature-type">Shape</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> =&nbsp;[]</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Examples/physics.ts#L141">src/Examples/physics.ts:141</a></li>
+							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Examples/physics.ts#L111">src/Examples/physics.ts:111</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -302,9 +304,9 @@
 					<h3>transform</h3>
 					<div class="tsd-signature tsd-kind-icon">transform<span class="tsd-signature-symbol">:</span> <a href="_src_engine_display_transformcomponent_.transformcomponent.html" class="tsd-signature-type">TransformComponent</a></div>
 					<aside class="tsd-sources">
-						<p>Inherited from <a href="_src_engine_base_gameobject_.gameobject.html">GameObject</a>.<a href="_src_engine_base_gameobject_.gameobject.html#transform">transform</a></p>
+						<p>Inherited from <a href="_src_engine_core_gameobject_.gameobject.html">GameObject</a>.<a href="_src_engine_core_gameobject_.gameobject.html#transform">transform</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Base/GameObject.ts#L68">src/Engine/Base/GameObject.ts:68</a></li>
+							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Core/GameObject.ts#L64">src/Engine/Core/GameObject.ts:64</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -320,9 +322,9 @@
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
-								<p>Inherited from <a href="_src_engine_base_baseobject_.baseobject.html">BaseObject</a>.<a href="_src_engine_base_baseobject_.baseobject.html#canrecycle">canRecycle</a></p>
+								<p>Inherited from <a href="_src_engine_core_baseobject_.baseobject.html">BaseObject</a>.<a href="_src_engine_core_baseobject_.baseobject.html#canrecycle">canRecycle</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Base/BaseObject.ts#L24">src/Engine/Base/BaseObject.ts:24</a></li>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Core/BaseObject.ts#L26">src/Engine/Core/BaseObject.ts:26</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
@@ -333,17 +335,17 @@
 					<a name="children" class="tsd-anchor"></a>
 					<h3>children</h3>
 					<ul class="tsd-signatures tsd-kind-get-signature tsd-parent-kind-class tsd-is-inherited tsd-is-not-exported">
-						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">get</span> children<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">ReadonlyArray</span><span class="tsd-signature-symbol">&lt;</span><a href="_src_engine_base_gameobject_.gameobject.html" class="tsd-signature-type">GameObject</a><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">get</span> children<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">ReadonlyArray</span><span class="tsd-signature-symbol">&lt;</span><a href="_src_engine_core_gameobject_.gameobject.html" class="tsd-signature-type">GameObject</a><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
-								<p>Inherited from <a href="_src_engine_base_gameobject_.gameobject.html">GameObject</a>.<a href="_src_engine_base_gameobject_.gameobject.html#children">children</a></p>
+								<p>Inherited from <a href="_src_engine_core_gameobject_.gameobject.html">GameObject</a>.<a href="_src_engine_core_gameobject_.gameobject.html#children">children</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Base/GameObject.ts#L78">src/Engine/Base/GameObject.ts:78</a></li>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Core/GameObject.ts#L74">src/Engine/Core/GameObject.ts:74</a></li>
 								</ul>
 							</aside>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">ReadonlyArray</span><span class="tsd-signature-symbol">&lt;</span><a href="_src_engine_base_gameobject_.gameobject.html" class="tsd-signature-type">GameObject</a><span class="tsd-signature-symbol">&gt;</span></h4>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">ReadonlyArray</span><span class="tsd-signature-symbol">&lt;</span><a href="_src_engine_core_gameobject_.gameobject.html" class="tsd-signature-type">GameObject</a><span class="tsd-signature-symbol">&gt;</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -356,9 +358,9 @@
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
-								<p>Inherited from <a href="_src_engine_base_baseobject_.baseobject.html">BaseObject</a>.<a href="_src_engine_base_baseobject_.baseobject.html#hasstarted">hasStarted</a></p>
+								<p>Inherited from <a href="_src_engine_core_baseobject_.baseobject.html">BaseObject</a>.<a href="_src_engine_core_baseobject_.baseobject.html#hasstarted">hasStarted</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Base/BaseObject.ts#L28">src/Engine/Base/BaseObject.ts:28</a></li>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Core/BaseObject.ts#L30">src/Engine/Core/BaseObject.ts:30</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
@@ -374,10 +376,10 @@
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
-								<p>Inherited from <a href="_src_engine_base_gameobject_.gameobject.html">GameObject</a>.<a href="_src_engine_base_gameobject_.gameobject.html#isactive">isActive</a></p>
-								<p>Overrides <a href="_src_engine_base_baseobject_.baseobject.html">BaseObject</a>.<a href="_src_engine_base_baseobject_.baseobject.html#isactive">isActive</a></p>
+								<p>Inherited from <a href="_src_engine_core_gameobject_.gameobject.html">GameObject</a>.<a href="_src_engine_core_gameobject_.gameobject.html#isactive">isActive</a></p>
+								<p>Overrides <a href="_src_engine_core_baseobject_.baseobject.html">BaseObject</a>.<a href="_src_engine_core_baseobject_.baseobject.html#isactive">isActive</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Base/GameObject.ts#L82">src/Engine/Base/GameObject.ts:82</a></li>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Core/GameObject.ts#L78">src/Engine/Core/GameObject.ts:78</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
@@ -393,9 +395,9 @@
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
-								<p>Inherited from <a href="_src_engine_base_baseobject_.baseobject.html">BaseObject</a>.<a href="_src_engine_base_baseobject_.baseobject.html#isdestroyed">isDestroyed</a></p>
+								<p>Inherited from <a href="_src_engine_core_baseobject_.baseobject.html">BaseObject</a>.<a href="_src_engine_core_baseobject_.baseobject.html#isdestroyed">isDestroyed</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Base/BaseObject.ts#L26">src/Engine/Base/BaseObject.ts:26</a></li>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Core/BaseObject.ts#L28">src/Engine/Core/BaseObject.ts:28</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
@@ -406,17 +408,17 @@
 					<a name="parent" class="tsd-anchor"></a>
 					<h3>parent</h3>
 					<ul class="tsd-signatures tsd-kind-get-signature tsd-parent-kind-class tsd-is-inherited tsd-is-not-exported">
-						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">get</span> parent<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_src_engine_base_gameobject_.gameobject.html" class="tsd-signature-type">GameObject</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span></li>
+						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">get</span> parent<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_src_engine_core_gameobject_.gameobject.html" class="tsd-signature-type">GameObject</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
-								<p>Inherited from <a href="_src_engine_base_gameobject_.gameobject.html">GameObject</a>.<a href="_src_engine_base_gameobject_.gameobject.html#parent">parent</a></p>
+								<p>Inherited from <a href="_src_engine_core_gameobject_.gameobject.html">GameObject</a>.<a href="_src_engine_core_gameobject_.gameobject.html#parent">parent</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Base/GameObject.ts#L74">src/Engine/Base/GameObject.ts:74</a></li>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Core/GameObject.ts#L70">src/Engine/Core/GameObject.ts:70</a></li>
 								</ul>
 							</aside>
-							<h4 class="tsd-returns-title">Returns <a href="_src_engine_base_gameobject_.gameobject.html" class="tsd-signature-type">GameObject</a>
+							<h4 class="tsd-returns-title">Returns <a href="_src_engine_core_gameobject_.gameobject.html" class="tsd-signature-type">GameObject</a>
 								<span class="tsd-signature-symbol"> | </span>
 								<span class="tsd-signature-type">null</span>
 							</h4>
@@ -435,10 +437,10 @@
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
-								<p>Inherited from <a href="_src_engine_base_gameobject_.gameobject.html">GameObject</a>.<a href="_src_engine_base_gameobject_.gameobject.html#activate">activate</a></p>
-								<p>Overrides <a href="_src_engine_base_baseobject_.baseobject.html">BaseObject</a>.<a href="_src_engine_base_baseobject_.baseobject.html#activate">activate</a></p>
+								<p>Inherited from <a href="_src_engine_core_gameobject_.gameobject.html">GameObject</a>.<a href="_src_engine_core_gameobject_.gameobject.html#activate">activate</a></p>
+								<p>Overrides <a href="_src_engine_core_baseobject_.baseobject.html">BaseObject</a>.<a href="_src_engine_core_baseobject_.baseobject.html#activate">activate</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Base/GameObject.ts#L176">src/Engine/Base/GameObject.ts:176</a></li>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Core/GameObject.ts#L172">src/Engine/Core/GameObject.ts:172</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -449,20 +451,20 @@
 					<a name="addchild" class="tsd-anchor"></a>
 					<h3>add<wbr>Child</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-not-exported">
-						<li class="tsd-signature tsd-kind-icon">add<wbr>Child<span class="tsd-signature-symbol">(</span>child<span class="tsd-signature-symbol">: </span><a href="_src_engine_base_gameobject_.gameobject.html" class="tsd-signature-type">GameObject</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+						<li class="tsd-signature tsd-kind-icon">add<wbr>Child<span class="tsd-signature-symbol">(</span>child<span class="tsd-signature-symbol">: </span><a href="_src_engine_core_gameobject_.gameobject.html" class="tsd-signature-type">GameObject</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
-								<p>Inherited from <a href="_src_engine_base_gameobject_.gameobject.html">GameObject</a>.<a href="_src_engine_base_gameobject_.gameobject.html#addchild">addChild</a></p>
+								<p>Inherited from <a href="_src_engine_core_gameobject_.gameobject.html">GameObject</a>.<a href="_src_engine_core_gameobject_.gameobject.html#addchild">addChild</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Base/GameObject.ts#L155">src/Engine/Base/GameObject.ts:155</a></li>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Core/GameObject.ts#L151">src/Engine/Core/GameObject.ts:151</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>child: <a href="_src_engine_base_gameobject_.gameobject.html" class="tsd-signature-type">GameObject</a></h5>
+									<h5>child: <a href="_src_engine_core_gameobject_.gameobject.html" class="tsd-signature-type">GameObject</a></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -478,15 +480,15 @@
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
-								<p>Inherited from <a href="_src_engine_base_gameobject_.gameobject.html">GameObject</a>.<a href="_src_engine_base_gameobject_.gameobject.html#addcomponent">addComponent</a></p>
+								<p>Inherited from <a href="_src_engine_core_gameobject_.gameobject.html">GameObject</a>.<a href="_src_engine_core_gameobject_.gameobject.html#addcomponent">addComponent</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Base/GameObject.ts#L113">src/Engine/Base/GameObject.ts:113</a></li>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Core/GameObject.ts#L109">src/Engine/Core/GameObject.ts:109</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-type-parameters-title">Type parameters</h4>
 							<ul class="tsd-type-parameters">
 								<li>
-									<h4>T<span class="tsd-signature-symbol">: </span><a href="_src_engine_base_component_.component.html" class="tsd-signature-type">Component</a></h4>
+									<h4>T<span class="tsd-signature-symbol">: </span><a href="_src_engine_core_component_.component.html" class="tsd-signature-type">Component</a></h4>
 								</li>
 							</ul>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -508,9 +510,9 @@
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
-								<p>Inherited from <a href="_src_engine_base_gameobject_.gameobject.html">GameObject</a>.<a href="_src_engine_base_gameobject_.gameobject.html#addtag">addTag</a></p>
+								<p>Inherited from <a href="_src_engine_core_gameobject_.gameobject.html">GameObject</a>.<a href="_src_engine_core_gameobject_.gameobject.html#addtag">addTag</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Base/GameObject.ts#L101">src/Engine/Base/GameObject.ts:101</a></li>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Core/GameObject.ts#L97">src/Engine/Core/GameObject.ts:97</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -533,7 +535,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Examples/physics.ts#L153">src/Examples/physics.ts:153</a></li>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Examples/physics.ts#L123">src/Examples/physics.ts:123</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -555,10 +557,10 @@
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
-								<p>Inherited from <a href="_src_engine_base_gameobject_.gameobject.html">GameObject</a>.<a href="_src_engine_base_gameobject_.gameobject.html#deactivate">deactivate</a></p>
-								<p>Overrides <a href="_src_engine_base_baseobject_.baseobject.html">BaseObject</a>.<a href="_src_engine_base_baseobject_.baseobject.html#deactivate">deactivate</a></p>
+								<p>Inherited from <a href="_src_engine_core_gameobject_.gameobject.html">GameObject</a>.<a href="_src_engine_core_gameobject_.gameobject.html#deactivate">deactivate</a></p>
+								<p>Overrides <a href="_src_engine_core_baseobject_.baseobject.html">BaseObject</a>.<a href="_src_engine_core_baseobject_.baseobject.html#deactivate">deactivate</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Base/GameObject.ts#L181">src/Engine/Base/GameObject.ts:181</a></li>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Core/GameObject.ts#L177">src/Engine/Core/GameObject.ts:177</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -575,10 +577,10 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<p>Implementation of <a href="../interfaces/_src_engine_utility_pool_.recyclable.html">Recyclable</a>.<a href="../interfaces/_src_engine_utility_pool_.recyclable.html#destroy">destroy</a></p>
-								<p>Inherited from <a href="_src_engine_base_gameobject_.gameobject.html">GameObject</a>.<a href="_src_engine_base_gameobject_.gameobject.html#destroy">destroy</a></p>
-								<p>Overrides <a href="_src_engine_base_baseobject_.baseobject.html">BaseObject</a>.<a href="_src_engine_base_baseobject_.baseobject.html#destroy">destroy</a></p>
+								<p>Inherited from <a href="_src_engine_core_gameobject_.gameobject.html">GameObject</a>.<a href="_src_engine_core_gameobject_.gameobject.html#destroy">destroy</a></p>
+								<p>Overrides <a href="_src_engine_core_baseobject_.baseobject.html">BaseObject</a>.<a href="_src_engine_core_baseobject_.baseobject.html#destroy">destroy</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Base/GameObject.ts#L239">src/Engine/Base/GameObject.ts:239</a></li>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Core/GameObject.ts#L241">src/Engine/Core/GameObject.ts:241</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -601,7 +603,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Examples/physics.ts#L161">src/Examples/physics.ts:161</a></li>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Examples/physics.ts#L131">src/Examples/physics.ts:131</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -623,10 +625,10 @@
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
-								<p>Inherited from <a href="_src_engine_base_gameobject_.gameobject.html">GameObject</a>.<a href="_src_engine_base_gameobject_.gameobject.html#fixedupdate">fixedUpdate</a></p>
-								<p>Overrides <a href="_src_engine_base_baseobject_.baseobject.html">BaseObject</a>.<a href="_src_engine_base_baseobject_.baseobject.html#fixedupdate">fixedUpdate</a></p>
+								<p>Inherited from <a href="_src_engine_core_gameobject_.gameobject.html">GameObject</a>.<a href="_src_engine_core_gameobject_.gameobject.html#fixedupdate">fixedUpdate</a></p>
+								<p>Overrides <a href="_src_engine_core_baseobject_.baseobject.html">BaseObject</a>.<a href="_src_engine_core_baseobject_.baseobject.html#fixedupdate">fixedUpdate</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Base/GameObject.ts#L197">src/Engine/Base/GameObject.ts:197</a></li>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Core/GameObject.ts#L193">src/Engine/Core/GameObject.ts:193</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -654,15 +656,15 @@
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
-								<p>Inherited from <a href="_src_engine_base_gameobject_.gameobject.html">GameObject</a>.<a href="_src_engine_base_gameobject_.gameobject.html#getcomponent">getComponent</a></p>
+								<p>Inherited from <a href="_src_engine_core_gameobject_.gameobject.html">GameObject</a>.<a href="_src_engine_core_gameobject_.gameobject.html#getcomponent">getComponent</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Base/GameObject.ts#L147">src/Engine/Base/GameObject.ts:147</a></li>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Core/GameObject.ts#L143">src/Engine/Core/GameObject.ts:143</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-type-parameters-title">Type parameters</h4>
 							<ul class="tsd-type-parameters">
 								<li>
-									<h4>T<span class="tsd-signature-symbol">: </span><a href="_src_engine_base_component_.component.html" class="tsd-signature-type">Component</a></h4>
+									<h4>T<span class="tsd-signature-symbol">: </span><a href="_src_engine_core_component_.component.html" class="tsd-signature-type">Component</a></h4>
 								</li>
 							</ul>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -687,15 +689,15 @@
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
-								<p>Inherited from <a href="_src_engine_base_gameobject_.gameobject.html">GameObject</a>.<a href="_src_engine_base_gameobject_.gameobject.html#getcomponents">getComponents</a></p>
+								<p>Inherited from <a href="_src_engine_core_gameobject_.gameobject.html">GameObject</a>.<a href="_src_engine_core_gameobject_.gameobject.html#getcomponents">getComponents</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Base/GameObject.ts#L151">src/Engine/Base/GameObject.ts:151</a></li>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Core/GameObject.ts#L147">src/Engine/Core/GameObject.ts:147</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-type-parameters-title">Type parameters</h4>
 							<ul class="tsd-type-parameters">
 								<li>
-									<h4>T<span class="tsd-signature-symbol">: </span><a href="_src_engine_base_component_.component.html" class="tsd-signature-type">Component</a></h4>
+									<h4>T<span class="tsd-signature-symbol">: </span><a href="_src_engine_core_component_.component.html" class="tsd-signature-type">Component</a></h4>
 								</li>
 							</ul>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -717,9 +719,9 @@
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
-								<p>Inherited from <a href="_src_engine_base_gameobject_.gameobject.html">GameObject</a>.<a href="_src_engine_base_gameobject_.gameobject.html#hastag">hasTag</a></p>
+								<p>Inherited from <a href="_src_engine_core_gameobject_.gameobject.html">GameObject</a>.<a href="_src_engine_core_gameobject_.gameobject.html#hastag">hasTag</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Base/GameObject.ts#L97">src/Engine/Base/GameObject.ts:97</a></li>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Core/GameObject.ts#L93">src/Engine/Core/GameObject.ts:93</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -741,9 +743,9 @@
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
-								<p>Inherited from <a href="_src_engine_base_gameobject_.gameobject.html">GameObject</a>.<a href="_src_engine_base_gameobject_.gameobject.html#initialize">initialize</a></p>
+								<p>Inherited from <a href="_src_engine_core_gameobject_.gameobject.html">GameObject</a>.<a href="_src_engine_core_gameobject_.gameobject.html#initialize">initialize</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Base/GameObject.ts#L253">src/Engine/Base/GameObject.ts:253</a></li>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Core/GameObject.ts#L255">src/Engine/Core/GameObject.ts:255</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -759,10 +761,10 @@
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
-								<p>Inherited from <a href="_src_engine_base_gameobject_.gameobject.html">GameObject</a>.<a href="_src_engine_base_gameobject_.gameobject.html#lateupdate">lateUpdate</a></p>
-								<p>Overrides <a href="_src_engine_base_baseobject_.baseobject.html">BaseObject</a>.<a href="_src_engine_base_baseobject_.baseobject.html#lateupdate">lateUpdate</a></p>
+								<p>Inherited from <a href="_src_engine_core_gameobject_.gameobject.html">GameObject</a>.<a href="_src_engine_core_gameobject_.gameobject.html#lateupdate">lateUpdate</a></p>
+								<p>Overrides <a href="_src_engine_core_baseobject_.baseobject.html">BaseObject</a>.<a href="_src_engine_core_baseobject_.baseobject.html#lateupdate">lateUpdate</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Base/GameObject.ts#L211">src/Engine/Base/GameObject.ts:211</a></li>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Core/GameObject.ts#L207">src/Engine/Core/GameObject.ts:207</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -784,11 +786,36 @@
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
-								<p>Overrides <a href="_src_engine_base_baseobject_.baseobject.html">BaseObject</a>.<a href="_src_engine_base_baseobject_.baseobject.html#postrender">postRender</a></p>
+								<p>Overrides <a href="_src_engine_core_gameobject_.gameobject.html">GameObject</a>.<a href="_src_engine_core_gameobject_.gameobject.html#postrender">postRender</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Examples/physics.ts#L146">src/Examples/physics.ts:146</a></li>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Examples/physics.ts#L116">src/Examples/physics.ts:116</a></li>
 								</ul>
 							</aside>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-overwrite tsd-is-inherited tsd-is-not-exported">
+					<a name="prerender" class="tsd-anchor"></a>
+					<h3>pre<wbr>Render</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-overwrite tsd-is-inherited tsd-is-not-exported">
+						<li class="tsd-signature tsd-kind-icon">pre<wbr>Render<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="_src_engine_core_gameobject_.gameobject.html">GameObject</a>.<a href="_src_engine_core_gameobject_.gameobject.html#prerender">preRender</a></p>
+								<p>Overrides <a href="_src_engine_core_baseobject_.baseobject.html">BaseObject</a>.<a href="_src_engine_core_baseobject_.baseobject.html#prerender">preRender</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Core/GameObject.ts#L214">src/Engine/Core/GameObject.ts:214</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<dl class="tsd-comment-tags">
+									<dt>inheritdoc</dt>
+									<dd></dd>
+								</dl>
+							</div>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
 						</li>
 					</ul>
@@ -797,20 +824,20 @@
 					<a name="removechild" class="tsd-anchor"></a>
 					<h3>remove<wbr>Child</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-not-exported">
-						<li class="tsd-signature tsd-kind-icon">remove<wbr>Child<span class="tsd-signature-symbol">(</span>child<span class="tsd-signature-symbol">: </span><a href="_src_engine_base_gameobject_.gameobject.html" class="tsd-signature-type">GameObject</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+						<li class="tsd-signature tsd-kind-icon">remove<wbr>Child<span class="tsd-signature-symbol">(</span>child<span class="tsd-signature-symbol">: </span><a href="_src_engine_core_gameobject_.gameobject.html" class="tsd-signature-type">GameObject</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
-								<p>Inherited from <a href="_src_engine_base_gameobject_.gameobject.html">GameObject</a>.<a href="_src_engine_base_gameobject_.gameobject.html#removechild">removeChild</a></p>
+								<p>Inherited from <a href="_src_engine_core_gameobject_.gameobject.html">GameObject</a>.<a href="_src_engine_core_gameobject_.gameobject.html#removechild">removeChild</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Base/GameObject.ts#L168">src/Engine/Base/GameObject.ts:168</a></li>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Core/GameObject.ts#L164">src/Engine/Core/GameObject.ts:164</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>child: <a href="_src_engine_base_gameobject_.gameobject.html" class="tsd-signature-type">GameObject</a></h5>
+									<h5>child: <a href="_src_engine_core_gameobject_.gameobject.html" class="tsd-signature-type">GameObject</a></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -821,20 +848,20 @@
 					<a name="removecomponent" class="tsd-anchor"></a>
 					<h3>remove<wbr>Component</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-not-exported">
-						<li class="tsd-signature tsd-kind-icon">remove<wbr>Component<span class="tsd-signature-symbol">(</span>component<span class="tsd-signature-symbol">: </span><a href="_src_engine_base_component_.component.html" class="tsd-signature-type">Component</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+						<li class="tsd-signature tsd-kind-icon">remove<wbr>Component<span class="tsd-signature-symbol">(</span>component<span class="tsd-signature-symbol">: </span><a href="_src_engine_core_component_.component.html" class="tsd-signature-type">Component</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
-								<p>Inherited from <a href="_src_engine_base_gameobject_.gameobject.html">GameObject</a>.<a href="_src_engine_base_gameobject_.gameobject.html#removecomponent">removeComponent</a></p>
+								<p>Inherited from <a href="_src_engine_core_gameobject_.gameobject.html">GameObject</a>.<a href="_src_engine_core_gameobject_.gameobject.html#removecomponent">removeComponent</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Base/GameObject.ts#L139">src/Engine/Base/GameObject.ts:139</a></li>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Core/GameObject.ts#L135">src/Engine/Core/GameObject.ts:135</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>component: <a href="_src_engine_base_component_.component.html" class="tsd-signature-type">Component</a></h5>
+									<h5>component: <a href="_src_engine_core_component_.component.html" class="tsd-signature-type">Component</a></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -850,9 +877,9 @@
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
-								<p>Inherited from <a href="_src_engine_base_gameobject_.gameobject.html">GameObject</a>.<a href="_src_engine_base_gameobject_.gameobject.html#removetag">removeTag</a></p>
+								<p>Inherited from <a href="_src_engine_core_gameobject_.gameobject.html">GameObject</a>.<a href="_src_engine_core_gameobject_.gameobject.html#removetag">removeTag</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Base/GameObject.ts#L107">src/Engine/Base/GameObject.ts:107</a></li>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Core/GameObject.ts#L103">src/Engine/Core/GameObject.ts:103</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -874,10 +901,10 @@
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
-								<p>Inherited from <a href="_src_engine_base_gameobject_.gameobject.html">GameObject</a>.<a href="_src_engine_base_gameobject_.gameobject.html#reset">reset</a></p>
-								<p>Overrides <a href="_src_engine_base_baseobject_.baseobject.html">BaseObject</a>.<a href="_src_engine_base_baseobject_.baseobject.html#reset">reset</a></p>
+								<p>Inherited from <a href="_src_engine_core_gameobject_.gameobject.html">GameObject</a>.<a href="_src_engine_core_gameobject_.gameobject.html#reset">reset</a></p>
+								<p>Overrides <a href="_src_engine_core_baseobject_.baseobject.html">BaseObject</a>.<a href="_src_engine_core_baseobject_.baseobject.html#reset">reset</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Base/GameObject.ts#L218">src/Engine/Base/GameObject.ts:218</a></li>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Core/GameObject.ts#L228">src/Engine/Core/GameObject.ts:228</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -899,10 +926,10 @@
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
-								<p>Inherited from <a href="_src_engine_base_gameobject_.gameobject.html">GameObject</a>.<a href="_src_engine_base_gameobject_.gameobject.html#start">start</a></p>
-								<p>Overrides <a href="_src_engine_base_baseobject_.baseobject.html">BaseObject</a>.<a href="_src_engine_base_baseobject_.baseobject.html#start">start</a></p>
+								<p>Inherited from <a href="_src_engine_core_gameobject_.gameobject.html">GameObject</a>.<a href="_src_engine_core_gameobject_.gameobject.html#start">start</a></p>
+								<p>Overrides <a href="_src_engine_core_baseobject_.baseobject.html">BaseObject</a>.<a href="_src_engine_core_baseobject_.baseobject.html#start">start</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Base/GameObject.ts#L189">src/Engine/Base/GameObject.ts:189</a></li>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Core/GameObject.ts#L185">src/Engine/Core/GameObject.ts:185</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -924,10 +951,10 @@
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
-								<p>Inherited from <a href="_src_engine_base_gameobject_.gameobject.html">GameObject</a>.<a href="_src_engine_base_gameobject_.gameobject.html#tostring">toString</a></p>
-								<p>Overrides <a href="_src_engine_base_baseobject_.baseobject.html">BaseObject</a>.<a href="_src_engine_base_baseobject_.baseobject.html#tostring">toString</a></p>
+								<p>Inherited from <a href="_src_engine_core_gameobject_.gameobject.html">GameObject</a>.<a href="_src_engine_core_gameobject_.gameobject.html#tostring">toString</a></p>
+								<p>Overrides <a href="_src_engine_core_baseobject_.baseobject.html">BaseObject</a>.<a href="_src_engine_core_baseobject_.baseobject.html#tostring">toString</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Base/GameObject.ts#L249">src/Engine/Base/GameObject.ts:249</a></li>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Core/GameObject.ts#L251">src/Engine/Core/GameObject.ts:251</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
@@ -943,10 +970,10 @@
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
-								<p>Inherited from <a href="_src_engine_base_gameobject_.gameobject.html">GameObject</a>.<a href="_src_engine_base_gameobject_.gameobject.html#update">update</a></p>
-								<p>Overrides <a href="_src_engine_base_baseobject_.baseobject.html">BaseObject</a>.<a href="_src_engine_base_baseobject_.baseobject.html#update">update</a></p>
+								<p>Inherited from <a href="_src_engine_core_gameobject_.gameobject.html">GameObject</a>.<a href="_src_engine_core_gameobject_.gameobject.html#update">update</a></p>
+								<p>Overrides <a href="_src_engine_core_baseobject_.baseobject.html">BaseObject</a>.<a href="_src_engine_core_baseobject_.baseobject.html#update">update</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Base/GameObject.ts#L204">src/Engine/Base/GameObject.ts:204</a></li>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Core/GameObject.ts#L200">src/Engine/Core/GameObject.ts:200</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -963,14 +990,14 @@
 					<a name="findwithtag" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagStatic">Static</span> Find<wbr>With<wbr>Tag</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-static tsd-is-not-exported">
-						<li class="tsd-signature tsd-kind-icon">Find<wbr>With<wbr>Tag<span class="tsd-signature-symbol">(</span>tag<span class="tsd-signature-symbol">: </span><a href="../modules/_src_engine_utility_type_.html#tag" class="tsd-signature-type">Tag</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">ReadonlyArray</span><span class="tsd-signature-symbol">&lt;</span><a href="_src_engine_base_gameobject_.gameobject.html" class="tsd-signature-type">GameObject</a><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">Find<wbr>With<wbr>Tag<span class="tsd-signature-symbol">(</span>tag<span class="tsd-signature-symbol">: </span><a href="../modules/_src_engine_utility_type_.html#tag" class="tsd-signature-type">Tag</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">ReadonlyArray</span><span class="tsd-signature-symbol">&lt;</span><a href="_src_engine_core_gameobject_.gameobject.html" class="tsd-signature-type">GameObject</a><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
-								<p>Inherited from <a href="_src_engine_base_gameobject_.gameobject.html">GameObject</a>.<a href="_src_engine_base_gameobject_.gameobject.html#findwithtag">FindWithTag</a></p>
+								<p>Inherited from <a href="_src_engine_core_gameobject_.gameobject.html">GameObject</a>.<a href="_src_engine_core_gameobject_.gameobject.html#findwithtag">FindWithTag</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/5ba281e/src/Engine/Base/GameObject.ts#L24">src/Engine/Base/GameObject.ts:24</a></li>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/51d7b9c/src/Engine/Core/GameObject.ts#L20">src/Engine/Core/GameObject.ts:20</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -979,7 +1006,7 @@
 									<h5>tag: <a href="../modules/_src_engine_utility_type_.html#tag" class="tsd-signature-type">Tag</a></h5>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">ReadonlyArray</span><span class="tsd-signature-symbol">&lt;</span><a href="_src_engine_base_gameobject_.gameobject.html" class="tsd-signature-type">GameObject</a><span class="tsd-signature-symbol">&gt;</span></h4>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">ReadonlyArray</span><span class="tsd-signature-symbol">&lt;</span><a href="_src_engine_core_gameobject_.gameobject.html" class="tsd-signature-type">GameObject</a><span class="tsd-signature-symbol">&gt;</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -1012,7 +1039,7 @@
 					<li class="current tsd-kind-class tsd-parent-kind-external-module tsd-is-not-exported">
 						<a href="_src_examples_physics_.gamemanager.html" class="tsd-kind-icon">Game<wbr>Manager</a>
 						<ul>
-							<li class=" tsd-kind-constructor tsd-parent-kind-class tsd-is-inherited tsd-is-not-exported">
+							<li class=" tsd-kind-constructor tsd-parent-kind-class tsd-is-overwrite tsd-is-inherited tsd-is-not-exported">
 								<a href="_src_examples_physics_.gamemanager.html#constructor" class="tsd-kind-icon">constructor</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-protected tsd-is-not-exported">
@@ -1110,6 +1137,9 @@
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-overwrite tsd-is-not-exported">
 								<a href="_src_examples_physics_.gamemanager.html#postrender" class="tsd-kind-icon">post<wbr>Render</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-overwrite tsd-is-inherited tsd-is-not-exported">
+								<a href="_src_examples_physics_.gamemanager.html#prerender" class="tsd-kind-icon">pre<wbr>Render</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-not-exported">
 								<a href="_src_examples_physics_.gamemanager.html#removechild" class="tsd-kind-icon">remove<wbr>Child</a>

@@ -90,7 +90,7 @@
 /******/ 	
 /******/ 	
 /******/ 	var hotApplyOnUpdate = true;
-/******/ 	var hotCurrentHash = "6352d1d61d8a85c1540e"; // eslint-disable-line no-unused-vars
+/******/ 	var hotCurrentHash = "f4f92d7748bd57741358"; // eslint-disable-line no-unused-vars
 /******/ 	var hotRequestTimeout = 10000;
 /******/ 	var hotCurrentModuleData = {};
 /******/ 	var hotCurrentChildModule; // eslint-disable-line no-unused-vars
@@ -689,7 +689,7 @@
 /******/
 /******/ 	// objects to store loaded and loading chunks
 /******/ 	var installedChunks = {
-/******/ 		3: 0
+/******/ 		4: 0
 /******/ 	};
 /******/
 /******/ 	// The require function
@@ -815,7 +815,30 @@
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var Pool_1 = __webpack_require__(47);
+var ProviderRegistry_1 = __webpack_require__(37);
+function Inject(token) {
+    return function (target, propertyKey, index) {
+        if (index === void 0) {
+            target[propertyKey] = ProviderRegistry_1.providerRegistry.get(token);
+        }
+        else {
+            var paramtypes = Reflect.getMetadata('design:paramtypes', target) || [];
+            paramtypes[index] = token;
+            Reflect.defineMetadata('design:paramtypes', paramtypes, target);
+        }
+    };
+}
+exports.Inject = Inject;
+
+
+/***/ }),
+/* 1 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var Pool_1 = __webpack_require__(52);
 var Vector = (function () {
     function Vector(x, y) {
         if (x === void 0) { x = 0; }
@@ -860,37 +883,54 @@ var Vector = (function () {
         configurable: true
     });
     Vector.prototype.setTo = function (x, y) {
+        if (y === void 0) { y = x; }
         this.x = x;
         this.y = y;
         return this;
     };
     Vector.prototype.add = function (otherOrX, y) {
-        if (y === void 0) { y = 0; }
         if (otherOrX instanceof Vector) {
             this.x += otherOrX.x;
             this.y += otherOrX.y;
         }
-        else {
+        else if (y !== void 0) {
             this.x += otherOrX;
             this.y += y;
+        }
+        else {
+            this.x += otherOrX;
+            this.y += otherOrX;
         }
         return this;
     };
     Vector.prototype.subtract = function (otherOrX, y) {
-        if (y === void 0) { y = 0; }
         if (otherOrX instanceof Vector) {
             this.x -= otherOrX.x;
             this.y -= otherOrX.y;
         }
-        else {
+        else if (y !== void 0) {
             this.x -= otherOrX;
             this.y -= y;
         }
+        else {
+            this.x -= otherOrX;
+            this.y -= otherOrX;
+        }
         return this;
     };
-    Vector.prototype.scale = function (value) {
-        this.x *= value;
-        this.y *= value;
+    Vector.prototype.multiply = function (otherOrX, y) {
+        if (otherOrX instanceof Vector) {
+            this.x *= otherOrX.x;
+            this.y *= otherOrX.y;
+        }
+        else if (y !== void 0) {
+            this.x *= otherOrX;
+            this.y *= y;
+        }
+        else {
+            this.x *= otherOrX;
+            this.y *= otherOrX;
+        }
         return this;
     };
     Vector.prototype.dot = function (other) {
@@ -921,7 +961,7 @@ var Vector = (function () {
     };
     Vector.prototype.normalize = function () {
         var magnitude = this.magnitude();
-        return magnitude > 0 ? this.scale(1 / magnitude) : this.setTo(0, 0);
+        return magnitude > 0 ? this.multiply(1 / magnitude) : this.setTo(0, 0);
     };
     Vector.prototype.normal = function () {
         var normal = new Vector(this.y, -this.x);
@@ -934,9 +974,19 @@ var Vector = (function () {
     Vector.prototype.reset = function () {
         return this.setTo(0, 0);
     };
-    Vector.prototype.equalTo = function (other) {
-        return this.x === other.x
-            && this.y === other.y;
+    Vector.prototype.rotate = function (radian) {
+        var cos = Math.cos(radian);
+        var sin = Math.sin(radian);
+        var x = cos * this.x - sin * this.y;
+        var y = sin * this.x + cos * this.y;
+        this.x = x;
+        this.y = y;
+        return this;
+    };
+    Vector.prototype.equalTo = function (other, tolerance) {
+        if (tolerance === void 0) { tolerance = 1e-6; }
+        return Math.abs(this.x - other.x) <= tolerance
+            && Math.abs(this.y - other.y) <= tolerance;
     };
     Vector.prototype.greaterThan = function (other) {
         return this.x > other.x
@@ -978,13 +1028,13 @@ exports.Vector = Vector;
 
 
 /***/ }),
-/* 1 */
+/* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var ProviderRegistry_1 = __webpack_require__(51);
+var ProviderRegistry_1 = __webpack_require__(37);
 function Service(token) {
     return function (target) {
         ProviderRegistry_1.providerRegistry.provide({ token: token || target, useClass: target });
@@ -994,14 +1044,14 @@ exports.Service = Service;
 
 
 /***/ }),
-/* 2 */
+/* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-var root_1 = __webpack_require__(13);
-var toSubscriber_1 = __webpack_require__(68);
-var observable_1 = __webpack_require__(44);
+var root_1 = __webpack_require__(18);
+var toSubscriber_1 = __webpack_require__(72);
+var observable_1 = __webpack_require__(49);
 /**
  * A representation of any set of values over any amount of time. This is the most basic building block
  * of RxJS.
@@ -1256,62 +1306,48 @@ exports.Observable = Observable;
 //# sourceMappingURL=Observable.js.map
 
 /***/ }),
-/* 3 */
+/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __metadata = (this && this.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-var Observable_1 = __webpack_require__(2);
-var Service_1 = __webpack_require__(1);
-var BrowserDelegate = (function () {
-    function BrowserDelegate() {
-        this.window = window;
-        this.document = this.window.document;
-        this.screen = window.screen;
-        this.resize$ = Observable_1.Observable.fromEvent(this.window, 'resize');
-        this.click$ = Observable_1.Observable.fromEvent(this.window, 'click');
-        this.mouseMove$ = Observable_1.Observable.fromEvent(this.window, 'mousemove');
-        this.mouseDown$ = Observable_1.Observable.fromEvent(this.window, 'mousedown');
-        this.mouseUp$ = Observable_1.Observable.fromEvent(this.window, 'mouseup');
-        this.wheel$ = Observable_1.Observable.fromEvent(this.window, 'wheel');
-        this.keyDown$ = Observable_1.Observable.fromEvent(this.window, 'keydown');
-        this.keyUp$ = Observable_1.Observable.fromEvent(this.window, 'keyup');
-        this.touchStart$ = Observable_1.Observable.fromEvent(this.window, 'touchstart');
-        this.touchEnd$ = Observable_1.Observable.fromEvent(this.window, 'touchend');
-        this.touchCancel$ = Observable_1.Observable.fromEvent(this.window, 'touchcancel');
-        this.touchMove$ = Observable_1.Observable.fromEvent(this.window, 'touchmove');
-        this.document.body.style.margin = '0';
-        this.document.body.style.width = '100%';
-        this.document.body.style.height = '100%';
-        this.document.body.style.overflow = 'auto';
-    }
-    BrowserDelegate.prototype.createCanvas = function () {
-        return this.document.createElement('canvas');
-    };
-    BrowserDelegate.prototype.getContext = function (canvas) {
-        return canvas.getContext('2d');
-    };
-    BrowserDelegate = __decorate([
-        Service_1.Service(),
-        __metadata("design:paramtypes", [])
-    ], BrowserDelegate);
-    return BrowserDelegate;
-}());
-exports.BrowserDelegate = BrowserDelegate;
+exports.BrowserDelegate = Symbol('BrowserDelegate');
 
 
 /***/ }),
-/* 4 */
+/* 5 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+function removeFromArray(array, item) {
+    var index = array.indexOf(item);
+    if (index === -1) {
+        return false;
+    }
+    array.splice(index, 1);
+    return true;
+}
+exports.removeFromArray = removeFromArray;
+function addToArray(array, item) {
+    var index = array.indexOf(item);
+    if (index !== -1) {
+        return false;
+    }
+    array.push(item);
+    return true;
+}
+exports.addToArray = addToArray;
+function includeInArray(array, item) {
+    return array.includes(item);
+}
+exports.includeInArray = includeInArray;
+
+
+/***/ }),
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1335,15 +1371,19 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-var BaseObject_1 = __webpack_require__(25);
-var Type_1 = __webpack_require__(10);
-var TransformComponent_1 = __webpack_require__(26);
+var BaseObject_1 = __webpack_require__(41);
+var Type_1 = __webpack_require__(14);
+var TransformComponent_1 = __webpack_require__(16);
 var ArrayUtility_1 = __webpack_require__(5);
-var Tree_1 = __webpack_require__(49);
-var runtime_1 = __webpack_require__(14);
-var GameObjectInitializer_1 = __webpack_require__(29);
-var Class_1 = __webpack_require__(8);
+var Tree_1 = __webpack_require__(59);
+var runtime_1 = __webpack_require__(12);
+var GameObjectInitializer_1 = __webpack_require__(28);
+var Class_1 = __webpack_require__(9);
+var Inject_1 = __webpack_require__(0);
 var GameObject = (function (_super) {
     __extends(GameObject, _super);
     function GameObject(gameObjectInitializer) {
@@ -1500,20 +1540,20 @@ var GameObject = (function (_super) {
     GameObject.prototype.lateUpdate = function () {
         this.components.forEach(function (component) { return component.lateUpdate(); });
     };
+    GameObject.prototype.preRender = function () {
+        this.components.forEach(function (component) { return component.preRender(); });
+    };
+    GameObject.prototype.postRender = function () {
+        this.components.forEach(function (component) { return component.postRender(); });
+    };
     GameObject.prototype.reset = function () {
         _super.prototype.reset.call(this);
         this.layer = Type_1.BuiltInLayer.Default;
         this.components = [];
         this.tags = [];
         this._hasStarted = false;
-        var componentMap = Reflect.getMetadata('component:map', this) || new Map();
-        var entries = componentMap.keys();
-        var curr = entries.next();
-        while (!curr.done) {
-            var propertyName = curr.value;
-            this[propertyName].reset();
-            curr = entries.next();
-        }
+        this.components.forEach(function (component) { return component.reset(); });
+        this.children.forEach(function (child) { return child.reset(); });
     };
     GameObject.prototype.destroy = function () {
         _super.prototype.destroy.call(this);
@@ -1533,7 +1573,8 @@ var GameObject = (function (_super) {
     GameObject.TaggedGameObjects = new Map();
     GameObject = GameObject_1 = __decorate([
         Class_1.Class(),
-        __metadata("design:paramtypes", [GameObjectInitializer_1.GameObjectInitializer])
+        __param(0, Inject_1.Inject(GameObjectInitializer_1.GameObjectInitializer)),
+        __metadata("design:paramtypes", [Object])
     ], GameObject);
     return GameObject;
     var GameObject_1;
@@ -1542,38 +1583,7 @@ exports.GameObject = GameObject;
 
 
 /***/ }),
-/* 5 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-function removeFromArray(array, item) {
-    var index = array.indexOf(item);
-    if (index === -1) {
-        return false;
-    }
-    array.splice(index, 1);
-    return true;
-}
-exports.removeFromArray = removeFromArray;
-function addToArray(array, item) {
-    var index = array.indexOf(item);
-    if (index !== -1) {
-        return false;
-    }
-    array.push(item);
-    return true;
-}
-exports.addToArray = addToArray;
-function includeInArray(array, item) {
-    return array.includes(item);
-}
-exports.includeInArray = includeInArray;
-
-
-/***/ }),
-/* 6 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1629,22 +1639,10 @@ var Color = (function () {
         return "rgba(" + this.red + "," + this.green + "," + this.blue + "," + this.alpha + ")";
     };
     Color.prototype.toHexString = function () {
-        var r = this.red.toString(16);
-        var g = this.green.toString(16);
-        var b = this.blue.toString(16);
-        var a = this.alpha.toString(16);
-        if (r.length < 2) {
-            r = "0" + r;
-        }
-        if (g.length < 2) {
-            g = "0" + g;
-        }
-        if (b.length < 2) {
-            b = "0" + b;
-        }
-        if (a.length < 2) {
-            a = "0" + a;
-        }
+        var r = ("0" + this.red.toString(16)).slice(-2);
+        var g = ("0" + this.green.toString(16)).slice(-2);
+        var b = ("0" + this.blue.toString(16)).slice(-2);
+        var a = ("0" + this.alpha.toString(16)).slice(-2);
         return "#" + r + g + b;
     };
     Color.prototype.setAlpha = function (alpha) {
@@ -1667,23 +1665,131 @@ exports.Color = Color;
 
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-Object.defineProperty(exports, "__esModule", { value: true });
-var runtime_1 = __webpack_require__(14);
-function Inject(token) {
-    return function (target, propertyKey) {
-        target[propertyKey] = runtime_1.getService(token);
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
-}
-exports.Inject = Inject;
+})();
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var Subject_1 = __webpack_require__(38);
+var Component_1 = __webpack_require__(10);
+var GameObject_1 = __webpack_require__(6);
+var TransformComponent_1 = __webpack_require__(16);
+var Bounds_1 = __webpack_require__(29);
+var RequireComponent_1 = __webpack_require__(30);
+var BrowserDelegate_1 = __webpack_require__(4);
+var Vector_1 = __webpack_require__(1);
+var Inject_1 = __webpack_require__(0);
+var RendererComponent = (function (_super) {
+    __extends(RendererComponent, _super);
+    function RendererComponent(host, browserDelegate) {
+        var _this = _super.call(this, host) || this;
+        _this.bounds = new Bounds_1.Bounds();
+        _this._onBecameVisible$ = new Subject_1.Subject();
+        _this._onBecameInvisible$ = new Subject_1.Subject();
+        _this.canvas = browserDelegate.createCanvas();
+        _this.ctx = browserDelegate.getContext(_this.canvas);
+        return _this;
+    }
+    Object.defineProperty(RendererComponent.prototype, "onBecameVisible$", {
+        get: function () { return this._onBecameVisible$.asObservable(); },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(RendererComponent.prototype, "onBecameInvisible$", {
+        get: function () { return this._onBecameInvisible$.asObservable(); },
+        enumerable: true,
+        configurable: true
+    });
+    RendererComponent.prototype.start = function () {
+        _super.prototype.start.call(this);
+        this.transform = this.getComponent(TransformComponent_1.TransformComponent);
+    };
+    RendererComponent.prototype.preRender = function () {
+        _super.prototype.preRender.call(this);
+        this.calculateBounds();
+    };
+    RendererComponent.prototype.render = function () { return; };
+    RendererComponent.prototype.onBecameVisible = function (camera) {
+        this._onBecameVisible$.next(camera);
+    };
+    RendererComponent.prototype.onBecameInvisible = function (camera) {
+        this._onBecameInvisible$.next(camera);
+    };
+    RendererComponent.prototype.destroy = function () {
+        _super.prototype.destroy.call(this);
+        this._onBecameVisible$.complete();
+        this._onBecameInvisible$.complete();
+    };
+    RendererComponent.prototype.calculateBounds = function () {
+        var _this = this;
+        var minX = Number.MAX_VALUE;
+        var minY = Number.MAX_VALUE;
+        var maxX = -Number.MAX_VALUE;
+        var maxY = -Number.MAX_VALUE;
+        var e = Vector_1.Vector.Get(this.canvas.width * 0.5, this.canvas.height * 0.5);
+        var c = this.transform.position;
+        var s = this.transform.scale;
+        Vector_1.Vector.Put(e);
+        [
+            Vector_1.Vector.Get(e.x, e.y),
+            Vector_1.Vector.Get(-e.x, e.y),
+            Vector_1.Vector.Get(-e.x, -e.y),
+            Vector_1.Vector.Get(e.x, -e.y)
+        ].forEach(function (p) {
+            p.multiply(s.x, s.y);
+            p.rotate(-_this.transform.rotation);
+            p.add(c);
+            if (p.x < minX) {
+                minX = p.x;
+            }
+            if (p.x > maxX) {
+                maxX = p.x;
+            }
+            if (p.y < minY) {
+                minY = p.y;
+            }
+            if (p.y > maxY) {
+                maxY = p.y;
+            }
+            Vector_1.Vector.Put(p);
+        });
+        this.bounds.reset(minX, minY, maxX, maxY);
+    };
+    RendererComponent = __decorate([
+        RequireComponent_1.RequireComponent([TransformComponent_1.TransformComponent]),
+        __param(1, Inject_1.Inject(BrowserDelegate_1.BrowserDelegate)),
+        __metadata("design:paramtypes", [GameObject_1.GameObject, Object])
+    ], RendererComponent);
+    return RendererComponent;
+}(Component_1.Component));
+exports.RendererComponent = RendererComponent;
 
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1698,7 +1804,168 @@ exports.Class = Class;
 
 
 /***/ }),
-/* 9 */
+/* 10 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+Object.defineProperty(exports, "__esModule", { value: true });
+var BaseObject_1 = __webpack_require__(41);
+var Component = (function (_super) {
+    __extends(Component, _super);
+    function Component(host) {
+        var _this = _super.call(this) || this;
+        _this.host = host;
+        return _this;
+    }
+    Component.prototype.addComponent = function (componentType) {
+        return this.host.addComponent(componentType);
+    };
+    Component.prototype.removeComponent = function (component) {
+        this.host.removeComponent(component);
+    };
+    Component.prototype.getComponent = function (componentType) {
+        return this.host.getComponent(componentType);
+    };
+    Component.prototype.getComponents = function (componentType) {
+        return this.host.getComponents(componentType);
+    };
+    Component.prototype.toString = function () {
+        return "GameComponent(" + this.id + ")";
+    };
+    return Component;
+}(BaseObject_1.BaseObject));
+exports.Component = Component;
+
+
+/***/ }),
+/* 11 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+function UniqueComponent() {
+    return function (ComponentType) {
+        Reflect.defineMetadata('component:unique', true, ComponentType);
+    };
+}
+exports.UniqueComponent = UniqueComponent;
+
+
+/***/ }),
+/* 12 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __generator = (this && this.__generator) || function (thisArg, body) {
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    function verb(n) { return function (v) { return step([n, v]); }; }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while (_) try {
+            if (f = 1, y && (t = y[op[0] & 2 ? "return" : op[0] ? "throw" : "next"]) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [0, t.value];
+            switch (op[0]) {
+                case 0: case 1: t = op; break;
+                case 4: _.label++; return { value: op[1], done: false };
+                case 5: _.label++; y = op[1]; op = [0]; continue;
+                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop(); continue;
+            }
+            op = body.call(thisArg, _);
+        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+    }
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var Engine_1 = __webpack_require__(21);
+var ProviderRegistry_1 = __webpack_require__(37);
+var engine;
+var global = new Map();
+function bootstrap() {
+    return __awaiter(this, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            engine = ProviderRegistry_1.providerRegistry.get(Engine_1.Engine);
+            return [2, engine.initialize()];
+        });
+    });
+}
+exports.bootstrap = bootstrap;
+function provide(providers) {
+    providers.forEach(function (provider) { return ProviderRegistry_1.providerRegistry.provide(provider); });
+}
+exports.provide = provide;
+function instantiate(InstanceType) {
+    var args = [];
+    for (var _i = 1; _i < arguments.length; _i++) {
+        args[_i - 1] = arguments[_i];
+    }
+    return ProviderRegistry_1.providerRegistry.instantiate.apply(ProviderRegistry_1.providerRegistry, [InstanceType].concat(args));
+}
+exports.instantiate = instantiate;
+function getService(token) {
+    return ProviderRegistry_1.providerRegistry.get(token);
+}
+exports.getService = getService;
+function create(factory) {
+    var args = [];
+    for (var _i = 1; _i < arguments.length; _i++) {
+        args[_i - 1] = arguments[_i];
+    }
+    return ProviderRegistry_1.providerRegistry.create.apply(ProviderRegistry_1.providerRegistry, [factory].concat(args));
+}
+exports.create = create;
+function def(key, value) {
+    if (value === void 0) { value = true; }
+    global.set(key, value);
+}
+exports.def = def;
+function ifdef(key, run) {
+    if (global.has(key)) {
+        run();
+    }
+}
+exports.ifdef = ifdef;
+function ifndef(key, run) {
+    if (!global.has(key)) {
+        run();
+    }
+}
+exports.ifndef = ifndef;
+exports.DEBUG = Symbol('DEBUG');
+exports.DEBUG_RENDERER = Symbol('DEBUG_RENDERER');
+exports.DEBUG_PHYSICS = Symbol('DEBUG_PHYSICS');
+
+
+/***/ }),
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1708,10 +1975,10 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var isFunction_1 = __webpack_require__(22);
-var Subscription_1 = __webpack_require__(16);
-var Observer_1 = __webpack_require__(43);
-var rxSubscriber_1 = __webpack_require__(24);
+var isFunction_1 = __webpack_require__(34);
+var Subscription_1 = __webpack_require__(27);
+var Observer_1 = __webpack_require__(48);
+var rxSubscriber_1 = __webpack_require__(36);
 /**
  * Implements the {@link Observer} interface and extends the
  * {@link Subscription} class. While the {@link Observer} is the public API for
@@ -1968,7 +2235,7 @@ var SafeSubscriber = (function (_super) {
 //# sourceMappingURL=Subscriber.js.map
 
 /***/ }),
-/* 10 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2006,52 +2273,17 @@ exports.resolveForwardRef = resolveForwardRef;
 
 
 /***/ }),
-/* 11 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 Object.defineProperty(exports, "__esModule", { value: true });
-var BaseObject_1 = __webpack_require__(25);
-var Component = (function (_super) {
-    __extends(Component, _super);
-    function Component(host) {
-        var _this = _super.call(this) || this;
-        _this.host = host;
-        return _this;
-    }
-    Component.prototype.addComponent = function (componentType) {
-        return this.host.addComponent(componentType);
-    };
-    Component.prototype.removeComponent = function (component) {
-        this.host.removeComponent(component);
-    };
-    Component.prototype.getComponent = function (componentType) {
-        return this.host.getComponent(componentType);
-    };
-    Component.prototype.getComponents = function (componentType) {
-        return this.host.getComponents(componentType);
-    };
-    Component.prototype.toString = function () {
-        return "GameComponent(" + this.id + ")";
-    };
-    return Component;
-}(BaseObject_1.BaseObject));
-exports.Component = Component;
+exports.SceneManager = Symbol('SceneManager');
 
 
 /***/ }),
-/* 12 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2073,35 +2305,69 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var Component_1 = __webpack_require__(11);
-var TransformComponent_1 = __webpack_require__(26);
-var Bounds_1 = __webpack_require__(19);
-var RequireComponent_1 = __webpack_require__(57);
-var RendererComponent = (function (_super) {
-    __extends(RendererComponent, _super);
-    function RendererComponent() {
+var Component_1 = __webpack_require__(10);
+var Vector_1 = __webpack_require__(1);
+var UniqueComponent_1 = __webpack_require__(11);
+var Matrix_1 = __webpack_require__(58);
+var TransformComponent = (function (_super) {
+    __extends(TransformComponent, _super);
+    function TransformComponent() {
         var _this = _super !== null && _super.apply(this, arguments) || this;
-        _this.bounds = new Bounds_1.Bounds();
-        _this.isVisible = false;
+        _this.position = Vector_1.Vector.Get();
+        _this.localPosition = Vector_1.Vector.Get();
+        _this.scale = Vector_1.Vector.Get(1, 1);
+        _this.localScale = Vector_1.Vector.Get(1, 1);
+        _this.rotation = 0;
+        _this.localRotation = 0;
+        _this.toWorldMatrix = new Matrix_1.Matrix();
+        _this.toLocalMatrix = _this.toWorldMatrix.getInverse();
         return _this;
     }
-    RendererComponent.prototype.start = function () {
-        _super.prototype.start.call(this);
-        this.transform = this.getComponent(TransformComponent_1.TransformComponent);
+    TransformComponent.prototype.fixedUpdate = function (alpha) {
+        _super.prototype.fixedUpdate.call(this, alpha);
+        if (this.host.parent) {
+            var parentTransform = this.host.parent.transform;
+            this.position.copy(parentTransform.position);
+            this.position.add(this.localPosition);
+            this.scale.copy(parentTransform.scale);
+            this.scale.multiply(this.localScale);
+            this.rotation = parentTransform.rotation + this.localRotation;
+        }
+        this.toWorldMatrix.reset();
+        this.toWorldMatrix.setTranslation(this.position);
+        this.toWorldMatrix.setRotatation(this.rotation);
+        this.toWorldMatrix.setScaling(this.scale);
+        this.toLocalMatrix.invertFrom(this.toWorldMatrix);
     };
-    RendererComponent.prototype.render = function (ctx, toScreenMatrix) { return; };
-    RendererComponent.prototype.onBecameVisible = function () { return; };
-    RendererComponent.prototype.onBecameInvisible = function () { return; };
-    RendererComponent = __decorate([
-        RequireComponent_1.RequireComponent([TransformComponent_1.TransformComponent])
-    ], RendererComponent);
-    return RendererComponent;
+    TransformComponent.prototype.reset = function () {
+        _super.prototype.reset.call(this);
+        this.position.reset();
+        this.localPosition.reset();
+        this.scale.setTo(1, 1);
+        this.localScale.setTo(1, 1);
+        this.rotation = 0;
+    };
+    TransformComponent.prototype.destroy = function () {
+        _super.prototype.destroy.call(this);
+        Vector_1.Vector.Put(this.position);
+        Vector_1.Vector.Put(this.localPosition);
+        Vector_1.Vector.Put(this.scale);
+        Vector_1.Vector.Put(this.localScale);
+        delete this.position;
+        delete this.scale;
+        delete this.localScale;
+    };
+    TransformComponent = __decorate([
+        UniqueComponent_1.UniqueComponent()
+    ], TransformComponent);
+    return TransformComponent;
 }(Component_1.Component));
-exports.RendererComponent = RendererComponent;
+exports.TransformComponent = TransformComponent;
 
 
 /***/ }),
-/* 13 */
+/* 17 */,
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2124,14 +2390,63 @@ exports.root = _root;
     }
 })();
 //# sourceMappingURL=root.js.map
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(40)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(45)))
 
 /***/ }),
-/* 14 */
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Screen = Symbol('Screen');
+
+
+/***/ }),
+/* 20 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Time = Symbol('Time');
+
+
+/***/ }),
+/* 21 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Engine = Symbol('Engine');
+
+
+/***/ }),
+/* 22 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
@@ -2168,171 +2483,239 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var Engine_1 = __webpack_require__(50);
-var ProviderRegistry_1 = __webpack_require__(51);
-var engine;
-function bootstrap() {
-    return __awaiter(this, void 0, void 0, function () {
-        return __generator(this, function (_a) {
-            engine = ProviderRegistry_1.providerRegistry.get(Engine_1.Engine);
-            return [2, engine.initialize()];
-        });
-    });
-}
-exports.bootstrap = bootstrap;
-function provide(providers) {
-    providers.forEach(function (provider) { return ProviderRegistry_1.providerRegistry.provide(provider); });
-}
-exports.provide = provide;
-function instantiate(InstanceType) {
-    var args = [];
-    for (var _i = 1; _i < arguments.length; _i++) {
-        args[_i - 1] = arguments[_i];
-    }
-    return ProviderRegistry_1.providerRegistry.instantiate.apply(ProviderRegistry_1.providerRegistry, [InstanceType].concat(args));
-}
-exports.instantiate = instantiate;
-function getService(token) {
-    return ProviderRegistry_1.providerRegistry.get(token);
-}
-exports.getService = getService;
-function create(factory) {
-    var args = [];
-    for (var _i = 1; _i < arguments.length; _i++) {
-        args[_i - 1] = arguments[_i];
-    }
-    return ProviderRegistry_1.providerRegistry.create.apply(ProviderRegistry_1.providerRegistry, [factory].concat(args));
-}
-exports.create = create;
-
-
-/***/ }),
-/* 15 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-Object.defineProperty(exports, "__esModule", { value: true });
-var RendererComponent_1 = __webpack_require__(12);
-var Color_1 = __webpack_require__(6);
-var ArrayUtility_1 = __webpack_require__(5);
-var LineRendererComponent = (function (_super) {
-    __extends(LineRendererComponent, _super);
-    function LineRendererComponent() {
-        var _this = _super !== null && _super.apply(this, arguments) || this;
-        _this.lineWidth = 1;
-        _this.strokeColor = Color_1.Color.Red;
-        _this.closePath = false;
-        _this.useLocalCoordinate = true;
-        _this._points = [];
+var Resource_1 = __webpack_require__(62);
+var DOM_1 = __webpack_require__(56);
+var BrowserDelegate_1 = __webpack_require__(4);
+var Inject_1 = __webpack_require__(0);
+var Texture = (function (_super) {
+    __extends(Texture, _super);
+    function Texture(path, imageData) {
+        var _this = _super.call(this) || this;
+        _this.path = path;
+        _this.canvas = _this.browser.document.createElement('canvas');
+        _this.ctx = _this.canvas.getContext('2d');
+        _this.isDirty = false;
+        if (imageData) {
+            _this.canvas.width = imageData.width;
+            _this.canvas.height = imageData.height;
+            _this.setImageData(imageData);
+        }
+        else {
+            _this.canvas.width = 0;
+            _this.canvas.height = 0;
+        }
         return _this;
     }
-    LineRendererComponent.prototype.points = function () { return this._points; };
-    LineRendererComponent.prototype.addPoint = function () {
+    Object.defineProperty(Texture.prototype, "width", {
+        get: function () { return this.canvas.width; },
+        set: function (value) {
+            this.canvas.width = value;
+            this.markAsDirty();
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Texture.prototype, "height", {
+        get: function () { return this.canvas.height; },
+        set: function (value) {
+            this.canvas.height = value;
+            this.markAsDirty();
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Texture.prototype, "imageBitmap", {
+        get: function () { return this.canvas; },
+        enumerable: true,
+        configurable: true
+    });
+    Texture.prototype.load = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var _this = this;
+            return __generator(this, function (_a) {
+                if (this.isLoaded) {
+                    return [2, Promise.resolve()];
+                }
+                this.source = new Image();
+                this.source.src = this.path;
+                return [2, DOM_1.onceEvent(this.source, 'load').then(function (e) { return _this.draw(); })];
+            });
+        });
+    };
+    Texture.prototype.getImageData = function (sx, sy, sw, sh) {
+        if (sx === void 0) { sx = 0; }
+        if (sy === void 0) { sy = 0; }
+        if (sw === void 0) { sw = this.width; }
+        if (sh === void 0) { sh = this.height; }
+        return this.ctx.getImageData(sx, sy, sw, sh);
+    };
+    Texture.prototype.setImageData = function (imageData, dx, dy, dirtyX, dirtyY, dirtyWidth, dirtyHeight) {
+        if (dx === void 0) { dx = 0; }
+        if (dy === void 0) { dy = 0; }
+        if (dirtyX === void 0) { dirtyX = 0; }
+        if (dirtyY === void 0) { dirtyY = 0; }
+        if (dirtyWidth === void 0) { dirtyWidth = imageData.width; }
+        if (dirtyHeight === void 0) { dirtyHeight = imageData.height; }
+        this.ctx.putImageData(imageData, dx, dy, dirtyX, dirtyY, dirtyWidth, dirtyHeight);
+    };
+    Texture.prototype.clone = function () {
+        return new Texture(this.path, this.getImageData());
+    };
+    Texture.prototype.markAsDirty = function () {
         var _this = this;
-        var points = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            points[_i] = arguments[_i];
-        }
-        points.forEach(function (point) { return ArrayUtility_1.addToArray(_this._points, point); });
-    };
-    LineRendererComponent.prototype.removePoint = function () {
-        var _this = this;
-        var points = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            points[_i] = arguments[_i];
-        }
-        points.forEach(function (point) { return ArrayUtility_1.removeFromArray(_this._points, point); });
-    };
-    LineRendererComponent.prototype.clearPoints = function () {
-        this._points.forEach(function (point) { return point.destroy(); });
-        this._points.splice(0, this._points.length);
-    };
-    LineRendererComponent.prototype.update = function () {
-        _super.prototype.update.call(this);
-        this.calculateBounds();
-    };
-    LineRendererComponent.prototype.render = function (ctx, toScreenMatrix) {
-        var count = this._points.length;
-        if (count === 0) {
+        if (this.isDirty) {
             return;
         }
-        ctx.save();
-        var m = toScreenMatrix.clone();
-        if (this.useLocalCoordinate) {
-            m.multiply(this.transform.toWorldMatrix);
+        this.isDirty = true;
+        if (!this.isLoaded) {
+            return;
         }
-        m.setScaling(-1, -1);
-        ctx.transform(m[0][0], m[0][1], m[1][0], m[1][1], m[0][2], m[1][2]);
-        var firstPoint = this._points[0];
-        ctx.lineWidth = this.lineWidth;
-        ctx.strokeStyle = this.strokeColor.toHexString();
-        ctx.beginPath();
-        ctx.moveTo(firstPoint.x, firstPoint.y);
-        if (count > 1) {
-            for (var i = 1; i < count; i++) {
-                var point = this._points[i];
-                ctx.lineTo(point.x, point.y);
-            }
-            if (this.closePath) {
-                ctx.lineTo(firstPoint.x, firstPoint.y);
-            }
-        }
-        ctx.stroke();
-        ctx.closePath();
-        ctx.restore();
+        setTimeout(function () { return _this.draw(); });
     };
-    LineRendererComponent.prototype.calculateBounds = function () {
-        var minX = Number.MAX_VALUE;
-        var maxX = -Number.MAX_VALUE;
-        var minY = Number.MAX_VALUE;
-        var maxY = -Number.MAX_VALUE;
-        this._points.forEach(function (point) {
-            if (point.x < minX) {
-                minX = point.x;
-            }
-            else if (point.x > maxX) {
-                maxX = point.x;
-            }
-            if (point.y < minY) {
-                minY = point.y;
-            }
-            else if (point.y > maxY) {
-                maxY = point.y;
-            }
-        });
-        this.bounds.reset(minX, minY, maxX, maxY);
-        if (this.useLocalCoordinate) {
-            this.bounds.center.add(this.transform.position);
+    Texture.prototype.draw = function () {
+        if (this.width === 0 && this.height === 0) {
+            this.canvas.width = this.source.width;
+            this.canvas.height = this.source.height;
+        }
+        this.ctx.drawImage(this.source, 0, 0, this.source.width, this.source.height, 0, 0, this.width, this.height);
+        this.isDirty = false;
+        if (!this.isLoaded) {
+            this._isLoaded.next(true);
         }
     };
-    return LineRendererComponent;
-}(RendererComponent_1.RendererComponent));
-exports.LineRendererComponent = LineRendererComponent;
+    __decorate([
+        Inject_1.Inject(BrowserDelegate_1.BrowserDelegate),
+        __metadata("design:type", Object)
+    ], Texture.prototype, "browser", void 0);
+    return Texture;
+}(Resource_1.Resource));
+exports.Texture = Texture;
 
 
 /***/ }),
-/* 16 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-var isArray_1 = __webpack_require__(69);
-var isObject_1 = __webpack_require__(41);
-var isFunction_1 = __webpack_require__(22);
-var tryCatch_1 = __webpack_require__(42);
-var errorObject_1 = __webpack_require__(23);
-var UnsubscriptionError_1 = __webpack_require__(70);
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var Texture_1 = __webpack_require__(22);
+var Vector_1 = __webpack_require__(1);
+var Rect_1 = __webpack_require__(64);
+var BrowserDelegate_1 = __webpack_require__(4);
+var Inject_1 = __webpack_require__(0);
+var Class_1 = __webpack_require__(9);
+var Sprite = (function () {
+    function Sprite(texture) {
+        this.pivot = new Vector_1.Vector(0.5, 0.5);
+        this.rect = new Rect_1.Rect();
+        this.canvas = this.browser.createCanvas();
+        this.ctx = this.browser.getContext(this.canvas);
+        this.setTexture(texture);
+    }
+    Object.defineProperty(Sprite.prototype, "texture", {
+        get: function () { return this._texture; },
+        set: function (texture) { this.setTexture(texture); },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Sprite.prototype, "width", {
+        get: function () { return this.rect.width; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Sprite.prototype, "height", {
+        get: function () { return this.rect.height; },
+        enumerable: true,
+        configurable: true
+    });
+    Sprite.prototype.setTexture = function (texture) {
+        var _this = this;
+        if (this._texture === texture) {
+            return;
+        }
+        this._texture = texture;
+        if (this.textureLoaded) {
+            this.textureLoaded.unsubscribe();
+        }
+        this.textureLoaded = texture.isLoaded$.subscribe(function () {
+            return _this.onTextureLoaded();
+        });
+    };
+    Sprite.prototype.onTextureLoaded = function () {
+        if (this.rect.width === 0 && this.rect.height === 0) {
+            this.rect.width = this._texture.width;
+            this.rect.height = this._texture.height;
+            this.canvas.width = this.rect.width;
+            this.canvas.height = this.rect.height;
+        }
+        if (this.textureLoaded) {
+            this.textureLoaded.unsubscribe();
+            delete this.textureLoaded;
+        }
+        this.ctx.clearRect(0, 0, this.rect.width, this.rect.height);
+        this.ctx.drawImage(this._texture.imageBitmap, this.rect.position.x, this.rect.position.y, this.rect.width, this.rect.height, 0, 0, this.rect.width, this.rect.height);
+    };
+    __decorate([
+        Inject_1.Inject(BrowserDelegate_1.BrowserDelegate),
+        __metadata("design:type", Object)
+    ], Sprite.prototype, "browser", void 0);
+    Sprite = __decorate([
+        Class_1.Class(),
+        __metadata("design:paramtypes", [Texture_1.Texture])
+    ], Sprite);
+    return Sprite;
+}());
+exports.Sprite = Sprite;
+
+
+/***/ }),
+/* 24 */,
+/* 25 */,
+/* 26 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+__webpack_require__(70);
+__webpack_require__(95);
+__webpack_require__(96);
+__webpack_require__(97);
+__webpack_require__(99);
+__webpack_require__(100);
+__webpack_require__(101);
+__webpack_require__(102);
+__webpack_require__(103);
+__webpack_require__(104);
+__webpack_require__(105);
+__webpack_require__(107);
+__webpack_require__(109);
+__webpack_require__(110);
+__webpack_require__(111);
+
+
+/***/ }),
+/* 27 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var isArray_1 = __webpack_require__(73);
+var isObject_1 = __webpack_require__(46);
+var isFunction_1 = __webpack_require__(34);
+var tryCatch_1 = __webpack_require__(47);
+var errorObject_1 = __webpack_require__(35);
+var UnsubscriptionError_1 = __webpack_require__(74);
 /**
  * Represents a disposable resource, such as the execution of an Observable. A
  * Subscription has one important method, `unsubscribe`, that takes no argument
@@ -2521,212 +2904,23 @@ function flattenUnsubscriptionErrors(errors) {
 //# sourceMappingURL=Subscription.js.map
 
 /***/ }),
-/* 17 */
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __metadata = (this && this.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-var BrowserDelegate_1 = __webpack_require__(3);
-var Service_1 = __webpack_require__(1);
-var Screen = (function () {
-    function Screen(browserDelegate) {
-        this.browserDelegate = browserDelegate;
-        this._width = 0;
-        this._height = 0;
-        this._isFullScreen = false;
-    }
-    Object.defineProperty(Screen.prototype, "width", {
-        get: function () {
-            return this._isFullScreen ?
-                this.browserDelegate.screen.width :
-                this.browserDelegate.window.innerWidth;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Screen.prototype, "height", {
-        get: function () {
-            return this._isFullScreen ?
-                this.browserDelegate.screen.height :
-                this.browserDelegate.window.innerHeight;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Screen.prototype, "isFullScreen", {
-        get: function () { return this._isFullScreen; },
-        enumerable: true,
-        configurable: true
-    });
-    Screen.prototype.setFullScreen = function (enable) {
-        if (enable === void 0) { enable = true; }
-        this._isFullScreen = enable;
-    };
-    Screen = __decorate([
-        Service_1.Service(),
-        __metadata("design:paramtypes", [BrowserDelegate_1.BrowserDelegate])
-    ], Screen);
-    return Screen;
-}());
-exports.Screen = Screen;
+exports.GameObjectInitializer = Symbol('GameObjectInitializer');
 
 
 /***/ }),
-/* 18 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __generator = (this && this.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while (_) try {
-            if (f = 1, y && (t = y[op[0] & 2 ? "return" : op[0] ? "throw" : "next"]) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [0, t.value];
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop(); continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-    }
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-var Subject_1 = __webpack_require__(52);
-var ArrayUtility_1 = __webpack_require__(5);
-var Service_1 = __webpack_require__(1);
-var SceneManager = (function () {
-    function SceneManager() {
-        this.scenes = [];
-        this._isLoading = false;
-        this.sceneLoaded = new Subject_1.Subject();
-        this.sceneUnloaded = new Subject_1.Subject();
-        this.sceneWillLoad = new Subject_1.Subject();
-        this.sceneWillUnload = new Subject_1.Subject();
-    }
-    Object.defineProperty(SceneManager.prototype, "isLoading", {
-        get: function () { return this._isLoading; },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(SceneManager.prototype, "sceneLoaded$", {
-        get: function () { return this.sceneLoaded.asObservable(); },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(SceneManager.prototype, "sceneUnloaded$", {
-        get: function () { return this.sceneUnloaded.asObservable(); },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(SceneManager.prototype, "sceneWillLoad$", {
-        get: function () { return this.sceneWillLoad.asObservable(); },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(SceneManager.prototype, "sceneWillUnload$", {
-        get: function () { return this.sceneWillUnload.asObservable(); },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(SceneManager.prototype, "currentScene", {
-        get: function () { return this._currentScene; },
-        enumerable: true,
-        configurable: true
-    });
-    SceneManager.prototype.add = function (scene) {
-        if (!ArrayUtility_1.addToArray(this.scenes, scene)) {
-            return false;
-        }
-        if (!this._currentScene) {
-            this._currentScene = scene;
-        }
-        return true;
-    };
-    SceneManager.prototype.remove = function (scene) {
-        if (this._currentScene === scene) {
-            throw new Error('Cannot remove current scene.');
-        }
-        return ArrayUtility_1.removeFromArray(this.scenes, scene);
-    };
-    SceneManager.prototype.switchTo = function (scene) {
-        return __awaiter(this, void 0, void 0, function () {
-            var _this = this;
-            return __generator(this, function (_a) {
-                if (!ArrayUtility_1.includeInArray(this.scenes, scene)) {
-                    this.add(scene);
-                }
-                if (this._currentScene === scene) {
-                    return [2, Promise.resolve()];
-                }
-                this._isLoading = true;
-                if (this._currentScene) {
-                    this.sceneWillUnload.next(this._currentScene);
-                }
-                this.sceneWillLoad.next(scene);
-                return [2, (scene.isLoaded ? Promise.resolve() : scene.load()).then(function () {
-                        _this._currentScene.deactivate();
-                        _this.sceneUnloaded.next(_this._currentScene);
-                        _this._currentScene = scene;
-                        _this._isLoading = false;
-                        _this.sceneLoaded.next(_this._currentScene);
-                    })];
-            });
-        });
-    };
-    SceneManager = __decorate([
-        Service_1.Service()
-    ], SceneManager);
-    return SceneManager;
-}());
-exports.SceneManager = SceneManager;
-
-
-/***/ }),
-/* 19 */
+/* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var Vector_1 = __webpack_require__(0);
+var Vector_1 = __webpack_require__(1);
 var Bounds = (function () {
     function Bounds() {
         var args = [];
@@ -2764,7 +2958,7 @@ var Bounds = (function () {
     });
     Object.defineProperty(Bounds.prototype, "size", {
         get: function () {
-            return this.extents.clone().scale(2);
+            return this.extents.clone().multiply(2);
         },
         enumerable: true,
         configurable: true
@@ -2836,504 +3030,55 @@ exports.Bounds = Bounds;
 
 
 /***/ }),
-/* 20 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __metadata = (this && this.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-var GameObject_1 = __webpack_require__(4);
-var Component_1 = __webpack_require__(11);
-var TransformComponent_1 = __webpack_require__(26);
-var Vector_1 = __webpack_require__(0);
-var Engine_1 = __webpack_require__(50);
-var Time_1 = __webpack_require__(28);
-var ForceMode_1 = __webpack_require__(59);
-var UniqueComponent_1 = __webpack_require__(27);
-var RequireComponent_1 = __webpack_require__(57);
-var DoublePI = Math.PI * 2;
-var RigidbodyComponent = (function (_super) {
-    __extends(RigidbodyComponent, _super);
-    function RigidbodyComponent(host, engine, time) {
-        var _this = _super.call(this, host) || this;
-        _this.engine = engine;
-        _this.time = time;
-        _this.angularDrag = 0;
-        _this.angularVelocity = 0;
-        _this.drag = 0;
-        _this.freezeRotation = false;
-        _this._mass = 1;
-        _this.inverseMass = 1;
-        _this._moi = 1000;
-        _this.inverseMoi = 0.001;
-        _this.maxAngularVelocity = Infinity;
-        _this.velocity = Vector_1.Vector.Get();
-        _this.useGravity = false;
-        _this.isSleeping = false;
-        _this.sleepThreshold = 0.2;
-        _this.motion = 0;
-        _this.forces = [
-            Vector_1.Vector.Get(),
-            Vector_1.Vector.Get(),
-            Vector_1.Vector.Get(),
-            Vector_1.Vector.Get()
-        ];
-        _this.torques = [0, 0, 0, 0];
-        _this.sleepTimer = 0;
-        return _this;
-    }
-    Object.defineProperty(RigidbodyComponent.prototype, "mass", {
-        get: function () { return this._mass; },
-        set: function (value) { this._mass = value; this.inverseMass = 1 / value; },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(RigidbodyComponent.prototype, "moi", {
-        get: function () { return this._moi; },
-        set: function (value) { this._moi = value; this.inverseMoi = 1 / value; },
-        enumerable: true,
-        configurable: true
-    });
-    RigidbodyComponent.prototype.start = function () {
-        _super.prototype.start.call(this);
-        this.transform = this.getComponent(TransformComponent_1.TransformComponent);
-    };
-    RigidbodyComponent.prototype.addForce = function (force, forceMode) {
-        if (forceMode === void 0) { forceMode = ForceMode_1.ForceMode.Force; }
-        this.forces[forceMode].add(force);
-    };
-    RigidbodyComponent.prototype.addTorque = function (torque, forceMode) {
-        if (forceMode === void 0) { forceMode = ForceMode_1.ForceMode.Force; }
-        this.torques[forceMode] += torque;
-    };
-    RigidbodyComponent.prototype.clearForce = function () {
-        this.forces.forEach(function (force) { return force.reset(); });
-    };
-    RigidbodyComponent.prototype.clearTorque = function () {
-        for (var i = 0; i < this.torques.length; i++) {
-            this.torques[i] = 0;
-        }
-    };
-    RigidbodyComponent.prototype.sleep = function () {
-        this.isSleeping = true;
-        this.velocity.reset();
-        this.angularVelocity = 0;
-        this.clearForce();
-        this.clearTorque();
-    };
-    RigidbodyComponent.prototype.awake = function () {
-        this.isSleeping = false;
-        this.sleepTimer = 0;
-    };
-    RigidbodyComponent.prototype.fixedUpdate = function (alpha) {
-        _super.prototype.fixedUpdate.call(this, alpha);
-        var deltaTimeInSecond = this.time.fixedDeltaTimeInSecond * alpha;
-        if (this.useGravity && !this.isSleeping) {
-            this.addForce(this.engine.gravity, ForceMode_1.ForceMode.Acceleration);
-        }
-        this.forces[ForceMode_1.ForceMode.Force].scale(deltaTimeInSecond * this.inverseMass);
-        this.velocity.add(this.forces[ForceMode_1.ForceMode.Force]);
-        this.forces[ForceMode_1.ForceMode.Force].reset();
-        this.forces[ForceMode_1.ForceMode.Acceleration].scale(deltaTimeInSecond);
-        this.velocity.add(this.forces[ForceMode_1.ForceMode.Acceleration]);
-        this.forces[ForceMode_1.ForceMode.Acceleration].reset();
-        this.forces[ForceMode_1.ForceMode.Impulse].scale(1 * this.inverseMass);
-        this.velocity.add(this.forces[ForceMode_1.ForceMode.Impulse]);
-        this.forces[ForceMode_1.ForceMode.Impulse].reset();
-        this.velocity.add(this.forces[ForceMode_1.ForceMode.VelocityChange]);
-        this.forces[ForceMode_1.ForceMode.VelocityChange].reset();
-        this.torques[ForceMode_1.ForceMode.Force] *= this.inverseMoi * deltaTimeInSecond;
-        this.angularVelocity += this.torques[ForceMode_1.ForceMode.Force];
-        this.torques[ForceMode_1.ForceMode.Force] = 0;
-        this.torques[ForceMode_1.ForceMode.Acceleration] *= deltaTimeInSecond;
-        this.angularVelocity += this.torques[ForceMode_1.ForceMode.Acceleration];
-        this.torques[ForceMode_1.ForceMode.Acceleration] = 0;
-        this.torques[ForceMode_1.ForceMode.Impulse] *= this.inverseMoi;
-        this.angularVelocity += this.torques[ForceMode_1.ForceMode.Impulse];
-        this.torques[ForceMode_1.ForceMode.Impulse] = 0;
-        this.angularVelocity += this.torques[ForceMode_1.ForceMode.VelocityChange];
-        this.torques[ForceMode_1.ForceMode.VelocityChange] = 0;
-        this
-            .motion = (this.velocity.squareMagnitude() + Math.pow(this.angularVelocity, 2)) * 0.5;
-        if (!this.isSleeping && this.sleepThreshold >= 0) {
-            if (this.motion < this.sleepThreshold) {
-                this.sleepTimer += deltaTimeInSecond;
-                if (this.sleepTimer > 0.5) {
-                    this.sleepTimer = 0;
-                    this.sleep();
-                }
-            }
-            else {
-                this.sleepTimer = 0;
-            }
-        }
-        else {
-            if (this.motion >= this.sleepThreshold) {
-                this.awake();
-            }
-        }
-        if (!this.velocity.isZero) {
-            this.velocity.scale(Math.max(0, 1 - this.drag * deltaTimeInSecond));
-            var velocity = this.velocity.clone().scale(deltaTimeInSecond);
-            this.transform.position.add(velocity);
-            velocity.destroy();
-        }
-        if (this.freezeRotation) {
-            this.angularVelocity = 0;
-        }
-        else {
-            if (Math.abs(this.angularVelocity) > 1e-6) {
-                this.angularVelocity *= Math.max(0, 1 - this.angularDrag * deltaTimeInSecond);
-                if (this.angularVelocity > this.maxAngularVelocity) {
-                    this.angularVelocity = this.maxAngularVelocity;
-                }
-                this.transform.rotation += this.angularVelocity * deltaTimeInSecond;
-                this.transform.rotation = this.transform.rotation % DoublePI;
-            }
-        }
-    };
-    RigidbodyComponent.prototype.reset = function () {
-        _super.prototype.reset.call(this);
-        this.angularDrag = 0;
-        this.angularVelocity = 0;
-        this.drag = 0;
-        this.freezeRotation = false;
-        this.mass = 1;
-        this.maxAngularVelocity = Infinity;
-        this.velocity = Vector_1.Vector.Get();
-        this.useGravity = false;
-        this.mass = 1;
-        this.moi = 1000;
-        this.isSleeping = false;
-        this.sleepThreshold = 0.2;
-        this.sleepTimer = 0;
-        this.forces = [
-            Vector_1.Vector.Get(),
-            Vector_1.Vector.Get(),
-            Vector_1.Vector.Get(),
-            Vector_1.Vector.Get()
-        ];
-        this.torques = [0, 0, 0, 0];
-    };
-    RigidbodyComponent.prototype.destroy = function () {
-        _super.prototype.destroy.call(this);
-        this.velocity.destroy();
-        this.forces.forEach(function (force) { return force.destroy(); });
-    };
-    RigidbodyComponent = __decorate([
-        UniqueComponent_1.UniqueComponent(),
-        RequireComponent_1.RequireComponent([TransformComponent_1.TransformComponent]),
-        __metadata("design:paramtypes", [GameObject_1.GameObject,
-            Engine_1.Engine,
-            Time_1.Time])
-    ], RigidbodyComponent);
-    return RigidbodyComponent;
-}(Component_1.Component));
-exports.RigidbodyComponent = RigidbodyComponent;
-
-
-/***/ }),
-/* 21 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-__webpack_require__(67);
-__webpack_require__(83);
-__webpack_require__(86);
-__webpack_require__(88);
-__webpack_require__(46);
-
-
-/***/ }),
-/* 22 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-function isFunction(x) {
-    return typeof x === 'function';
-}
-exports.isFunction = isFunction;
-//# sourceMappingURL=isFunction.js.map
-
-/***/ }),
-/* 23 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-// typeof any so that it we don't have to cast when comparing a result to the error object
-exports.errorObject = { e: {} };
-//# sourceMappingURL=errorObject.js.map
-
-/***/ }),
-/* 24 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-var root_1 = __webpack_require__(13);
-var Symbol = root_1.root.Symbol;
-exports.rxSubscriber = (typeof Symbol === 'function' && typeof Symbol.for === 'function') ?
-    Symbol.for('rxSubscriber') : '@@rxSubscriber';
-/**
- * @deprecated use rxSubscriber instead
- */
-exports.$$rxSubscriber = exports.rxSubscriber;
-//# sourceMappingURL=rxSubscriber.js.map
-
-/***/ }),
-/* 25 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-var BaseObject = (function () {
-    function BaseObject() {
-        this.name = '';
-        this._isActive = false;
-        this._destroyed = false;
-        this._hasStarted = false;
-    }
-    Object.defineProperty(BaseObject.prototype, "isActive", {
-        get: function () { return this._isActive; },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(BaseObject.prototype, "canRecycle", {
-        get: function () { return this._destroyed; },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(BaseObject.prototype, "isDestroyed", {
-        get: function () { return this._destroyed; },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(BaseObject.prototype, "hasStarted", {
-        get: function () { return this._hasStarted; },
-        enumerable: true,
-        configurable: true
-    });
-    BaseObject.prototype.activate = function () {
-        this._isActive = true;
-    };
-    BaseObject.prototype.deactivate = function () {
-        this._isActive = false;
-    };
-    BaseObject.prototype.reset = function () {
-        this._destroyed = false;
-        this._isActive = true;
-    };
-    BaseObject.prototype.start = function () {
-        this.activate();
-        this._hasStarted = true;
-    };
-    BaseObject.prototype.fixedUpdate = function (alpha) { return; };
-    BaseObject.prototype.update = function () { return; };
-    BaseObject.prototype.lateUpdate = function () { return; };
-    BaseObject.prototype.postRender = function () { return; };
-    BaseObject.prototype.destroy = function () {
-        this._destroyed = true;
-        this._isActive = false;
-    };
-    return BaseObject;
-}());
-exports.BaseObject = BaseObject;
-
-
-/***/ }),
-/* 26 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-var Component_1 = __webpack_require__(11);
-var Vector_1 = __webpack_require__(0);
-var UniqueComponent_1 = __webpack_require__(27);
-var Matrix_1 = __webpack_require__(48);
-var TransformComponent = (function (_super) {
-    __extends(TransformComponent, _super);
-    function TransformComponent() {
-        var _this = _super !== null && _super.apply(this, arguments) || this;
-        _this.position = Vector_1.Vector.Get();
-        _this.localPosition = Vector_1.Vector.Get();
-        _this.scale = Vector_1.Vector.Get();
-        _this.rotation = 0;
-        _this.toWorldMatrix = new Matrix_1.Matrix();
-        _this.toLocalMatrix = _this.toWorldMatrix.getInverse();
-        return _this;
-    }
-    TransformComponent.prototype.fixedUpdate = function () {
-        this.calculate();
-    };
-    TransformComponent.prototype.calculate = function () {
-        if (this.host.parent) {
-            this.position.copy(this.localPosition);
-            this.position.add(this.host.parent.transform.position);
-        }
-        this.toWorldMatrix.reset();
-        this.toWorldMatrix.setTranslation(this.position);
-        this.toWorldMatrix.setRotatation(this.rotation);
-        this.toWorldMatrix.setScaling(this.scale);
-        this.toLocalMatrix.invertFrom(this.toWorldMatrix);
-    };
-    TransformComponent.prototype.reset = function () {
-        _super.prototype.reset.call(this);
-        this.position = Vector_1.Vector.Get();
-        this.localPosition = Vector_1.Vector.Get();
-        this.scale = Vector_1.Vector.Get(1, 1);
-        this.rotation = 0;
-    };
-    TransformComponent.prototype.destroy = function () {
-        _super.prototype.destroy.call(this);
-        Vector_1.Vector.Put(this.position);
-        Vector_1.Vector.Put(this.localPosition);
-        Vector_1.Vector.Put(this.scale);
-        delete this.position;
-        delete this.scale;
-    };
-    TransformComponent = __decorate([
-        UniqueComponent_1.UniqueComponent()
-    ], TransformComponent);
-    return TransformComponent;
-}(Component_1.Component));
-exports.TransformComponent = TransformComponent;
-
-
-/***/ }),
-/* 27 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-function UniqueComponent() {
-    return function (ComponentType) {
-        Reflect.defineMetadata('component:unique', true, ComponentType);
-    };
-}
-exports.UniqueComponent = UniqueComponent;
-
-
-/***/ }),
-/* 28 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-var Service_1 = __webpack_require__(1);
-var Time = (function () {
-    function Time() {
-        this._isPaused = true;
-        this.deltaTime = 0;
-        this.fixedDeltaTime = 1000 / 60;
-        this.fixedDeltaTimeInSecond = 1 / 60;
-    }
-    Time.prototype.tick = function (deltaTime) {
-        this.deltaTime = deltaTime;
-    };
-    Time = __decorate([
-        Service_1.Service()
-    ], Time);
-    return Time;
-}());
-exports.Time = Time;
-
-
-/***/ }),
-/* 29 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-var Service_1 = __webpack_require__(1);
-var GameObjectInitializer = (function () {
-    function GameObjectInitializer() {
-        this.queue = [];
-    }
-    Object.defineProperty(GameObjectInitializer.prototype, "length", {
-        get: function () { return this.queue.length; },
-        enumerable: true,
-        configurable: true
-    });
-    GameObjectInitializer.prototype.push = function (gameObject) {
-        this.queue.push(gameObject);
-    };
-    GameObjectInitializer.prototype.resolve = function () {
-        var gameObject = this.queue.shift();
-        while (gameObject) {
-            gameObject.initialize();
-            gameObject = this.queue.shift();
-        }
-    };
-    GameObjectInitializer = __decorate([
-        Service_1.Service()
-    ], GameObjectInitializer);
-    return GameObjectInitializer;
-}());
-exports.GameObjectInitializer = GameObjectInitializer;
-
-
-/***/ }),
 /* 30 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
+Object.defineProperty(exports, "__esModule", { value: true });
+var ArrayUtility_1 = __webpack_require__(5);
+function RequireComponent(RequireTypes) {
+    return function (ComponentType) {
+        var requireComponentTypes = Reflect.getMetadata('component:require', ComponentType) || [];
+        RequireTypes.forEach(function (RequireType) { return ArrayUtility_1.addToArray(requireComponentTypes, RequireType); });
+        Reflect.defineMetadata('component:require', requireComponentTypes, ComponentType);
+    };
+}
+exports.RequireComponent = RequireComponent;
+
+
+/***/ }),
+/* 31 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var ForceMode;
+(function (ForceMode) {
+    ForceMode[ForceMode["Force"] = 0] = "Force";
+    ForceMode[ForceMode["Acceleration"] = 1] = "Acceleration";
+    ForceMode[ForceMode["Impulse"] = 2] = "Impulse";
+    ForceMode[ForceMode["VelocityChange"] = 3] = "VelocityChange";
+})(ForceMode = exports.ForceMode || (exports.ForceMode = {}));
+
+
+/***/ }),
+/* 32 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.CollisionJumpTable = Symbol('CollisionJumpTable');
+
+
+/***/ }),
+/* 33 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = Object.setPrototypeOf ||
         ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
@@ -3352,6 +3097,9 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 };
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
 };
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -3389,23 +3137,27 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var BaseObject_1 = __webpack_require__(25);
-var Tree_1 = __webpack_require__(49);
-var Bundle_1 = __webpack_require__(92);
-var Camera_1 = __webpack_require__(55);
+var BaseObject_1 = __webpack_require__(41);
+var Tree_1 = __webpack_require__(59);
+var Bundle_1 = __webpack_require__(112);
+var Camera_1 = __webpack_require__(63);
 var ArrayUtility_1 = __webpack_require__(5);
-var Inject_1 = __webpack_require__(7);
-var Class_1 = __webpack_require__(8);
-var BroadPhaseCollisionResolver_1 = __webpack_require__(58);
-var NarrowPhaseCollisionResolver_1 = __webpack_require__(95);
-var GameObjectInitializer_1 = __webpack_require__(29);
+var Inject_1 = __webpack_require__(0);
+var Class_1 = __webpack_require__(9);
+var BroadPhaseCollisionResolver_1 = __webpack_require__(42);
+var NarrowPhaseCollisionResolver_1 = __webpack_require__(61);
+var GameObjectInitializer_1 = __webpack_require__(28);
+var RenderProcess_1 = __webpack_require__(57);
+var runtime_1 = __webpack_require__(12);
 var Scene = (function (_super) {
     __extends(Scene, _super);
-    function Scene(broadPhaseCollisionResolver, narrowPhaseCollisionResolver, gameObjectInitializer) {
+    function Scene(broadPhaseCollisionResolver, narrowPhaseCollisionResolver, gameObjectInitializer, renderProcess, mainCamera) {
         var _this = _super.call(this) || this;
         _this.broadPhaseCollisionResolver = broadPhaseCollisionResolver;
         _this.narrowPhaseCollisionResolver = narrowPhaseCollisionResolver;
         _this.gameObjectInitializer = gameObjectInitializer;
+        _this.renderProcess = renderProcess;
+        _this.mainCamera = mainCamera;
         _this.resources = new Bundle_1.Bundle();
         _this.gameObjects = new Tree_1.Tree(null);
         _this.cameras = [];
@@ -3470,13 +3222,18 @@ var Scene = (function (_super) {
     Scene.prototype.lateUpdate = function () {
         this.gameObjects.forEachChildren(function (gameObject) { return gameObject.lateUpdate(); });
     };
-    Scene.prototype.render = function (ctx) {
+    Scene.prototype.preRender = function () {
+        this.gameObjects.forEachChildren(function (gameObject) { return gameObject.preRender(); });
+    };
+    Scene.prototype.render = function (ctx, width, height) {
         var _this = this;
-        this.cameras.forEach(function (camera) { return camera.render(ctx, _this.gameObjects); });
+        this.renderProcess.useContext(ctx, width, height);
+        this.cameras.forEach(function (camera) { return _this.renderProcess.render(camera, _this.gameObjects); });
+        runtime_1.ifdef(runtime_1.DEBUG_PHYSICS, function () { return _this.cameras.forEach(function (camera) { return _this.broadPhaseCollisionResolver.debugRender(ctx, camera); }); });
     };
     Scene.prototype.postRender = function () {
-        this.gameObjectInitializer.resolve();
         this.gameObjects.forEachChildren(function (gameObject) { return gameObject.postRender(); });
+        this.gameObjectInitializer.resolve();
     };
     Scene.prototype.destroy = function () {
         _super.prototype.destroy.call(this);
@@ -3485,15 +3242,14 @@ var Scene = (function (_super) {
     Scene.prototype.toString = function () {
         return "Scene(" + this.name + ")";
     };
-    __decorate([
-        Inject_1.Inject(Camera_1.MainCamera),
-        __metadata("design:type", Camera_1.Camera)
-    ], Scene.prototype, "mainCamera", void 0);
     Scene = __decorate([
         Class_1.Class(),
-        __metadata("design:paramtypes", [BroadPhaseCollisionResolver_1.BroadPhaseCollisionResolver,
-            NarrowPhaseCollisionResolver_1.NarrowPhaseCollisionResolver,
-            GameObjectInitializer_1.GameObjectInitializer])
+        __param(0, Inject_1.Inject(BroadPhaseCollisionResolver_1.BroadPhaseCollisionResolver)),
+        __param(1, Inject_1.Inject(NarrowPhaseCollisionResolver_1.NarrowPhaseCollisionResolver)),
+        __param(2, Inject_1.Inject(GameObjectInitializer_1.GameObjectInitializer)),
+        __param(3, Inject_1.Inject(RenderProcess_1.RenderProcess)),
+        __param(4, Inject_1.Inject(Camera_1.MainCamera)),
+        __metadata("design:paramtypes", [Object, Object, Object, Object, Camera_1.Camera])
     ], Scene);
     return Scene;
 }(BaseObject_1.BaseObject));
@@ -3501,423 +3257,390 @@ exports.Scene = Scene;
 
 
 /***/ }),
-/* 31 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __metadata = (this && this.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __generator = (this && this.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while (_) try {
-            if (f = 1, y && (t = y[op[0] & 2 ? "return" : op[0] ? "throw" : "next"]) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [0, t.value];
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop(); continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-    }
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-var Resource_1 = __webpack_require__(54);
-var DOM_1 = __webpack_require__(32);
-var BrowserDelegate_1 = __webpack_require__(3);
-var Inject_1 = __webpack_require__(7);
-var Texture = (function (_super) {
-    __extends(Texture, _super);
-    function Texture(path, imageData) {
-        var _this = _super.call(this) || this;
-        _this.path = path;
-        _this.canvas = _this.browser.document.createElement('canvas');
-        _this.ctx = _this.canvas.getContext('2d');
-        _this.isDirty = false;
-        if (imageData) {
-            _this.canvas.width = imageData.width;
-            _this.canvas.height = imageData.height;
-            _this.setImageData(imageData);
-        }
-        else {
-            _this.canvas.width = 0;
-            _this.canvas.height = 0;
-        }
-        return _this;
-    }
-    Object.defineProperty(Texture.prototype, "width", {
-        get: function () { return this.canvas.width; },
-        set: function (value) {
-            this.canvas.width = value;
-            this.markAsDirty();
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Texture.prototype, "height", {
-        get: function () { return this.canvas.height; },
-        set: function (value) {
-            this.canvas.height = value;
-            this.markAsDirty();
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Texture.prototype, "imageBitmap", {
-        get: function () { return this.canvas; },
-        enumerable: true,
-        configurable: true
-    });
-    Texture.prototype.load = function () {
-        return __awaiter(this, void 0, void 0, function () {
-            var _this = this;
-            return __generator(this, function (_a) {
-                if (this.isLoaded) {
-                    return [2, Promise.resolve()];
-                }
-                this.source = new Image();
-                this.source.src = this.path;
-                return [2, DOM_1.onceEvent(this.source, 'load').then(function (e) { return _this.draw(); })];
-            });
-        });
-    };
-    Texture.prototype.getImageData = function (sx, sy, sw, sh) {
-        if (sx === void 0) { sx = 0; }
-        if (sy === void 0) { sy = 0; }
-        if (sw === void 0) { sw = this.width; }
-        if (sh === void 0) { sh = this.height; }
-        return this.ctx.getImageData(sx, sy, sw, sh);
-    };
-    Texture.prototype.setImageData = function (imageData, dx, dy, dirtyX, dirtyY, dirtyWidth, dirtyHeight) {
-        if (dx === void 0) { dx = 0; }
-        if (dy === void 0) { dy = 0; }
-        if (dirtyX === void 0) { dirtyX = 0; }
-        if (dirtyY === void 0) { dirtyY = 0; }
-        if (dirtyWidth === void 0) { dirtyWidth = imageData.width; }
-        if (dirtyHeight === void 0) { dirtyHeight = imageData.height; }
-        this.ctx.putImageData(imageData, dx, dy, dirtyX, dirtyY, dirtyWidth, dirtyHeight);
-    };
-    Texture.prototype.clone = function () {
-        return new Texture(this.path, this.getImageData());
-    };
-    Texture.prototype.markAsDirty = function () {
-        var _this = this;
-        if (this.isDirty) {
-            return;
-        }
-        this.isDirty = true;
-        if (!this.isLoaded) {
-            return;
-        }
-        setTimeout(function () { return _this.draw(); });
-    };
-    Texture.prototype.draw = function () {
-        if (this.width === 0 && this.height === 0) {
-            this.canvas.width = this.source.width;
-            this.canvas.height = this.source.height;
-        }
-        this.ctx.drawImage(this.source, 0, 0, this.source.width, this.source.height, 0, 0, this.width, this.height);
-        this.isDirty = false;
-        if (!this.isLoaded) {
-            this._isLoaded.next(true);
-        }
-    };
-    __decorate([
-        Inject_1.Inject(BrowserDelegate_1.BrowserDelegate),
-        __metadata("design:type", BrowserDelegate_1.BrowserDelegate)
-    ], Texture.prototype, "browser", void 0);
-    return Texture;
-}(Resource_1.Resource));
-exports.Texture = Texture;
-
+function isFunction(x) {
+    return typeof x === 'function';
+}
+exports.isFunction = isFunction;
+//# sourceMappingURL=isFunction.js.map
 
 /***/ }),
-/* 32 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __generator = (this && this.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while (_) try {
-            if (f = 1, y && (t = y[op[0] & 2 ? "return" : op[0] ? "throw" : "next"]) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [0, t.value];
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop(); continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-    }
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-var Observable_1 = __webpack_require__(2);
-function onceEvent(node, eventName) {
-    return __awaiter(this, void 0, void 0, function () {
-        return __generator(this, function (_a) {
-            return [2, new Promise(function (resolve, reject) {
-                    var onEvent = function (e) {
-                        resolve(e);
-                        teardown();
-                    };
-                    var onError = function (e) {
-                        reject(e);
-                        teardown();
-                    };
-                    var teardown = function () {
-                        node.removeEventListener(eventName, onEvent);
-                        node.removeEventListener('error', onError);
-                    };
-                    node.addEventListener(eventName, onEvent);
-                    node.addEventListener('error', onError);
-                })];
-        });
-    });
-}
-exports.onceEvent = onceEvent;
-function observeEvent(node, eventName) {
-    return new Observable_1.Observable(function (subscriber) {
-        node.addEventListener(eventName, function (e) { return subscriber.next(e); });
-        var parentNode = node.parentNode;
-        if (parentNode) {
-            var observer = new MutationObserver(function (records) {
-                var shouldComplete = records
-                    .reduce(function (prev, curr) { return prev.concat(listToArray(curr.removedNodes)); }, [])
-                    .some(function (removeedNode) { return removeedNode === node; });
-                if (shouldComplete) {
-                    subscriber.complete();
-                }
-            });
-            observer.observe(parentNode, { childList: true });
-        }
-    });
-}
-exports.observeEvent = observeEvent;
-function listToArray(list) {
-    return Array.prototype.slice.call(list);
-}
-exports.listToArray = listToArray;
-
-
-/***/ }),
-/* 33 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __metadata = (this && this.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-var Vector_1 = __webpack_require__(0);
-var Rect_1 = __webpack_require__(56);
-var BrowserDelegate_1 = __webpack_require__(3);
-var Inject_1 = __webpack_require__(7);
-var Sprite = (function () {
-    function Sprite(texture) {
-        this.pivot = new Vector_1.Vector(0.5, 0.5);
-        this.rect = new Rect_1.Rect();
-        this.textureRect = new Rect_1.Rect();
-        this.canvas = this.browser.createCanvas();
-        this.ctx = this.browser.getContext(this.canvas);
-        this.setTexture(texture);
-    }
-    Object.defineProperty(Sprite.prototype, "imageBitmap", {
-        get: function () {
-            this.update();
-            return this.canvas;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Sprite.prototype, "texture", {
-        get: function () { return this._texture; },
-        set: function (texture) { this.setTexture(texture); },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Sprite.prototype, "width", {
-        get: function () { return this.rect.width; },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Sprite.prototype, "height", {
-        get: function () { return this.rect.height; },
-        enumerable: true,
-        configurable: true
-    });
-    Sprite.prototype.setTexture = function (texture) {
-        var _this = this;
-        this._texture = texture;
-        if (this.textureLoaded) {
-            this.textureLoaded.unsubscribe();
-        }
-        this.textureLoaded = texture.isLoaded$.subscribe(function () {
-            return _this.onTextureLoaded();
-        });
-    };
-    Sprite.prototype.onTextureLoaded = function () {
-        if (this.rect.width === 0 && this.rect.height === 0) {
-            this.rect.width = this._texture.width;
-            this.rect.height = this._texture.height;
-            this.canvas.width = this.rect.width;
-            this.canvas.height = this.rect.height;
-        }
-        if (this.textureRect.width === 0 && this.textureRect.height === 0) {
-            this.textureRect.width = this._texture.width;
-            this.textureRect.height = this._texture.height;
-        }
-    };
-    Sprite.prototype.update = function () {
-        this.canvas.width = this.rect.width;
-        this.canvas.height = this.rect.height;
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        this.ctx.drawImage(this._texture.imageBitmap, this.textureRect.position.x, this.textureRect.position.y, this.textureRect.width, this.textureRect.height, this.rect.position.x, this.rect.position.y, this.rect.width, this.rect.height);
-    };
-    __decorate([
-        Inject_1.Inject(BrowserDelegate_1.BrowserDelegate),
-        __metadata("design:type", BrowserDelegate_1.BrowserDelegate)
-    ], Sprite.prototype, "browser", void 0);
-    return Sprite;
-}());
-exports.Sprite = Sprite;
-
-
-/***/ }),
-/* 34 */,
 /* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
+// typeof any so that it we don't have to cast when comparing a result to the error object
+exports.errorObject = { e: {} };
+//# sourceMappingURL=errorObject.js.map
+
+/***/ }),
+/* 36 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var root_1 = __webpack_require__(18);
+var Symbol = root_1.root.Symbol;
+exports.rxSubscriber = (typeof Symbol === 'function' && typeof Symbol.for === 'function') ?
+    Symbol.for('rxSubscriber') : '@@rxSubscriber';
+/**
+ * @deprecated use rxSubscriber instead
+ */
+exports.$$rxSubscriber = exports.rxSubscriber;
+//# sourceMappingURL=rxSubscriber.js.map
+
+/***/ }),
+/* 37 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
 Object.defineProperty(exports, "__esModule", { value: true });
-var RendererComponent_1 = __webpack_require__(12);
-var UniqueComponent_1 = __webpack_require__(27);
-var SpriteRendererComponent = (function (_super) {
-    __extends(SpriteRendererComponent, _super);
-    function SpriteRendererComponent() {
-        return _super !== null && _super.apply(this, arguments) || this;
+__webpack_require__(51);
+var Type_1 = __webpack_require__(14);
+var ProviderRegistry = (function () {
+    function ProviderRegistry() {
+        this.providers = new Map();
+        this.service = new Map();
     }
-    SpriteRendererComponent.prototype.update = function () {
-        _super.prototype.update.call(this);
-        if (!this.sprite) {
+    ProviderRegistry.prototype.provide = function (provider) {
+        this.providers.set(provider.token, provider);
+    };
+    ProviderRegistry.prototype.resolve = function (token) {
+        return this.providers.get(token);
+    };
+    ProviderRegistry.prototype.get = function (token) {
+        var resolvedToken = Type_1.resolveForwardRef(token);
+        if (this.service.has(resolvedToken)) {
+            return this.service.get(resolvedToken);
+        }
+        var provider = this.resolve(resolvedToken);
+        if (!provider) {
             return;
         }
-        this.calculateBounds(this.sprite.width, this.sprite.height);
-    };
-    SpriteRendererComponent.prototype.render = function (ctx, toScreenMatrix) {
-        if (!this.sprite) {
-            return;
+        var service;
+        if (provider.useClass) {
+            service = this.instantiate(provider.useClass);
         }
-        this.bounds.extents.setTo(this.sprite.width * 0.5, this.sprite.height * 0.5);
-        ctx.save();
-        var m = toScreenMatrix.clone().multiply(this.transform.toWorldMatrix);
-        m.setScaling(-1, -1);
-        ctx.transform(m[0][0], m[0][1], m[1][0], m[1][1], m[0][2], m[1][2]);
-        ctx.drawImage(this.sprite.imageBitmap, this.sprite.rect.position.x, this.sprite.rect.position.y, this.sprite.rect.width, this.sprite.rect.height, -this.sprite.pivot.x * this.sprite.width, -this.sprite.pivot.y * this.sprite.height, this.sprite.width, this.sprite.height);
-        ctx.restore();
+        if (provider.useFactory) {
+            service = this.create(provider.useFactory);
+        }
+        if (provider.useValue) {
+            service = provider.useValue;
+        }
+        if (service) {
+            this.service.set(resolvedToken, service);
+        }
+        return service;
     };
-    SpriteRendererComponent.prototype.calculateBounds = function (width, height) {
-        this.bounds.center.copy(this.transform.position);
-        this.bounds.extents.setTo(width * 0.5, height * 0.5);
+    ProviderRegistry.prototype.instantiate = function (InstanceType) {
+        var args = [];
+        for (var _i = 1; _i < arguments.length; _i++) {
+            args[_i - 1] = arguments[_i];
+        }
+        this.resolveDependencies(InstanceType, args);
+        return new (InstanceType.bind.apply(InstanceType, [void 0].concat(args)))();
     };
-    SpriteRendererComponent = __decorate([
-        UniqueComponent_1.UniqueComponent()
-    ], SpriteRendererComponent);
-    return SpriteRendererComponent;
-}(RendererComponent_1.RendererComponent));
-exports.SpriteRendererComponent = SpriteRendererComponent;
+    ProviderRegistry.prototype.create = function (factory) {
+        var args = [];
+        for (var _i = 1; _i < arguments.length; _i++) {
+            args[_i - 1] = arguments[_i];
+        }
+        this.resolveDependencies(factory, args);
+        return factory.apply(void 0, args);
+    };
+    ProviderRegistry.prototype.resolveDependencies = function (target, args) {
+        var _this = this;
+        var dependencies = Reflect.getMetadata('design:paramtypes', target) || [];
+        dependencies.forEach(function (dependency, index) {
+            if (!args[index]) {
+                args[index] = _this.get(dependency);
+            }
+        });
+    };
+    return ProviderRegistry;
+}());
+exports.ProviderRegistry = ProviderRegistry;
+exports.providerRegistry = new ProviderRegistry();
 
 
 /***/ }),
-/* 36 */,
-/* 37 */,
-/* 38 */,
-/* 39 */,
+/* 38 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var Observable_1 = __webpack_require__(3);
+var Subscriber_1 = __webpack_require__(13);
+var Subscription_1 = __webpack_require__(27);
+var ObjectUnsubscribedError_1 = __webpack_require__(53);
+var SubjectSubscription_1 = __webpack_require__(98);
+var rxSubscriber_1 = __webpack_require__(36);
+/**
+ * @class SubjectSubscriber<T>
+ */
+var SubjectSubscriber = (function (_super) {
+    __extends(SubjectSubscriber, _super);
+    function SubjectSubscriber(destination) {
+        _super.call(this, destination);
+        this.destination = destination;
+    }
+    return SubjectSubscriber;
+}(Subscriber_1.Subscriber));
+exports.SubjectSubscriber = SubjectSubscriber;
+/**
+ * @class Subject<T>
+ */
+var Subject = (function (_super) {
+    __extends(Subject, _super);
+    function Subject() {
+        _super.call(this);
+        this.observers = [];
+        this.closed = false;
+        this.isStopped = false;
+        this.hasError = false;
+        this.thrownError = null;
+    }
+    Subject.prototype[rxSubscriber_1.rxSubscriber] = function () {
+        return new SubjectSubscriber(this);
+    };
+    Subject.prototype.lift = function (operator) {
+        var subject = new AnonymousSubject(this, this);
+        subject.operator = operator;
+        return subject;
+    };
+    Subject.prototype.next = function (value) {
+        if (this.closed) {
+            throw new ObjectUnsubscribedError_1.ObjectUnsubscribedError();
+        }
+        if (!this.isStopped) {
+            var observers = this.observers;
+            var len = observers.length;
+            var copy = observers.slice();
+            for (var i = 0; i < len; i++) {
+                copy[i].next(value);
+            }
+        }
+    };
+    Subject.prototype.error = function (err) {
+        if (this.closed) {
+            throw new ObjectUnsubscribedError_1.ObjectUnsubscribedError();
+        }
+        this.hasError = true;
+        this.thrownError = err;
+        this.isStopped = true;
+        var observers = this.observers;
+        var len = observers.length;
+        var copy = observers.slice();
+        for (var i = 0; i < len; i++) {
+            copy[i].error(err);
+        }
+        this.observers.length = 0;
+    };
+    Subject.prototype.complete = function () {
+        if (this.closed) {
+            throw new ObjectUnsubscribedError_1.ObjectUnsubscribedError();
+        }
+        this.isStopped = true;
+        var observers = this.observers;
+        var len = observers.length;
+        var copy = observers.slice();
+        for (var i = 0; i < len; i++) {
+            copy[i].complete();
+        }
+        this.observers.length = 0;
+    };
+    Subject.prototype.unsubscribe = function () {
+        this.isStopped = true;
+        this.closed = true;
+        this.observers = null;
+    };
+    Subject.prototype._trySubscribe = function (subscriber) {
+        if (this.closed) {
+            throw new ObjectUnsubscribedError_1.ObjectUnsubscribedError();
+        }
+        else {
+            return _super.prototype._trySubscribe.call(this, subscriber);
+        }
+    };
+    Subject.prototype._subscribe = function (subscriber) {
+        if (this.closed) {
+            throw new ObjectUnsubscribedError_1.ObjectUnsubscribedError();
+        }
+        else if (this.hasError) {
+            subscriber.error(this.thrownError);
+            return Subscription_1.Subscription.EMPTY;
+        }
+        else if (this.isStopped) {
+            subscriber.complete();
+            return Subscription_1.Subscription.EMPTY;
+        }
+        else {
+            this.observers.push(subscriber);
+            return new SubjectSubscription_1.SubjectSubscription(this, subscriber);
+        }
+    };
+    Subject.prototype.asObservable = function () {
+        var observable = new Observable_1.Observable();
+        observable.source = this;
+        return observable;
+    };
+    Subject.create = function (destination, source) {
+        return new AnonymousSubject(destination, source);
+    };
+    return Subject;
+}(Observable_1.Observable));
+exports.Subject = Subject;
+/**
+ * @class AnonymousSubject<T>
+ */
+var AnonymousSubject = (function (_super) {
+    __extends(AnonymousSubject, _super);
+    function AnonymousSubject(destination, source) {
+        _super.call(this);
+        this.destination = destination;
+        this.source = source;
+    }
+    AnonymousSubject.prototype.next = function (value) {
+        var destination = this.destination;
+        if (destination && destination.next) {
+            destination.next(value);
+        }
+    };
+    AnonymousSubject.prototype.error = function (err) {
+        var destination = this.destination;
+        if (destination && destination.error) {
+            this.destination.error(err);
+        }
+    };
+    AnonymousSubject.prototype.complete = function () {
+        var destination = this.destination;
+        if (destination && destination.complete) {
+            this.destination.complete();
+        }
+    };
+    AnonymousSubject.prototype._subscribe = function (subscriber) {
+        var source = this.source;
+        if (source) {
+            return this.source.subscribe(subscriber);
+        }
+        else {
+            return Subscription_1.Subscription.EMPTY;
+        }
+    };
+    return AnonymousSubject;
+}(Subject));
+exports.AnonymousSubject = AnonymousSubject;
+//# sourceMappingURL=Subject.js.map
+
+/***/ }),
+/* 39 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.KeyboardInput = Symbol('KeyboardInput');
+
+
+/***/ }),
 /* 40 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.PointerInput = Symbol('PointerInput');
+
+
+/***/ }),
+/* 41 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var BaseObject = (function () {
+    function BaseObject() {
+        this.name = '';
+        this._isActive = false;
+        this._destroyed = false;
+        this._hasStarted = false;
+        this.id = BaseObject.NextId++;
+    }
+    Object.defineProperty(BaseObject.prototype, "isActive", {
+        get: function () { return this._isActive; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(BaseObject.prototype, "canRecycle", {
+        get: function () { return this._destroyed; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(BaseObject.prototype, "isDestroyed", {
+        get: function () { return this._destroyed; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(BaseObject.prototype, "hasStarted", {
+        get: function () { return this._hasStarted; },
+        enumerable: true,
+        configurable: true
+    });
+    BaseObject.prototype.activate = function () {
+        this._isActive = true;
+    };
+    BaseObject.prototype.deactivate = function () {
+        this._isActive = false;
+    };
+    BaseObject.prototype.reset = function () {
+        this._destroyed = false;
+        this._isActive = true;
+    };
+    BaseObject.prototype.start = function () {
+        this.activate();
+        this._hasStarted = true;
+    };
+    BaseObject.prototype.fixedUpdate = function (alpha) { return; };
+    BaseObject.prototype.update = function () { return; };
+    BaseObject.prototype.lateUpdate = function () { return; };
+    BaseObject.prototype.preRender = function () { return; };
+    BaseObject.prototype.postRender = function () { return; };
+    BaseObject.prototype.destroy = function () {
+        this._destroyed = true;
+        this._isActive = false;
+    };
+    BaseObject.NextId = 0;
+    return BaseObject;
+}());
+exports.BaseObject = BaseObject;
+
+
+/***/ }),
+/* 42 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.BroadPhaseCollisionResolver = Symbol('BroadPhaseCollisionResolver');
+
+
+/***/ }),
+/* 43 */,
+/* 44 */,
+/* 45 */
 /***/ (function(module, exports) {
 
 var g;
@@ -3944,7 +3667,7 @@ module.exports = g;
 
 
 /***/ }),
-/* 41 */
+/* 46 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3956,12 +3679,12 @@ exports.isObject = isObject;
 //# sourceMappingURL=isObject.js.map
 
 /***/ }),
-/* 42 */
+/* 47 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-var errorObject_1 = __webpack_require__(23);
+var errorObject_1 = __webpack_require__(35);
 var tryCatchTarget;
 function tryCatcher() {
     try {
@@ -3981,7 +3704,7 @@ exports.tryCatch = tryCatch;
 //# sourceMappingURL=tryCatch.js.map
 
 /***/ }),
-/* 43 */
+/* 48 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3995,12 +3718,12 @@ exports.empty = {
 //# sourceMappingURL=Observer.js.map
 
 /***/ }),
-/* 44 */
+/* 49 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-var root_1 = __webpack_require__(13);
+var root_1 = __webpack_require__(18);
 function getSymbolObservable(context) {
     var $$observable;
     var Symbol = context.Symbol;
@@ -4027,7 +3750,7 @@ exports.$$observable = exports.observable;
 //# sourceMappingURL=observable.js.map
 
 /***/ }),
-/* 45 */
+/* 50 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4039,7 +3762,7 @@ exports.isScheduler = isScheduler;
 //# sourceMappingURL=isScheduler.js.map
 
 /***/ }),
-/* 46 */
+/* 51 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(process, global) {/*! *****************************************************************************
@@ -5167,10 +4890,10 @@ var Reflect;
             Function("return this;")());
 })(Reflect || (Reflect = {}));
 //# sourceMappingURL=Reflect.js.map
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(90), __webpack_require__(40)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(94), __webpack_require__(45)))
 
 /***/ }),
-/* 47 */
+/* 52 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5234,13 +4957,166 @@ exports.Pool = Pool;
 
 
 /***/ }),
-/* 48 */
+/* 53 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+/**
+ * An error thrown when an action is invalid because the object has been
+ * unsubscribed.
+ *
+ * @see {@link Subject}
+ * @see {@link BehaviorSubject}
+ *
+ * @class ObjectUnsubscribedError
+ */
+var ObjectUnsubscribedError = (function (_super) {
+    __extends(ObjectUnsubscribedError, _super);
+    function ObjectUnsubscribedError() {
+        var err = _super.call(this, 'object unsubscribed');
+        this.name = err.name = 'ObjectUnsubscribedError';
+        this.stack = err.stack;
+        this.message = err.message;
+    }
+    return ObjectUnsubscribedError;
+}(Error));
+exports.ObjectUnsubscribedError = ObjectUnsubscribedError;
+//# sourceMappingURL=ObjectUnsubscribedError.js.map
+
+/***/ }),
+/* 54 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var Vector_1 = __webpack_require__(0);
+exports.MouseInput = Symbol('MouseInput');
+
+
+/***/ }),
+/* 55 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.TouchInput = Symbol('TouchInput');
+
+
+/***/ }),
+/* 56 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __generator = (this && this.__generator) || function (thisArg, body) {
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    function verb(n) { return function (v) { return step([n, v]); }; }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while (_) try {
+            if (f = 1, y && (t = y[op[0] & 2 ? "return" : op[0] ? "throw" : "next"]) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [0, t.value];
+            switch (op[0]) {
+                case 0: case 1: t = op; break;
+                case 4: _.label++; return { value: op[1], done: false };
+                case 5: _.label++; y = op[1]; op = [0]; continue;
+                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop(); continue;
+            }
+            op = body.call(thisArg, _);
+        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+    }
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var Observable_1 = __webpack_require__(3);
+function onceEvent(node, eventName) {
+    return __awaiter(this, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            return [2, new Promise(function (resolve, reject) {
+                    var onEvent = function (e) {
+                        resolve(e);
+                        teardown();
+                    };
+                    var onError = function (e) {
+                        reject(e);
+                        teardown();
+                    };
+                    var teardown = function () {
+                        node.removeEventListener(eventName, onEvent);
+                        node.removeEventListener('error', onError);
+                    };
+                    node.addEventListener(eventName, onEvent);
+                    node.addEventListener('error', onError);
+                })];
+        });
+    });
+}
+exports.onceEvent = onceEvent;
+function observeEvent(node, eventName) {
+    return new Observable_1.Observable(function (subscriber) {
+        node.addEventListener(eventName, function (e) { return subscriber.next(e); });
+        var parentNode = node.parentNode;
+        if (parentNode) {
+            var observer = new MutationObserver(function (records) {
+                var shouldComplete = records
+                    .reduce(function (prev, curr) { return prev.concat(listToArray(curr.removedNodes)); }, [])
+                    .some(function (removeedNode) { return removeedNode === node; });
+                if (shouldComplete) {
+                    subscriber.complete();
+                }
+            });
+            observer.observe(parentNode, { childList: true });
+        }
+    });
+}
+exports.observeEvent = observeEvent;
+function listToArray(list) {
+    return Array.prototype.slice.call(list);
+}
+exports.listToArray = listToArray;
+
+
+/***/ }),
+/* 57 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.RenderProcess = Symbol('RenderProcess');
+
+
+/***/ }),
+/* 58 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var Vector_1 = __webpack_require__(1);
 var Matrix = (function () {
     function Matrix(value) {
         this._value = [
@@ -5268,20 +5144,24 @@ var Matrix = (function () {
         configurable: true
     });
     Matrix.prototype.save = function () {
-        this._save = [
+        this._save.push([
             [this[0][0], this[0][1], this[0][2]],
             [this[1][0], this[1][1], this[1][2]]
-        ];
+        ]);
         return this;
     };
     Matrix.prototype.restore = function () {
-        this._value = [
-            [this._save[0][0], this._save[0][1], this._save[0][2]],
-            [this._save[1][0], this._save[1][1], this._save[1][2]]
-        ];
+        var last = this._save.pop();
+        if (last) {
+            this._value = last;
+        }
+        else {
+            this.reset();
+        }
         return this;
     };
     Matrix.prototype.reset = function () {
+        this._save = [];
         this._value = [
             [1, 0, 0],
             [0, 1, 0]
@@ -5380,10 +5260,8 @@ var Matrix = (function () {
         var c_minor = source[1][0] * 0 - source[1][1] * 0;
         var d_minor = source[0][1] * 1 - source[0][2] * 0;
         var e_minor = source[0][0] * 1 - source[0][2] * 0;
-        var f_minor = source[0][0] * 0 - source[0][1] * 0;
         var g_minor = source[0][1] * source[1][2] - source[0][2] * source[1][1];
         var h_minor = source[0][0] * source[1][2] - source[0][2] * source[1][0];
-        var i_minor = source[0][0] * source[1][1] - source[0][1] * source[1][0];
         var inverseDeterminant = 1 / (source[0][0] * a_minor - source[0][1] * b_minor + source[0][2] * c_minor);
         this[0][0] = inverseDeterminant * a_minor;
         this[0][1] = inverseDeterminant * -d_minor;
@@ -5412,7 +5290,7 @@ exports.Matrix = Matrix;
 
 
 /***/ }),
-/* 49 */
+/* 59 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5532,465 +5410,80 @@ exports.Tree = Tree;
 
 
 /***/ }),
-/* 50 */
+/* 60 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __metadata = (this && this.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __generator = (this && this.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while (_) try {
-            if (f = 1, y && (t = y[op[0] & 2 ? "return" : op[0] ? "throw" : "next"]) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [0, t.value];
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop(); continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-    }
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-var Screen_1 = __webpack_require__(17);
-var SceneManager_1 = __webpack_require__(18);
-var BrowserDelegate_1 = __webpack_require__(3);
-var Time_1 = __webpack_require__(28);
-var Vector_1 = __webpack_require__(0);
-var Service_1 = __webpack_require__(1);
-var Engine = (function () {
-    function Engine(screen, time, sceneManager, browser) {
-        this.screen = screen;
-        this.time = time;
-        this.sceneManager = sceneManager;
-        this.browser = browser;
-        this.gravity = Vector_1.Vector.Get(0, -100);
-        this.accumulator = 0;
-        this._isPaused = true;
-        this.isInitialized = false;
-        this.bindedmainloop = this.mainloop.bind(this);
-        this.lastTimestamp = 0;
-        this.canvas = this.browser.document.createElement('canvas');
-        this.ctx = this.canvas.getContext('2d');
+var Vector_1 = __webpack_require__(1);
+var Ray = (function () {
+    function Ray(origin, direction) {
+        if (origin === void 0) { origin = new Vector_1.Vector(); }
+        if (direction === void 0) { direction = new Vector_1.Vector(); }
+        this.origin = origin;
+        this.direction = direction;
+        this.direction.normalize();
     }
-    Object.defineProperty(Engine.prototype, "isPaused", {
-        get: function () { return this._isPaused; },
-        enumerable: true,
-        configurable: true
-    });
-    Engine.prototype.initialize = function () {
-        return __awaiter(this, void 0, void 0, function () {
-            var _this = this;
-            var _a, width, height, err_1;
-            return __generator(this, function (_b) {
-                switch (_b.label) {
-                    case 0:
-                        if (this.isInitialized) {
-                            throw new Error('Repeated engine initialization.');
-                        }
-                        this.check();
-                        this.isInitialized = true;
-                        _a = this.screen, width = _a.width, height = _a.height;
-                        this.canvas.width = width;
-                        this.canvas.height = height;
-                        this.browser.document.body.appendChild(this.canvas);
-                        this.browser.resize$.subscribe(function (e) { return _this.onResize(e); });
-                        this.sceneManager.sceneLoaded$.subscribe(function (s) { return _this.onSceneLoaded(s); });
-                        _b.label = 1;
-                    case 1:
-                        _b.trys.push([1, 3, , 4]);
-                        return [4, this.sceneManager.currentScene.load()];
-                    case 2:
-                        _b.sent();
-                        return [3, 4];
-                    case 3:
-                        err_1 = _b.sent();
-                        console.error(err_1);
-                        return [3, 4];
-                    case 4:
-                        this.currentScene = this.sceneManager.currentScene;
-                        this.resume();
-                        return [2];
-                }
-            });
-        });
+    Ray.prototype.getPoint = function (distance) {
+        return this.direction.clone().multiply(distance).add(this.origin);
     };
-    Engine.prototype.pause = function () {
-        this._isPaused = true;
-    };
-    Engine.prototype.resume = function () {
-        this._isPaused = false;
-        requestAnimationFrame(this.bindedmainloop);
-    };
-    Engine.prototype.check = function () {
-        if (!this.sceneManager.currentScene) {
-            throw new Error('No active scene');
+    Ray.prototype.intersect = function (another) {
+        var p = this.origin;
+        var r = this.direction;
+        var q;
+        var s;
+        var l = 0;
+        if (another instanceof Ray) {
+            q = another.origin;
+            s = another.direction;
         }
-    };
-    Engine.prototype.mainloop = function (timestamp) {
-        if (this._isPaused) {
-            return;
+        else {
+            q = another.begin;
+            s = another.getDirection();
+            l = another.length;
         }
-        var frameTime = timestamp - this.lastTimestamp;
-        this.lastTimestamp = timestamp;
-        this.accumulator += frameTime;
-        if (this.accumulator > 200) {
-            this.accumulator = 200;
+        var pq = q.clone().subtract(p);
+        var r_x_s = r.cross(s);
+        var pq_x_r = pq.cross(r);
+        if (r_x_s === 0) {
+            return -1;
         }
-        while (this.accumulator > this.time.fixedDeltaTime) {
-            this.time.tick(frameTime);
-            this.currentScene.fixedUpdate(1);
-            this.accumulator -= this.time.fixedDeltaTime;
+        else {
+            var t = pq.cross(s) / r_x_s;
+            var u = pq_x_r / r_x_s;
+            if (l && u > l) {
+                return -1;
+            }
+            if (u >= 0 && t >= 0) {
+                return t;
+            }
         }
-        this.currentScene.fixedUpdate(this.accumulator / this.time.fixedDeltaTime);
-        this.accumulator = 0;
-        this.currentScene.update();
-        this.currentScene.lateUpdate();
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        this.currentScene.render(this.ctx);
-        this.currentScene.postRender();
-        requestAnimationFrame(this.bindedmainloop);
+        return -1;
     };
-    Engine.prototype.onResize = function (e) {
-        var _a = this.screen, width = _a.width, height = _a.height;
-        this.canvas.width = width;
-        this.canvas.height = height;
-    };
-    Engine.prototype.onSceneLoaded = function (scene) {
-        this.currentScene = scene;
-    };
-    Engine = __decorate([
-        Service_1.Service(),
-        __metadata("design:paramtypes", [Screen_1.Screen,
-            Time_1.Time,
-            SceneManager_1.SceneManager,
-            BrowserDelegate_1.BrowserDelegate])
-    ], Engine);
-    return Engine;
+    return Ray;
 }());
-exports.Engine = Engine;
+exports.Ray = Ray;
 
 
 /***/ }),
-/* 51 */
+/* 61 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-__webpack_require__(46);
-var Type_1 = __webpack_require__(10);
-var ProviderRegistry = (function () {
-    function ProviderRegistry() {
-        this.providers = new Map();
-        this.service = new Map();
-    }
-    ProviderRegistry.prototype.provide = function (provider) {
-        this.providers.set(provider.token, provider);
-    };
-    ProviderRegistry.prototype.resolve = function (token) {
-        return this.providers.get(token);
-    };
-    ProviderRegistry.prototype.get = function (token) {
-        var resolvedToken = Type_1.resolveForwardRef(token);
-        if (this.service.has(resolvedToken)) {
-            return this.service.get(resolvedToken);
-        }
-        var provider = this.resolve(resolvedToken);
-        if (!provider) {
-            return;
-        }
-        var service;
-        if (provider.useClass) {
-            service = this.instantiate(provider.useClass);
-        }
-        if (provider.useFactory) {
-            service = this.create(provider.useFactory);
-        }
-        if (provider.useValue) {
-            service = provider.useValue;
-        }
-        if (service) {
-            this.service.set(resolvedToken, service);
-        }
-        return service;
-    };
-    ProviderRegistry.prototype.instantiate = function (InstanceType) {
-        var args = [];
-        for (var _i = 1; _i < arguments.length; _i++) {
-            args[_i - 1] = arguments[_i];
-        }
-        this.resolveDependencies(InstanceType, args);
-        return new (InstanceType.bind.apply(InstanceType, [void 0].concat(args)))();
-    };
-    ProviderRegistry.prototype.create = function (factory) {
-        var args = [];
-        for (var _i = 1; _i < arguments.length; _i++) {
-            args[_i - 1] = arguments[_i];
-        }
-        this.resolveDependencies(factory, args);
-        return factory.apply(void 0, args);
-    };
-    ProviderRegistry.prototype.resolveDependencies = function (target, args) {
-        var _this = this;
-        var dependencies = Reflect.getMetadata('design:paramtypes', target) || [];
-        dependencies.forEach(function (dependency, index) {
-            if (!args[index]) {
-                args[index] = _this.get(dependency);
-            }
-        });
-    };
-    return ProviderRegistry;
-}());
-exports.ProviderRegistry = ProviderRegistry;
-exports.providerRegistry = new ProviderRegistry();
+exports.NarrowPhaseCollisionResolver = Symbol('NarrowPhaseCollisionResolver');
 
 
 /***/ }),
-/* 52 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
-var Observable_1 = __webpack_require__(2);
-var Subscriber_1 = __webpack_require__(9);
-var Subscription_1 = __webpack_require__(16);
-var ObjectUnsubscribedError_1 = __webpack_require__(53);
-var SubjectSubscription_1 = __webpack_require__(91);
-var rxSubscriber_1 = __webpack_require__(24);
-/**
- * @class SubjectSubscriber<T>
- */
-var SubjectSubscriber = (function (_super) {
-    __extends(SubjectSubscriber, _super);
-    function SubjectSubscriber(destination) {
-        _super.call(this, destination);
-        this.destination = destination;
-    }
-    return SubjectSubscriber;
-}(Subscriber_1.Subscriber));
-exports.SubjectSubscriber = SubjectSubscriber;
-/**
- * @class Subject<T>
- */
-var Subject = (function (_super) {
-    __extends(Subject, _super);
-    function Subject() {
-        _super.call(this);
-        this.observers = [];
-        this.closed = false;
-        this.isStopped = false;
-        this.hasError = false;
-        this.thrownError = null;
-    }
-    Subject.prototype[rxSubscriber_1.rxSubscriber] = function () {
-        return new SubjectSubscriber(this);
-    };
-    Subject.prototype.lift = function (operator) {
-        var subject = new AnonymousSubject(this, this);
-        subject.operator = operator;
-        return subject;
-    };
-    Subject.prototype.next = function (value) {
-        if (this.closed) {
-            throw new ObjectUnsubscribedError_1.ObjectUnsubscribedError();
-        }
-        if (!this.isStopped) {
-            var observers = this.observers;
-            var len = observers.length;
-            var copy = observers.slice();
-            for (var i = 0; i < len; i++) {
-                copy[i].next(value);
-            }
-        }
-    };
-    Subject.prototype.error = function (err) {
-        if (this.closed) {
-            throw new ObjectUnsubscribedError_1.ObjectUnsubscribedError();
-        }
-        this.hasError = true;
-        this.thrownError = err;
-        this.isStopped = true;
-        var observers = this.observers;
-        var len = observers.length;
-        var copy = observers.slice();
-        for (var i = 0; i < len; i++) {
-            copy[i].error(err);
-        }
-        this.observers.length = 0;
-    };
-    Subject.prototype.complete = function () {
-        if (this.closed) {
-            throw new ObjectUnsubscribedError_1.ObjectUnsubscribedError();
-        }
-        this.isStopped = true;
-        var observers = this.observers;
-        var len = observers.length;
-        var copy = observers.slice();
-        for (var i = 0; i < len; i++) {
-            copy[i].complete();
-        }
-        this.observers.length = 0;
-    };
-    Subject.prototype.unsubscribe = function () {
-        this.isStopped = true;
-        this.closed = true;
-        this.observers = null;
-    };
-    Subject.prototype._trySubscribe = function (subscriber) {
-        if (this.closed) {
-            throw new ObjectUnsubscribedError_1.ObjectUnsubscribedError();
-        }
-        else {
-            return _super.prototype._trySubscribe.call(this, subscriber);
-        }
-    };
-    Subject.prototype._subscribe = function (subscriber) {
-        if (this.closed) {
-            throw new ObjectUnsubscribedError_1.ObjectUnsubscribedError();
-        }
-        else if (this.hasError) {
-            subscriber.error(this.thrownError);
-            return Subscription_1.Subscription.EMPTY;
-        }
-        else if (this.isStopped) {
-            subscriber.complete();
-            return Subscription_1.Subscription.EMPTY;
-        }
-        else {
-            this.observers.push(subscriber);
-            return new SubjectSubscription_1.SubjectSubscription(this, subscriber);
-        }
-    };
-    Subject.prototype.asObservable = function () {
-        var observable = new Observable_1.Observable();
-        observable.source = this;
-        return observable;
-    };
-    Subject.create = function (destination, source) {
-        return new AnonymousSubject(destination, source);
-    };
-    return Subject;
-}(Observable_1.Observable));
-exports.Subject = Subject;
-/**
- * @class AnonymousSubject<T>
- */
-var AnonymousSubject = (function (_super) {
-    __extends(AnonymousSubject, _super);
-    function AnonymousSubject(destination, source) {
-        _super.call(this);
-        this.destination = destination;
-        this.source = source;
-    }
-    AnonymousSubject.prototype.next = function (value) {
-        var destination = this.destination;
-        if (destination && destination.next) {
-            destination.next(value);
-        }
-    };
-    AnonymousSubject.prototype.error = function (err) {
-        var destination = this.destination;
-        if (destination && destination.error) {
-            this.destination.error(err);
-        }
-    };
-    AnonymousSubject.prototype.complete = function () {
-        var destination = this.destination;
-        if (destination && destination.complete) {
-            this.destination.complete();
-        }
-    };
-    AnonymousSubject.prototype._subscribe = function (subscriber) {
-        var source = this.source;
-        if (source) {
-            return this.source.subscribe(subscriber);
-        }
-        else {
-            return Subscription_1.Subscription.EMPTY;
-        }
-    };
-    return AnonymousSubject;
-}(Subject));
-exports.AnonymousSubject = AnonymousSubject;
-//# sourceMappingURL=Subject.js.map
-
-/***/ }),
-/* 53 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
-/**
- * An error thrown when an action is invalid because the object has been
- * unsubscribed.
- *
- * @see {@link Subject}
- * @see {@link BehaviorSubject}
- *
- * @class ObjectUnsubscribedError
- */
-var ObjectUnsubscribedError = (function (_super) {
-    __extends(ObjectUnsubscribedError, _super);
-    function ObjectUnsubscribedError() {
-        var err = _super.call(this, 'object unsubscribed');
-        this.name = err.name = 'ObjectUnsubscribedError';
-        this.stack = err.stack;
-        this.message = err.message;
-    }
-    return ObjectUnsubscribedError;
-}(Error));
-exports.ObjectUnsubscribedError = ObjectUnsubscribedError;
-//# sourceMappingURL=ObjectUnsubscribedError.js.map
-
-/***/ }),
-/* 54 */
+/* 62 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var BehaviorSubject_1 = __webpack_require__(93);
+var BehaviorSubject_1 = __webpack_require__(113);
 var Resource = (function () {
     function Resource() {
         this._isLoaded = new BehaviorSubject_1.BehaviorSubject(false);
@@ -6018,7 +5511,7 @@ exports.Resource = Resource;
 
 
 /***/ }),
-/* 55 */
+/* 63 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6042,25 +5535,26 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-var GameObject_1 = __webpack_require__(4);
-var Screen_1 = __webpack_require__(17);
-var GameObjectInitializer_1 = __webpack_require__(29);
-var Color_1 = __webpack_require__(6);
-var Bounds_1 = __webpack_require__(19);
-var Rect_1 = __webpack_require__(56);
-var Matrix_1 = __webpack_require__(48);
-var Type_1 = __webpack_require__(10);
-var RendererComponent_1 = __webpack_require__(12);
-var BrowserDelegate_1 = __webpack_require__(3);
-var Service_1 = __webpack_require__(1);
+var GameObject_1 = __webpack_require__(6);
+var Screen_1 = __webpack_require__(19);
+var GameObjectInitializer_1 = __webpack_require__(28);
+var Color_1 = __webpack_require__(7);
+var Bounds_1 = __webpack_require__(29);
+var Rect_1 = __webpack_require__(64);
+var Matrix_1 = __webpack_require__(58);
+var Type_1 = __webpack_require__(14);
+var BrowserDelegate_1 = __webpack_require__(4);
+var Service_1 = __webpack_require__(2);
+var Inject_1 = __webpack_require__(0);
 exports.MainCamera = Symbol('MainCamera');
 var Camera = (function (_super) {
     __extends(Camera, _super);
     function Camera(browser, screen, gameObjectInitializer) {
         var _this = _super.call(this, gameObjectInitializer) || this;
-        _this.browser = browser;
-        _this.screen = screen;
         _this.aspect = 16 / 9;
         _this.backgroundColor = Color_1.Color.Black;
         _this.toWorldMatrix = new Matrix_1.Matrix();
@@ -6069,14 +5563,10 @@ var Camera = (function (_super) {
         _this.eventMask = Type_1.AllBuiltInLayer;
         _this.rect = new Rect_1.Rect();
         _this.bounds = new Bounds_1.Bounds();
-        _this.canvas = browser.document.createElement('canvas');
-        _this.ctx = _this.canvas.getContext('2d');
-        _this.setSize(_this.screen.width, _this.screen.height);
+        _this.setSize(screen.width, screen.height);
         return _this;
     }
     Camera.prototype.setSize = function (width, height) {
-        this.canvas.width = width;
-        this.canvas.height = height;
         this.toScreenMatrix.reset();
         this.rect.width = width;
         this.rect.height = height;
@@ -6084,34 +5574,20 @@ var Camera = (function (_super) {
         var halfHeight = height * 0.5;
         this.toScreenMatrix.setTranslation(halfWidth, halfHeight);
         this.toScreenMatrix.setScaling(0, -1);
-        this.toScreenMatrix.save();
         this.bounds.extents.setTo(halfWidth, halfHeight);
     };
     Camera.prototype.update = function () {
         _super.prototype.update.call(this);
-        this.toScreenMatrix.restore();
+        this.toScreenMatrix.save();
         this.toScreenMatrix.setTranslation(-this.transform.position.x, -this.transform.position.y);
         this.toScreenMatrix.setRotatation(this.transform.rotation);
         this.toScreenMatrix.setScaling(this.transform.scale);
         this.toWorldMatrix.invertFrom(this.toScreenMatrix);
         this.bounds.center.copy(this.transform.position);
     };
-    Camera.prototype.render = function (ctx, gameObjects) {
-        var _this = this;
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        this.ctx.save();
-        this.ctx.fillStyle = this.backgroundColor.toHexString();
-        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-        this.ctx.restore();
-        gameObjects.forEachChildren(function (gameObject) {
-            if ((gameObject.layer & _this.cullingMask) === 0) {
-                return;
-            }
-            var renderers = gameObject.getComponents(RendererComponent_1.RendererComponent)
-                .filter(function (renderer) { return _this.checkGameObjectVisible(renderer); });
-            renderers.forEach(function (renderer) { return renderer.render(_this.ctx, _this.toScreenMatrix); });
-        });
-        ctx.drawImage(this.canvas, 0, 0, this.canvas.width, this.canvas.height, this.rect.position.x, this.rect.position.y, this.rect.width, this.rect.height);
+    Camera.prototype.postRender = function () {
+        _super.prototype.postRender.call(this);
+        this.toScreenMatrix.restore();
     };
     Camera.prototype.screenToWorld = function (point) {
         var result = point.clone();
@@ -6123,27 +5599,12 @@ var Camera = (function (_super) {
         this.toScreenMatrix.multiplyToPoint(result);
         return result;
     };
-    Camera.prototype.checkGameObjectVisible = function (renderer) {
-        var isVisible = this.bounds.intersects(renderer.bounds);
-        if (isVisible) {
-            if (!renderer.isVisible) {
-                renderer.isVisible = true;
-                renderer.onBecameVisible();
-            }
-        }
-        else {
-            if (renderer.isVisible) {
-                renderer.isVisible = false;
-                renderer.onBecameInvisible();
-            }
-        }
-        return isVisible;
-    };
     Camera = __decorate([
         Service_1.Service(exports.MainCamera),
-        __metadata("design:paramtypes", [BrowserDelegate_1.BrowserDelegate,
-            Screen_1.Screen,
-            GameObjectInitializer_1.GameObjectInitializer])
+        __param(0, Inject_1.Inject(BrowserDelegate_1.BrowserDelegate)),
+        __param(1, Inject_1.Inject(Screen_1.Screen)),
+        __param(2, Inject_1.Inject(GameObjectInitializer_1.GameObjectInitializer)),
+        __metadata("design:paramtypes", [Object, Object, Object])
     ], Camera);
     return Camera;
 }(GameObject_1.GameObject));
@@ -6151,13 +5612,13 @@ exports.Camera = Camera;
 
 
 /***/ }),
-/* 56 */
+/* 64 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var Vector_1 = __webpack_require__(0);
+var Vector_1 = __webpack_require__(1);
 var Rect = (function () {
     function Rect(position, width, height) {
         if (position === void 0) { position = new Vector_1.Vector(); }
@@ -6238,174 +5699,44 @@ exports.Rect = Rect;
 
 
 /***/ }),
-/* 57 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-var ArrayUtility_1 = __webpack_require__(5);
-function RequireComponent(RequireTypes) {
-    return function (ComponentType) {
-        var requireComponentTypes = Reflect.getMetadata('component:require', ComponentType) || [];
-        RequireTypes.forEach(function (RequireType) { return ArrayUtility_1.addToArray(requireComponentTypes, RequireType); });
-        Reflect.defineMetadata('component:require', requireComponentTypes, ComponentType);
-    };
-}
-exports.RequireComponent = RequireComponent;
-
-
-/***/ }),
-/* 58 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-var ArrayUtility_1 = __webpack_require__(5);
-var Pair_1 = __webpack_require__(94);
-var Service_1 = __webpack_require__(1);
-var BroadPhaseCollisionResolver = (function () {
-    function BroadPhaseCollisionResolver() {
-        this.awakeColliders = [];
-        this.sleepingColliders = [];
-        this._pairs = [];
-    }
-    Object.defineProperty(BroadPhaseCollisionResolver.prototype, "pairs", {
-        get: function () { return this._pairs; },
-        enumerable: true,
-        configurable: true
-    });
-    BroadPhaseCollisionResolver.prototype.track = function (collider) {
-        if (collider.rigidbody && !collider.rigidbody.isSleeping) {
-            return ArrayUtility_1.addToArray(this.awakeColliders, collider);
-        }
-        else {
-            return ArrayUtility_1.addToArray(this.sleepingColliders, collider);
-        }
-    };
-    BroadPhaseCollisionResolver.prototype.untrack = function (collider) {
-        if (ArrayUtility_1.removeFromArray(this.awakeColliders, collider)) {
-            return true;
-        }
-        return ArrayUtility_1.removeFromArray(this.sleepingColliders, collider);
-    };
-    BroadPhaseCollisionResolver.prototype.fixedUpdate = function () {
-        this._pairs.forEach(function (pair) { return Pair_1.Pair.Put(pair); });
-        this._pairs.splice(0, this._pairs.length);
-        var awakeLength = this.awakeColliders.length;
-        var sleepingLength = this.sleepingColliders.length;
-        var colliderA;
-        var colliderB;
-        for (var a = 0; a < awakeLength; a++) {
-            colliderA = this.awakeColliders[a];
-            if (!colliderA.host.isActive) {
-                continue;
-            }
-            for (var b = a + 1; b < awakeLength; b++) {
-                colliderB = this.awakeColliders[b];
-                if (!colliderB.host.isActive) {
-                    continue;
-                }
-                if ((colliderA.layer & colliderB.layer) === 0) {
-                    continue;
-                }
-                if (colliderA.bounds.intersects(colliderB.bounds)) {
-                    var pair = Pair_1.Pair.Get(colliderA, colliderB);
-                    if (pair) {
-                        this._pairs.push(pair);
-                    }
-                }
-            }
-            for (var b = 0; b < sleepingLength; b++) {
-                colliderB = this.sleepingColliders[b];
-                if (!colliderB.host.isActive) {
-                    continue;
-                }
-                if ((colliderA.layer & colliderB.layer) === 0) {
-                    continue;
-                }
-                if (colliderA.bounds.intersects(colliderB.bounds)) {
-                    var pair = Pair_1.Pair.Get(colliderA, colliderB);
-                    if (pair) {
-                        this._pairs.push(pair);
-                    }
-                }
-            }
-        }
-    };
-    BroadPhaseCollisionResolver.prototype.update = function () {
-        var _this = this;
-        var goToSleep = this.awakeColliders.filter(function (collider) { return collider.rigidbody && collider.rigidbody.isSleeping; });
-        goToSleep.forEach(function (collider) {
-            ArrayUtility_1.removeFromArray(_this.awakeColliders, collider);
-            ArrayUtility_1.addToArray(_this.sleepingColliders, collider);
-        });
-        var goToAwake = this.sleepingColliders.filter(function (collider) { return collider.rigidbody && !collider.rigidbody.isSleeping; });
-        goToAwake.forEach(function (collider) {
-            ArrayUtility_1.removeFromArray(_this.sleepingColliders, collider);
-            ArrayUtility_1.addToArray(_this.awakeColliders, collider);
-        });
-        this._pairs.forEach(function (pair) { return Pair_1.Pair.Put(pair); });
-        this._pairs.splice(0, this._pairs.length);
-    };
-    BroadPhaseCollisionResolver = __decorate([
-        Service_1.Service()
-    ], BroadPhaseCollisionResolver);
-    return BroadPhaseCollisionResolver;
-}());
-exports.BroadPhaseCollisionResolver = BroadPhaseCollisionResolver;
-
-
-/***/ }),
-/* 59 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-var ForceMode;
-(function (ForceMode) {
-    ForceMode[ForceMode["Force"] = 0] = "Force";
-    ForceMode[ForceMode["Acceleration"] = 1] = "Acceleration";
-    ForceMode[ForceMode["Impulse"] = 2] = "Impulse";
-    ForceMode[ForceMode["VelocityChange"] = 3] = "VelocityChange";
-})(ForceMode = exports.ForceMode || (exports.ForceMode = {}));
-
-
-/***/ }),
-/* 60 */,
-/* 61 */,
-/* 62 */,
-/* 63 */,
-/* 64 */,
 /* 65 */,
 /* 66 */,
-/* 67 */
+/* 67 */,
+/* 68 */,
+/* 69 */,
+/* 70 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-var Observable_1 = __webpack_require__(2);
-var merge_1 = __webpack_require__(71);
+Object.defineProperty(exports, "__esModule", { value: true });
+__webpack_require__(71);
+__webpack_require__(87);
+__webpack_require__(90);
+__webpack_require__(92);
+__webpack_require__(51);
+
+
+/***/ }),
+/* 71 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var Observable_1 = __webpack_require__(3);
+var merge_1 = __webpack_require__(75);
 Observable_1.Observable.merge = merge_1.merge;
 //# sourceMappingURL=merge.js.map
 
 /***/ }),
-/* 68 */
+/* 72 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-var Subscriber_1 = __webpack_require__(9);
-var rxSubscriber_1 = __webpack_require__(24);
-var Observer_1 = __webpack_require__(43);
+var Subscriber_1 = __webpack_require__(13);
+var rxSubscriber_1 = __webpack_require__(36);
+var Observer_1 = __webpack_require__(48);
 function toSubscriber(nextOrObserver, error, complete) {
     if (nextOrObserver) {
         if (nextOrObserver instanceof Subscriber_1.Subscriber) {
@@ -6424,7 +5755,7 @@ exports.toSubscriber = toSubscriber;
 //# sourceMappingURL=toSubscriber.js.map
 
 /***/ }),
-/* 69 */
+/* 73 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6433,7 +5764,7 @@ exports.isArray = Array.isArray || (function (x) { return x && typeof x.length =
 //# sourceMappingURL=isArray.js.map
 
 /***/ }),
-/* 70 */
+/* 74 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6464,25 +5795,25 @@ exports.UnsubscriptionError = UnsubscriptionError;
 //# sourceMappingURL=UnsubscriptionError.js.map
 
 /***/ }),
-/* 71 */
+/* 75 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-var merge_1 = __webpack_require__(72);
+var merge_1 = __webpack_require__(76);
 exports.merge = merge_1.mergeStatic;
 //# sourceMappingURL=merge.js.map
 
 /***/ }),
-/* 72 */
+/* 76 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-var Observable_1 = __webpack_require__(2);
-var ArrayObservable_1 = __webpack_require__(73);
-var mergeAll_1 = __webpack_require__(76);
-var isScheduler_1 = __webpack_require__(45);
+var Observable_1 = __webpack_require__(3);
+var ArrayObservable_1 = __webpack_require__(77);
+var mergeAll_1 = __webpack_require__(80);
+var isScheduler_1 = __webpack_require__(50);
 /* tslint:enable:max-line-length */
 /**
  * Creates an output Observable which concurrently emits all values from every
@@ -6625,7 +5956,7 @@ exports.mergeStatic = mergeStatic;
 //# sourceMappingURL=merge.js.map
 
 /***/ }),
-/* 73 */
+/* 77 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6635,10 +5966,10 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var Observable_1 = __webpack_require__(2);
-var ScalarObservable_1 = __webpack_require__(74);
-var EmptyObservable_1 = __webpack_require__(75);
-var isScheduler_1 = __webpack_require__(45);
+var Observable_1 = __webpack_require__(3);
+var ScalarObservable_1 = __webpack_require__(78);
+var EmptyObservable_1 = __webpack_require__(79);
+var isScheduler_1 = __webpack_require__(50);
 /**
  * We need this JSDoc comment for affecting ESDoc.
  * @extends {Ignored}
@@ -6753,7 +6084,7 @@ exports.ArrayObservable = ArrayObservable;
 //# sourceMappingURL=ArrayObservable.js.map
 
 /***/ }),
-/* 74 */
+/* 78 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6763,7 +6094,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var Observable_1 = __webpack_require__(2);
+var Observable_1 = __webpack_require__(3);
 /**
  * We need this JSDoc comment for affecting ESDoc.
  * @extends {Ignored}
@@ -6817,7 +6148,7 @@ exports.ScalarObservable = ScalarObservable;
 //# sourceMappingURL=ScalarObservable.js.map
 
 /***/ }),
-/* 75 */
+/* 79 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6827,7 +6158,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var Observable_1 = __webpack_require__(2);
+var Observable_1 = __webpack_require__(3);
 /**
  * We need this JSDoc comment for affecting ESDoc.
  * @extends {Ignored}
@@ -6904,7 +6235,7 @@ exports.EmptyObservable = EmptyObservable;
 //# sourceMappingURL=EmptyObservable.js.map
 
 /***/ }),
-/* 76 */
+/* 80 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6914,8 +6245,8 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var OuterSubscriber_1 = __webpack_require__(77);
-var subscribeToResult_1 = __webpack_require__(78);
+var OuterSubscriber_1 = __webpack_require__(81);
+var subscribeToResult_1 = __webpack_require__(82);
 /**
  * Converts a higher-order Observable into a first-order Observable which
  * concurrently delivers all values that are emitted on the inner Observables.
@@ -7021,7 +6352,7 @@ exports.MergeAllSubscriber = MergeAllSubscriber;
 //# sourceMappingURL=mergeAll.js.map
 
 /***/ }),
-/* 77 */
+/* 81 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7031,7 +6362,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var Subscriber_1 = __webpack_require__(9);
+var Subscriber_1 = __webpack_require__(13);
 /**
  * We need this JSDoc comment for affecting ESDoc.
  * @ignore
@@ -7057,19 +6388,19 @@ exports.OuterSubscriber = OuterSubscriber;
 //# sourceMappingURL=OuterSubscriber.js.map
 
 /***/ }),
-/* 78 */
+/* 82 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-var root_1 = __webpack_require__(13);
-var isArrayLike_1 = __webpack_require__(79);
-var isPromise_1 = __webpack_require__(80);
-var isObject_1 = __webpack_require__(41);
-var Observable_1 = __webpack_require__(2);
-var iterator_1 = __webpack_require__(81);
-var InnerSubscriber_1 = __webpack_require__(82);
-var observable_1 = __webpack_require__(44);
+var root_1 = __webpack_require__(18);
+var isArrayLike_1 = __webpack_require__(83);
+var isPromise_1 = __webpack_require__(84);
+var isObject_1 = __webpack_require__(46);
+var Observable_1 = __webpack_require__(3);
+var iterator_1 = __webpack_require__(85);
+var InnerSubscriber_1 = __webpack_require__(86);
+var observable_1 = __webpack_require__(49);
 function subscribeToResult(outerSubscriber, result, outerValue, outerIndex) {
     var destination = new InnerSubscriber_1.InnerSubscriber(outerSubscriber, outerValue, outerIndex);
     if (destination.closed) {
@@ -7141,7 +6472,7 @@ exports.subscribeToResult = subscribeToResult;
 //# sourceMappingURL=subscribeToResult.js.map
 
 /***/ }),
-/* 79 */
+/* 83 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7150,7 +6481,7 @@ exports.isArrayLike = (function (x) { return x && typeof x.length === 'number'; 
 //# sourceMappingURL=isArrayLike.js.map
 
 /***/ }),
-/* 80 */
+/* 84 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7162,12 +6493,12 @@ exports.isPromise = isPromise;
 //# sourceMappingURL=isPromise.js.map
 
 /***/ }),
-/* 81 */
+/* 85 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-var root_1 = __webpack_require__(13);
+var root_1 = __webpack_require__(18);
 function symbolIteratorPonyfill(root) {
     var Symbol = root.Symbol;
     if (typeof Symbol === 'function') {
@@ -7206,7 +6537,7 @@ exports.$$iterator = exports.iterator;
 //# sourceMappingURL=iterator.js.map
 
 /***/ }),
-/* 82 */
+/* 86 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7216,7 +6547,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var Subscriber_1 = __webpack_require__(9);
+var Subscriber_1 = __webpack_require__(13);
 /**
  * We need this JSDoc comment for affecting ESDoc.
  * @ignore
@@ -7248,28 +6579,28 @@ exports.InnerSubscriber = InnerSubscriber;
 //# sourceMappingURL=InnerSubscriber.js.map
 
 /***/ }),
-/* 83 */
+/* 87 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-var Observable_1 = __webpack_require__(2);
-var fromEvent_1 = __webpack_require__(84);
+var Observable_1 = __webpack_require__(3);
+var fromEvent_1 = __webpack_require__(88);
 Observable_1.Observable.fromEvent = fromEvent_1.fromEvent;
 //# sourceMappingURL=fromEvent.js.map
 
 /***/ }),
-/* 84 */
+/* 88 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-var FromEventObservable_1 = __webpack_require__(85);
+var FromEventObservable_1 = __webpack_require__(89);
 exports.fromEvent = FromEventObservable_1.FromEventObservable.create;
 //# sourceMappingURL=fromEvent.js.map
 
 /***/ }),
-/* 85 */
+/* 89 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7279,11 +6610,11 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var Observable_1 = __webpack_require__(2);
-var tryCatch_1 = __webpack_require__(42);
-var isFunction_1 = __webpack_require__(22);
-var errorObject_1 = __webpack_require__(23);
-var Subscription_1 = __webpack_require__(16);
+var Observable_1 = __webpack_require__(3);
+var tryCatch_1 = __webpack_require__(47);
+var isFunction_1 = __webpack_require__(34);
+var errorObject_1 = __webpack_require__(35);
+var Subscription_1 = __webpack_require__(27);
 var toString = Object.prototype.toString;
 function isNodeStyleEventEmitter(sourceObj) {
     return !!sourceObj && typeof sourceObj.addListener === 'function' && typeof sourceObj.removeListener === 'function';
@@ -7415,18 +6746,18 @@ exports.FromEventObservable = FromEventObservable;
 //# sourceMappingURL=FromEventObservable.js.map
 
 /***/ }),
-/* 86 */
+/* 90 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-var Observable_1 = __webpack_require__(2);
-var map_1 = __webpack_require__(87);
+var Observable_1 = __webpack_require__(3);
+var map_1 = __webpack_require__(91);
 Observable_1.Observable.prototype.map = map_1.map;
 //# sourceMappingURL=map.js.map
 
 /***/ }),
-/* 87 */
+/* 91 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7436,7 +6767,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var Subscriber_1 = __webpack_require__(9);
+var Subscriber_1 = __webpack_require__(13);
 /**
  * Applies a given `project` function to each value emitted by the source
  * Observable, and emits the resulting values as an Observable.
@@ -7519,18 +6850,18 @@ var MapSubscriber = (function (_super) {
 //# sourceMappingURL=map.js.map
 
 /***/ }),
-/* 88 */
+/* 92 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-var Observable_1 = __webpack_require__(2);
-var filter_1 = __webpack_require__(89);
+var Observable_1 = __webpack_require__(3);
+var filter_1 = __webpack_require__(93);
 Observable_1.Observable.prototype.filter = filter_1.filter;
 //# sourceMappingURL=filter.js.map
 
 /***/ }),
-/* 89 */
+/* 93 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7540,7 +6871,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var Subscriber_1 = __webpack_require__(9);
+var Subscriber_1 = __webpack_require__(13);
 /* tslint:enable:max-line-length */
 /**
  * Filter items emitted by the source Observable by only emitting those that
@@ -7628,7 +6959,7 @@ var FilterSubscriber = (function (_super) {
 //# sourceMappingURL=filter.js.map
 
 /***/ }),
-/* 90 */
+/* 94 */
 /***/ (function(module, exports) {
 
 // shim for using process in browser
@@ -7818,7 +7149,365 @@ process.umask = function() { return 0; };
 
 
 /***/ }),
-/* 91 */
+/* 95 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __generator = (this && this.__generator) || function (thisArg, body) {
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    function verb(n) { return function (v) { return step([n, v]); }; }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while (_) try {
+            if (f = 1, y && (t = y[op[0] & 2 ? "return" : op[0] ? "throw" : "next"]) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [0, t.value];
+            switch (op[0]) {
+                case 0: case 1: t = op; break;
+                case 4: _.label++; return { value: op[1], done: false };
+                case 5: _.label++; y = op[1]; op = [0]; continue;
+                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop(); continue;
+            }
+            op = body.call(thisArg, _);
+        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+    }
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var Inject_1 = __webpack_require__(0);
+var Screen_1 = __webpack_require__(19);
+var SceneManager_1 = __webpack_require__(15);
+var BrowserDelegate_1 = __webpack_require__(4);
+var Time_1 = __webpack_require__(20);
+var Vector_1 = __webpack_require__(1);
+var Service_1 = __webpack_require__(2);
+var Engine_1 = __webpack_require__(21);
+var EngineImplement = (function () {
+    function EngineImplement(screen, time, sceneManager, browser) {
+        this.screen = screen;
+        this.time = time;
+        this.sceneManager = sceneManager;
+        this.browser = browser;
+        this.gravity = Vector_1.Vector.Get(0, -100);
+        this.accumulator = 0;
+        this._isPaused = true;
+        this.isInitialized = false;
+        this.bindedmainloop = this.mainloop.bind(this);
+        this.lastTimestamp = 0;
+        this.canvas = this.browser.document.createElement('canvas');
+        this.ctx = this.canvas.getContext('2d');
+    }
+    Object.defineProperty(EngineImplement.prototype, "isPaused", {
+        get: function () { return this._isPaused; },
+        enumerable: true,
+        configurable: true
+    });
+    EngineImplement.prototype.initialize = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var _this = this;
+            var _a, width, height, err_1;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0:
+                        if (this.isInitialized) {
+                            throw new Error('Repeated engine initialization.');
+                        }
+                        this.check();
+                        this.isInitialized = true;
+                        _a = this.screen, width = _a.width, height = _a.height;
+                        this.canvas.width = width;
+                        this.canvas.height = height;
+                        this.browser.document.body.appendChild(this.canvas);
+                        this.browser.resize$.subscribe(function (e) { return _this.onResize(e); });
+                        this.sceneManager.sceneLoaded$.subscribe(function (s) { return _this.onSceneLoaded(s); });
+                        _b.label = 1;
+                    case 1:
+                        _b.trys.push([1, 3, , 4]);
+                        return [4, this.sceneManager.currentScene.load()];
+                    case 2:
+                        _b.sent();
+                        return [3, 4];
+                    case 3:
+                        err_1 = _b.sent();
+                        console.error(err_1);
+                        return [3, 4];
+                    case 4:
+                        this.currentScene = this.sceneManager.currentScene;
+                        this.resume();
+                        return [2];
+                }
+            });
+        });
+    };
+    EngineImplement.prototype.pause = function () {
+        this._isPaused = true;
+    };
+    EngineImplement.prototype.resume = function () {
+        this._isPaused = false;
+        requestAnimationFrame(this.bindedmainloop);
+    };
+    EngineImplement.prototype.check = function () {
+        if (!this.sceneManager.currentScene) {
+            throw new Error('No active scene');
+        }
+    };
+    EngineImplement.prototype.mainloop = function (timestamp) {
+        if (this._isPaused) {
+            return;
+        }
+        var frameTime = timestamp - this.lastTimestamp;
+        this.lastTimestamp = timestamp;
+        this.accumulator += frameTime;
+        if (this.accumulator > 200) {
+            this.accumulator = 200;
+        }
+        while (this.accumulator > this.time.fixedDeltaTime) {
+            this.time.tick(frameTime);
+            this.currentScene.fixedUpdate(1);
+            this.accumulator -= this.time.fixedDeltaTime;
+        }
+        this.currentScene.fixedUpdate(this.accumulator / this.time.fixedDeltaTime);
+        this.accumulator = 0;
+        this.currentScene.update();
+        this.currentScene.lateUpdate();
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        this.currentScene.preRender();
+        this.currentScene.render(this.ctx, this.canvas.width, this.canvas.height);
+        this.currentScene.postRender();
+        requestAnimationFrame(this.bindedmainloop);
+    };
+    EngineImplement.prototype.onResize = function (e) {
+        var _a = this.screen, width = _a.width, height = _a.height;
+        this.canvas.width = width;
+        this.canvas.height = height;
+    };
+    EngineImplement.prototype.onSceneLoaded = function (scene) {
+        this.currentScene = scene;
+    };
+    EngineImplement = __decorate([
+        Service_1.Service(Engine_1.Engine),
+        __param(0, Inject_1.Inject(Screen_1.Screen)),
+        __param(1, Inject_1.Inject(Time_1.Time)),
+        __param(2, Inject_1.Inject(SceneManager_1.SceneManager)),
+        __param(3, Inject_1.Inject(BrowserDelegate_1.BrowserDelegate)),
+        __metadata("design:paramtypes", [Object, Object, Object, Object])
+    ], EngineImplement);
+    return EngineImplement;
+}());
+exports.EngineImplement = EngineImplement;
+
+
+/***/ }),
+/* 96 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var Service_1 = __webpack_require__(2);
+var GameObjectInitializer_1 = __webpack_require__(28);
+var GameObjectInitializerImplement = (function () {
+    function GameObjectInitializerImplement() {
+        this.queue = [];
+    }
+    Object.defineProperty(GameObjectInitializerImplement.prototype, "length", {
+        get: function () { return this.queue.length; },
+        enumerable: true,
+        configurable: true
+    });
+    GameObjectInitializerImplement.prototype.push = function (gameObject) {
+        this.queue.push(gameObject);
+    };
+    GameObjectInitializerImplement.prototype.resolve = function () {
+        var gameObject = this.queue.shift();
+        while (gameObject) {
+            gameObject.initialize();
+            gameObject = this.queue.shift();
+        }
+    };
+    GameObjectInitializerImplement = __decorate([
+        Service_1.Service(GameObjectInitializer_1.GameObjectInitializer)
+    ], GameObjectInitializerImplement);
+    return GameObjectInitializerImplement;
+}());
+exports.GameObjectInitializerImplement = GameObjectInitializerImplement;
+
+
+/***/ }),
+/* 97 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __generator = (this && this.__generator) || function (thisArg, body) {
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    function verb(n) { return function (v) { return step([n, v]); }; }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while (_) try {
+            if (f = 1, y && (t = y[op[0] & 2 ? "return" : op[0] ? "throw" : "next"]) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [0, t.value];
+            switch (op[0]) {
+                case 0: case 1: t = op; break;
+                case 4: _.label++; return { value: op[1], done: false };
+                case 5: _.label++; y = op[1]; op = [0]; continue;
+                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop(); continue;
+            }
+            op = body.call(thisArg, _);
+        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+    }
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var Subject_1 = __webpack_require__(38);
+var ArrayUtility_1 = __webpack_require__(5);
+var Service_1 = __webpack_require__(2);
+var SceneManager_1 = __webpack_require__(15);
+var SceneManagerImplement = (function () {
+    function SceneManagerImplement() {
+        this.scenes = [];
+        this._isLoading = false;
+        this.sceneLoaded = new Subject_1.Subject();
+        this.sceneUnloaded = new Subject_1.Subject();
+        this.sceneWillLoad = new Subject_1.Subject();
+        this.sceneWillUnload = new Subject_1.Subject();
+    }
+    Object.defineProperty(SceneManagerImplement.prototype, "isLoading", {
+        get: function () { return this._isLoading; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(SceneManagerImplement.prototype, "sceneLoaded$", {
+        get: function () { return this.sceneLoaded.asObservable(); },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(SceneManagerImplement.prototype, "sceneUnloaded$", {
+        get: function () { return this.sceneUnloaded.asObservable(); },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(SceneManagerImplement.prototype, "sceneWillLoad$", {
+        get: function () { return this.sceneWillLoad.asObservable(); },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(SceneManagerImplement.prototype, "sceneWillUnload$", {
+        get: function () { return this.sceneWillUnload.asObservable(); },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(SceneManagerImplement.prototype, "currentScene", {
+        get: function () { return this._currentScene; },
+        enumerable: true,
+        configurable: true
+    });
+    SceneManagerImplement.prototype.add = function (scene) {
+        if (!ArrayUtility_1.addToArray(this.scenes, scene)) {
+            return false;
+        }
+        if (!this._currentScene) {
+            this._currentScene = scene;
+        }
+        return true;
+    };
+    SceneManagerImplement.prototype.remove = function (scene) {
+        if (this._currentScene === scene) {
+            throw new Error('Cannot remove current scene.');
+        }
+        return ArrayUtility_1.removeFromArray(this.scenes, scene);
+    };
+    SceneManagerImplement.prototype.switchTo = function (scene) {
+        return __awaiter(this, void 0, void 0, function () {
+            var _this = this;
+            return __generator(this, function (_a) {
+                if (!ArrayUtility_1.includeInArray(this.scenes, scene)) {
+                    this.add(scene);
+                }
+                if (this._currentScene === scene) {
+                    return [2, Promise.resolve()];
+                }
+                this._isLoading = true;
+                if (this._currentScene) {
+                    this.sceneWillUnload.next(this._currentScene);
+                }
+                this.sceneWillLoad.next(scene);
+                return [2, (scene.isLoaded ? Promise.resolve() : scene.load()).then(function () {
+                        _this._currentScene.deactivate();
+                        _this.sceneUnloaded.next(_this._currentScene);
+                        _this._currentScene = scene;
+                        _this._isLoading = false;
+                        _this.sceneLoaded.next(_this._currentScene);
+                    })];
+            });
+        });
+    };
+    SceneManagerImplement = __decorate([
+        Service_1.Service(SceneManager_1.SceneManager)
+    ], SceneManagerImplement);
+    return SceneManagerImplement;
+}());
+exports.SceneManagerImplement = SceneManagerImplement;
+
+
+/***/ }),
+/* 98 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7828,7 +7517,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var Subscription_1 = __webpack_require__(16);
+var Subscription_1 = __webpack_require__(27);
 /**
  * We need this JSDoc comment for affecting ESDoc.
  * @ignore
@@ -7864,7 +7553,1037 @@ exports.SubjectSubscription = SubjectSubscription;
 //# sourceMappingURL=SubjectSubscription.js.map
 
 /***/ }),
-/* 92 */
+/* 99 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var BrowserDelegate_1 = __webpack_require__(4);
+var Service_1 = __webpack_require__(2);
+var Screen_1 = __webpack_require__(19);
+var Inject_1 = __webpack_require__(0);
+var ScreenImplement = (function () {
+    function ScreenImplement(browserDelegate) {
+        this.browserDelegate = browserDelegate;
+        this._isFullScreen = false;
+    }
+    Object.defineProperty(ScreenImplement.prototype, "width", {
+        get: function () {
+            return this._isFullScreen ?
+                this.browserDelegate.screen.width :
+                this.browserDelegate.window.innerWidth;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(ScreenImplement.prototype, "height", {
+        get: function () {
+            return this._isFullScreen ?
+                this.browserDelegate.screen.height :
+                this.browserDelegate.window.innerHeight;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(ScreenImplement.prototype, "isFullScreen", {
+        get: function () { return this._isFullScreen; },
+        enumerable: true,
+        configurable: true
+    });
+    ScreenImplement.prototype.setFullScreen = function (enable) {
+        if (enable === void 0) { enable = true; }
+        this._isFullScreen = enable;
+    };
+    ScreenImplement = __decorate([
+        Service_1.Service(Screen_1.Screen),
+        __param(0, Inject_1.Inject(BrowserDelegate_1.BrowserDelegate)),
+        __metadata("design:paramtypes", [Object])
+    ], ScreenImplement);
+    return ScreenImplement;
+}());
+exports.ScreenImplement = ScreenImplement;
+
+
+/***/ }),
+/* 100 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var BrowserDelegate_1 = __webpack_require__(4);
+var Service_1 = __webpack_require__(2);
+var KeyboardInput_1 = __webpack_require__(39);
+var Inject_1 = __webpack_require__(0);
+var KeyboardInputImplement = (function () {
+    function KeyboardInputImplement(browserDelegate) {
+        this.browserDelegate = browserDelegate;
+    }
+    Object.defineProperty(KeyboardInputImplement.prototype, "keyDown$", {
+        get: function () { return this.browserDelegate.keyDown$; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(KeyboardInputImplement.prototype, "keyUp$", {
+        get: function () { return this.browserDelegate.keyUp$; },
+        enumerable: true,
+        configurable: true
+    });
+    KeyboardInputImplement = __decorate([
+        Service_1.Service(KeyboardInput_1.KeyboardInput),
+        __param(0, Inject_1.Inject(BrowserDelegate_1.BrowserDelegate)),
+        __metadata("design:paramtypes", [Object])
+    ], KeyboardInputImplement);
+    return KeyboardInputImplement;
+}());
+exports.KeyboardInputImplement = KeyboardInputImplement;
+
+
+/***/ }),
+/* 101 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var BrowserDelegate_1 = __webpack_require__(4);
+var Service_1 = __webpack_require__(2);
+var MouseInput_1 = __webpack_require__(54);
+var Inject_1 = __webpack_require__(0);
+var MouseInputImplement = (function () {
+    function MouseInputImplement(browserDelegate) {
+        this.browserDelegate = browserDelegate;
+    }
+    Object.defineProperty(MouseInputImplement.prototype, "click$", {
+        get: function () { return this.browserDelegate.click$; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(MouseInputImplement.prototype, "mouseMove$", {
+        get: function () { return this.browserDelegate.mouseMove$; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(MouseInputImplement.prototype, "mouseDown$", {
+        get: function () { return this.browserDelegate.mouseDown$; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(MouseInputImplement.prototype, "mouseUp$", {
+        get: function () { return this.browserDelegate.mouseUp$; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(MouseInputImplement.prototype, "wheel$", {
+        get: function () { return this.browserDelegate.wheel$; },
+        enumerable: true,
+        configurable: true
+    });
+    MouseInputImplement = __decorate([
+        Service_1.Service(MouseInput_1.MouseInput),
+        __param(0, Inject_1.Inject(BrowserDelegate_1.BrowserDelegate)),
+        __metadata("design:paramtypes", [Object])
+    ], MouseInputImplement);
+    return MouseInputImplement;
+}());
+exports.MouseInputImplement = MouseInputImplement;
+
+
+/***/ }),
+/* 102 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var BrowserDelegate_1 = __webpack_require__(4);
+var Service_1 = __webpack_require__(2);
+var TouchInput_1 = __webpack_require__(55);
+var Inject_1 = __webpack_require__(0);
+var TouchInputImplement = (function () {
+    function TouchInputImplement(browserDelegate) {
+        this.browserDelegate = browserDelegate;
+    }
+    Object.defineProperty(TouchInputImplement.prototype, "touchStart$", {
+        get: function () { return this.browserDelegate.touchStart$; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(TouchInputImplement.prototype, "touchEnd$", {
+        get: function () { return this.browserDelegate.touchEnd$; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(TouchInputImplement.prototype, "touchCancel$", {
+        get: function () { return this.browserDelegate.touchCancel$; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(TouchInputImplement.prototype, "touchMove$", {
+        get: function () { return this.browserDelegate.touchMove$; },
+        enumerable: true,
+        configurable: true
+    });
+    TouchInputImplement = __decorate([
+        Service_1.Service(TouchInput_1.TouchInput),
+        __param(0, Inject_1.Inject(BrowserDelegate_1.BrowserDelegate)),
+        __metadata("design:paramtypes", [Object])
+    ], TouchInputImplement);
+    return TouchInputImplement;
+}());
+exports.TouchInputImplement = TouchInputImplement;
+
+
+/***/ }),
+/* 103 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var Observable_1 = __webpack_require__(3);
+var MouseInput_1 = __webpack_require__(54);
+var TouchInput_1 = __webpack_require__(55);
+var DOM_1 = __webpack_require__(56);
+var Vector_1 = __webpack_require__(1);
+var Service_1 = __webpack_require__(2);
+var PointerInput_1 = __webpack_require__(40);
+var Inject_1 = __webpack_require__(0);
+var PointerInputImplement = (function () {
+    function PointerInputImplement(mouseInput, touchInput) {
+        this.mouseInput = mouseInput;
+        this.touchInput = touchInput;
+    }
+    Object.defineProperty(PointerInputImplement.prototype, "pointerStart$", {
+        get: function () {
+            var _this = this;
+            return Observable_1.Observable.merge(this.mouseInput.mouseDown$.map(function (e) { return _this.parseMouseEvent(e); }), this.touchInput.touchStart$.map(function (e) { return _this.parseTouchEvent(e); }));
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(PointerInputImplement.prototype, "pointerEnd$", {
+        get: function () {
+            var _this = this;
+            return Observable_1.Observable.merge(this.mouseInput.mouseUp$.map(function (e) { return _this.parseMouseEvent(e); }), this.touchInput.touchEnd$.map(function (e) { return _this.parseTouchEvent(e); }));
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(PointerInputImplement.prototype, "pointerMove$", {
+        get: function () {
+            var _this = this;
+            return Observable_1.Observable.merge(this.mouseInput.mouseMove$.map(function (e) { return _this.parseMouseEvent(e); }), this.touchInput.touchMove$.map(function (e) { return _this.parseTouchEvent(e); }));
+        },
+        enumerable: true,
+        configurable: true
+    });
+    PointerInputImplement.prototype.parseMouseEvent = function (e) {
+        return {
+            altKey: e.altKey,
+            ctrlKey: e.ctrlKey,
+            shiftKey: e.shiftKey,
+            metaKey: e.metaKey,
+            locations: [Vector_1.Vector.Get(e.clientX, e.clientY)]
+        };
+    };
+    PointerInputImplement.prototype.parseTouchEvent = function (e) {
+        var locations = [];
+        DOM_1.listToArray(e.touches).forEach(function (touch) {
+            if (touch) {
+                locations.push(Vector_1.Vector.Get(touch.clientX, touch.clientY));
+            }
+        });
+        return {
+            altKey: e.altKey,
+            ctrlKey: e.ctrlKey,
+            shiftKey: e.shiftKey,
+            metaKey: e.metaKey,
+            locations: locations
+        };
+    };
+    PointerInputImplement = __decorate([
+        Service_1.Service(PointerInput_1.PointerInput),
+        __param(0, Inject_1.Inject(MouseInput_1.MouseInput)),
+        __param(1, Inject_1.Inject(TouchInput_1.TouchInput)),
+        __metadata("design:paramtypes", [Object, Object])
+    ], PointerInputImplement);
+    return PointerInputImplement;
+}());
+exports.PointerInputImplement = PointerInputImplement;
+
+
+/***/ }),
+/* 104 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var RenderProcess_1 = __webpack_require__(57);
+var RendererComponent_1 = __webpack_require__(8);
+var Service_1 = __webpack_require__(2);
+var Vector_1 = __webpack_require__(1);
+var runtime_1 = __webpack_require__(12);
+var Inject_1 = __webpack_require__(0);
+var BrowserDelegate_1 = __webpack_require__(4);
+var RenderProcessImplement = (function () {
+    function RenderProcessImplement(browserDelegate) {
+        this.browserDelegate = browserDelegate;
+        this.width = 0;
+        this.height = 0;
+        this.caches = new Map();
+    }
+    RenderProcessImplement.prototype.useContext = function (ctx, width, height) {
+        this.ctx = ctx;
+        this.width = width;
+        this.height = height;
+    };
+    RenderProcessImplement.prototype.render = function (camera, gameObjects) {
+        var _this = this;
+        if (!this.ctx) {
+            return;
+        }
+        var ctx = this.ctx;
+        var cache = this.getCache(camera);
+        var _a = camera.rect, width = _a.width, height = _a.height;
+        cache.canvas.width = width;
+        cache.canvas.height = height;
+        cache.ctx.clearRect(0, 0, width, height);
+        cache.ctx.save();
+        cache.ctx.fillStyle = camera.backgroundColor.toHexString();
+        cache.ctx.fillRect(0, 0, this.width, this.height);
+        cache.ctx.restore();
+        cache.ctx.save();
+        gameObjects.forEachChildren(function (gameObject) {
+            if (gameObject.layer & camera.cullingMask) {
+                _this.renderGameObject(cache.ctx, camera, gameObject);
+            }
+        });
+        cache.ctx.restore();
+        var _b = camera.rect.position, x = _b.x, y = _b.y;
+        ctx.drawImage(cache.canvas, 0, 0, width, height, x, y, width, height);
+    };
+    RenderProcessImplement.prototype.renderGameObject = function (ctx, camera, gameObject) {
+        var _this = this;
+        var renderers = gameObject.getComponents(RendererComponent_1.RendererComponent);
+        var _a = gameObject.transform, rotation = _a.rotation, scale = _a.scale, worldPosition = _a.position;
+        var position = Vector_1.Vector.Get().copy(worldPosition);
+        camera.toScreenMatrix.multiplyToPoint(position);
+        renderers.forEach(function (renderer) {
+            renderer.render();
+            var image = renderer.canvas;
+            var width = image.width, height = image.height;
+            ctx.save();
+            ctx.translate(position.x, position.y);
+            ctx.rotate(-rotation);
+            ctx.scale(scale.x, scale.y);
+            ctx.drawImage(image, -width * 0.5, -height * 0.5, width, height);
+            ctx.restore();
+            runtime_1.ifdef(runtime_1.DEBUG_RENDERER, function () { return _this.drawDebugOutline(ctx, camera, renderer.bounds); });
+        });
+    };
+    RenderProcessImplement.prototype.drawDebugOutline = function (ctx, camera, bounds) {
+        var min = bounds.min, max = bounds.max;
+        camera.toScreenMatrix.multiplyToPoint(min);
+        camera.toScreenMatrix.multiplyToPoint(max);
+        ctx.beginPath();
+        ctx.moveTo(min.x, min.y);
+        ctx.lineTo(max.x, min.y);
+        ctx.lineTo(max.x, max.y);
+        ctx.lineTo(min.x, max.y);
+        ctx.lineTo(min.x, min.y);
+        ctx.closePath();
+        ctx.save();
+        ctx.strokeStyle = '#f00';
+        ctx.stroke();
+        ctx.restore();
+    };
+    RenderProcessImplement.prototype.getCache = function (camera) {
+        var cache = this.caches.get(camera);
+        if (!cache) {
+            var canvas = this.browserDelegate.createCanvas();
+            var ctx = this.browserDelegate.getContext(canvas);
+            cache = { canvas: canvas, ctx: ctx };
+            this.caches.set(camera, cache);
+        }
+        return cache;
+    };
+    RenderProcessImplement = __decorate([
+        Service_1.Service(RenderProcess_1.RenderProcess),
+        __param(0, Inject_1.Inject(BrowserDelegate_1.BrowserDelegate)),
+        __metadata("design:paramtypes", [Object])
+    ], RenderProcessImplement);
+    return RenderProcessImplement;
+}());
+exports.RenderProcessImplement = RenderProcessImplement;
+
+
+/***/ }),
+/* 105 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var Service_1 = __webpack_require__(2);
+var CollisionContact_1 = __webpack_require__(106);
+var CollisionJumpTable_1 = __webpack_require__(32);
+var CollisionJumpTableImplement = (function () {
+    function CollisionJumpTableImplement() {
+    }
+    CollisionJumpTableImplement.prototype.circleCircle = function (colliderA, colliderB) {
+        var maxDistance = colliderA.calculatedRadius + colliderB.calculatedRadius;
+        var positionA = colliderA.bounds.center;
+        var positionB = colliderB.bounds.center;
+        var distance = positionA.distanceTo(positionB);
+        if (distance > maxDistance) {
+            return;
+        }
+        var normal = positionB.clone().subtract(positionA).multiply(colliderA.radius / distance);
+        var point = positionA.clone().add(normal);
+        normal.normalize();
+        var mtv = normal.clone().multiply(maxDistance - distance);
+        return new CollisionContact_1.CollisionContact(colliderA, colliderB, mtv, point, normal);
+    };
+    CollisionJumpTableImplement.prototype.circlePolygon = function (colliderA, colliderB) {
+        var positionA = colliderA.bounds.center;
+        var positionB = colliderB.bounds.center;
+        var minAxis = this.circleBoxSAT(colliderA, colliderB);
+        if (!minAxis) {
+            return;
+        }
+        var ab = positionB.clone().subtract(positionA);
+        var hasSameDirection = minAxis.dot(ab) >= 0;
+        if (!hasSameDirection) {
+            minAxis.multiply(-1);
+        }
+        var normal = minAxis.clone().normalize();
+        var pointA = colliderA.getFurthestPoint(minAxis);
+        var pointB = colliderB.getFurthestPoint(minAxis);
+        var containsPointA = colliderB.contains(pointA);
+        var containsPointB = colliderA.contains(pointB);
+        var contactPoint;
+        if (containsPointA && containsPointB) {
+            contactPoint = pointA.add(pointB).multiply(0.5);
+        }
+        else if (containsPointA) {
+            contactPoint = pointA;
+        }
+        else if (containsPointB) {
+            contactPoint = pointB;
+        }
+        else {
+            contactPoint = pointA.add(pointB).multiply(0.5);
+        }
+        return new CollisionContact_1.CollisionContact(colliderA, colliderB, minAxis, contactPoint, normal);
+    };
+    CollisionJumpTableImplement.prototype.polygonPolygon = function (colliderA, colliderB) {
+        var positionA = colliderA.bounds.center;
+        var positionB = colliderB.bounds.center;
+        var minAxis = this.polygonPolygonSAT(colliderA, colliderB);
+        if (!minAxis) {
+            return;
+        }
+        var ab = positionB.clone().subtract(positionA);
+        var hasSameDirection = minAxis.dot(ab) >= 0;
+        if (!hasSameDirection) {
+            minAxis.multiply(-1);
+        }
+        var normal = minAxis.clone().normalize();
+        var pointA = colliderA.getFurthestPoint(minAxis);
+        var pointB = colliderB.getFurthestPoint(minAxis);
+        var containsPointA = colliderB.contains(pointA);
+        var containsPointB = colliderA.contains(pointB);
+        var contactPoint;
+        if (containsPointA && containsPointB) {
+            contactPoint = pointA.clone().add(pointB).multiply(0.5);
+        }
+        else if (containsPointA) {
+            contactPoint = pointA.clone();
+        }
+        else if (containsPointB) {
+            contactPoint = pointB.clone();
+        }
+        else {
+            contactPoint = pointA.clone().add(pointB).multiply(0.5);
+        }
+        return new CollisionContact_1.CollisionContact(colliderA, colliderB, minAxis, contactPoint, normal);
+    };
+    CollisionJumpTableImplement.prototype.polygonPolygonSAT = function (colliderA, colliderB) {
+        var axes = colliderA.calculatedAxes.concat(colliderB.calculatedAxes).map(function (axis) { return axis.normal(); });
+        return this.findMTV(colliderA, colliderB, axes);
+    };
+    CollisionJumpTableImplement.prototype.circleBoxSAT = function (colliderA, colliderB) {
+        var positionA = colliderA.bounds.center;
+        var positionB = colliderB.bounds.center;
+        var ba = positionA.clone().subtract(positionB);
+        var closestPointOnPoly = colliderB.getFurthestPoint(ba);
+        var axes = colliderB.calculatedAxes.map(function (axis) { return axis.normal(); }).concat([positionA.clone().subtract(closestPointOnPoly).normalize()]);
+        return this.findMTV(colliderA, colliderB, axes);
+    };
+    CollisionJumpTableImplement.prototype.findMTV = function (colliderA, colliderB, axes) {
+        var count = axes.length;
+        var minOverlap = Number.MAX_VALUE;
+        var minIndex = -1;
+        for (var i = 0; i < count; i++) {
+            var projectionA = colliderA.project(axes[i]);
+            var projectionB = colliderB.project(axes[i]);
+            var overlap = projectionA.getOverlap(projectionB);
+            if (overlap <= 0) {
+                return;
+            }
+            else {
+                if (overlap < minOverlap) {
+                    minOverlap = overlap;
+                    minIndex = i;
+                }
+            }
+        }
+        if (minIndex === -1) {
+            return;
+        }
+        if (axes[minIndex].isZero) {
+            return;
+        }
+        return axes[minIndex].clone().normalize().multiply(minOverlap);
+    };
+    CollisionJumpTableImplement = __decorate([
+        Service_1.Service(CollisionJumpTable_1.CollisionJumpTable)
+    ], CollisionJumpTableImplement);
+    return CollisionJumpTableImplement;
+}());
+exports.CollisionJumpTableImplement = CollisionJumpTableImplement;
+
+
+/***/ }),
+/* 106 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var Vector_1 = __webpack_require__(1);
+var ForceMode_1 = __webpack_require__(31);
+var CollisionContact = (function () {
+    function CollisionContact(colliderA, colliderB, mtv, point, normal) {
+        this.colliderA = colliderA;
+        this.colliderB = colliderB;
+        this.mtv = mtv;
+        this.point = point;
+        this.normal = normal;
+        this._canRecycle = false;
+        this._resolved = false;
+    }
+    Object.defineProperty(CollisionContact.prototype, "canRecycle", {
+        get: function () { return this._canRecycle; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(CollisionContact.prototype, "resolved", {
+        get: function () { return this._resolved; },
+        enumerable: true,
+        configurable: true
+    });
+    CollisionContact.prototype.resolve = function () {
+        if (this._resolved) {
+            return;
+        }
+        var a = this.colliderA;
+        var b = this.colliderB;
+        var bodyA = a.rigidbody;
+        var bodyB = b.rigidbody;
+        var shouldAwakeBodyA = bodyB ? !bodyB.isSleeping : false;
+        var shouldAwakeBodyB = bodyA ? !bodyA.isSleeping : false;
+        if (!bodyA && !bodyB) {
+            return;
+        }
+        var velocityA = bodyA ? bodyA.velocity : Vector_1.Vector.Zero;
+        var velocityB = bodyB ? bodyB.velocity : Vector_1.Vector.Zero;
+        var angularVelocityA = bodyA ? bodyA.angularVelocity : 0;
+        var angularVelocityB = bodyB ? bodyB.angularVelocity : 0;
+        var relativeA = this.point.clone().subtract(a.bounds.center);
+        var relativeB = this.point.clone().subtract(b.bounds.center);
+        var relativeVelocity = velocityB.clone()
+            .add(relativeB.cross(-angularVelocityB))
+            .subtract(velocityA)
+            .subtract(relativeA.cross(-angularVelocityA));
+        var rvDotNormal = relativeVelocity.dot(this.normal);
+        if (rvDotNormal > 0) {
+            return;
+        }
+        var restitution = Math.min(this.colliderA.restitution, this.colliderB.restitution);
+        var inverseMassA = bodyA ? bodyA.inverseMass : 0;
+        var inverseMassB = bodyB ? bodyB.inverseMass : 0;
+        var sumOfInverseMass = inverseMassA + inverseMassB;
+        var inverseMoiA = bodyA ? bodyA.inverseMoi : 0;
+        var inverseMoiB = bodyB ? bodyB.inverseMoi : 0;
+        var j_moi_a = Vector_1.Vector.Cross(relativeA.cross(this.normal), relativeA).multiply(inverseMoiA);
+        var j_moi_b = Vector_1.Vector.Cross(relativeB.cross(this.normal), relativeB).multiply(inverseMoiB);
+        var j_moi = j_moi_a.add(j_moi_b).dot(this.normal);
+        var j = -(1 + restitution) * rvDotNormal / (sumOfInverseMass + j_moi);
+        var impulse = this.normal.clone().multiply(j);
+        if (bodyA && bodyB) {
+            this.mtv.multiply(0.5);
+        }
+        if (bodyA) {
+            if (shouldAwakeBodyA && bodyA.isSleeping) {
+                bodyA.awake();
+            }
+            bodyA.host.transform.position.add(this.mtv.clone().multiply(-1));
+            bodyA.addForce(impulse.clone().multiply(-1), ForceMode_1.ForceMode.Impulse);
+        }
+        if (bodyB) {
+            if (shouldAwakeBodyB && bodyB.isSleeping) {
+                bodyB.awake();
+            }
+            bodyB.host.transform.position.add(this.mtv);
+            bodyB.addForce(impulse, ForceMode_1.ForceMode.Impulse);
+        }
+        var tangent = this.normal.normal();
+        var frictionImpulse;
+        var jt_moi_a = Vector_1.Vector.Cross(relativeA.cross(tangent), relativeA).multiply(inverseMoiA);
+        var jt_moi_b = Vector_1.Vector.Cross(relativeB.cross(tangent), relativeB).multiply(inverseMoiB);
+        var jt_moi = jt_moi_a.add(jt_moi_b).dot(tangent);
+        var t = relativeVelocity.clone().subtract(this.normal.clone().multiply(rvDotNormal)).normalize();
+        var jt = -relativeVelocity.dot(t) / (sumOfInverseMass + jt_moi);
+        var mu = Math.sqrt(Math.pow(this.colliderA.friction, 2) + Math.pow(this.colliderB.friction, 2));
+        if (Math.abs(jt) < j * mu) {
+            frictionImpulse = t.clone().multiply(jt);
+        }
+        else {
+            frictionImpulse = t.clone().multiply(-j * mu);
+        }
+        if (bodyA) {
+            bodyA.addForce(frictionImpulse.clone().multiply(-1), ForceMode_1.ForceMode.Impulse);
+            bodyA.addTorque(-frictionImpulse.dot(t) * relativeA.cross(t), ForceMode_1.ForceMode.Impulse);
+        }
+        if (bodyB) {
+            bodyB.addForce(frictionImpulse, ForceMode_1.ForceMode.Impulse);
+            bodyB.addTorque(frictionImpulse.dot(t) * relativeB.cross(t), ForceMode_1.ForceMode.Impulse);
+        }
+    };
+    CollisionContact.prototype.destroy = function () {
+        this._canRecycle = true;
+    };
+    return CollisionContact;
+}());
+exports.CollisionContact = CollisionContact;
+
+
+/***/ }),
+/* 107 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var ArrayUtility_1 = __webpack_require__(5);
+var Pair_1 = __webpack_require__(108);
+var Service_1 = __webpack_require__(2);
+var BroadPhaseCollisionResolver_1 = __webpack_require__(42);
+var Vector_1 = __webpack_require__(1);
+var Color_1 = __webpack_require__(7);
+var Ray_1 = __webpack_require__(60);
+var BroadPhaseCollisionResolverImplement = (function () {
+    function BroadPhaseCollisionResolverImplement() {
+        this.awakeColliders = [];
+        this.sleepingColliders = [];
+        this._pairs = [];
+    }
+    Object.defineProperty(BroadPhaseCollisionResolverImplement.prototype, "pairs", {
+        get: function () { return this._pairs; },
+        enumerable: true,
+        configurable: true
+    });
+    BroadPhaseCollisionResolverImplement.prototype.track = function (collider) {
+        if (collider.rigidbody && !collider.rigidbody.isSleeping) {
+            return ArrayUtility_1.addToArray(this.awakeColliders, collider);
+        }
+        else {
+            return ArrayUtility_1.addToArray(this.sleepingColliders, collider);
+        }
+    };
+    BroadPhaseCollisionResolverImplement.prototype.untrack = function (collider) {
+        if (ArrayUtility_1.removeFromArray(this.awakeColliders, collider)) {
+            return true;
+        }
+        return ArrayUtility_1.removeFromArray(this.sleepingColliders, collider);
+    };
+    BroadPhaseCollisionResolverImplement.prototype.fixedUpdate = function () {
+        this._pairs.forEach(function (pair) { return Pair_1.Pair.Put(pair); });
+        this._pairs.splice(0, this._pairs.length);
+        var awakeLength = this.awakeColliders.length;
+        var sleepingLength = this.sleepingColliders.length;
+        var colliderA;
+        var colliderB;
+        for (var a = 0; a < awakeLength; a++) {
+            colliderA = this.awakeColliders[a];
+            if (!colliderA.host.isActive) {
+                continue;
+            }
+            for (var b = a + 1; b < awakeLength; b++) {
+                colliderB = this.awakeColliders[b];
+                if (!colliderB.host.isActive) {
+                    continue;
+                }
+                if ((colliderA.layer & colliderB.layer) === 0) {
+                    continue;
+                }
+                if (colliderA.bounds.intersects(colliderB.bounds)) {
+                    var pair = Pair_1.Pair.Get(colliderA, colliderB);
+                    if (pair) {
+                        this._pairs.push(pair);
+                    }
+                }
+            }
+            for (var b = 0; b < sleepingLength; b++) {
+                colliderB = this.sleepingColliders[b];
+                if (!colliderB.host.isActive) {
+                    continue;
+                }
+                if ((colliderA.layer & colliderB.layer) === 0) {
+                    continue;
+                }
+                if (colliderA.bounds.intersects(colliderB.bounds)) {
+                    var pair = Pair_1.Pair.Get(colliderA, colliderB);
+                    if (pair) {
+                        this._pairs.push(pair);
+                    }
+                }
+            }
+        }
+    };
+    BroadPhaseCollisionResolverImplement.prototype.update = function () {
+        var _this = this;
+        var goToSleep = this.awakeColliders.filter(function (collider) { return collider.rigidbody && collider.rigidbody.isSleeping; });
+        goToSleep.forEach(function (collider) {
+            ArrayUtility_1.removeFromArray(_this.awakeColliders, collider);
+            ArrayUtility_1.addToArray(_this.sleepingColliders, collider);
+        });
+        var goToAwake = this.sleepingColliders.filter(function (collider) { return collider.rigidbody && !collider.rigidbody.isSleeping; });
+        goToAwake.forEach(function (collider) {
+            ArrayUtility_1.removeFromArray(_this.sleepingColliders, collider);
+            ArrayUtility_1.addToArray(_this.awakeColliders, collider);
+        });
+        this._pairs.forEach(function (pair) { return Pair_1.Pair.Put(pair); });
+        this._pairs.splice(0, this._pairs.length);
+    };
+    BroadPhaseCollisionResolverImplement.prototype.debugRender = function (ctx, camera) {
+        var _this = this;
+        this.awakeColliders.forEach(function (collider) {
+            if (collider.bounds.intersects(camera.bounds)) {
+                _this.debugRenderCollider(ctx, camera, collider, Color_1.Color.Red);
+            }
+        });
+        this.sleepingColliders.forEach(function (collider) {
+            if (collider.bounds.intersects(camera.bounds)) {
+                _this.debugRenderCollider(ctx, camera, collider, Color_1.Color.Cyan);
+            }
+        });
+    };
+    BroadPhaseCollisionResolverImplement.prototype.debugRenderCollider = function (ctx, camera, collider, color) {
+        var rigidbody = collider.rigidbody;
+        var bounds = collider.bounds;
+        var points = [
+            Vector_1.Vector.Get().copy(bounds.center).add(bounds.extents.x, bounds.extents.y),
+            Vector_1.Vector.Get().copy(bounds.center).add(bounds.extents.x, -bounds.extents.y),
+            Vector_1.Vector.Get().copy(bounds.center).add(-bounds.extents.x, -bounds.extents.y),
+            Vector_1.Vector.Get().copy(bounds.center).add(-bounds.extents.x, bounds.extents.y)
+        ];
+        points.forEach(function (p) { return camera.toScreenMatrix.multiplyToPoint(p); });
+        ctx.save();
+        ctx.strokeStyle = color.toHexString();
+        ctx.beginPath();
+        ctx.moveTo(points[3].x, points[3].y);
+        for (var i = 0; i < 4; i++) {
+            ctx.lineTo(points[i].x, points[i].y);
+        }
+        ctx.closePath();
+        ctx.stroke();
+        points.forEach(function (p) { return Vector_1.Vector.Put(p); });
+        points.splice(0, 4);
+        var rotation = collider.transform.rotation;
+        var direction = Vector_1.Vector.Get(1, 0).rotate(rotation);
+        var ray = new Ray_1.Ray(bounds.center, direction);
+        var point = collider.rayCast(ray) || direction;
+        var center = Vector_1.Vector.Get().copy(bounds.center);
+        camera.toScreenMatrix.multiplyToPoint(point);
+        camera.toScreenMatrix.multiplyToPoint(center);
+        ctx.beginPath();
+        ctx.moveTo(center.x, center.y);
+        ctx.lineTo(point.x, point.y);
+        ctx.closePath();
+        ctx.stroke();
+        Vector_1.Vector.Put(point);
+        Vector_1.Vector.Put(center);
+        ctx.restore();
+    };
+    BroadPhaseCollisionResolverImplement = __decorate([
+        Service_1.Service(BroadPhaseCollisionResolver_1.BroadPhaseCollisionResolver)
+    ], BroadPhaseCollisionResolverImplement);
+    return BroadPhaseCollisionResolverImplement;
+}());
+exports.BroadPhaseCollisionResolverImplement = BroadPhaseCollisionResolverImplement;
+
+
+/***/ }),
+/* 108 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var Pool_1 = __webpack_require__(52);
+var Pair = (function () {
+    function Pair(_bodyA, _bodyB) {
+        this._bodyA = _bodyA;
+        this._bodyB = _bodyB;
+    }
+    Pair.Get = function (colliderA, colliderB) {
+        return this.Instances.get(colliderA, colliderB);
+    };
+    Pair.Put = function (pair) { this.Instances.put(pair); };
+    Object.defineProperty(Pair.prototype, "canRecycle", {
+        get: function () { return this._canRecycle; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Pair.prototype, "bodyA", {
+        get: function () { return this._bodyA; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Pair.prototype, "bodyB", {
+        get: function () { return this._bodyB; },
+        enumerable: true,
+        configurable: true
+    });
+    Pair.prototype.reset = function (bodyA, bodyB) {
+        this._bodyA = bodyA;
+        this._bodyB = bodyB;
+    };
+    Pair.prototype.destroy = function () {
+        this._canRecycle = true;
+    };
+    Pair.Instances = new Pool_1.Pool(Pair);
+    return Pair;
+}());
+exports.Pair = Pair;
+
+
+/***/ }),
+/* 109 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var Service_1 = __webpack_require__(2);
+var NarrowPhaseCollisionResolver_1 = __webpack_require__(61);
+var NarrowPhaseCollisionResolverImplement = (function () {
+    function NarrowPhaseCollisionResolverImplement() {
+    }
+    NarrowPhaseCollisionResolverImplement.prototype.resolve = function (pairs) {
+        var _this = this;
+        pairs.forEach(function (pair) { return _this.resolvePair(pair); });
+    };
+    NarrowPhaseCollisionResolverImplement.prototype.resolvePair = function (pair) {
+        var bodyA = pair.bodyA, bodyB = pair.bodyB;
+        var collisionConctact = bodyA.collide(bodyB);
+        if (collisionConctact) {
+            collisionConctact.resolve();
+        }
+    };
+    NarrowPhaseCollisionResolverImplement = __decorate([
+        Service_1.Service(NarrowPhaseCollisionResolver_1.NarrowPhaseCollisionResolver)
+    ], NarrowPhaseCollisionResolverImplement);
+    return NarrowPhaseCollisionResolverImplement;
+}());
+exports.NarrowPhaseCollisionResolverImplement = NarrowPhaseCollisionResolverImplement;
+
+
+/***/ }),
+/* 110 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var Service_1 = __webpack_require__(2);
+var Time_1 = __webpack_require__(20);
+var TimeImplement = (function () {
+    function TimeImplement() {
+        this.deltaTime = 0;
+        this.fixedDeltaTime = 1000 / 60;
+        this.fixedDeltaTimeInSecond = 1 / 60;
+    }
+    TimeImplement.prototype.tick = function (deltaTime) {
+        this.deltaTime = deltaTime;
+    };
+    TimeImplement = __decorate([
+        Service_1.Service(Time_1.Time)
+    ], TimeImplement);
+    return TimeImplement;
+}());
+exports.TimeImplement = TimeImplement;
+
+
+/***/ }),
+/* 111 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var Observable_1 = __webpack_require__(3);
+var Service_1 = __webpack_require__(2);
+var BrowserDelegate_1 = __webpack_require__(4);
+var BrowserDelegateImplement = (function () {
+    function BrowserDelegateImplement() {
+        this.window = window;
+        this.document = this.window.document;
+        this.screen = window.screen;
+        this.resize$ = Observable_1.Observable.fromEvent(this.window, 'resize');
+        this.click$ = Observable_1.Observable.fromEvent(this.window, 'click');
+        this.mouseMove$ = Observable_1.Observable.fromEvent(this.window, 'mousemove');
+        this.mouseDown$ = Observable_1.Observable.fromEvent(this.window, 'mousedown');
+        this.mouseUp$ = Observable_1.Observable.fromEvent(this.window, 'mouseup');
+        this.wheel$ = Observable_1.Observable.fromEvent(this.window, 'wheel');
+        this.keyDown$ = Observable_1.Observable.fromEvent(this.window, 'keydown');
+        this.keyUp$ = Observable_1.Observable.fromEvent(this.window, 'keyup');
+        this.touchStart$ = Observable_1.Observable.fromEvent(this.window, 'touchstart');
+        this.touchEnd$ = Observable_1.Observable.fromEvent(this.window, 'touchend');
+        this.touchCancel$ = Observable_1.Observable.fromEvent(this.window, 'touchcancel');
+        this.touchMove$ = Observable_1.Observable.fromEvent(this.window, 'touchmove');
+        this.document.body.style.margin = '0';
+        this.document.body.style.width = '100%';
+        this.document.body.style.height = '100%';
+        this.document.body.style.overflow = 'auto';
+    }
+    BrowserDelegateImplement.prototype.createCanvas = function () {
+        return this.document.createElement('canvas');
+    };
+    BrowserDelegateImplement.prototype.getContext = function (canvas) {
+        return canvas.getContext('2d');
+    };
+    BrowserDelegateImplement = __decorate([
+        Service_1.Service(BrowserDelegate_1.BrowserDelegate),
+        __metadata("design:paramtypes", [])
+    ], BrowserDelegateImplement);
+    return BrowserDelegateImplement;
+}());
+exports.BrowserDelegateImplement = BrowserDelegateImplement;
+
+
+/***/ }),
+/* 112 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7915,7 +8634,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var Resource_1 = __webpack_require__(54);
+var Resource_1 = __webpack_require__(62);
 var ArrayUtility_1 = __webpack_require__(5);
 var Bundle = (function (_super) {
     __extends(Bundle, _super);
@@ -7956,7 +8675,7 @@ exports.Bundle = Bundle;
 
 
 /***/ }),
-/* 93 */
+/* 113 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7966,7 +8685,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var Subject_1 = __webpack_require__(52);
+var Subject_1 = __webpack_require__(38);
 var ObjectUnsubscribedError_1 = __webpack_require__(53);
 /**
  * @class BehaviorSubject<T>
@@ -8009,87 +8728,6 @@ var BehaviorSubject = (function (_super) {
 }(Subject_1.Subject));
 exports.BehaviorSubject = BehaviorSubject;
 //# sourceMappingURL=BehaviorSubject.js.map
-
-/***/ }),
-/* 94 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-var Pool_1 = __webpack_require__(47);
-var Pair = (function () {
-    function Pair(_bodyA, _bodyB) {
-        this._bodyA = _bodyA;
-        this._bodyB = _bodyB;
-    }
-    Pair.Get = function (colliderA, colliderB) {
-        return this.Instances.get(colliderA, colliderB);
-    };
-    Pair.Put = function (pair) { this.Instances.put(pair); };
-    Object.defineProperty(Pair.prototype, "canRecycle", {
-        get: function () { return this._canRecycle; },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Pair.prototype, "bodyA", {
-        get: function () { return this._bodyA; },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Pair.prototype, "bodyB", {
-        get: function () { return this._bodyB; },
-        enumerable: true,
-        configurable: true
-    });
-    Pair.prototype.reset = function (bodyA, bodyB) {
-        this._bodyA = bodyA;
-        this._bodyB = bodyB;
-    };
-    Pair.prototype.destroy = function () {
-        this._canRecycle = true;
-    };
-    Pair.Instances = new Pool_1.Pool(Pair);
-    return Pair;
-}());
-exports.Pair = Pair;
-
-
-/***/ }),
-/* 95 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-var Service_1 = __webpack_require__(1);
-var NarrowPhaseCollisionResolver = (function () {
-    function NarrowPhaseCollisionResolver() {
-    }
-    NarrowPhaseCollisionResolver.prototype.resolve = function (pairs) {
-        var _this = this;
-        pairs.forEach(function (pair) { return _this.resolvePair(pair); });
-    };
-    NarrowPhaseCollisionResolver.prototype.resolvePair = function (pair) {
-        var bodyA = pair.bodyA, bodyB = pair.bodyB;
-        var collisionConctact = bodyA.collide(bodyB);
-        if (collisionConctact) {
-            collisionConctact.resolve();
-        }
-    };
-    NarrowPhaseCollisionResolver = __decorate([
-        Service_1.Service()
-    ], NarrowPhaseCollisionResolver);
-    return NarrowPhaseCollisionResolver;
-}());
-exports.NarrowPhaseCollisionResolver = NarrowPhaseCollisionResolver;
-
 
 /***/ })
 /******/ ]);
