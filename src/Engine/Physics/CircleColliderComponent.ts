@@ -87,10 +87,7 @@ export class CircleColliderComponent extends ColliderComponent {
     if (discriminant > 0) {
       const d1 = d + discriminant;
       const d2 = d - discriminant;
-      /**
-       * TODO: I should figure out which value should I use, max or min one?
-       */
-      d = Math.max(d1, d2);
+      d = Math.min(d1, d2);
     }
 
     return ray.getPoint(d);
