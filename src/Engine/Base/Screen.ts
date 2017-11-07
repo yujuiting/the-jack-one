@@ -1,13 +1,8 @@
 import { BrowserDelegate } from 'Engine/Utility/BrowserDelegate';
 import { Service } from 'Engine/Decorator/Service';
-import { Inject } from 'Engine/Decorator/Inject';
 
 @Service()
 export class Screen {
-
-  private _width: number = 0;
-
-  private _height: number = 0;
 
   private _isFullScreen: boolean = false;
 

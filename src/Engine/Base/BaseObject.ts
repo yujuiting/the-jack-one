@@ -2,9 +2,11 @@ import { Recyclable } from 'Engine/Utility/Pool';
 
 /**
  * BaseObject provide basic life cycle in game loop.
- * DO NOT inherit from BaseObject, descendants of BaseObject will not be updated.
+ * DO NOT inherit from BaseObject directly, descendants of BaseObject will not be updated.
  */
 export abstract class BaseObject implements Recyclable {
+
+  private static NextId = 0;
 
   public readonly id: number;
 
@@ -26,6 +28,10 @@ export abstract class BaseObject implements Recyclable {
   public get isDestroyed(): boolean { return this._destroyed; }
 
   public get hasStarted(): boolean { return this._hasStarted; }
+
+  constructor() {
+    this.id = BaseObject.NextId++;
+  }
 
   public activate(): void {
     this._isActive = true;
@@ -63,6 +69,8 @@ export abstract class BaseObject implements Recyclable {
    * Guarantee called after all object updated.
    */
   public lateUpdate(): void { return; }
+
+  public preRender(): void { return; }
 
   /**
    * Called after rendered.

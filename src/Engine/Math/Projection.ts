@@ -1,4 +1,4 @@
-import { Pool, Recyclable } from 'Engine/Utility/Pool';
+import { Recyclable } from 'Engine/Utility/Pool';
 
 export class Projection implements Recyclable {
 

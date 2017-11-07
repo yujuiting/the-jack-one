@@ -2,7 +2,6 @@ import { GameObject } from 'Engine/Base/GameObject';
 import { Time } from 'Engine/Time/Time';
 import { Subject } from 'rxjs/Subject';
 import { Observable } from 'rxjs/Observable';
-import { Inject } from 'Engine/Decorator/Inject';
 import { Class } from 'Engine/Decorator/Class';
 import { GameObjectInitializer } from 'Engine/Base/GameObjectInitializer';
 

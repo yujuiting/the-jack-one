@@ -98,7 +98,7 @@ class CameraController extends Component {
       this.body.velocity.add(-this.speed, 0);
     }
 
-    this.body.velocity.normalize().scale(this.speed);
+    this.body.velocity.normalize().multiply(this.speed);
   }
 
 }

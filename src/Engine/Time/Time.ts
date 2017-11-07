@@ -1,4 +1,3 @@
-import { Engine } from 'Engine/Base/Engine';
 import { Service } from 'Engine/Decorator/Service';
 
 interface InternalTime extends Time {
@@ -8,8 +7,6 @@ interface InternalTime extends Time {
 
 @Service()
 export class Time {
-
-  private _isPaused: boolean = true;
 
   /**
    * In millisecond

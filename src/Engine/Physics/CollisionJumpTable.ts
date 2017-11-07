@@ -19,13 +19,13 @@ export class CollisionJumpTable {
       return;
     }
 
-    const normal = positionB.clone().subtract(positionA).scale(colliderA.radius / distance);
+    const normal = positionB.clone().subtract(positionA).multiply(colliderA.radius / distance);
 
     const point = positionA.clone().add(normal);
 
     normal.normalize();
 
-    const mtv = normal.clone().scale(maxDistance - distance);
+    const mtv = normal.clone().multiply(maxDistance - distance);
 
     return new CollisionContact(colliderA, colliderB, mtv, point, normal);
   }
@@ -43,7 +43,7 @@ export class CollisionJumpTable {
     const ab = positionB.clone().subtract(positionA);
     const hasSameDirection = minAxis.dot(ab) >= 0;
     if (!hasSameDirection) {
-      minAxis.scale(-1);
+      minAxis.multiply(-1);
     }
 
     const normal = minAxis.clone().normalize();
@@ -56,14 +56,14 @@ export class CollisionJumpTable {
     let contactPoint: Vector;
 
     if (containsPointA && containsPointB) {
-      contactPoint = pointA.clone().add(pointB).scale(0.5);
+      contactPoint = pointA.clone().add(pointB).multiply(0.5);
     } else if (containsPointA) {
       contactPoint = pointA.clone();
     } else if (containsPointB) {
       contactPoint = pointB.clone();
     } else {
       // I am not sure what is this condition...
-      contactPoint = pointA.clone().add(pointB).scale(0.5);
+      contactPoint = pointA.clone().add(pointB).multiply(0.5);
     }
 
     return new CollisionContact(colliderA, colliderB, minAxis, contactPoint, normal);
@@ -82,7 +82,7 @@ export class CollisionJumpTable {
     const ab = positionB.clone().subtract(positionA);
     const hasSameDirection = minAxis.dot(ab) >= 0;
     if (!hasSameDirection) {
-      minAxis.scale(-1);
+      minAxis.multiply(-1);
     }
 
     const normal = minAxis.clone().normalize();
@@ -95,14 +95,14 @@ export class CollisionJumpTable {
     let contactPoint: Vector;
 
     if (containsPointA && containsPointB) {
-      contactPoint = pointA.clone().add(pointB).scale(0.5);
+      contactPoint = pointA.clone().add(pointB).multiply(0.5);
     } else if (containsPointA) {
       contactPoint = pointA.clone();
     } else if (containsPointB) {
       contactPoint = pointB.clone();
     } else {
       // I am not sure what is this condition...
-      contactPoint = pointA.clone().add(pointB).scale(0.5);
+      contactPoint = pointA.clone().add(pointB).multiply(0.5);
     }
 
     return new CollisionContact(colliderA, colliderB, minAxis, contactPoint, normal);
@@ -158,7 +158,7 @@ export class CollisionJumpTable {
       return;
     }
 
-    return axes[minIndex].clone().normalize().scale(minOverlap);
+    return axes[minIndex].clone().normalize().multiply(minOverlap);
   }
 
 }

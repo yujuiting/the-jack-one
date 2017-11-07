@@ -1,6 +1,4 @@
 import { RendererComponent } from 'Engine/Render/RendererComponent';
-import { Matrix } from 'Engine/Math/Matrix';
-import { Vector } from 'Engine/Math/Vector';
 import { Color } from 'Engine/Display/Color';
 
 export class CircleRendererComponent extends RendererComponent {
@@ -9,9 +7,9 @@ export class CircleRendererComponent extends RendererComponent {
 
   public lineWidth: number = 1;
 
-  public strokeColor: Color = Color.Red;
+  public strokeColor: Color|undefined = Color.Red;
 
-  public center: Vector = new Vector();
+  public fillColor: Color|undefined;
 
   public startAngle: number = 0;
 
@@ -23,41 +21,35 @@ export class CircleRendererComponent extends RendererComponent {
 
   public update(): void {
     super.update();
-    this.calculateBounds();
+
+    const halfOfLineWidth = Math.floor(this.lineWidth * 0.5);
+    this.canvas.width = this.radius + halfOfLineWidth;
+    this.canvas.height = this.radius + halfOfLineWidth;
   }
 
-  public render(ctx: CanvasRenderingContext2D, toScreenMatrix: Matrix): void {
+  public render(): void {
+    const ctx = this.ctx;
+
+    ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
     ctx.save();
 
-    const m = toScreenMatrix.clone();
-
-    if (this.useLocalCoordinate) {
-      m.multiply(this.transform.toWorldMatrix);
+    if (!this.useLocalCoordinate) {
+      const m = this.transform.toLocalMatrix;
+      ctx.transform(
+        m[0][0], m[0][1],
+        m[1][0], m[1][1],
+        m[0][2], m[1][2]
+      );
     }
-
-    /**
-     * reverse first to correct y-axis and rotate direction
-     */
-    m.setScaling(-1, -1);
-
-    ctx.transform(
-      m[0][0], m[0][1],
-      m[1][0], m[1][1],
-      m[0][2], m[1][2]
-    );
 
     ctx.lineWidth = this.lineWidth;
 
-    ctx.strokeStyle = this.strokeColor.toHexString();
-
     ctx.beginPath();
 
-    const center = this.center.clone();
-
     ctx.arc(
-      center.x,
-      center.y,
+      this.bounds.extents.x,
+      this.bounds.extents.y,
       this.radius,
       this.startAngle,
       this.endAngle,
@@ -66,18 +58,17 @@ export class CircleRendererComponent extends RendererComponent {
 
     ctx.closePath();
 
-    ctx.stroke();
+    if (this.strokeColor) {
+      ctx.strokeStyle = this.strokeColor.toHexString();
+      ctx.stroke();
+    }
+
+    if (this.fillColor) {
+      ctx.fillStyle = this.fillColor.toHexString();
+      ctx.fill();
+    }
 
     ctx.restore();
-  }
-
-  private calculateBounds(): void {
-    this.bounds.center.copy(this.center);
-    this.bounds.extents.setTo(this.radius, this.radius);
-
-    if (this.useLocalCoordinate) {
-      this.bounds.center.add(this.transform.position);
-    }
   }
 
 }

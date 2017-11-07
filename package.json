@@ -4,10 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "webpack",
+    "build": "tsc",
     "serve": "webpack-dev-server",
     "lint": "tslint --project .",
-    "test": "nyc mocha --opts .mocha",
+    "test": "TS_NODE_PROJECT=tsconfig.test.json nyc mocha --opts .mocha",
     "watch": "nyc mocha --opts .mocha --watch",
     "start": "npm run serve",
     "coverage:coveralls": "nyc report --reporter=text-lcov | coveralls",
@@ -57,7 +57,7 @@
     "tslint-eslint-rules": "^4.1.1",
     "tslint-microsoft-contrib": "^5.0.1",
     "typedoc": "^0.8.0",
-    "typescript": "^2.5.3",
+    "typescript": "^2.6.1",
     "webpack": "^3.7.1",
     "webpack-dev-server": "^2.9.1"
   },

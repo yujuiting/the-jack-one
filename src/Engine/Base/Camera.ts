@@ -2,17 +2,12 @@ import { GameObject } from 'Engine/Base/GameObject';
 import { Screen } from 'Engine/Base/Screen';
 import { GameObjectInitializer } from 'Engine/Base/GameObjectInitializer';
 import { Color } from 'Engine/Display/Color';
-import { TransformComponent } from 'Engine/Display/TransformComponent';
 import { Bounds } from 'Engine/Display/Bounds';
 import { Vector } from 'Engine/Math/Vector';
 import { Rect } from 'Engine/Math/Rect';
 import { Matrix } from 'Engine/Math/Matrix';
-import { Layer, AllBuiltInLayer, Type } from 'Engine/Utility/Type';
-import { RendererComponent } from 'Engine/Render/RendererComponent';
-import { Pool } from 'Engine/Utility/Pool';
-import { ReadonlyTree } from 'Engine/Utility/Tree';
+import { Layer, AllBuiltInLayer } from 'Engine/Utility/Type';
 import { BrowserDelegate } from 'Engine/Utility/BrowserDelegate';
-import { Inject } from 'Engine/Decorator/Inject';
 import { Service } from 'Engine/Decorator/Service';
 
 export const MainCamera = Symbol('MainCamera');
@@ -51,22 +46,14 @@ export class Camera extends GameObject {
    */
   public bounds: Bounds = new Bounds();
 
-  private canvas: HTMLCanvasElement;
-
-  private ctx: CanvasRenderingContext2D;
-
-  constructor(private browser: BrowserDelegate,
-              private screen: Screen,
+  constructor(browser: BrowserDelegate,
+              screen: Screen,
               gameObjectInitializer: GameObjectInitializer) {
     super(gameObjectInitializer);
-    this.canvas = browser.document.createElement('canvas');
-    this.ctx = <CanvasRenderingContext2D>this.canvas.getContext('2d');
-    this.setSize(this.screen.width, this.screen.height);
+    this.setSize(screen.width, screen.height);
   }
 
   public setSize(width: number, height: number): void {
-    this.canvas.width = width;
-    this.canvas.height = height;
     this.toScreenMatrix.reset();
 
     this.rect.width = width;
@@ -75,12 +62,10 @@ export class Camera extends GameObject {
     const halfWidth = width * 0.5;
     const halfHeight = height * 0.5;
 
-    /**
-     * Transform coordinate, reverse Y axis and set center as zero point.
-     */
+    // set center as zero point.
     this.toScreenMatrix.setTranslation(halfWidth, halfHeight);
+    // reverse Y axis
     this.toScreenMatrix.setScaling(0, -1);
-    this.toScreenMatrix.save();
 
     this.bounds.extents.setTo(halfWidth, halfHeight);
   }
@@ -88,9 +73,10 @@ export class Camera extends GameObject {
   public update(): void {
     super.update();
     /**
-     * Perform camera movement.
+     * Perform camera movement, rotation and scaling.
+     * Save those transform and restore after render.
      */
-    this.toScreenMatrix.restore();
+    this.toScreenMatrix.save();
     this.toScreenMatrix.setTranslation(-this.transform.position.x, -this.transform.position.y);
     this.toScreenMatrix.setRotatation(this.transform.rotation);
     this.toScreenMatrix.setScaling(this.transform.scale);
@@ -100,35 +86,9 @@ export class Camera extends GameObject {
     this.bounds.center.copy(this.transform.position);
   }
 
-  public render(ctx: CanvasRenderingContext2D, gameObjects: ReadonlyTree<GameObject>): void {
-    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-
-    this.ctx.save();
-    this.ctx.fillStyle = this.backgroundColor.toHexString();
-    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-    this.ctx.restore();
-
-    gameObjects.forEachChildren(gameObject => {
-      if ((gameObject.layer & this.cullingMask) === 0) {
-        return;
-      }
-
-      const renderers = gameObject.getComponents(<Type<RendererComponent>>RendererComponent)
-                                  .filter(renderer => this.checkGameObjectVisible(renderer));
-
-      renderers.forEach(renderer => renderer.render(this.ctx, this.toScreenMatrix));
-    });
-
-    ctx.drawImage(
-      this.canvas,
-      0, 0,
-      this.canvas.width,
-      this.canvas.height,
-      this.rect.position.x,
-      this.rect.position.y,
-      this.rect.width,
-      this.rect.height
-    );
+  public postRender(): void {
+    super.postRender();
+    this.toScreenMatrix.restore();
   }
 
   public screenToWorld(point: Vector): Vector {
@@ -141,27 +101,6 @@ export class Camera extends GameObject {
     const result = point.clone();
     this.toScreenMatrix.multiplyToPoint(result);
     return result;
-  }
-
-  /**
-   * Check renderer visibility and trigger relevant event if necessary.
-   */
-  private checkGameObjectVisible(renderer: RendererComponent): boolean {
-    const isVisible = this.bounds.intersects(renderer.bounds);
-
-    if (isVisible) {
-      if (!renderer.isVisible) {
-        renderer.isVisible = true;
-        renderer.onBecameVisible();
-      }
-    } else {
-      if (renderer.isVisible) {
-        renderer.isVisible = false;
-        renderer.onBecameInvisible();
-      }
-    }
-
-    return isVisible;
   }
 
 }

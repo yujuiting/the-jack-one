@@ -1,5 +1,4 @@
 // tslint:disable max-func-body-length cyclomatic-complexity
-import { RigidbodyComponent } from 'Engine/Physics/RigidbodyComponent';
 import { ColliderComponent } from 'Engine/Physics/ColliderComponent';
 import { Vector } from 'Engine/Math/Vector';
 import { Recyclable } from 'Engine/Utility/Pool';
@@ -69,18 +68,18 @@ export class CollisionContact implements Recyclable {
     const inverseMoiA = bodyA ? bodyA.inverseMoi : 0;
     const inverseMoiB = bodyB ? bodyB.inverseMoi : 0;
 
-    const j_moi_a = Vector.Cross(relativeA.cross(this.normal), relativeA).scale(inverseMoiA);
-    const j_moi_b = Vector.Cross(relativeB.cross(this.normal), relativeB).scale(inverseMoiB);
+    const j_moi_a = Vector.Cross(relativeA.cross(this.normal), relativeA).multiply(inverseMoiA);
+    const j_moi_b = Vector.Cross(relativeB.cross(this.normal), relativeB).multiply(inverseMoiB);
     const j_moi = j_moi_a.add(j_moi_b).dot(this.normal);
 
     // Calculate impulse scalar
     // https://en.wikipedia.org/wiki/Collision_response
     const j = -(1 + restitution) * rvDotNormal / (sumOfInverseMass + j_moi);
 
-    const impulse = this.normal.clone().scale(j);
+    const impulse = this.normal.clone().multiply(j);
 
     if (bodyA && bodyB) {
-      this.mtv.scale(0.5);
+      this.mtv.multiply(0.5);
     }
 
     if (bodyA) {
@@ -88,9 +87,9 @@ export class CollisionContact implements Recyclable {
         bodyA.awake();
       }
 
-      bodyA.host.transform.position.add(this.mtv.clone().scale(-1));
+      bodyA.host.transform.position.add(this.mtv.clone().multiply(-1));
       // impulse
-      bodyA.addForce(impulse.clone().scale(-1), ForceMode.Impulse);
+      bodyA.addForce(impulse.clone().multiply(-1), ForceMode.Impulse);
 
       // TODO: force at specific point should cause torque
       // torque
@@ -115,12 +114,12 @@ export class CollisionContact implements Recyclable {
 
     let frictionImpulse: Vector;
 
-    const jt_moi_a = Vector.Cross(relativeA.cross(tangent), relativeA).scale(inverseMoiA);
-    const jt_moi_b = Vector.Cross(relativeB.cross(tangent), relativeB).scale(inverseMoiB);
+    const jt_moi_a = Vector.Cross(relativeA.cross(tangent), relativeA).multiply(inverseMoiA);
+    const jt_moi_b = Vector.Cross(relativeB.cross(tangent), relativeB).multiply(inverseMoiB);
     const jt_moi = jt_moi_a.add(jt_moi_b).dot(tangent);
 
     // Solve for the tangent vector
-    const t = relativeVelocity.clone().subtract(this.normal.clone().scale(rvDotNormal)).normalize();
+    const t = relativeVelocity.clone().subtract(this.normal.clone().multiply(rvDotNormal)).normalize();
 
     // Solve for magnitude to apply along the friction vector
     const jt = -relativeVelocity.dot(t) / (sumOfInverseMass + jt_moi);
@@ -132,13 +131,13 @@ export class CollisionContact implements Recyclable {
     // Clamp magnitude of friction and create impulse vector
     // const frictionImpulse = tangent.clone();
     if (Math.abs( jt ) < j * mu) {
-      frictionImpulse = t.clone().scale(jt);
+      frictionImpulse = t.clone().multiply(jt);
     } else {
-      frictionImpulse = t.clone().scale(-j * mu);
+      frictionImpulse = t.clone().multiply(-j * mu);
     }
 
     if (bodyA) {
-      bodyA.addForce(frictionImpulse.clone().scale(-1), ForceMode.Impulse);
+      bodyA.addForce(frictionImpulse.clone().multiply(-1), ForceMode.Impulse);
       bodyA.addTorque(-frictionImpulse.dot(t) * relativeA.cross(t) , ForceMode.Impulse);
     }
 

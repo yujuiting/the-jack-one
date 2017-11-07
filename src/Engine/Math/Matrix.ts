@@ -13,7 +13,7 @@ export class Matrix {
     [0, 1, 0]
   ];
 
-  private _save: number[][] = [];
+  private _save: number[][][] = [];
 
   public get [0](): number[] { return this._value[0]; }
   public get [1](): number[] { return this._value[1]; }
@@ -29,23 +29,32 @@ export class Matrix {
     this.save();
   }
 
+  /**
+   * Save current state, it can be restore later.
+   */
   public save(): this {
-    this._save = [
+    this._save.push([
       [this[0][0], this[0][1], this[0][2]],
       [this[1][0], this[1][1], this[1][2]]
-    ];
+    ]);
     return this;
   }
 
   public restore(): this {
-    this._value = [
-      [this._save[0][0], this._save[0][1], this._save[0][2]],
-      [this._save[1][0], this._save[1][1], this._save[1][2]]
-    ];
+    const last = this._save.pop();
+    if (last) {
+      this._value = last;
+    } else {
+      this.reset();
+    }
     return this;
   }
 
+  /**
+   * Reset matrix to identity, and also clear saved states.
+   */
   public reset(): this {
+    this._save = [];
     this._value = [
       [1, 0, 0],
       [0, 1, 0]
@@ -169,10 +178,10 @@ export class Matrix {
     const c_minor = source[1][0] * 0 - source[1][1] * 0;
     const d_minor = source[0][1] * 1 - source[0][2] * 0;
     const e_minor = source[0][0] * 1 - source[0][2] * 0;
-    const f_minor = source[0][0] * 0 - source[0][1] * 0;
+    // const f_minor = source[0][0] * 0 - source[0][1] * 0;
     const g_minor = source[0][1] * source[1][2] - source[0][2] * source[1][1];
     const h_minor = source[0][0] * source[1][2] - source[0][2] * source[1][0];
-    const i_minor = source[0][0] * source[1][1] - source[0][1] * source[1][0];
+    // const i_minor = source[0][0] * source[1][1] - source[0][1] * source[1][0];
     const inverseDeterminant = 1 / (source[0][0] * a_minor - source[0][1] * b_minor + source[0][2] * c_minor);
     this[0][0] = inverseDeterminant * a_minor;
     this[0][1] = inverseDeterminant * -d_minor;

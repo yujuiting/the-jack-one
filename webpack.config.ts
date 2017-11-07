@@ -1,8 +1,7 @@
-import * as fs from 'fs';
 import * as path from 'path';
 import * as HtmlWebpackPlugin from 'html-webpack-plugin';
 import { Configuration, HotModuleReplacementPlugin, optimize } from 'webpack';
-import { CheckerPlugin, TsConfigPathsPlugin } from 'awesome-typescript-loader';
+import { CheckerPlugin } from 'awesome-typescript-loader';
 import * as CopyWebpackPlugin from 'copy-webpack-plugin';
 
 const context = path.join(__dirname, 'src');
@@ -13,7 +12,8 @@ const games = {
 const examples = {
   'examples/control-camera': 'Examples/control-camera.ts',
   'examples/manage-cameras': 'Examples/manage-cameras.ts',
-  'examples/physics': 'Examples/physics.ts'
+  'examples/physics': 'Examples/physics.ts',
+  'examples/test': 'Examples/test.ts'
 };
 
 const config: Configuration = {
@@ -22,7 +22,7 @@ const config: Configuration = {
 
   entry: {
     // Web
-    index: 'Web/main.ts',
+    // index: 'Web/main.ts',
     // Games
     ...games,
     ...examples
@@ -62,7 +62,7 @@ const config: Configuration = {
 
     new HotModuleReplacementPlugin(),
 
-    new HtmlWebpackPlugin({ chunks: ['commons', 'index'] }),
+    // new HtmlWebpackPlugin({ chunks: ['commons', 'index'] }),
 
     ...Object.keys(games).map(name =>
       new HtmlWebpackPlugin({ chunks: ['commons', name], filename: `${name}.html` })),

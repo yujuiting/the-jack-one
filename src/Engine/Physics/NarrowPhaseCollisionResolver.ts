@@ -1,4 +1,3 @@
-import { ColliderComponent } from 'Engine/Physics/ColliderComponent';
 import { Pair } from 'Engine/Physics/Pair';
 import { Service } from 'Engine/Decorator/Service';
 

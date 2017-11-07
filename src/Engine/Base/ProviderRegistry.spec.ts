@@ -7,14 +7,14 @@ class Foo { prop: string; }
 
 class Foo2 { prop: string; }
 
-class Bar {
-  constructor(public foo: Foo) {}
-}
+// class Bar {
+//   constructor(public foo: Foo) {}
+// }
 
-class Lala {
-  constructor(public prop: string,
-              public foo: Foo) {}
-}
+// class Lala {
+//   constructor(public prop: string,
+//               public foo: Foo) {}
+// }
 
 @suite class ProviderRegistryTestSuite {
 

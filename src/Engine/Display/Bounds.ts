@@ -40,7 +40,7 @@ export class Bounds implements Recyclable {
   }
 
   public get size(): Vector {
-    return this.extents.clone().scale(2);
+    return this.extents.clone().multiply(2);
   }
 
   public get top(): number { return this.center.y + this.extents.y; }

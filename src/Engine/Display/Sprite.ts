@@ -4,39 +4,29 @@ import { Vector } from 'Engine/Math/Vector';
 import { Rect } from 'Engine/Math/Rect';
 import { BrowserDelegate } from 'Engine/Utility/BrowserDelegate';
 import { Inject } from 'Engine/Decorator/Inject';
+import { Class } from 'Engine/Decorator/Class';
 
+@Class()
 export class Sprite {
 
-  /**
-   * Pivot value between [0, 1]
-   */
   public pivot: Vector = new Vector(0.5, 0.5);
 
   /**
-   * Rect of this sprite.
+   * Location of the Sprite on the original Texture, specified in pixels.
+   * Default, it will set to whole texture when texture loaded.
    */
   public rect: Rect = new Rect();
-
-  /**
-   * Which part of texture is used.
-   */
-  public textureRect: Rect = new Rect();
 
   @Inject(BrowserDelegate)
   private browser: BrowserDelegate;
 
-  private canvas: HTMLCanvasElement = this.browser.createCanvas();
+  public canvas: HTMLCanvasElement = this.browser.createCanvas();
 
   private ctx: CanvasRenderingContext2D = this.browser.getContext(this.canvas);
 
   private _texture: Texture;
 
-  private textureLoaded: Subscription;
-
-  get imageBitmap(): ImageBitmap|HTMLCanvasElement {
-    this.update();
-    return this.canvas;
-  }
+  private textureLoaded: Subscription|undefined;
 
   get texture(): Texture { return this._texture; }
 
@@ -51,6 +41,10 @@ export class Sprite {
   }
 
   public setTexture(texture: Texture): void {
+    if (this._texture === texture) {
+      return;
+    }
+
     this._texture = texture;
 
     if (this.textureLoaded) {
@@ -69,26 +63,19 @@ export class Sprite {
       this.canvas.height = this.rect.height;
     }
 
-    if (this.textureRect.width === 0 && this.textureRect.height === 0) {
-      this.textureRect.width = this._texture.width;
-      this.textureRect.height = this._texture.height;
+    if (this.textureLoaded) {
+      this.textureLoaded.unsubscribe();
+      delete this.textureLoaded;
     }
-  }
 
-  private update(): void {
-    this.canvas.width = this.rect.width;
-    this.canvas.height = this.rect.height;
-
-    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-
+    this.ctx.clearRect(0, 0, this.rect.width, this.rect.height);
     this.ctx.drawImage(
       this._texture.imageBitmap,
-      this.textureRect.position.x,
-      this.textureRect.position.y,
-      this.textureRect.width,
-      this.textureRect.height,
       this.rect.position.x,
       this.rect.position.y,
+      this.rect.width,
+      this.rect.height,
+      0, 0,
       this.rect.width,
       this.rect.height
     );

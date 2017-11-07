@@ -9,10 +9,10 @@ import { Screen } from 'Engine/Base/Screen';
 import { Camera } from 'Engine/Base/Camera';
 import { instantiate, bootstrap } from 'Engine/Base/runtime';
 
-import { Time } from 'Engine/Time/Time';
+// import { Time } from 'Engine/Time/Time';
 
 import { Class } from 'Engine/Decorator/Class';
-import { Inject } from 'Engine/Decorator/Inject';
+// import { Inject } from 'Engine/Decorator/Inject';
 
 import { Sprite } from 'Engine/Display/Sprite';
 import { Color } from 'Engine/Display/Color';
@@ -66,7 +66,7 @@ class Player extends GameObject {
       // dest - pos = relative
       .subtract(this.transform.position)
       .normalize()
-      .scale(this.moveSpeed);
+      .multiply(this.moveSpeed);
   }
 
   public stopMove(): void {
@@ -130,8 +130,8 @@ class Label extends GameObject {
 @Class()
 class CameraFollow extends Component {
 
-  @Inject(Time)
-  private time: Time;
+  // @Inject(Time)
+  // private time: Time;
 
   public bounds: Bounds = new Bounds();
 

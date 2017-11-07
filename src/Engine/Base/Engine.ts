@@ -3,10 +3,8 @@ import { Scene } from 'Engine/Base/Scene';
 import { SceneManager } from 'Engine/Base/SceneManager';
 import { BrowserDelegate } from 'Engine/Utility/BrowserDelegate';
 import { Time } from 'Engine/Time/Time';
-import { ReadonlyTree } from 'Engine/Utility/Tree';
 import { Vector } from 'Engine/Math/Vector';
 import { Service } from 'Engine/Decorator/Service';
-import { Inject } from 'Engine/Decorator/Inject';
 
 @Service()
 export class Engine {
@@ -73,7 +71,6 @@ export class Engine {
 
   public resume() {
     this._isPaused = false;
-    // this.lastTimestamp = this.browser.window.performance.now();
     requestAnimationFrame(this.bindedmainloop);
   }
 
@@ -88,7 +85,6 @@ export class Engine {
       return;
     }
 
-    // const timestamp = this.browser.window.performance.now();
     const frameTime = timestamp - this.lastTimestamp;
     this.lastTimestamp = timestamp;
     this.accumulator += frameTime;
@@ -120,7 +116,9 @@ export class Engine {
 
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-    this.currentScene.render(this.ctx);
+    this.currentScene.preRender();
+
+    this.currentScene.render(this.ctx, this.canvas.width, this.canvas.height);
 
     this.currentScene.postRender();
 

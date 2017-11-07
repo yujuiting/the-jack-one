@@ -4,6 +4,8 @@ import { Type, Token } from 'Engine/Utility/Type';
 
 let engine: Engine;
 
+const global: Map<any, any> = new Map();
+
 export async function bootstrap(): Promise<void> {
   engine = <Engine>providerRegistry.get(Engine);
   return engine.initialize();
@@ -24,3 +26,21 @@ export function getService<T>(token: Token): T|undefined {
 export function create<T>(factory: Function, ...args: any[]): T|undefined {
   return providerRegistry.create(factory, ...args);
 }
+
+export function def(key: any, value: any = true): void {
+  global.set(key, value);
+}
+
+export function ifdef(key: any, run: Function): void {
+  if (global.has(key)) {
+    run();
+  }
+}
+
+export function ifndef(key: any, run: Function): void {
+  if (!global.has(key)) {
+    run();
+  }
+}
+
+export const DEBUG = Symbol('DEBUG');

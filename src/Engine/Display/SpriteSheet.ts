@@ -1,51 +1,80 @@
 import { Texture } from 'Engine/Resource/Texture';
-import { Vector } from 'Engine/Math/Vector';
 import { Sprite } from 'Engine/Display/Sprite';
 
-interface SpriteSheetCell {
-  offsetX?: number;
-  offsetY?: number;
+export interface SpriteSheetCell {
+  x?: number;
+  y?: number;
   width: number;
   height: number;
-  frameCount: number;
 }
 
-interface SpriteSheetCellMap {
-  [name: string]: SpriteSheetCell;
+export type SpriteSheetCells = SpriteSheetCell[];
+
+export interface SpriteSheetCellMap {
+  [name: string]: SpriteSheetCells;
+}
+
+interface InternalSpriteSheet {
+  frameTime: number;
 }
 
 export class SpriteSheet {
 
   private sprites: Map<string, Sprite[]> = new Map();
 
-  constructor(public texture: Texture,
-              public frameTime: number,
-              private cellMap: SpriteSheetCellMap = {}) {
-    const keys = Object.keys(cellMap);
-    keys.forEach(key => {
-      const cell = cellMap[key];
-      const sprites: Sprite[] = [];
-      for (let i = 0; i < cell.frameCount; i++) {
-        const sprite = new Sprite(texture);
-        sprite.textureRect.position.setTo(
-          (cell.offsetX || 0) + cell.width * i, cell.offsetY || 0);
-        sprite.textureRect.width = sprite.rect.width = cell.width;
-        sprite.textureRect.height = sprite.rect.height = cell.height;
-        sprites.push(sprite);
-      }
-      this.sprites.set(key, sprites);
-    });
+  public readonly frameTime: number;
+
+  public get fps(): number { return this._fps; }
+
+  public set fps(value: number) {
+    this._fps = value;
+    (<InternalSpriteSheet>this).frameTime = 1 / value;
   }
+
+  constructor(public texture: Texture,
+              private cellMapOrCells: SpriteSheetCellMap|SpriteSheetCells,
+              private _fps = 24) {
+    if (Array.isArray(cellMapOrCells)) {
+      const sprites = this.makeSprites(texture, cellMapOrCells);
+      const key = 'default';
+      this.sprites.set(key, sprites);
+    } else {
+      const keys = Object.keys(cellMapOrCells);
+      keys.forEach(key => {
+        const cells = cellMapOrCells[key];
+        const sprites = this.makeSprites(texture, cells);
+        this.sprites.set(key, sprites);
+      });
+    }
+
+    this.frameTime = 1 / _fps;
+}
 
   public getSprites(key: string): ReadonlyArray<Sprite> {
     return this.sprites.get(key) || [];
   }
 
-  public getSprite(key: string, index: number): Sprite {
-    const cell = this.cellMap[key];
-    const correctedIndex = index % cell.frameCount;
+  public getSprite(key: string, index: number): Sprite|undefined {
+    const sprites = this.sprites.get(key);
+    if (!sprites) {
+      return;
+    }
 
-    return (<Sprite[]>this.sprites.get(key))[correctedIndex];
+    const correctedIndex = index % sprites.length;
+
+    return sprites[correctedIndex];
+  }
+
+  private makeSprites(texture: Texture, cells: SpriteSheetCells): Sprite[] {
+    const sprites: Sprite[] = [];
+    cells.forEach(cell => {
+      const sprite = new Sprite(texture);
+      sprite.rect.position.setTo(cell.x || 0, cell.y || 0);
+      sprite.rect.width = cell.width;
+      sprite.rect.height = cell.height;
+      sprites.push(sprite);
+    });
+    return sprites;
   }
 
 }

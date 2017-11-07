@@ -9,7 +9,7 @@ export class Ray {
   }
 
   public getPoint(distance: number): Vector {
-    return this.direction.clone().scale(distance).add(this.origin);
+    return this.direction.clone().multiply(distance).add(this.origin);
   }
 
   /**

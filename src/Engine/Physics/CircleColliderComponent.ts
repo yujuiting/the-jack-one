@@ -68,7 +68,7 @@ export class CircleColliderComponent extends ColliderComponent {
       this.debugColliderRenderer.strokeColor = color;
       this.debugDirectionRenderer.strokeColor = color;
 
-      this.debugColliderRenderer.center.copy(this.bounds.center);
+      // this.debugColliderRenderer.center.copy(this.bounds.center);
       this.debugColliderRenderer.radius = this.radius;
 
       this.debugBoundsRenderer.clearPoints();
@@ -83,7 +83,7 @@ export class CircleColliderComponent extends ColliderComponent {
 
       const rotation = this.host.transform.rotation;
       const direction = new Vector(Math.cos(rotation), Math.sin(rotation));
-      const point = this.host.transform.position.clone().add(direction.scale(this.radius));
+      const point = this.host.transform.position.clone().add(direction.multiply(this.radius));
       this.debugDirectionRenderer.clearPoints();
       this.debugDirectionRenderer.addPoint(this.bounds.center, point);
 
@@ -172,7 +172,7 @@ export class CircleColliderComponent extends ColliderComponent {
    * @inheritdoc
    */
   public getFurthestPoint(direction: Vector): Vector {
-    return this.bounds.center.clone().add(direction.clone().normalize().scale(this.radius));
+    return this.bounds.center.clone().add(direction.clone().normalize().multiply(this.radius));
   }
 
 }

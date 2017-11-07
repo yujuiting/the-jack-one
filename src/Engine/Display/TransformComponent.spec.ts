@@ -22,7 +22,7 @@ import { Vector } from 'Engine/Math/Vector';
     this.transform.position.setTo(10, 20);
     this.transform.rotation = Math.PI / 2;
     this.transform.scale.setTo(1, 2);
-    this.transform.calculate();
+    this.transform.fixedUpdate(1);
 
     const p = new Vector(5, 10);
     this.transform.toWorldMatrix.multiplyToPoint(p);
@@ -35,7 +35,7 @@ import { Vector } from 'Engine/Math/Vector';
     this.transform.position.setTo(10, 20);
     this.transform.rotation = Math.PI / 2;
     this.transform.scale.setTo(1, 2);
-    this.transform.calculate();
+    this.transform.fixedUpdate(1);
 
     const p = new Vector(5, 10);
     this.transform.toLocalMatrix.multiplyToPoint(p);

@@ -1,8 +1,6 @@
 import { BaseObject } from 'Engine/Base/BaseObject';
 import { GameObject } from 'Engine/Base/GameObject';
-import { Tree, ReadonlyTree } from 'Engine/Utility/Tree';
-import { Pool } from 'Engine/Utility/Pool';
-import { Resource } from 'Engine/Resource/Resource';
+import { Tree } from 'Engine/Utility/Tree';
 import { Bundle } from 'Engine/Resource/Bundle';
 import { Camera, MainCamera } from 'Engine/Base/Camera';
 import { addToArray,
@@ -11,9 +9,9 @@ import { Inject } from 'Engine/Decorator/Inject';
 import { Class } from 'Engine/Decorator/Class';
 import { BroadPhaseCollisionResolver } from 'Engine/Physics/BroadPhaseCollisionResolver';
 import { NarrowPhaseCollisionResolver } from 'Engine/Physics/NarrowPhaseCollisionResolver';
-import { ColliderComponent } from 'Engine/Physics/ColliderComponent';
 import { Vector } from 'Engine/Math/Vector';
 import { GameObjectInitializer } from 'Engine/Base/GameObjectInitializer';
+import { RenderProcess } from 'Engine/Base/RenderProcess';
 
 /**
  * Scene manage game objects and resources.
@@ -33,6 +31,9 @@ export class Scene extends BaseObject {
 
   @Inject(MainCamera)
   public mainCamera: Camera;
+
+  @Inject(RenderProcess)
+  private renderProcess: RenderProcess;
 
   public get isLoaded(): boolean { return this.resources.isLoaded; }
 
@@ -103,15 +104,22 @@ export class Scene extends BaseObject {
     this.gameObjects.forEachChildren(gameObject => gameObject.lateUpdate());
   }
 
-  public render(ctx: CanvasRenderingContext2D): void {
-    // render cameras
+  public preRender(): void {
+    this.gameObjects.forEachChildren(gameObject => gameObject.preRender());
+  }
+
+  public render(ctx: CanvasRenderingContext2D, width: number, height: number): void {
     // TODO: camera order is an issue
-    this.cameras.forEach(camera => camera.render(ctx, this.gameObjects));
+    this.renderProcess.useContext(ctx, width, height);
+    this.cameras.forEach(camera => this.renderProcess.render(camera, this.gameObjects));
   }
 
   public postRender(): void {
-    this.gameObjectInitializer.resolve();
     this.gameObjects.forEachChildren(gameObject => gameObject.postRender());
+    /**
+     * Resove all game object initialization at final step to ensure their cycle start at update call.
+     */
+    this.gameObjectInitializer.resolve();
   }
 
   public destroy(): void {

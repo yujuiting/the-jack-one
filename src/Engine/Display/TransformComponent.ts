@@ -1,5 +1,4 @@
 import { Component } from 'Engine/Base/Component';
-import { GameObject } from 'Engine/Base/GameObject';
 import { Vector } from 'Engine/Math/Vector';
 import { UniqueComponent } from 'Engine/Decorator/UniqueComponent';
 import { Matrix } from 'Engine/Math/Matrix';
@@ -11,22 +10,28 @@ import { Matrix } from 'Engine/Math/Matrix';
 export class TransformComponent extends Component {
 
   /**
-   * position in world coordinate
+   * Position in world space.
    */
   public position: Vector = Vector.Get();
 
   /**
-   * local position, relative to parent.
+   * Local position, relative to parent.
    */
   public localPosition: Vector = Vector.Get();
 
-  public scale: Vector = Vector.Get();
+  /**
+   * Scale in world space.
+   */
+  public scale: Vector = Vector.Get(1, 1);
+
+  public localScale: Vector = Vector.Get(1, 1);
 
   /**
-   * rotation in world coordinate
-   * it is radian
+   * Rotation in world space.
    */
   public rotation: number = 0;
+
+  public localRotation: number = 0;
 
   /**
    * calculate every fixed update
@@ -38,14 +43,16 @@ export class TransformComponent extends Component {
    */
   public readonly toLocalMatrix: Matrix = this.toWorldMatrix.getInverse();
 
-  public fixedUpdate(): void {
-    this.calculate();
-  }
+  public fixedUpdate(alpha: number): void {
+    super.fixedUpdate(alpha);
 
-  public calculate(): void {
     if (this.host.parent) {
-      this.position.copy(this.localPosition);
-      this.position.add(this.host.parent.transform.position);
+      const parentTransform = this.host.parent.transform;
+      this.position.copy(parentTransform.position);
+      this.position.add(this.localPosition);
+      this.scale.copy(parentTransform.scale);
+      this.scale.multiply(this.localScale);
+      this.rotation = parentTransform.rotation + this.localRotation;
     }
 
     this.toWorldMatrix.reset();
@@ -65,9 +72,10 @@ export class TransformComponent extends Component {
 
   public reset(): void {
     super.reset();
-    this.position = Vector.Get();
-    this.localPosition = Vector.Get();
-    this.scale = Vector.Get(1, 1);
+    this.position.reset();
+    this.localPosition.reset();
+    this.scale.setTo(1, 1);
+    this.localScale.setTo(1, 1);
     this.rotation = 0;
   }
 
@@ -76,8 +84,10 @@ export class TransformComponent extends Component {
     Vector.Put(this.position);
     Vector.Put(this.localPosition);
     Vector.Put(this.scale);
+    Vector.Put(this.localScale);
     delete this.position;
     delete this.scale;
+    delete this.localScale;
   }
 
 }

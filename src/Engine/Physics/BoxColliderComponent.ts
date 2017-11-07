@@ -1,15 +1,7 @@
 import { GameObject } from 'Engine/Base/GameObject';
-import { ColliderComponent } from 'Engine/Physics/ColliderComponent';
-import { Bounds } from 'Engine/Display/Bounds';
-import { LineRendererComponent } from 'Engine/Render/LineRendererComponent';
 import { Vector } from 'Engine/Math/Vector';
 import { Line } from 'Engine/Math/Line';
-import { Ray } from 'Engine/Math/Ray';
-import { Projection } from 'Engine/Math/Projection';
-import { CollisionContact } from 'Engine/Physics/CollisionContact';
-import { CircleColliderComponent } from 'Engine/Physics/CircleColliderComponent';
 import { forwardRef } from 'Engine/Utility/Type';
-import { Color } from 'Engine/Display/Color';
 import { PolygonColliderComponent } from 'Engine/Physics/PolygonColliderComponent';
 
 /**

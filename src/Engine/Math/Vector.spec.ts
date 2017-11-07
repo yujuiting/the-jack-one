@@ -77,7 +77,7 @@ import { Vector } from './Vector';
 
   @test 'should scale vector' () {
     const v = new Vector(12, 14);
-    v.scale(2);
+    v.multiply(2);
     expect(v.x).to.equal(24);
     expect(v.y).to.equal(28);
   }
@@ -95,6 +95,28 @@ import { Vector } from './Vector';
     v.reset();
     expect(v.x).to.equal(0);
     expect(v.y).to.equal(0);
+  }
+
+  @test 'should rotate' () {
+    const l = Math.sqrt(2) * 5;
+    const r = Math.PI / 4;
+    const v = new Vector(l, 0);
+
+    v.rotate(r);
+    expect(v.x).to.closeTo(5, 1e-6);
+    expect(v.y).to.closeTo(5, 1e-6);
+
+    v.rotate(r);
+    expect(v.x).to.closeTo(0, 1e-6);
+    expect(v.y).to.closeTo(l, 1e-6);
+
+    v.rotate(r);
+    expect(v.x).to.closeTo(-5, 1e-6);
+    expect(v.y).to.closeTo(5, 1e-6);
+
+    v.rotate(r);
+    expect(v.x).to.closeTo(-l, 1e-6);
+    expect(v.y).to.closeTo(0, 1e-6);
   }
 
   @test 'should check equal' () {

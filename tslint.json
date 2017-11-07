@@ -8,12 +8,7 @@
     "no-relative-imports": false,
     "function-name": false,
     "missing-jsdoc": false,
-    "typedef": [
-      true,
-      "parameter",
-      "property-declaration",
-      "member-variable-declaration"
-    ],
+    "typedef": [false],
     "no-parameter-properties": false,
     "variable-name": false,
     "no-increment-decrement": false,

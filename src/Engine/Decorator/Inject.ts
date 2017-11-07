@@ -1,4 +1,4 @@
-import { Token, Type } from 'Engine/Utility/Type';
+import { Token } from 'Engine/Utility/Type';
 import { getService } from 'Engine/Base/runtime';
 
 export function Inject(token: Token): PropertyDecorator {

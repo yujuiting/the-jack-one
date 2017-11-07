@@ -37,6 +37,7 @@ export class Vector implements Recyclable {
   private static pool: Pool<Vector> = new Pool(Vector);
 
   public static Get(x: number = 0, y: number = 0): Vector {
+    // vector pool did not have limit
     return (<Vector>this.pool.get()).setTo(x, y);
   }
 
@@ -61,34 +62,41 @@ export class Vector implements Recyclable {
   }
 
   public add(other: Vector): this;
-  public add(x: number, y: number): this;
-  public add(otherOrX: Vector|number, y: number = 0): this {
+  public add(x: number, y?: number): this;
+  public add(otherOrX: Vector|number, y?: number): this {
     if (otherOrX instanceof Vector) {
       this.x += otherOrX.x;
       this.y += otherOrX.y;
     } else {
       this.x += otherOrX;
-      this.y += y;
+      this.y += y || otherOrX;
     }
     return this;
   }
 
   public subtract(other: Vector): this;
-  public subtract(x: number, y: number): this;
-  public subtract(otherOrX: Vector|number, y: number = 0): this {
+  public subtract(x: number, y?: number): this;
+  public subtract(otherOrX: Vector|number, y?: number): this {
     if (otherOrX instanceof Vector) {
       this.x -= otherOrX.x;
       this.y -= otherOrX.y;
     } else {
       this.x -= otherOrX;
-      this.y -= y;
+      this.y -= y || otherOrX;
     }
     return this;
   }
 
-  public scale(value: number): this {
-    this.x *= value;
-    this.y *= value;
+  public multiply(other: Vector): this;
+  public multiply(x: number, y?: number): this;
+  public multiply(otherOrX: Vector|number, y?: number): this {
+    if (otherOrX instanceof Vector) {
+      this.x *= otherOrX.x;
+      this.y *= otherOrX.y;
+    } else {
+      this.x *= otherOrX;
+      this.y *= y || otherOrX;
+    }
     return this;
   }
 
@@ -127,7 +135,7 @@ export class Vector implements Recyclable {
 
   public normalize(): this {
     const magnitude = this.magnitude();
-    return magnitude > 0 ? this.scale(1 / magnitude) : this.setTo(0, 0);
+    return magnitude > 0 ? this.multiply(1 / magnitude) : this.setTo(0, 0);
   }
 
   /**
@@ -145,6 +153,16 @@ export class Vector implements Recyclable {
 
   public reset(): this {
     return this.setTo(0, 0);
+  }
+
+  public rotate(radian: number): this {
+    const cos = Math.cos(radian);
+    const sin = Math.sin(radian);
+    const x = cos * this.x - sin * this.y;
+    const y = sin * this.x + cos * this.y;
+    this.x = x;
+    this.y = y;
+    return this;
   }
 
   public equalTo(other: Vector): boolean {

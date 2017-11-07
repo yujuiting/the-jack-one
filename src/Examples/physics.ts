@@ -49,11 +49,13 @@ class Shape extends GameObject {
 
   protected size: number;
 
-  public get isVisible(): boolean { return this.outline && this.outline.isVisible; }
+  public isVisible: boolean = true;
 
   public start(): void {
     super.start();
     this.renderer = this.addComponent(SpriteRendererComponent);
+    this.renderer.onBecameVisible$.subscribe(() => this.isVisible = true);
+    this.renderer.onBecameInvisible$.subscribe(() => this.isVisible = false);
     this.body = this.addComponent(RigidbodyComponent);
     this.size = this.random.integer(32, 128);
     this.body.useGravity = true;

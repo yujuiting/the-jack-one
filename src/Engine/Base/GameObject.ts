@@ -1,6 +1,6 @@
 import { BaseObject } from 'Engine/Base/BaseObject';
 import { Component } from 'Engine/Base/Component';
-import { Type, Tag, Layer, BuiltInLayer, getClass } from 'Engine/Utility/Type';
+import { Type, Tag, Layer, BuiltInLayer } from 'Engine/Utility/Type';
 import { TransformComponent } from 'Engine/Display/TransformComponent';
 import { addToArray,
          removeFromArray,
@@ -9,11 +9,6 @@ import { Tree } from 'Engine/Utility/Tree';
 import { instantiate } from 'Engine/Base/runtime';
 import { GameObjectInitializer } from 'Engine/Base/GameObjectInitializer';
 import { Class } from 'Engine/Decorator/Class';
-
-interface InternalGameObject extends GameObject {
-  node: Tree<GameObject>;
-  transform: TransformComponent;
-}
 
 /**
  * Basic class in engine
@@ -215,22 +210,28 @@ export class GameObject extends BaseObject {
   /**
    * @inheritdoc
    */
+  public preRender(): void {
+    this.components.forEach(component => component.preRender());
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public postRender(): void {
+    this.components.forEach(component => component.postRender());
+  }
+
+  /**
+   * @inheritdoc
+   */
   public reset(): void {
     super.reset();
     this.layer = BuiltInLayer.Default;
     this.components = [];
     this.tags = [];
     this._hasStarted = false;
-
-    // reset required components
-    const componentMap: Map<string|symbol, Type<Component>> = Reflect.getMetadata('component:map', this) || new Map();
-    const entries = componentMap.keys();
-    let curr = entries.next();
-    while (!curr.done) {
-      const propertyName = curr.value;
-      (<Component>(<any>this)[propertyName]).reset();
-      curr = entries.next();
-    }
+    this.components.forEach(component => component.reset());
+    this.children.forEach(child => child.reset());
   }
 
   /**

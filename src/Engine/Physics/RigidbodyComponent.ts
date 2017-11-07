@@ -7,7 +7,6 @@ import { Time } from 'Engine/Time/Time';
 import { ForceMode } from 'Engine/Physics/ForceMode';
 import { UniqueComponent } from 'Engine/Decorator/UniqueComponent';
 import { RequireComponent } from 'Engine/Decorator/RequireComponent';
-import { Inject } from 'Engine/Decorator/Inject';
 
 interface InternalRigidbodyComponent extends RigidbodyComponent {
   motion: number;
@@ -139,21 +138,21 @@ export class RigidbodyComponent extends Component {
      * ∆tf = m∆v
      * ∆v = ∆tf/m
      */
-    this.forces[ForceMode.Force].scale(deltaTimeInSecond * this.inverseMass);
+    this.forces[ForceMode.Force].multiply(deltaTimeInSecond * this.inverseMass);
     this.velocity.add(this.forces[ForceMode.Force]);
     this.forces[ForceMode.Force].reset();
 
     /**
      * Acceleration ignore mass.
      */
-    this.forces[ForceMode.Acceleration].scale(deltaTimeInSecond);
+    this.forces[ForceMode.Acceleration].multiply(deltaTimeInSecond);
     this.velocity.add(this.forces[ForceMode.Acceleration]);
     this.forces[ForceMode.Acceleration].reset();
 
     /**
      * Impulse handle without delta time.
      */
-    this.forces[ForceMode.Impulse].scale(1 * this.inverseMass);
+    this.forces[ForceMode.Impulse].multiply(1 * this.inverseMass);
     this.velocity.add(this.forces[ForceMode.Impulse]);
     this.forces[ForceMode.Impulse].reset();
 
@@ -202,8 +201,8 @@ export class RigidbodyComponent extends Component {
     }
 
     if (!this.velocity.isZero) {
-      this.velocity.scale(Math.max(0, 1 - this.drag * deltaTimeInSecond));
-      const velocity = this.velocity.clone().scale(deltaTimeInSecond);
+      this.velocity.multiply(Math.max(0, 1 - this.drag * deltaTimeInSecond));
+      const velocity = this.velocity.clone().multiply(deltaTimeInSecond);
       this.transform.position.add(velocity);
       velocity.destroy();
     }

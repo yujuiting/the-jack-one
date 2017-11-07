@@ -1,6 +1,5 @@
 import { GameObject } from 'Engine/Base/GameObject';
 import { ColliderComponent } from 'Engine/Physics/ColliderComponent';
-import { Bounds } from 'Engine/Display/Bounds';
 import { LineRendererComponent } from 'Engine/Render/LineRendererComponent';
 import { Vector } from 'Engine/Math/Vector';
 import { Line } from 'Engine/Math/Line';
@@ -106,7 +105,7 @@ export class PolygonColliderComponent extends ColliderComponent {
       const direction = new Vector(Math.cos(rotation), Math.sin(rotation));
       const ray = new Ray(this.bounds.center.clone(), direction.clone());
       const point = this.rayCast(ray) || direction;
-      const center = this._cachedPoints.reduce((result, curr) => result.add(curr), new Vector()).scale(1 / this._cachedPoints.length);
+      const center = this._cachedPoints.reduce((result, curr) => result.add(curr), new Vector()).multiply(1 / this._cachedPoints.length);
       this.debugDirectionRenderer.clearPoints();
       this.debugDirectionRenderer.addPoint(center, point);
 

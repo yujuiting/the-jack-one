@@ -1,7 +1,6 @@
 import { BrowserDelegate } from 'Engine/Utility/BrowserDelegate';
 import { Observable } from 'rxjs/Observable';
 import { Service } from 'Engine/Decorator/Service';
-import { Inject } from 'Engine/Decorator/Inject';
 
 @Service()
 export class KeyboardInput {
