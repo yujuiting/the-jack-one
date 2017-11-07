@@ -12,7 +12,7 @@ jobs:
   build:
     docker:
       # specify the version you desire here
-      - image: circleci/node:9
+      - image: circleci/node:8.9
 
     working_directory: ~/repo
 
@@ -32,7 +32,7 @@ jobs:
       - save_cache:
           key: dependency-cache-{{ checksum "package.json" }}
           paths:
-            - node_modules
+            - ./node_modules
         
       # run tests!
       - run: npm test
