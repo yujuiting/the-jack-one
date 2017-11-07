@@ -26,7 +26,7 @@ import { RigidbodyComponent } from 'Engine/Physics/RigidbodyComponent';
 
 import { KeyboardInput } from 'Engine/Input/KeyboardInput';
 
-const texture: Texture = new Texture('../Assets/circle.png');
+const texture: Texture = new Texture('../assets/circle.png');
 
 @Class()
 class CameraController extends Component {

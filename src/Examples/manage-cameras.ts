@@ -30,7 +30,7 @@ import { PointerInput, PointerEvent } from 'Engine/Input/PointerInput';
 
 import { RigidbodyComponent } from 'Engine/Physics/RigidbodyComponent';
 
-const texture: Texture = new Texture('../Assets/circle.png');
+const texture: Texture = new Texture('../assets/circle.png');
 
 @Class()
 class Player extends GameObject {

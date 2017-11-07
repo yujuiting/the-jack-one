@@ -33,8 +33,8 @@ import { CircleColliderComponent } from 'Engine/Physics/CircleColliderComponent'
 
 import { PointerInput, PointerEvent } from 'Engine/Input/PointerInput';
 
-const rectTexture = new Texture('/Assets/rect.png');
-const circleTexture = new Texture('/Assets/circle.png');
+const rectTexture = new Texture('../assets/rect.png');
+const circleTexture = new Texture('../assets/circle.png');
 
 @Class()
 class Shape extends GameObject {
