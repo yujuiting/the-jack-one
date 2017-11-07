@@ -12,16 +12,12 @@ jobs:
   build:
     docker:
       # specify the version you desire here
-      - image: circleci/node:8.9
+      - image: circleci/node:9
 
     working_directory: ~/repo
 
     steps:
       - checkout
-
-      - run:
-          name: Update npm
-          command: 'sudo npm install -g npm@latest'
 
       # Download and cache dependencies
       - restore_cache:
