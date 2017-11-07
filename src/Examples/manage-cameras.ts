@@ -49,8 +49,7 @@ class Player extends GameObject {
     super.start();
 
     const sprite = new Sprite(texture);
-    sprite.rect.width = 100;
-    sprite.rect.height = 100;
+    this.transform.scale.setTo(0.25);
 
     this.renderer = this.addComponent(SpriteRendererComponent);
     this.renderer.sprite = sprite;
@@ -130,9 +129,6 @@ class Label extends GameObject {
 @Class()
 class CameraFollow extends Component {
 
-  // @Inject(Time)
-  // private time: Time;
-
   public bounds: Bounds = new Bounds();
 
   private target: GameObject|null;
@@ -181,7 +177,7 @@ class Game {
 
   constructor(@Inject(SceneManager) sceneManager: SceneManager,
               @Inject(PointerInput) pointerInput: PointerInput,
-              @Inject(Screen) screen: Screen) {
+              @Inject(Screen) private screen: Screen) {
     this.scene.resources.add(texture);
     this.scene.add(this.player);
     this.scene.add(this.subCamera);
@@ -217,7 +213,7 @@ class Game {
 
   private onPointerStart(e: PointerEvent): void {
     const location = e.locations[0];
-    const halfScreenWidth = screen.width * 0.5;
+    const halfScreenWidth = this.screen.width * 0.5;
     if (location.x > halfScreenWidth) {
       // do not handle sub camera
       return;

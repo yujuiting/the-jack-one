@@ -112,8 +112,7 @@ class Jack extends GameObject {
     super.start();
 
     const sprite = new Sprite(texture);
-    sprite.rect.width = 100;
-    sprite.rect.height = 100;
+    this.transform.scale.setTo(0.25);
 
     this.renderer = this.addComponent(SpriteRendererComponent);
     this.renderer.sprite = sprite;

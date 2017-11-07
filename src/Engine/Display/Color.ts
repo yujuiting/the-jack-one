@@ -87,23 +87,10 @@ export class Color {
   }
 
   public toHexString(): string {
-    let r = this.red.toString(16);
-    let g = this.green.toString(16);
-    let b = this.blue.toString(16);
-    let a = this.alpha.toString(16);
-    if (r.length < 2) {
-      r = `0${r}`;
-    }
-    if (g.length < 2) {
-      g = `0${g}`;
-    }
-    if (b.length < 2) {
-      b = `0${b}`;
-    }
-    if (a.length < 2) {
-      a = `0${a}`;
-    }
-
+    const r = `0${this.red.toString(16)}`.slice(-2);
+    const g = `0${this.green.toString(16)}`.slice(-2);
+    const b = `0${this.blue.toString(16)}`.slice(-2);
+    const a = `0${this.alpha.toString(16)}`.slice(-2);
     return `#${r}${g}${b}`;
   }
 

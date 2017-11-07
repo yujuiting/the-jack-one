@@ -10,7 +10,7 @@ import { CollisionJumpTable } from 'Engine/Physics/CollisionJumpTable';
 export class CollisionJumpTableImplement implements CollisionJumpTable {
 
   public circleCircle(colliderA: CircleColliderComponent, colliderB: CircleColliderComponent): CollisionContact|undefined {
-    const maxDistance = colliderA.radius + colliderB.radius;
+    const maxDistance = colliderA.calculatedRadius + colliderB.calculatedRadius;
     const positionA = colliderA.bounds.center;
     const positionB = colliderB.bounds.center;
 
@@ -57,14 +57,14 @@ export class CollisionJumpTableImplement implements CollisionJumpTable {
     let contactPoint: Vector;
 
     if (containsPointA && containsPointB) {
-      contactPoint = pointA.clone().add(pointB).multiply(0.5);
+      contactPoint = pointA.add(pointB).multiply(0.5);
     } else if (containsPointA) {
-      contactPoint = pointA.clone();
+      contactPoint = pointA;
     } else if (containsPointB) {
-      contactPoint = pointB.clone();
+      contactPoint = pointB;
     } else {
       // I am not sure what is this condition...
-      contactPoint = pointA.clone().add(pointB).multiply(0.5);
+      contactPoint = pointA.add(pointB).multiply(0.5);
     }
 
     return new CollisionContact(colliderA, colliderB, minAxis, contactPoint, normal);
@@ -114,7 +114,7 @@ export class CollisionJumpTableImplement implements CollisionJumpTable {
    * @see http://www.dyn4j.org/2010/01/sat/
    */
   private polygonPolygonSAT(colliderA: PolygonColliderComponent, colliderB: PolygonColliderComponent): Vector|undefined {
-    const axes = [...colliderA.cachedAxes, ...colliderB.cachedAxes].map(axis => axis.normal());
+    const axes = [...colliderA.calculatedAxes, ...colliderB.calculatedAxes].map(axis => axis.normal());
     return this.findMTV(colliderA, colliderB, axes);
   }
 
@@ -127,7 +127,7 @@ export class CollisionJumpTableImplement implements CollisionJumpTable {
     const positionB = colliderB.bounds.center;
     const ba = positionA.clone().subtract(positionB);
     const closestPointOnPoly = colliderB.getFurthestPoint(ba);
-    const axes = [...colliderB.cachedAxes.map(axis => axis.normal()), positionA.clone().subtract(closestPointOnPoly).normalize()];
+    const axes = [...colliderB.calculatedAxes.map(axis => axis.normal()), positionA.clone().subtract(closestPointOnPoly).normalize()];
 
     return this.findMTV(colliderA, colliderB, axes);
   }

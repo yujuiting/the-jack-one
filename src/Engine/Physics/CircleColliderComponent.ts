@@ -12,6 +12,10 @@ import { CollisionContact } from 'Engine/Physics/CollisionContact';
 import { LineRendererComponent } from 'Engine/Render/LineRendererComponent';
 import { Color } from 'Engine/Display/Color';
 
+interface InternalCircleColliderComponent {
+  calculatedRadius: number;
+}
+
 /**
  * @see BoxColliderComponent
  */
@@ -22,93 +26,23 @@ export class CircleColliderComponent extends ColliderComponent {
   public radius: number = 0;
 
   /**
-   * Debug draw collider shape
+   * Calaulated radius.
    */
-  private debugColliderRenderer: CircleRendererComponent|null = null;
-
-  /**
-   * Debug draw AABB
-   */
-  private debugBoundsRenderer: LineRendererComponent|null = null;
-
-  /**
-   * Debug draw collider direction
-   */
-  protected debugDirectionRenderer: LineRendererComponent|null = null;
+  public readonly calculatedRadius = 0;
 
   constructor(host: GameObject,
               @Inject(CollisionJumpTable) private collisionJumpTable: CollisionJumpTable) {
     super(host);
   }
 
-  public fixedUpdate(): void {
-    this.calculate();
-  }
+  public fixedUpdate(alpha: number): void {
+    super.fixedUpdate(alpha);
 
-  public update(): void {
-    if (this.debug) {
-      const isSleep = this.rigidbody ? this.rigidbody.isSleeping : true;
-      const color = isSleep ? Color.Green : Color.Red;
-
-      if (!this.debugColliderRenderer) {
-        this.debugColliderRenderer = this.addComponent(CircleRendererComponent);
-        this.debugColliderRenderer.useLocalCoordinate = false;
-      }
-
-      if (!this.debugBoundsRenderer) {
-        this.debugBoundsRenderer = this.addComponent(LineRendererComponent);
-        this.debugBoundsRenderer.useLocalCoordinate = false;
-        this.debugBoundsRenderer.closePath = true;
-        this.debugBoundsRenderer.strokeColor = Color.Cyan;
-      }
-
-      if (!this.debugDirectionRenderer) {
-        this.debugDirectionRenderer = this.addComponent(LineRendererComponent);
-        this.debugDirectionRenderer.useLocalCoordinate = false;
-      }
-
-      this.debugColliderRenderer.strokeColor = color;
-      this.debugDirectionRenderer.strokeColor = color;
-
-      // this.debugColliderRenderer.center.copy(this.bounds.center);
-      this.debugColliderRenderer.radius = this.radius;
-
-      this.debugBoundsRenderer.clearPoints();
-      const min = this.bounds.min;
-      const max = this.bounds.max;
-      this.debugBoundsRenderer.addPoint(
-        new Vector(min.x, min.y),
-        new Vector(min.x, max.y),
-        new Vector(max.x, max.y),
-        new Vector(max.x, min.y)
-      );
-
-      const rotation = this.host.transform.rotation;
-      const direction = new Vector(Math.cos(rotation), Math.sin(rotation));
-      const point = this.host.transform.position.clone().add(direction.multiply(this.radius));
-      this.debugDirectionRenderer.clearPoints();
-      this.debugDirectionRenderer.addPoint(this.bounds.center, point);
-
-    } else {
-      if (this.debugColliderRenderer) {
-        this.removeComponent(this.debugColliderRenderer);
-        this.debugColliderRenderer = null;
-      }
-      if (this.debugBoundsRenderer) {
-        this.removeComponent(this.debugBoundsRenderer);
-        this.debugBoundsRenderer = null;
-      }
-      if (this.debugDirectionRenderer) {
-        this.removeComponent(this.debugDirectionRenderer);
-        this.debugDirectionRenderer = null;
-      }
-    }
-  }
-
-  public calculate(): void {
+    const scale = (this.transform.scale.x + this.transform.scale.y) * 0.5;
+    (<InternalCircleColliderComponent>this).calculatedRadius = this.radius * scale;
     // update bounds
     this.bounds.center.copy(this.host.transform.position);
-    this.bounds.extents.setTo(this.radius, this.radius);
+    this.bounds.extents.setTo(this.calculatedRadius, this.calculatedRadius);
   }
 
   /**
@@ -128,7 +62,7 @@ export class CircleColliderComponent extends ColliderComponent {
    * @inheritdoc
    */
   public contains(point: Vector): boolean {
-    return this.bounds.center.distanceTo(point) <= this.radius;
+    return this.bounds.center.distanceTo(point) <= this.calculatedRadius;
   }
 
   /**
@@ -136,9 +70,9 @@ export class CircleColliderComponent extends ColliderComponent {
    * @override
    * @inheritdoc
    */
-  public rayCast(ray: Ray, max: number = Infinity): Vector|undefined {
+  public rayCast(ray: Ray): Vector|undefined {
     const c = this.bounds.center;
-    const r = this.radius;
+    const r = this.calculatedRadius;
     const o = ray.origin;
     const l = ray.direction;
     const co = o.clone().subtract(c);
@@ -153,7 +87,10 @@ export class CircleColliderComponent extends ColliderComponent {
     if (discriminant > 0) {
       const d1 = d + discriminant;
       const d2 = d - discriminant;
-      d = Math.min(d1, d2);
+      /**
+       * TODO: I should figure out which value should I use, max or min one?
+       */
+      d = Math.max(d1, d2);
     }
 
     return ray.getPoint(d);
@@ -165,7 +102,7 @@ export class CircleColliderComponent extends ColliderComponent {
    */
   public project(axis: Vector): Projection {
     const dot = this.bounds.center.dot(axis);
-    const s = [dot, dot + this.radius, dot - this.radius];
+    const s = [dot, dot + this.calculatedRadius, dot - this.calculatedRadius];
     return new Projection(Math.min(...s), Math.max(...s));
   }
 
@@ -174,7 +111,7 @@ export class CircleColliderComponent extends ColliderComponent {
    * @inheritdoc
    */
   public getFurthestPoint(direction: Vector): Vector {
-    return this.bounds.center.clone().add(direction.clone().normalize().multiply(this.radius));
+    return this.bounds.center.clone().add(direction.clone().normalize().multiply(this.calculatedRadius));
   }
 
 }

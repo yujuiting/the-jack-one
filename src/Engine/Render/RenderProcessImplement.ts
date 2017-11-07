@@ -6,8 +6,15 @@ import { RendererComponent } from 'Engine/Render/RendererComponent';
 import { Service } from 'Engine/Decorator/Service';
 import { Vector } from 'Engine/Math/Vector';
 import { Type } from 'Engine/Utility/Type';
-import { ifdef, DEBUG } from 'Engine/runtime';
+import { ifdef, DEBUG, DEBUG_RENDERER } from 'Engine/runtime';
 import { Bounds } from 'Engine/Display/Bounds';
+import { Inject } from 'Engine/Decorator/Inject';
+import { BrowserDelegate } from 'Engine/Utility/BrowserDelegate';
+
+interface RenderProcessCache {
+  canvas: HTMLCanvasElement;
+  ctx: CanvasRenderingContext2D;
+}
 
 @Service(RenderProcess)
 export class RenderProcessImplement implements RenderProcess {
@@ -17,6 +24,10 @@ export class RenderProcessImplement implements RenderProcess {
   private width = 0;
 
   private height = 0;
+
+  private caches = new Map<Camera, RenderProcessCache>();
+
+  constructor(@Inject(BrowserDelegate) private browserDelegate: BrowserDelegate) {}
 
   public useContext(ctx: CanvasRenderingContext2D, width: number, height: number): void {
     this.ctx = ctx;
@@ -35,24 +46,38 @@ export class RenderProcessImplement implements RenderProcess {
 
     const ctx = this.ctx;
 
+    const cache = this.getCache(camera);
+
+    const { width, height } = camera.rect;
+
+    cache.canvas.width = width;
+    cache.canvas.height = height;
+    cache.ctx.clearRect(0, 0, width, height);
+
     // TODO: handle window.devicePixelRatio
 
-    ctx.save();
+    cache.ctx.save();
 
     // draw background
-    ctx.fillStyle = camera.backgroundColor.toHexString();
-    ctx.fillRect(0, 0, this.width, this.height);
+    cache.ctx.fillStyle = camera.backgroundColor.toHexString();
+    cache.ctx.fillRect(0, 0, this.width, this.height);
 
-    ctx.restore();
+    cache.ctx.restore();
 
-    ctx.save();
+    cache.ctx.save();
 
     // render game objects
     gameObjects.forEachChildren(gameObject => {
-      this.renderGameObject(ctx, camera, gameObject);
+      if (gameObject.layer & camera.cullingMask) {
+        this.renderGameObject(cache.ctx, camera, gameObject);
+      }
     });
 
-    ctx.restore();
+    cache.ctx.restore();
+
+    const { x, y } = camera.rect.position;
+
+    ctx.drawImage(cache.canvas, 0, 0, width, height, x, y, width, height);
   }
 
   private renderGameObject(ctx: CanvasRenderingContext2D, camera: Camera, gameObject: GameObject): void {
@@ -80,7 +105,7 @@ export class RenderProcessImplement implements RenderProcess {
 
       ctx.restore();
 
-      ifdef(DEBUG, () => this.drawDebugOutline(ctx, camera, renderer.bounds));
+      ifdef(DEBUG_RENDERER, () => this.drawDebugOutline(ctx, camera, renderer.bounds));
     });
   }
 
@@ -102,6 +127,19 @@ export class RenderProcessImplement implements RenderProcess {
     ctx.strokeStyle = '#f00';
     ctx.stroke();
     ctx.restore();
+  }
+
+  private getCache(camera: Camera): RenderProcessCache {
+    let cache = this.caches.get(camera);
+
+    if (!cache) {
+      const canvas = this.browserDelegate.createCanvas();
+      const ctx = this.browserDelegate.getContext(canvas);
+      cache = { canvas, ctx };
+      this.caches.set(camera, cache);
+    }
+
+    return cache;
   }
 
 }

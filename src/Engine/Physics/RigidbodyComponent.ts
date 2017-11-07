@@ -65,7 +65,7 @@ export class RigidbodyComponent extends Component {
 
   public isSleeping: boolean = false;
 
-  public sleepThreshold: number = 0.2;
+  public sleepThreshold: number = 1;
 
   public readonly motion: number = 0;
 
@@ -81,6 +81,8 @@ export class RigidbodyComponent extends Component {
   private sleepTimer: number = 0;
 
   private transform: TransformComponent;
+
+  private lastPosition: Vector = Vector.Get();
 
   constructor(host: GameObject,
               @Inject(Engine) private engine: Engine,
@@ -181,9 +183,73 @@ export class RigidbodyComponent extends Component {
     this.angularVelocity += this.torques[ForceMode.VelocityChange];
     this.torques[ForceMode.VelocityChange] = 0;
 
-    (<InternalRigidbodyComponent>this)
-      .motion = (this.velocity.squareMagnitude() + Math.pow(this.angularVelocity, 2)) * 0.5;
+    this.checkSleep(deltaTimeInSecond);
 
+    // update position
+    if (!this.velocity.isZero) {
+      this.velocity.multiply(Math.max(0, 1 - this.drag * deltaTimeInSecond));
+      const velocity = this.velocity.clone().multiply(deltaTimeInSecond);
+      this.transform.position.add(velocity);
+      velocity.destroy();
+    }
+
+    // update rotation
+    if (this.freezeRotation) {
+      this.angularVelocity = 0;
+    } else {
+      if (Math.abs(this.angularVelocity) > 1e-6) {
+        this.angularVelocity *= Math.max(0, 1 - this.angularDrag * deltaTimeInSecond);
+
+        if (this.angularVelocity > this.maxAngularVelocity) {
+          this.angularVelocity = this.maxAngularVelocity;
+        }
+
+        this.transform.rotation += this.angularVelocity * deltaTimeInSecond;
+        this.transform.rotation = this.transform.rotation % DoublePI;
+      }
+    }
+
+    // update motion
+    (<InternalRigidbodyComponent>this).motion = (this.velocity.squareMagnitude() + Math.pow(this.angularVelocity, 2)) * 0.5;
+
+    this.lastPosition.copy(this.transform.position);
+  }
+
+  public reset(): void {
+    super.reset();
+    this.angularDrag = 0;
+    this.angularVelocity = 0;
+    this.drag = 0;
+    this.freezeRotation = false;
+    this.mass = 1;
+    this.maxAngularVelocity = Infinity;
+    this.velocity = Vector.Get();
+    this.useGravity = false;
+    this.mass = 1;
+    this.moi = 1000;
+    this.isSleeping = false;
+    this.sleepThreshold = 1;
+    this.sleepTimer = 0;
+    this.forces = [
+      Vector.Get(),
+      Vector.Get(),
+      Vector.Get(),
+      Vector.Get()
+    ];
+    this.torques = [0, 0, 0, 0];
+    this.lastPosition = Vector.Get();
+  }
+
+  public destroy(): void {
+    super.destroy();
+    this.velocity.destroy();
+    this.forces.forEach(force => force.destroy());
+    Vector.Put(this.velocity);
+    Vector.Put(this.lastPosition);
+    this.forces.forEach(force => Vector.Put(force));
+  }
+
+  private checkSleep(deltaTimeInSecond: number): void {
     if (!this.isSleeping && this.sleepThreshold >= 0) {
       if (this.motion < this.sleepThreshold) {
         this.sleepTimer += deltaTimeInSecond;
@@ -201,57 +267,8 @@ export class RigidbodyComponent extends Component {
       }
     }
 
-    if (!this.velocity.isZero) {
-      this.velocity.multiply(Math.max(0, 1 - this.drag * deltaTimeInSecond));
-      const velocity = this.velocity.clone().multiply(deltaTimeInSecond);
-      this.transform.position.add(velocity);
-      velocity.destroy();
+    if (!this.transform.position.equalTo(this.lastPosition, 1)) {
+      this.awake();
     }
-
-    if (this.freezeRotation) {
-      this.angularVelocity = 0;
-    } else {
-      if (Math.abs(this.angularVelocity) > 1e-6) {
-        this.angularVelocity *= Math.max(0, 1 - this.angularDrag * deltaTimeInSecond);
-
-        if (this.angularVelocity > this.maxAngularVelocity) {
-          this.angularVelocity = this.maxAngularVelocity;
-        }
-
-        this.transform.rotation += this.angularVelocity * deltaTimeInSecond;
-
-        this.transform.rotation = this.transform.rotation % DoublePI;
-      }
-    }
-  }
-
-  public reset(): void {
-    super.reset();
-    this.angularDrag = 0;
-    this.angularVelocity = 0;
-    this.drag = 0;
-    this.freezeRotation = false;
-    this.mass = 1;
-    this.maxAngularVelocity = Infinity;
-    this.velocity = Vector.Get();
-    this.useGravity = false;
-    this.mass = 1;
-    this.moi = 1000;
-    this.isSleeping = false;
-    this.sleepThreshold = 0.2;
-    this.sleepTimer = 0;
-    this.forces = [
-      Vector.Get(),
-      Vector.Get(),
-      Vector.Get(),
-      Vector.Get()
-    ];
-    this.torques = [0, 0, 0, 0];
-  }
-
-  public destroy(): void {
-    super.destroy();
-    this.velocity.destroy();
-    this.forces.forEach(force => force.destroy());
   }
 }

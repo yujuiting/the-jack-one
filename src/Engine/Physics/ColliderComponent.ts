@@ -8,9 +8,11 @@ import { Ray } from 'Engine/Math/Ray';
 import { Projection } from 'Engine/Math/Projection';
 import { ColliderType } from 'Engine/Physics/ColliderType';
 import { BroadPhaseCollisionResolver } from 'Engine/Physics/BroadPhaseCollisionResolver';
+import { TransformComponent } from 'Engine/Display/TransformComponent';
 
 interface InternalColliderComponent {
   rigidbody: RigidbodyComponent|undefined;
+  transform: TransformComponent;
   type: ColliderType;
 }
 
@@ -32,7 +34,7 @@ export class ColliderComponent extends Component {
    */
   public layer: number = 1;
 
-  public debug: boolean = false;
+  // public debug: boolean = false;
 
   public restitution: number = 0.2;
 
@@ -48,6 +50,8 @@ export class ColliderComponent extends Component {
    * 2. rigidbody collider  : with rigidbody
    */
   public readonly rigidbody: RigidbodyComponent|undefined;
+
+  public readonly transform: TransformComponent;
 
   @Inject(BroadPhaseCollisionResolver)
   private broadPhaseCollisionResolver: BroadPhaseCollisionResolver;
@@ -88,6 +92,8 @@ export class ColliderComponent extends Component {
         (<InternalColliderComponent>this).type = ColliderType.Rigidbody;
       }
     }
+
+    (<InternalColliderComponent>this).transform = <TransformComponent>this.getComponent(TransformComponent);
 
     /**
      * TODO: track after checked target has been added to scene

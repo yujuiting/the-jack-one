@@ -1,11 +1,12 @@
 // tslint:disable max-classes-per-file
 import 'Engine/preset';
+import { instantiate, bootstrap, def, DEBUG_PHYSICS } from 'Engine/runtime';
+def(DEBUG_PHYSICS);
 
 import { GameObject } from 'Engine/Core/GameObject';
 import { Scene } from 'Engine/Core/Scene';
 import { Screen } from 'Engine/Display/Screen';
 import { SceneManager } from 'Engine/Core/SceneManager';
-import { instantiate, bootstrap } from 'Engine/runtime';
 
 import { Type } from 'Engine/Utility/Type';
 import { BrowserDelegate } from 'Engine/Utility/BrowserDelegate';
@@ -32,22 +33,19 @@ import { CircleColliderComponent } from 'Engine/Physics/CircleColliderComponent'
 
 import { PointerInput, PointerEvent } from 'Engine/Input/PointerInput';
 
-const rectTexture = new Texture('../Assets/rect.png');
-const circleTexture = new Texture('../Assets/circle.png');
+const rectTexture = new Texture('/Assets/rect.png');
+const circleTexture = new Texture('/Assets/circle.png');
 
 @Class()
 class Shape extends GameObject {
 
   protected renderer: SpriteRendererComponent;
 
-  protected outline: LineRendererComponent | CircleRendererComponent;
-
   protected body: RigidbodyComponent;
 
-  @Inject(Random)
-  protected random: Random;
-
   protected size: number;
+
+  @Inject(Random) protected random: Random;
 
   public isVisible: boolean = true;
 
@@ -57,7 +55,8 @@ class Shape extends GameObject {
     this.renderer.onBecameVisible$.subscribe(() => this.isVisible = true);
     this.renderer.onBecameInvisible$.subscribe(() => this.isVisible = false);
     this.body = this.addComponent(RigidbodyComponent);
-    this.size = this.random.integer(32, 128);
+    this.size = this.random.integer(64, 128);
+    this.transform.scale.setTo(this.size / 400);
     this.body.useGravity = true;
   }
 
@@ -70,27 +69,9 @@ class Box extends Shape {
 
   public start(): void {
     super.start();
-    this.outline = this.addComponent(LineRendererComponent);
     this.collider = this.addComponent(BoxColliderComponent);
-
     this.renderer.sprite = new Sprite(rectTexture);
-
-    const halfSize = this.size / 2;
-
-    this.renderer.sprite.rect.width = this.size;
-    this.renderer.sprite.rect.height = this.size;
-
-    this.outline.addPoint(
-      new Vector(halfSize, halfSize),
-      new Vector(halfSize, -halfSize),
-      new Vector(-halfSize, -halfSize),
-      new Vector(-halfSize, halfSize)
-    );
-
-    this.outline.closePath = true;
-    this.outline.strokeColor = Color.CreateByHexRgb('#94CFFF');
-
-    this.collider.size.setTo(this.size, this.size);
+    this.collider.size.setTo(400);
   }
 
 }
@@ -102,20 +83,9 @@ class Circle extends Shape {
 
   public start(): void {
     super.start();
-    this.outline = this.addComponent(CircleRendererComponent);
     this.collider = this.addComponent(CircleColliderComponent);
-
     this.renderer.sprite = new Sprite(circleTexture);
-
-    const halfSize = this.size / 2;
-
-    this.renderer.sprite.rect.width = this.size;
-    this.renderer.sprite.rect.height = this.size;
-
-    this.outline.radius = halfSize;
-    this.outline.strokeColor = Color.CreateByHexRgb('#94CFFF');
-
-    this.collider.radius = halfSize;
+    this.collider.radius = 200;
   }
 
 }
@@ -128,9 +98,7 @@ class Wall extends GameObject {
   public start(): void {
      super.start();
      this.collider = this.addComponent(BoxColliderComponent);
-
      this.collider.size.setTo(3000, 2);
-     this.collider.debug = true;
   }
 
 }

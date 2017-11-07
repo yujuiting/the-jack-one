@@ -55,7 +55,7 @@ export class Vector implements Recyclable {
   constructor(public x: number = 0,
               public y: number = 0) {}
 
-  public setTo(x: number, y: number): this {
+  public setTo(x: number, y: number = x): this {
     this.x = x;
     this.y = y;
     return this;
@@ -67,9 +67,12 @@ export class Vector implements Recyclable {
     if (otherOrX instanceof Vector) {
       this.x += otherOrX.x;
       this.y += otherOrX.y;
+    } else if (y !== void 0) {
+      this.x += otherOrX;
+      this.y += y;
     } else {
       this.x += otherOrX;
-      this.y += y || otherOrX;
+      this.y += otherOrX;
     }
     return this;
   }
@@ -80,9 +83,12 @@ export class Vector implements Recyclable {
     if (otherOrX instanceof Vector) {
       this.x -= otherOrX.x;
       this.y -= otherOrX.y;
+    } else if (y !== void 0) {
+      this.x -= otherOrX;
+      this.y -= y;
     } else {
       this.x -= otherOrX;
-      this.y -= y || otherOrX;
+      this.y -= otherOrX;
     }
     return this;
   }
@@ -93,9 +99,12 @@ export class Vector implements Recyclable {
     if (otherOrX instanceof Vector) {
       this.x *= otherOrX.x;
       this.y *= otherOrX.y;
+    } else if (y !== void 0) {
+      this.x *= otherOrX;
+      this.y *= y;
     } else {
       this.x *= otherOrX;
-      this.y *= y || otherOrX;
+      this.y *= otherOrX;
     }
     return this;
   }
@@ -165,9 +174,9 @@ export class Vector implements Recyclable {
     return this;
   }
 
-  public equalTo(other: Vector): boolean {
-    return this.x === other.x
-        && this.y === other.y;
+  public equalTo(other: Vector, tolerance = 1e-6): boolean {
+    return Math.abs(this.x - other.x) <= tolerance
+        && Math.abs(this.y - other.y) <= tolerance;
   }
 
   public greaterThan(other: Vector): boolean {

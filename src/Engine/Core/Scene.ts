@@ -12,6 +12,7 @@ import { NarrowPhaseCollisionResolver } from 'Engine/Physics/NarrowPhaseCollisio
 import { Vector } from 'Engine/Math/Vector';
 import { GameObjectInitializer } from 'Engine/Core/GameObjectInitializer';
 import { RenderProcess } from 'Engine/Render/RenderProcess';
+import { ifdef, DEBUG_PHYSICS, DEBUG } from 'Engine/runtime';
 
 /**
  * Scene manage game objects and resources.
@@ -108,6 +109,7 @@ export class Scene extends BaseObject {
     // TODO: camera order is an issue
     this.renderProcess.useContext(ctx, width, height);
     this.cameras.forEach(camera => this.renderProcess.render(camera, this.gameObjects));
+    ifdef(DEBUG_PHYSICS, () => this.cameras.forEach(camera => this.broadPhaseCollisionResolver.debugRender(ctx, camera)));
   }
 
   public postRender(): void {

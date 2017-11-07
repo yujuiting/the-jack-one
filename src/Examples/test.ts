@@ -17,12 +17,16 @@ import { Sprite } from 'Engine/Display/Sprite';
 import { SpriteSheet } from 'Engine/Display/SpriteSheet';
 import { Texture } from 'Engine/Resource/Texture';
 import { Inject } from 'Engine/Decorator/Inject';
+import { LineRendererComponent } from 'Engine/Render/LineRendererComponent';
+import { Vector } from 'Engine/Math/Vector';
+import { Color } from 'Engine/Display/Color';
 
 @Class()
 class Subject extends GameObject {
   // public renderer = this.addComponent(TextRendererComponent);
   // public renderer = this.addComponent(SpriteRendererComponent);
-  public renderer = this.addComponent(SpriteSheetRendererComponent);
+  // public renderer = this.addComponent(SpriteSheetRendererComponent);
+  public renderer = this.addComponent(LineRendererComponent);
 }
 
 @Class()
@@ -46,7 +50,7 @@ class World {
         { x: 210, y: 0, width: 210, height: 200 },
         { x: 420, y: 0, width: 210, height: 200 }
       ],
-      12
+      6
     );
 
     scene.resources.add(texture);
@@ -54,9 +58,18 @@ class World {
     const subject = instantiate(Subject);
     // subject.renderer.text = 'Hello Engine';
     // subject.renderer.sprite = sprite;
-    subject.renderer.spriteSheet = spritesheet;
+    // subject.renderer.spriteSheet = spritesheet;
     // subject.renderer.sprite = <Sprite>spritesheet.getSprite('default', 0);
     // subject.transform.scale.setTo(1.4, 1);
+    subject.renderer.addPoint(
+      new Vector(100, 100),
+      new Vector(100, -100),
+      new Vector(-100, -100),
+      new Vector(-100, 100)
+    );
+    subject.renderer.closePath = true;
+    subject.renderer.strokeColor = Color.Blue;
+    subject.transform.position.setTo(100, 0);
     scene.add(subject);
 
     const onKeyDown$ = keyboardInput.keyDown$.map(e => e.key);

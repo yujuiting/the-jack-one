@@ -28,7 +28,7 @@ export class SpriteSheet {
 
   public set fps(value: number) {
     this._fps = value;
-    (<InternalSpriteSheet>this).frameTime = 1 / value;
+    (<InternalSpriteSheet>this).frameTime = 1000 / value;
   }
 
   constructor(public texture: Texture,
@@ -47,7 +47,7 @@ export class SpriteSheet {
       });
     }
 
-    this.frameTime = 1 / _fps;
+    this.frameTime = 1000 / _fps;
 }
 
   public getSprites(key: string): ReadonlyArray<Sprite> {

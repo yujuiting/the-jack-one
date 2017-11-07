@@ -44,3 +44,5 @@ export function ifndef(key: any, run: Function): void {
 }
 
 export const DEBUG = Symbol('DEBUG');
+export const DEBUG_RENDERER = Symbol('DEBUG_RENDERER');
+export const DEBUG_PHYSICS = Symbol('DEBUG_PHYSICS');

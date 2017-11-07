@@ -46,7 +46,7 @@ import { Ray } from 'Engine/Math/Ray';
   }
 
   @test 'should calculate points' () {
-    let points: ReadonlyArray<Vector> = this.collider.cachedPoints;
+    let points: ReadonlyArray<Vector> = this.collider.calculatedPoints;
 
     expect(points.length).to.equal(4);
 
@@ -66,7 +66,7 @@ import { Ray } from 'Engine/Math/Ray';
     this.gameObject.transform.rotation = Math.PI / 4;
     this.gameObject.fixedUpdate();
 
-    points = this.collider.cachedPoints;
+    points = this.collider.calculatedPoints;
 
     expect(points[0].x).to.closeTo(0, 1e-6);
     expect(points[0].y).to.closeTo(-7.071068, 1e-6);
@@ -82,7 +82,7 @@ import { Ray } from 'Engine/Math/Ray';
   }
 
   @test 'should calculate sides' () {
-    const sides: ReadonlyArray<Line> = this.collider.cachedSides;
+    const sides: ReadonlyArray<Line> = this.collider.calculatedSides;
 
     expect(sides.length).to.equal(4);
 

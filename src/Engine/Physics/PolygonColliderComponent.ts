@@ -20,146 +20,64 @@ forwardRef(() => GameObject);
 export class PolygonColliderComponent extends ColliderComponent {
 
   /**
-   * Points for polygon shape definition.
+   * Points for polygon shape definition in local space.
    */
   public points: Vector[] = [];
 
-  /**
-   * Cache points, axes and sides in world coordinate information for physics calculation.
-   */
-  protected readonly _cachedPoints: Vector[] = [];
-  protected readonly _cachedAxes: Vector[] = [];
-  protected readonly _cachedSides: Line[] = [];
+  protected readonly _calculatedPoints: Vector[] = [];
+  protected readonly _calculatedAxes: Vector[] = [];
+  protected readonly _calculatedSides: Line[] = [];
 
   /**
-   * Debug draw collider shape
+   * Calculated points, axes and sides in world coordinate information for physics calculation.
    */
-  protected debugColliderRenderer: LineRendererComponent|null = null;
-
-  /**
-   * Debug draw AABB
-   */
-  protected debugBoundsRenderer: LineRendererComponent|null = null;
-
-  /**
-   * Debug draw collider direction
-   */
-  protected debugDirectionRenderer: LineRendererComponent|null = null;
-
-  public get cachedPoints(): ReadonlyArray<Vector> { return this._cachedPoints; }
-
-  public get cachedAxes(): ReadonlyArray<Vector> { return this._cachedAxes; }
-
-  public get cachedSides(): ReadonlyArray<Line> { return this._cachedSides; }
+  public get calculatedPoints(): ReadonlyArray<Vector> { return this._calculatedPoints; }
+  public get calculatedAxes(): ReadonlyArray<Vector> { return this._calculatedAxes; }
+  public get calculatedSides(): ReadonlyArray<Line> { return this._calculatedSides; }
 
   constructor(host: GameObject,
               @Inject(CollisionJumpTable) protected collisionJumpTable: CollisionJumpTable) {
     super(host);
   }
 
-  public fixedUpdate(): void {
+  public fixedUpdate(alpha: number): void {
+    super.fixedUpdate(alpha);
     this.calculate();
-  }
-
-  public update(): void {
-    if (this.debug) {
-      const isSleep = this.rigidbody ? this.rigidbody.isSleeping : true;
-      const color = isSleep ? Color.Green : Color.Red;
-
-      if (!this.debugColliderRenderer) {
-        this.debugColliderRenderer = this.addComponent(LineRendererComponent);
-        this.debugColliderRenderer.useLocalCoordinate = false;
-        this.debugColliderRenderer.closePath = true;
-      }
-
-      if (!this.debugBoundsRenderer) {
-        this.debugBoundsRenderer = this.addComponent(LineRendererComponent);
-        this.debugBoundsRenderer.useLocalCoordinate = false;
-        this.debugBoundsRenderer.closePath = true;
-        this.debugBoundsRenderer.strokeColor = Color.Cyan;
-      }
-
-      if (!this.debugDirectionRenderer) {
-        this.debugDirectionRenderer = this.addComponent(LineRendererComponent);
-        this.debugDirectionRenderer.useLocalCoordinate = false;
-      }
-
-      this.debugColliderRenderer.strokeColor = color;
-      this.debugDirectionRenderer.strokeColor = color;
-
-      this.debugColliderRenderer.clearPoints();
-      if (this._cachedPoints.length > 1) {
-        this.debugColliderRenderer.addPoint(...this._cachedPoints);
-      }
-
-      const min = this.bounds.min;
-      const max = this.bounds.max;
-
-      this.debugBoundsRenderer.clearPoints();
-      this.debugBoundsRenderer.addPoint(
-        new Vector(min.x, min.y),
-        new Vector(min.x, max.y),
-        new Vector(max.x, max.y),
-        new Vector(max.x, min.y)
-      );
-
-      const rotation = this.host.transform.rotation;
-      const direction = new Vector(Math.cos(rotation), Math.sin(rotation));
-      const ray = new Ray(this.bounds.center.clone(), direction.clone());
-      const point = this.rayCast(ray) || direction;
-      const center = this._cachedPoints.reduce((result, curr) => result.add(curr), new Vector()).multiply(1 / this._cachedPoints.length);
-      this.debugDirectionRenderer.clearPoints();
-      this.debugDirectionRenderer.addPoint(center, point);
-
-    } else {
-      if (this.debugColliderRenderer) {
-        this.removeComponent(this.debugColliderRenderer);
-        this.debugColliderRenderer = null;
-      }
-      if (this.debugBoundsRenderer) {
-        this.removeComponent(this.debugBoundsRenderer);
-        this.debugBoundsRenderer = null;
-      }
-      if (this.debugDirectionRenderer) {
-        this.removeComponent(this.debugDirectionRenderer);
-        this.debugDirectionRenderer = null;
-      }
-    }
   }
 
   public calculate(): void {
     const toWorldMatrix = this.host.transform.toWorldMatrix;
     const count = this.points.length;
-    const diff = count - this._cachedPoints.length;
+    const diff = count - this._calculatedPoints.length;
 
     if (diff > 0) {
       for (let i = 0; i < diff; i++) {
-        this._cachedPoints.push(new Vector());
-        this._cachedAxes.push(new Vector());
-        this._cachedSides.push(new Line(new Vector(), new Vector()));
+        this._calculatedPoints.push(new Vector());
+        this._calculatedAxes.push(new Vector());
+        this._calculatedSides.push(new Line(new Vector(), new Vector()));
       }
     } else if (diff < 0) {
-      this._cachedPoints.splice(0, -diff);
-      this._cachedAxes.splice(0, -diff);
-      this._cachedSides.splice(0, -diff);
+      this._calculatedPoints.splice(0, -diff);
+      this._calculatedAxes.splice(0, -diff);
+      this._calculatedSides.splice(0, -diff);
     }
 
-    this._cachedPoints.forEach((point, index) => point.copy(this.points[index]));
-    this._cachedPoints.forEach(point => toWorldMatrix.multiplyToPoint(point));
+    this._calculatedPoints.forEach((point, index) => point.copy(this.points[index]));
+    this._calculatedPoints.forEach(point => toWorldMatrix.multiplyToPoint(point));
 
     for (let i = 0; i < count; i++) {
-      const p1 = this._cachedPoints[i];
-      const p2 = this._cachedPoints[(i + 1) % count];
-      const axis = this._cachedAxes[i];
-      const side = this._cachedSides[i];
+      const p1 = this._calculatedPoints[i];
+      const p2 = this._calculatedPoints[(i + 1) % count];
+      const axis = this._calculatedAxes[i];
+      const side = this._calculatedSides[i];
       axis.copy(p1).subtract(p2);
       side.begin.copy(p1);
       side.end.copy(p2);
     }
 
     // update bounds
-    const x = this._cachedPoints.map(p => p.x);
-    const y = this._cachedPoints.map(p => p.y);
+    const x = this._calculatedPoints.map(p => p.x);
+    const y = this._calculatedPoints.map(p => p.y);
     const minX = Math.min(...x);
     const minY = Math.min(...y);
     const maxX = Math.max(...x);
@@ -187,7 +105,7 @@ export class PolygonColliderComponent extends ColliderComponent {
    */
   public contains(point: Vector): boolean {
     const ray = new Ray(point, Vector.Right);
-    const count = this._cachedSides.reduce((acc, side) => ray.intersect(side) === -1 ? acc : ++acc, 0);
+    const count = this._calculatedSides.reduce((acc, side) => ray.intersect(side) === -1 ? acc : ++acc, 0);
     return count % 2 !== 0;
   }
 
@@ -198,7 +116,7 @@ export class PolygonColliderComponent extends ColliderComponent {
   public rayCast(ray: Ray): Vector|undefined {
     let minDistance = Number.MAX_VALUE;
     let noIntersect = true;
-    this._cachedSides.forEach(side => {
+    this._calculatedSides.forEach(side => {
       const distance = ray.intersect(side);
       if (distance > 0 && distance < minDistance) {
         minDistance = distance;
@@ -220,7 +138,7 @@ export class PolygonColliderComponent extends ColliderComponent {
   public project(axis: Vector): Projection {
     let min = Number.MAX_VALUE;
     let max = -Number.MAX_VALUE;
-    this._cachedPoints.forEach(point => {
+    this._calculatedPoints.forEach(point => {
       const s = point.dot(axis);
       min = Math.min(min, s);
       max = Math.max(max, s);
@@ -236,14 +154,14 @@ export class PolygonColliderComponent extends ColliderComponent {
   public getFurthestPoint(direction: Vector): Vector {
     let max = -Number.MAX_VALUE;
     let pointer = -1;
-    this._cachedPoints.forEach((point, index) => {
+    this._calculatedPoints.forEach((point, index) => {
       const dot = point.dot(direction);
       if (dot > max) {
         max = dot;
         pointer = index;
       }
     });
-    return this._cachedPoints[pointer].clone();
+    return this._calculatedPoints[pointer].clone();
   }
 
 }

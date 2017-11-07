@@ -13,8 +13,6 @@ export class LineRendererComponent extends RendererComponent {
 
   public closePath: boolean = false;
 
-  public useLocalCoordinate: boolean = true;
-
   private _points: Vector[] = [];
 
   public points(): ReadonlyArray<Vector> { return this._points; }
@@ -58,8 +56,8 @@ export class LineRendererComponent extends RendererComponent {
       }
     });
 
-    this.canvas.width = maxX - minX;
-    this.canvas.height = maxY - minX;
+    this.canvas.width = maxX - minX + this.lineWidth * 2;
+    this.canvas.height = maxY - minX + this.lineWidth * 2;
   }
 
   public render(): void {
@@ -76,14 +74,8 @@ export class LineRendererComponent extends RendererComponent {
 
     ctx.save();
 
-    if (!this.useLocalCoordinate) {
-      const m = this.transform.toLocalMatrix;
-      ctx.transform(
-        m[0][0], m[0][1],
-        m[1][0], m[1][1],
-        m[0][2], m[1][2]
-      );
-    }
+    // move to center of canvas
+    ctx.translate(this.canvas.width * 0.5, this.canvas.height * 0.5);
 
     const firstPoint = this._points[0];
 
