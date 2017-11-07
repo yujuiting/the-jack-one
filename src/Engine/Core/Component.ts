@@ -1,5 +1,5 @@
-import { BaseObject } from 'Engine/Base/BaseObject';
-import { GameObject } from 'Engine/Base/GameObject';
+import { BaseObject } from 'Engine/Core/BaseObject';
+import { GameObject } from 'Engine/Core/GameObject';
 import { Type } from 'Engine/Utility/Type';
 
 /**

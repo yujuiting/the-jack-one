@@ -1,5 +1,5 @@
-import { Engine } from 'Engine/Base/Engine';
-import { providerRegistry, Provider } from 'Engine/Base/ProviderRegistry';
+import { Engine } from 'Engine/Core/Engine';
+import { providerRegistry, Provider } from 'Engine/Core/ProviderRegistry';
 import { Type, Token } from 'Engine/Utility/Type';
 
 let engine: Engine;

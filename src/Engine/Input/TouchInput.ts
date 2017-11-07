@@ -1,18 +1,15 @@
-import { BrowserDelegate } from 'Engine/Utility/BrowserDelegate';
 import { Observable } from 'rxjs/Observable';
-import { Service } from 'Engine/Decorator/Service';
 
-@Service()
-export class TouchInput {
+export const TouchInput = Symbol('TouchInput');
 
-  public get touchStart$(): Observable<TouchEvent> { return this.browserDelegate.touchStart$; }
+export interface TouchInput {
 
-  public get touchEnd$(): Observable<TouchEvent> { return this.browserDelegate.touchEnd$; }
+  readonly touchStart$: Observable<TouchEvent>;
 
-  public get touchCancel$(): Observable<TouchEvent> { return this.browserDelegate.touchCancel$; }
+  readonly touchEnd$: Observable<TouchEvent>;
 
-  public get touchMove$(): Observable<TouchEvent> { return this.browserDelegate.touchMove$; }
+  readonly touchCancel$: Observable<TouchEvent>;
 
-  constructor(private browserDelegate: BrowserDelegate) {}
+  readonly touchMove$: Observable<TouchEvent>;
 
 }

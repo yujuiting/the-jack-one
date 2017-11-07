@@ -1,12 +1,13 @@
-import { GameObject } from 'Engine/Base/GameObject';
-import { Component } from 'Engine/Base/Component';
+import { GameObject } from 'Engine/Core/GameObject';
+import { Component } from 'Engine/Core/Component';
 import { TransformComponent } from 'Engine/Display/TransformComponent';
 import { Vector } from 'Engine/Math/Vector';
-import { Engine } from 'Engine/Base/Engine';
+import { Engine } from 'Engine/Core/Engine';
 import { Time } from 'Engine/Time/Time';
 import { ForceMode } from 'Engine/Physics/ForceMode';
 import { UniqueComponent } from 'Engine/Decorator/UniqueComponent';
 import { RequireComponent } from 'Engine/Decorator/RequireComponent';
+import { Inject } from 'Engine/Decorator/Inject';
 
 interface InternalRigidbodyComponent extends RigidbodyComponent {
   motion: number;
@@ -82,8 +83,8 @@ export class RigidbodyComponent extends Component {
   private transform: TransformComponent;
 
   constructor(host: GameObject,
-              private engine: Engine,
-              private time: Time) {
+              @Inject(Engine) private engine: Engine,
+              @Inject(Time) private time: Time) {
     super(host);
   }
 

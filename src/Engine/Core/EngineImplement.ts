@@ -1,13 +1,15 @@
-import { Screen } from 'Engine/Base/Screen';
-import { Scene } from 'Engine/Base/Scene';
-import { SceneManager } from 'Engine/Base/SceneManager';
+import { Inject } from 'Engine/Decorator/Inject';
+import { Screen } from 'Engine/Display/Screen';
+import { Scene } from 'Engine/Core/Scene';
+import { SceneManager } from 'Engine/Core/SceneManager';
 import { BrowserDelegate } from 'Engine/Utility/BrowserDelegate';
 import { Time } from 'Engine/Time/Time';
 import { Vector } from 'Engine/Math/Vector';
 import { Service } from 'Engine/Decorator/Service';
+import { Engine } from 'Engine/Core/Engine';
 
-@Service()
-export class Engine {
+@Service(Engine)
+export class EngineImplement implements Engine {
 
   public readonly gravity: Vector = Vector.Get(0, -100);
 
@@ -29,10 +31,10 @@ export class Engine {
 
   public get isPaused(): boolean { return this._isPaused; }
 
-  constructor(public readonly screen: Screen,
-              public readonly time: Time,
-              public readonly sceneManager: SceneManager,
-              private readonly browser: BrowserDelegate) {
+  constructor(@Inject(Screen) public readonly screen: Screen,
+              @Inject(Time) public readonly time: Time,
+              @Inject(SceneManager) public readonly sceneManager: SceneManager,
+              @Inject(BrowserDelegate) private readonly browser: BrowserDelegate) {
     this.canvas = this.browser.document.createElement('canvas');
     this.ctx = <CanvasRenderingContext2D>this.canvas.getContext('2d');
   }

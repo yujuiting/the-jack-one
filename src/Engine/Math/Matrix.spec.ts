@@ -1,4 +1,5 @@
 // tslint:disable member-access no-unused-expression
+import 'Engine/preset';
 import { expect } from 'chai';
 import { suite, test } from 'mocha-typescript';
 import { Matrix } from './Matrix';

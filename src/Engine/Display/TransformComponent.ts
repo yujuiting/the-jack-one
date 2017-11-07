@@ -1,4 +1,4 @@
-import { Component } from 'Engine/Base/Component';
+import { Component } from 'Engine/Core/Component';
 import { Vector } from 'Engine/Math/Vector';
 import { UniqueComponent } from 'Engine/Decorator/UniqueComponent';
 import { Matrix } from 'Engine/Math/Matrix';

@@ -14,9 +14,6 @@ export class SpriteRendererComponent extends RendererComponent {
     super.update();
     if (this.sprite) {
       const { width, height } = this.sprite;
-      // const scale = this.transform.scale;
-      // const width = sourceWidth * scale.x;
-      // const height = sourceHeight * scale.y;
       this.canvas.width = width;
       this.canvas.height = height;
     }

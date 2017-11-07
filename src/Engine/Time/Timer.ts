@@ -1,9 +1,10 @@
-import { GameObject } from 'Engine/Base/GameObject';
+import { GameObject } from 'Engine/Core/GameObject';
 import { Time } from 'Engine/Time/Time';
 import { Subject } from 'rxjs/Subject';
 import { Observable } from 'rxjs/Observable';
 import { Class } from 'Engine/Decorator/Class';
-import { GameObjectInitializer } from 'Engine/Base/GameObjectInitializer';
+import { GameObjectInitializer } from 'Engine/Core/GameObjectInitializer';
+import { Inject } from 'Engine/Decorator/Inject';
 
 interface InternalTimer {
   timestamp: number;
@@ -23,8 +24,8 @@ export class Timer extends GameObject {
 
   private timeEvent: Subject<number> = new Subject<number>();
 
-  constructor(private time: Time,
-              gameObjectInitializer: GameObjectInitializer) {
+  constructor(@Inject(Time) private time: Time,
+              @Inject(GameObjectInitializer) gameObjectInitializer: GameObjectInitializer) {
     super(gameObjectInitializer);
     this.pause();
   }

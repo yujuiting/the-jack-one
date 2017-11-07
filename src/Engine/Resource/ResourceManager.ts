@@ -1,14 +1,10 @@
 import { Bundle } from 'Engine/Resource/Bundle';
 import { Resource } from 'Engine/Resource/Resource';
-import { Service } from 'Engine/Decorator/Service';
 
-@Service()
-export class ResourceManager {
+export const ResourceManager = Symbol('ResourceManager');
 
-  private bundle: Bundle = new Bundle();
+export interface ResourceManager {
 
-  public add(resource: Resource): void {
-    this.bundle.add(resource);
-  }
+  add(resource: Resource): void;
 
 }

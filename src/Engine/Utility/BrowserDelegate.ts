@@ -1,55 +1,44 @@
 import { Observable } from 'rxjs/Observable';
-import { Service } from 'Engine/Decorator/Service';
+
+export const BrowserDelegate = Symbol('BrowserDelegate');
 
 /**
  * Browser API interface for internal usage.
  */
-@Service()
-export class BrowserDelegate {
+export interface BrowserDelegate {
 
-  public readonly window: Window = window;
+  readonly window: Window;
 
-  public readonly document: Document = this.window.document;
+  readonly document: Document;
 
-  public readonly screen: Screen = window.screen;
+  readonly screen: Screen;
 
-  public readonly resize$: Observable<Event> = Observable.fromEvent(this.window, 'resize');
+  readonly resize$: Observable<Event>;
 
-  public readonly click$: Observable<MouseEvent> = Observable.fromEvent(this.window, 'click');
+  readonly click$: Observable<MouseEvent>;
 
-  public readonly mouseMove$: Observable<MouseEvent> = Observable.fromEvent(this.window, 'mousemove');
+  readonly mouseMove$: Observable<MouseEvent>;
 
-  public readonly mouseDown$: Observable<MouseEvent> = Observable.fromEvent(this.window, 'mousedown');
+  readonly mouseDown$: Observable<MouseEvent>;
 
-  public readonly mouseUp$: Observable<MouseEvent> = Observable.fromEvent(this.window, 'mouseup');
+  readonly mouseUp$: Observable<MouseEvent>;
 
-  public readonly wheel$: Observable<WheelEvent> = Observable.fromEvent(this.window, 'wheel');
+  readonly wheel$: Observable<WheelEvent>;
 
-  public readonly keyDown$: Observable<KeyboardEvent> = Observable.fromEvent(this.window, 'keydown');
+  readonly keyDown$: Observable<KeyboardEvent>;
 
-  public readonly keyUp$: Observable<KeyboardEvent> = Observable.fromEvent(this.window, 'keyup');
+  readonly keyUp$: Observable<KeyboardEvent>;
 
-  public readonly touchStart$: Observable<TouchEvent> = Observable.fromEvent(this.window, 'touchstart');
+  readonly touchStart$: Observable<TouchEvent>;
 
-  public readonly touchEnd$: Observable<TouchEvent> = Observable.fromEvent(this.window, 'touchend');
+  readonly touchEnd$: Observable<TouchEvent>;
 
-  public readonly touchCancel$: Observable<TouchEvent> = Observable.fromEvent(this.window, 'touchcancel');
+  readonly touchCancel$: Observable<TouchEvent>;
 
-  public readonly touchMove$: Observable<TouchEvent> = Observable.fromEvent(this.window, 'touchmove');
+  readonly touchMove$: Observable<TouchEvent>;
 
-  constructor() {
-    this.document.body.style.margin = '0';
-    this.document.body.style.width = '100%';
-    this.document.body.style.height = '100%';
-    this.document.body.style.overflow = 'auto';
-  }
+  createCanvas(): HTMLCanvasElement;
 
-  public createCanvas(): HTMLCanvasElement {
-    return this.document.createElement('canvas');
-  }
-
-  public getContext(canvas: HTMLCanvasElement): CanvasRenderingContext2D {
-    return <CanvasRenderingContext2D>canvas.getContext('2d');
-  }
+  getContext(canvas: HTMLCanvasElement): CanvasRenderingContext2D;
 
 }

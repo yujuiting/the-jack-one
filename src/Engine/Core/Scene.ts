@@ -1,8 +1,8 @@
-import { BaseObject } from 'Engine/Base/BaseObject';
-import { GameObject } from 'Engine/Base/GameObject';
+import { BaseObject } from 'Engine/Core/BaseObject';
+import { GameObject } from 'Engine/Core/GameObject';
 import { Tree } from 'Engine/Utility/Tree';
 import { Bundle } from 'Engine/Resource/Bundle';
-import { Camera, MainCamera } from 'Engine/Base/Camera';
+import { Camera, MainCamera } from 'Engine/Core/Camera';
 import { addToArray,
          removeFromArray } from 'Engine/Utility/ArrayUtility';
 import { Inject } from 'Engine/Decorator/Inject';
@@ -10,8 +10,8 @@ import { Class } from 'Engine/Decorator/Class';
 import { BroadPhaseCollisionResolver } from 'Engine/Physics/BroadPhaseCollisionResolver';
 import { NarrowPhaseCollisionResolver } from 'Engine/Physics/NarrowPhaseCollisionResolver';
 import { Vector } from 'Engine/Math/Vector';
-import { GameObjectInitializer } from 'Engine/Base/GameObjectInitializer';
-import { RenderProcess } from 'Engine/Base/RenderProcess';
+import { GameObjectInitializer } from 'Engine/Core/GameObjectInitializer';
+import { RenderProcess } from 'Engine/Render/RenderProcess';
 
 /**
  * Scene manage game objects and resources.
@@ -29,17 +29,13 @@ export class Scene extends BaseObject {
 
   private cameras: Camera[] = [];
 
-  @Inject(MainCamera)
-  public mainCamera: Camera;
-
-  @Inject(RenderProcess)
-  private renderProcess: RenderProcess;
-
   public get isLoaded(): boolean { return this.resources.isLoaded; }
 
-  constructor(private broadPhaseCollisionResolver: BroadPhaseCollisionResolver,
-              private narrowPhaseCollisionResolver: NarrowPhaseCollisionResolver,
-              private gameObjectInitializer: GameObjectInitializer) {
+  constructor(@Inject(BroadPhaseCollisionResolver) private broadPhaseCollisionResolver: BroadPhaseCollisionResolver,
+              @Inject(NarrowPhaseCollisionResolver) private narrowPhaseCollisionResolver: NarrowPhaseCollisionResolver,
+              @Inject(GameObjectInitializer) private gameObjectInitializer: GameObjectInitializer,
+              @Inject(RenderProcess) private renderProcess: RenderProcess,
+              @Inject(MainCamera) public mainCamera: Camera) {
     super();
     this.add(this.mainCamera);
   }

@@ -1,11 +1,12 @@
 // tslint:disable member-access no-unused-expression
+import 'Engine/preset';
 import { suite, test } from 'mocha-typescript';
 import { expect, use } from 'chai';
 import { spy } from 'sinon';
 import { Time } from 'Engine/Time/Time';
 import { Timer } from 'Engine/Time/Timer';
-import { instantiate, getService } from 'Engine/Base/runtime';
-import { GameObjectInitializer } from 'Engine/Base/GameObjectInitializer';
+import { instantiate, getService } from 'Engine/runtime';
+import { GameObjectInitializer } from 'Engine/Core/GameObjectInitializer';
 import * as sinonChai from 'sinon-chai';
 use(sinonChai);
 

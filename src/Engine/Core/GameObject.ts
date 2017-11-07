@@ -1,14 +1,15 @@
-import { BaseObject } from 'Engine/Base/BaseObject';
-import { Component } from 'Engine/Base/Component';
+import { BaseObject } from 'Engine/Core/BaseObject';
+import { Component } from 'Engine/Core/Component';
 import { Type, Tag, Layer, BuiltInLayer } from 'Engine/Utility/Type';
 import { TransformComponent } from 'Engine/Display/TransformComponent';
 import { addToArray,
          removeFromArray,
          includeInArray } from 'Engine/Utility/ArrayUtility';
 import { Tree } from 'Engine/Utility/Tree';
-import { instantiate } from 'Engine/Base/runtime';
-import { GameObjectInitializer } from 'Engine/Base/GameObjectInitializer';
+import { instantiate } from 'Engine/runtime';
+import { GameObjectInitializer } from 'Engine/Core/GameObjectInitializer';
 import { Class } from 'Engine/Decorator/Class';
+import { Inject } from 'Engine/Decorator/Inject';
 
 /**
  * Basic class in engine
@@ -83,7 +84,7 @@ export class GameObject extends BaseObject {
     return this._isActive;
   }
 
-  constructor(gameObjectInitializer: GameObjectInitializer) {
+  constructor(@Inject(GameObjectInitializer) gameObjectInitializer: GameObjectInitializer) {
     super();
     this.transform = this.addComponent(TransformComponent);
     gameObjectInitializer.push(this);

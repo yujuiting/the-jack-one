@@ -1,12 +1,13 @@
 // tslint:disable max-classes-per-file no-stateless-class
-import 'Engine/imports';
-import { instantiate, bootstrap, def, DEBUG } from 'Engine/Base/runtime';
+import 'Engine/preset';
+
+import { instantiate, bootstrap, def, DEBUG } from 'Engine/runtime';
 def(DEBUG);
 
-import { GameObject } from 'Engine/Base/GameObject';
-import { Scene } from 'Engine/Base/Scene';
-// import { Screen } from 'Engine/Base/Screen';
-import { SceneManager } from 'Engine/Base/SceneManager';
+import { GameObject } from 'Engine/Core/GameObject';
+import { Scene } from 'Engine/Core/Scene';
+// import { Screen } from 'Engine/Display/Screen';
+import { SceneManager } from 'Engine/Core/SceneManager';
 import { Class } from 'Engine/Decorator/Class';
 // import { TextRendererComponent } from 'Engine/Render/TextRendererComponent';
 import { KeyboardInput } from 'Engine/Input/KeyboardInput';
@@ -15,6 +16,7 @@ import { SpriteSheetRendererComponent } from 'Engine/Render/SpriteSheetRendererC
 import { Sprite } from 'Engine/Display/Sprite';
 import { SpriteSheet } from 'Engine/Display/SpriteSheet';
 import { Texture } from 'Engine/Resource/Texture';
+import { Inject } from 'Engine/Decorator/Inject';
 
 @Class()
 class Subject extends GameObject {
@@ -26,8 +28,8 @@ class Subject extends GameObject {
 @Class()
 class World {
 
-  constructor(sceneManager: SceneManager,
-              keyboardInput: KeyboardInput) {
+  constructor(@Inject(SceneManager) sceneManager: SceneManager,
+              @Inject(KeyboardInput) keyboardInput: KeyboardInput) {
     const scene = instantiate(Scene);
     sceneManager.add(scene);
 

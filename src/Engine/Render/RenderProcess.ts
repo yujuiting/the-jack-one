@@ -1,5 +1,5 @@
-import { GameObject } from 'Engine/Base/GameObject';
-import { Camera } from 'Engine/Base/Camera';
+import { GameObject } from 'Engine/Core/GameObject';
+import { Camera } from 'Engine/Core/Camera';
 import { ReadonlyTree } from 'Engine/Utility/Tree';
 
 export const RenderProcess = Symbol('RenderProcess');

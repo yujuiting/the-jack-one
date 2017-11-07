@@ -1,12 +1,12 @@
 // tslint:disable max-classes-per-file
-import 'Engine/imports';
+import 'Engine/preset';
 
-import { GameObject } from 'Engine/Base/GameObject';
-import { Component } from 'Engine/Base/Component';
-import { Scene } from 'Engine/Base/Scene';
-import { SceneManager } from 'Engine/Base/SceneManager';
-import { Camera } from 'Engine/Base/Camera';
-import { instantiate, bootstrap } from 'Engine/Base/runtime';
+import { GameObject } from 'Engine/Core/GameObject';
+import { Component } from 'Engine/Core/Component';
+import { Scene } from 'Engine/Core/Scene';
+import { SceneManager } from 'Engine/Core/SceneManager';
+import { Camera } from 'Engine/Core/Camera';
+import { instantiate, bootstrap } from 'Engine/runtime';
 
 import { Class } from 'Engine/Decorator/Class';
 import { Inject } from 'Engine/Decorator/Inject';
@@ -128,7 +128,7 @@ class Game {
 
   private camera: Camera = this.scene.mainCamera;
 
-  constructor(sceneManager: SceneManager) {
+  constructor(@Inject(SceneManager) sceneManager: SceneManager) {
     this.scene.resources.add(texture);
 
     sceneManager.add(this.scene);

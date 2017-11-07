@@ -1,4 +1,4 @@
-import { GameObject } from 'Engine/Base/GameObject';
+import { GameObject } from 'Engine/Core/GameObject';
 import { ColliderComponent } from 'Engine/Physics/ColliderComponent';
 import { CircleRendererComponent } from 'Engine/Render/CircleRendererComponent';
 import { Vector } from 'Engine/Math/Vector';
@@ -36,8 +36,10 @@ export class CircleColliderComponent extends ColliderComponent {
    */
   protected debugDirectionRenderer: LineRendererComponent|null = null;
 
-  @Inject(CollisionJumpTable)
-  private collisionJumpTable: CollisionJumpTable;
+  constructor(host: GameObject,
+              @Inject(CollisionJumpTable) private collisionJumpTable: CollisionJumpTable) {
+    super(host);
+  }
 
   public fixedUpdate(): void {
     this.calculate();

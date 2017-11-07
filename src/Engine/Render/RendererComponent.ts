@@ -1,13 +1,14 @@
 import { Subject } from 'rxjs/Subject';
 import { Observable } from 'rxjs/Observable';
-import { Component } from 'Engine/Base/Component';
-import { GameObject } from 'Engine/Base/GameObject';
+import { Component } from 'Engine/Core/Component';
+import { GameObject } from 'Engine/Core/GameObject';
 import { TransformComponent } from 'Engine/Display/TransformComponent';
 import { Bounds } from 'Engine/Display/Bounds';
 import { RequireComponent } from 'Engine/Decorator/RequireComponent';
 import { BrowserDelegate } from 'Engine/Utility/BrowserDelegate';
-import { Camera } from 'Engine/Base/Camera';
+import { Camera } from 'Engine/Core/Camera';
 import { Vector } from 'Engine/Math/Vector';
+import { Inject } from 'Engine/Decorator/Inject';
 
 /**
  * Base renderer
@@ -35,7 +36,7 @@ export class RendererComponent extends Component {
   get onBecameInvisible$(): Observable<Camera> { return this._onBecameInvisible$.asObservable(); }
 
   constructor(host: GameObject,
-              browserDelegate: BrowserDelegate) {
+              @Inject(BrowserDelegate) browserDelegate: BrowserDelegate) {
     super(host);
     this.canvas = browserDelegate.createCanvas();
     this.ctx = browserDelegate.getContext(this.canvas);

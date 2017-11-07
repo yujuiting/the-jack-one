@@ -1,27 +1,19 @@
-import { Service } from 'Engine/Decorator/Service';
+export const Time = Symbol('Time');
 
-interface InternalTime extends Time {
-  deltaTime: number;
-  fixedDeltaTime: number;
-}
-
-@Service()
-export class Time {
+export interface Time {
 
   /**
    * In millisecond
    */
-  public readonly deltaTime: number = 0;
+  readonly deltaTime: number;
 
   /**
    * Fix update time in milliseconds
    */
-  public readonly fixedDeltaTime: number = 1000 / 60;
+  readonly fixedDeltaTime: number;
 
-  public readonly fixedDeltaTimeInSecond: number = 1 / 60;
+  readonly fixedDeltaTimeInSecond: number;
 
-  public tick(deltaTime: number): void {
-    (<InternalTime>this).deltaTime = deltaTime;
-  }
+  tick(deltaTime: number): void;
 
 }

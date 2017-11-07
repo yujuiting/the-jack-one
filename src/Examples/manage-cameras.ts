@@ -1,18 +1,18 @@
 // tslint:disable max-classes-per-file
-import 'Engine/imports';
+import 'Engine/preset';
 
-import { GameObject } from 'Engine/Base/GameObject';
-import { Component } from 'Engine/Base/Component';
-import { Scene } from 'Engine/Base/Scene';
-import { SceneManager } from 'Engine/Base/SceneManager';
-import { Screen } from 'Engine/Base/Screen';
-import { Camera } from 'Engine/Base/Camera';
-import { instantiate, bootstrap } from 'Engine/Base/runtime';
+import { GameObject } from 'Engine/Core/GameObject';
+import { Component } from 'Engine/Core/Component';
+import { Scene } from 'Engine/Core/Scene';
+import { SceneManager } from 'Engine/Core/SceneManager';
+import { Screen } from 'Engine/Display/Screen';
+import { Camera } from 'Engine/Core/Camera';
+import { instantiate, bootstrap } from 'Engine/runtime';
 
 // import { Time } from 'Engine/Time/Time';
 
 import { Class } from 'Engine/Decorator/Class';
-// import { Inject } from 'Engine/Decorator/Inject';
+import { Inject } from 'Engine/Decorator/Inject';
 
 import { Sprite } from 'Engine/Display/Sprite';
 import { Color } from 'Engine/Display/Color';
@@ -179,9 +179,9 @@ class Game {
 
   private subCamera: Camera = instantiate(Camera);
 
-  constructor(sceneManager: SceneManager,
-              pointerInput: PointerInput,
-              screen: Screen) {
+  constructor(@Inject(SceneManager) sceneManager: SceneManager,
+              @Inject(PointerInput) pointerInput: PointerInput,
+              @Inject(Screen) screen: Screen) {
     this.scene.resources.add(texture);
     this.scene.add(this.player);
     this.scene.add(this.subCamera);

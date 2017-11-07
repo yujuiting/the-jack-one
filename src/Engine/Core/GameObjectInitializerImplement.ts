@@ -1,8 +1,9 @@
-import { GameObject } from 'Engine/Base/GameObject';
+import { GameObject } from 'Engine/Core/GameObject';
 import { Service } from 'Engine/Decorator/Service';
+import { GameObjectInitializer } from 'Engine/Core/GameObjectInitializer';
 
-@Service()
-export class GameObjectInitializer {
+@Service(GameObjectInitializer)
+export class GameObjectInitializerImplement implements GameObjectInitializer {
 
   private queue: GameObject[] = [];
 

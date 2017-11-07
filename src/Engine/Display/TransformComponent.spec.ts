@@ -1,10 +1,11 @@
 // tslint:disable member-access no-unused-expression
+import 'Engine/preset';
 import { expect } from 'chai';
 import { suite, test } from 'mocha-typescript';
-import { instantiate, getService } from 'Engine/Base/runtime';
-import { GameObjectInitializer } from 'Engine/Base/GameObjectInitializer';
+import { instantiate, getService } from 'Engine/runtime';
+import { GameObjectInitializer } from 'Engine/Core/GameObjectInitializer';
 import { TransformComponent } from 'Engine/Display/TransformComponent';
-import { GameObject } from 'Engine/Base/GameObject';
+import { GameObject } from 'Engine/Core/GameObject';
 import { Vector } from 'Engine/Math/Vector';
 
 @suite class TransformComponentTestSuite {

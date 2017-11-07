@@ -1,8 +1,10 @@
 import { BrowserDelegate } from 'Engine/Utility/BrowserDelegate';
 import { Service } from 'Engine/Decorator/Service';
+import { Screen } from 'Engine/Display/Screen';
+import { Inject } from 'Engine/Decorator/Inject';
 
-@Service()
-export class Screen {
+@Service(Screen)
+export class ScreenImplement implements Screen {
 
   private _isFullScreen: boolean = false;
 
@@ -20,7 +22,7 @@ export class Screen {
 
   get isFullScreen(): boolean { return this._isFullScreen; }
 
-  constructor(private browserDelegate: BrowserDelegate) {}
+  constructor(@Inject(BrowserDelegate) private browserDelegate: BrowserDelegate) {}
 
   public setFullScreen(enable: boolean = true): void {
     this._isFullScreen = enable;

@@ -1,14 +1,11 @@
-import { BrowserDelegate } from 'Engine/Utility/BrowserDelegate';
 import { Observable } from 'rxjs/Observable';
-import { Service } from 'Engine/Decorator/Service';
 
-@Service()
-export class KeyboardInput {
+export const KeyboardInput = Symbol('KeyboardInput');
 
-  public get keyDown$(): Observable<KeyboardEvent> { return this.browserDelegate.keyDown$; }
+export interface KeyboardInput {
 
-  public get keyUp$(): Observable<KeyboardEvent> { return this.browserDelegate.keyUp$; }
+  readonly keyDown$: Observable<KeyboardEvent>;
 
-  constructor(private browserDelegate: BrowserDelegate) {}
+  readonly keyUp$: Observable<KeyboardEvent>;
 
 }

@@ -1,12 +1,12 @@
-import { RenderProcess } from 'Engine/Base/RenderProcess';
-import { GameObject } from 'Engine/Base/GameObject';
-import { Camera } from 'Engine/Base/Camera';
+import { RenderProcess } from 'Engine/Render/RenderProcess';
+import { GameObject } from 'Engine/Core/GameObject';
+import { Camera } from 'Engine/Core/Camera';
 import { ReadonlyTree } from 'Engine/Utility/Tree';
 import { RendererComponent } from 'Engine/Render/RendererComponent';
 import { Service } from 'Engine/Decorator/Service';
 import { Vector } from 'Engine/Math/Vector';
 import { Type } from 'Engine/Utility/Type';
-import { ifdef, DEBUG } from 'Engine/Base/runtime';
+import { ifdef, DEBUG } from 'Engine/runtime';
 import { Bounds } from 'Engine/Display/Bounds';
 
 @Service(RenderProcess)

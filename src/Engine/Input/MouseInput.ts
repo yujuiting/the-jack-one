@@ -1,20 +1,17 @@
-import { BrowserDelegate } from 'Engine/Utility/BrowserDelegate';
 import { Observable } from 'rxjs/Observable';
-import { Service } from 'Engine/Decorator/Service';
 
-@Service()
-export class MouseInput {
+export const MouseInput = Symbol('MouseInput');
 
-  public get click$(): Observable<MouseEvent> { return this.browserDelegate.click$; }
+export interface MouseInput {
 
-  public get mouseMove$(): Observable<MouseEvent> { return this.browserDelegate.mouseMove$; }
+  readonly click$: Observable<MouseEvent>;
 
-  public get mouseDown$(): Observable<MouseEvent> { return this.browserDelegate.mouseDown$; }
+  readonly mouseMove$: Observable<MouseEvent>;
 
-  public get mouseUp$(): Observable<MouseEvent> { return this.browserDelegate.mouseUp$; }
+  readonly mouseDown$: Observable<MouseEvent>;
 
-  public get wheel$(): Observable<MouseEvent> { return this.browserDelegate.wheel$; }
+  readonly mouseUp$: Observable<MouseEvent>;
 
-  constructor(private browserDelegate: BrowserDelegate) {}
+  readonly wheel$: Observable<MouseEvent>;
 
 }

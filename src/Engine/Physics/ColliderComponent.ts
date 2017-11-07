@@ -1,6 +1,6 @@
 import { Inject } from 'Engine/Decorator/Inject';
 import { Bounds } from 'Engine/Display/Bounds';
-import { Component } from 'Engine/Base/Component';
+import { Component } from 'Engine/Core/Component';
 import { RigidbodyComponent } from 'Engine/Physics/RigidbodyComponent';
 import { Vector } from 'Engine/Math/Vector';
 import { CollisionContact } from 'Engine/Physics/CollisionContact';

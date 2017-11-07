@@ -1,4 +1,4 @@
-import { GameObject } from 'Engine/Base/GameObject';
+import { GameObject } from 'Engine/Core/GameObject';
 import { ColliderComponent } from 'Engine/Physics/ColliderComponent';
 import { LineRendererComponent } from 'Engine/Render/LineRendererComponent';
 import { Vector } from 'Engine/Math/Vector';
@@ -46,14 +46,16 @@ export class PolygonColliderComponent extends ColliderComponent {
    */
   protected debugDirectionRenderer: LineRendererComponent|null = null;
 
-  @Inject(CollisionJumpTable)
-  protected collisionJumpTable: CollisionJumpTable;
-
   public get cachedPoints(): ReadonlyArray<Vector> { return this._cachedPoints; }
 
   public get cachedAxes(): ReadonlyArray<Vector> { return this._cachedAxes; }
 
   public get cachedSides(): ReadonlyArray<Line> { return this._cachedSides; }
+
+  constructor(host: GameObject,
+              @Inject(CollisionJumpTable) protected collisionJumpTable: CollisionJumpTable) {
+    super(host);
+  }
 
   public fixedUpdate(): void {
     this.calculate();

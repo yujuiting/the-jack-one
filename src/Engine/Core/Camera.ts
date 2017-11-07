@@ -1,6 +1,6 @@
-import { GameObject } from 'Engine/Base/GameObject';
-import { Screen } from 'Engine/Base/Screen';
-import { GameObjectInitializer } from 'Engine/Base/GameObjectInitializer';
+import { GameObject } from 'Engine/Core/GameObject';
+import { Screen } from 'Engine/Display/Screen';
+import { GameObjectInitializer } from 'Engine/Core/GameObjectInitializer';
 import { Color } from 'Engine/Display/Color';
 import { Bounds } from 'Engine/Display/Bounds';
 import { Vector } from 'Engine/Math/Vector';
@@ -9,6 +9,7 @@ import { Matrix } from 'Engine/Math/Matrix';
 import { Layer, AllBuiltInLayer } from 'Engine/Utility/Type';
 import { BrowserDelegate } from 'Engine/Utility/BrowserDelegate';
 import { Service } from 'Engine/Decorator/Service';
+import { Inject } from 'Engine/Decorator/Inject';
 
 export const MainCamera = Symbol('MainCamera');
 
@@ -46,9 +47,9 @@ export class Camera extends GameObject {
    */
   public bounds: Bounds = new Bounds();
 
-  constructor(browser: BrowserDelegate,
-              screen: Screen,
-              gameObjectInitializer: GameObjectInitializer) {
+  constructor(@Inject(BrowserDelegate) browser: BrowserDelegate,
+              @Inject(Screen) screen: Screen,
+              @Inject(GameObjectInitializer) gameObjectInitializer: GameObjectInitializer) {
     super(gameObjectInitializer);
     this.setSize(screen.width, screen.height);
   }

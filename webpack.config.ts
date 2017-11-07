@@ -89,7 +89,7 @@ const config: Configuration = {
     noInfo: true,
     stats: 'errors-only',
     watchOptions: {
-      aggregateTimeout: 1000,
+      aggregateTimeout: 500,
       poll: 1000
     }
   }

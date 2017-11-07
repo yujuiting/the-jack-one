@@ -1,8 +1,10 @@
-import { GameObject } from 'Engine/Base/GameObject';
+import { GameObject } from 'Engine/Core/GameObject';
 import { Vector } from 'Engine/Math/Vector';
 import { Line } from 'Engine/Math/Line';
 import { forwardRef } from 'Engine/Utility/Type';
 import { PolygonColliderComponent } from 'Engine/Physics/PolygonColliderComponent';
+import { Inject } from 'Engine/Decorator/Inject';
+import { CollisionJumpTable } from 'Engine/Physics/CollisionJumpTable';
 
 /**
  * TODO:
@@ -17,8 +19,9 @@ export class BoxColliderComponent extends PolygonColliderComponent {
 
   public size: Vector = new Vector();
 
-  constructor(host: GameObject) {
-    super(host);
+  constructor(host: GameObject,
+              @Inject(CollisionJumpTable) collisionJumpTable: CollisionJumpTable) {
+    super(host, collisionJumpTable);
     for (let i = 0; i < 4; i++) {
       this.points.push(new Vector());
       this._cachedPoints.push(new Vector());

@@ -1,11 +1,11 @@
 // tslint:disable max-classes-per-file
-import 'Engine/imports';
+import 'Engine/preset';
 
-import { GameObject } from 'Engine/Base/GameObject';
-import { Scene } from 'Engine/Base/Scene';
-import { Screen } from 'Engine/Base/Screen';
-import { SceneManager } from 'Engine/Base/SceneManager';
-import { instantiate, bootstrap } from 'Engine/Base/runtime';
+import { GameObject } from 'Engine/Core/GameObject';
+import { Scene } from 'Engine/Core/Scene';
+import { Screen } from 'Engine/Display/Screen';
+import { SceneManager } from 'Engine/Core/SceneManager';
+import { instantiate, bootstrap } from 'Engine/runtime';
 
 import { Type } from 'Engine/Utility/Type';
 import { BrowserDelegate } from 'Engine/Utility/BrowserDelegate';
@@ -182,10 +182,10 @@ class Game {
   private wallRight: Wall;
   private wallLeft: Wall;
 
-  constructor(private sceneManager: SceneManager,
-              private pointerInput: PointerInput,
-              private browserDelegate: BrowserDelegate,
-              private screen: Screen) {
+  constructor(@Inject(SceneManager) private sceneManager: SceneManager,
+              @Inject(PointerInput) private pointerInput: PointerInput,
+              @Inject(BrowserDelegate) private browserDelegate: BrowserDelegate,
+              @Inject(Screen) private screen: Screen) {
     // create scene
     this.scene = instantiate(Scene);
     this.sceneManager.add(this.scene);

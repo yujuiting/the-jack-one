@@ -1,13 +1,14 @@
 import { Subject } from 'rxjs/Subject';
 import { Observable } from 'rxjs/Observable';
-import { Scene } from 'Engine/Base/Scene';
+import { Scene } from 'Engine/Core/Scene';
 import { addToArray,
          removeFromArray,
          includeInArray } from 'Engine/Utility/ArrayUtility';
 import { Service } from 'Engine/Decorator/Service';
+import { SceneManager } from 'Engine/Core/SceneManager';
 
-@Service()
-export class SceneManager {
+@Service(SceneManager)
+export class SceneManagerImplement implements SceneManager {
 
   private readonly scenes: Scene[] = [];
 

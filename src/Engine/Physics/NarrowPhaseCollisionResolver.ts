@@ -1,19 +1,9 @@
 import { Pair } from 'Engine/Physics/Pair';
-import { Service } from 'Engine/Decorator/Service';
 
-@Service()
-export class NarrowPhaseCollisionResolver {
+export const NarrowPhaseCollisionResolver = Symbol('NarrowPhaseCollisionResolver');
 
-  public resolve(pairs: ReadonlyArray<Pair>): void {
-    pairs.forEach(pair => this.resolvePair(pair));
-  }
+export interface NarrowPhaseCollisionResolver {
 
-  private resolvePair(pair: Pair): void {
-    const { bodyA, bodyB } = pair;
-    const collisionConctact = bodyA.collide(bodyB);
-    if (collisionConctact) {
-      collisionConctact.resolve();
-    }
-  }
+  resolve(pairs: ReadonlyArray<Pair>): void;
 
 }
