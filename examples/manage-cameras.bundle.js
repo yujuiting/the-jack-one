@@ -48,7 +48,7 @@ var LineRendererComponent_1 = __webpack_require__(25);
 var TextRendererComponent_1 = __webpack_require__(43);
 var PointerInput_1 = __webpack_require__(40);
 var RigidbodyComponent_1 = __webpack_require__(17);
-var texture = new Texture_1.Texture('Assets/circle.png');
+var texture = new Texture_1.Texture('../assets/circle.png');
 var Player = (function (_super) {
     __extends(Player, _super);
     function Player() {

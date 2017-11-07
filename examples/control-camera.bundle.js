@@ -514,7 +514,7 @@ var SpriteRendererComponent_1 = __webpack_require__(24);
 var LineRendererComponent_1 = __webpack_require__(25);
 var RigidbodyComponent_1 = __webpack_require__(17);
 var KeyboardInput_1 = __webpack_require__(39);
-var texture = new Texture_1.Texture('../Assets/circle.png');
+var texture = new Texture_1.Texture('../assets/circle.png');
 var CameraController = (function (_super) {
     __extends(CameraController, _super);
     function CameraController() {
