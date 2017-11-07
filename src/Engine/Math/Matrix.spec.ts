@@ -17,8 +17,8 @@ import { Vector } from './Vector';
 
   @test 'should write default value' () {
     const m = new Matrix([
-      [1, 2],
-      [3, 4]
+      [1, 2, 0],
+      [3, 4, 0]
     ]);
     expect(m[0][0]).to.equal(1);
     expect(m[0][1]).to.equal(2);
@@ -59,12 +59,12 @@ import { Vector } from './Vector';
 
   @test 'should multiply to self' () {
     const m1 = new Matrix([
-      [1, 2],
-      [3, 4]
+      [1, 2, 0],
+      [3, 4, 0]
     ]);
     const m2 = new Matrix([
-      [5, 6],
-      [7, 8]
+      [5, 6, 0],
+      [7, 8, 0]
     ]);
     m1.multiply(m2);
     expect(m1[0][0]).to.equal(19);
@@ -108,8 +108,8 @@ import { Vector } from './Vector';
 
   @test 'should clone' () {
     const m1 = new Matrix([
-      [1, 2],
-      [3, 4]
+      [1, 2, 0],
+      [3, 4, 0]
     ]);
     const m2 = m1.clone();
     expect(m1).not.to.equal(m2);
@@ -121,8 +121,8 @@ import { Vector } from './Vector';
 
   @test 'should invert from source' () {
     const m = new Matrix([
-      [1, 2],
-      [3, 4]
+      [1, 2, 0],
+      [3, 4, 0]
     ]);
 
     m.setTranslation(new Vector(5, 6));
@@ -141,8 +141,8 @@ import { Vector } from './Vector';
 
   @test 'should get inverse' () {
     const m = new Matrix([
-      [1, 2],
-      [3, 4]
+      [1, 2, 0],
+      [3, 4, 0]
     ]);
 
     m.setTranslation(new Vector(5, 6));
@@ -154,8 +154,8 @@ import { Vector } from './Vector';
 
   @test 'should to string' () {
     const m = new Matrix([
-      [1, 2],
-      [3, 4]
+      [1, 2, 0],
+      [3, 4, 0]
     ]);
     expect(m.toString()).to.equal('Matrix [1,2,0][3,4,0]');
   }

@@ -1,6 +1,11 @@
 import { Vector } from 'Engine/Math/Vector';
 
-export class Matrix {
+export interface MatrixLike {
+  [0]: [number, number, number];
+  [1]: [number, number, number];
+}
+
+export class Matrix implements MatrixLike {
 
   public static readonly Identity: Matrix = new Matrix();
 
@@ -8,23 +13,24 @@ export class Matrix {
    * [m11, m12, dx]
    * [m21, m22m dy]
    */
-  private _value: number[][] = [
+  private _value: MatrixLike = [
     [1, 0, 0],
     [0, 1, 0]
   ];
 
-  private _save: number[][][] = [];
+  private _save: MatrixLike[] = [];
 
-  public get [0](): number[] { return this._value[0]; }
-  public get [1](): number[] { return this._value[1]; }
+  public get [0](): [number, number, number] { return this._value[0]; }
+  public get [1](): [number, number, number] { return this._value[1]; }
 
-  constructor(value?: number[][]) {
+  constructor(value?: MatrixLike) {
     if (value !== void 0) {
-      for (let i = 0; i < 2; i++) {
-        for (let j = 0; j < 3; j++) {
-          this._value[i][j] = value[i][j] || this._value[i][j];
-        }
-      }
+      this[0][0] = value[0][0];
+      this[0][1] = value[0][1];
+      this[0][2] = value[0][2];
+      this[1][0] = value[1][0];
+      this[1][1] = value[1][1];
+      this[1][2] = value[1][2];
     }
     this.save();
   }
@@ -63,56 +69,55 @@ export class Matrix {
   }
 
   public setRotatation(radian: number): this {
-    const rotation = new Matrix([
-      [Math.cos(radian), -Math.sin(radian)],
-      [Math.sin(radian),  Math.cos(radian)]
+    /**
+     * TODO: m11, m22 has default value 1, that should be a bug?
+     */
+    const cos = Math.cos(radian) || 1;
+    const sin = Math.sin(radian);
+    return this.multiply([
+      [cos, -sin, 0],
+      [sin,  cos, 0]
     ]);
-    return this.multiply(rotation);
   }
 
   public setTranslation(position: Vector): this;
   public setTranslation(x: number, y: number): this;
   public setTranslation(positionOrX: Vector|number, y?: number): this {
-    let translation: Matrix;
     if (positionOrX instanceof Vector) {
-      translation = new Matrix([
+      return this.multiply([
         [1, 0, positionOrX.x],
         [0, 1, positionOrX.y]
       ]);
     } else if (y !== void 0) {
-      translation = new Matrix([
+      return this.multiply([
         [1, 0, positionOrX],
         [0, 1, y]
       ]);
-    } else {
-      return this;
     }
-
-    return this.multiply(translation);
+    return this;
   }
 
   public setScaling(magnification: Vector): this;
   public setScaling(x: number, y: number): this;
   public setScaling(magnificationOrX: Vector|number, y?: number): this {
-    let scaling: Matrix;
+    /**
+     * TODO: m11, m22 has default value 1, that should be a bug?
+     */
     if (magnificationOrX instanceof Vector) {
-      scaling = new Matrix([
-        [magnificationOrX.x, 0],
-        [0, magnificationOrX.y]
+      return this.multiply([
+        [magnificationOrX.x || 1, 0, 0],
+        [0, magnificationOrX.y || 1, 0]
       ]);
     } else if (y !== void 0) {
-      scaling = new Matrix([
-        [magnificationOrX, 0],
-        [0, y]
+      return this.multiply([
+        [magnificationOrX || 1, 0, 0],
+        [0, y || 1, 0]
       ]);
-    } else {
-      return this;
     }
-
-    return this.multiply(scaling);
+    return this;
   }
 
-  public multiply(other: Matrix): this {
+  public multiply(other: MatrixLike): this {
     const a1 = this[0][0];
     const b1 = this[0][1];
     const c1 = this[0][2];
@@ -158,7 +163,7 @@ export class Matrix {
     return this;
   }
 
-  public equalTo(another: Matrix): boolean {
+  public equalTo(another: MatrixLike): boolean {
     return this[0][0] === another[0][0] &&
            this[0][1] === another[0][1] &&
            this[0][2] === another[0][2] &&
@@ -167,7 +172,7 @@ export class Matrix {
            this[1][2] === another[1][2];
   }
 
-  public invertFrom(source: Matrix): this {
+  public invertFrom(source: MatrixLike): this {
     /**
      * [ a, b, c ]
      * [ d, e, f ]
@@ -201,10 +206,7 @@ export class Matrix {
   }
 
   public toString(): string {
-    const matrixString = this._value
-      .map(row => row.join(','))
-      .reduce((prev, curr) => prev += `[${curr}]`, '');
-
+    const matrixString = `[${this[0]}][${this[1]}]`;
     return `Matrix ${matrixString}`;
   }
 
