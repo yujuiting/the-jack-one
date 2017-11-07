@@ -8,6 +8,10 @@ dependencies:
   pre:
     - sudo apt-get update; sudo apt-get install libcairo2-dev libjpeg8-dev libpango1.0-dev libgif-dev build-essential g++
 
+branches:
+  only:
+    - master
+
 jobs:
   build:
     docker:
@@ -32,9 +36,5 @@ jobs:
         
       # run tests!
       - run: npm test
-
-    branches:
-      ignore:
-        - gh-pages
 
 
