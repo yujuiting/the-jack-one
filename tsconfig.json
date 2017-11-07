@@ -1,9 +1,8 @@
+// for editor
 {
   "compilerOptions": {
     "target": "es5",
     "moduleResolution": "node",
-    "sourceMap": true,
-    "declaration": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "noImplicitAny": true,
@@ -18,8 +17,7 @@
     "baseUrl": "src",
     "paths": {
       "*": ["*"]
-    },
-    "outDir": "build"
+    }
   },
   "exclude": [
     "node_modules",

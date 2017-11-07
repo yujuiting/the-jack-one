@@ -51,7 +51,7 @@ export function observeEvent<T extends Event>(node: EventTarget,
 /**
  * To describe any list-like object from browser.
  */
-interface ListOf<T> {
+export interface ListOf<T> {
   readonly length: number;
   item(index: number): T;
   [index: number]: T;

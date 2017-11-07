@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "tsc",
+    "build": "webpack",
     "serve": "webpack-dev-server",
     "lint": "tslint --project .",
     "test": "TS_NODE_PROJECT=tsconfig.test.json nyc mocha --opts .mocha",
