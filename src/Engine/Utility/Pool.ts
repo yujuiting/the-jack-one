@@ -23,8 +23,9 @@ export class Pool<T extends Recyclable> {
   public readonly size = 0;
 
   constructor(private factory: Factory<T>,
-              public readonly max: number = Infinity) {
-    (<InternalPool>this).size = max <= 1024 ? max : 1024;
+              public readonly max: number = Infinity,
+              initSize: number = max <= 1024 ? max : 1024) {
+    (<InternalPool>this).size = initSize;
     for (let i = 0; i < this.size; i++) {
       const instance = factory();
       instance.destroy();

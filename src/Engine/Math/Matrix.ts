@@ -1,11 +1,21 @@
 import { Vector } from 'Engine/Math/Vector';
+import { Recyclable, Pool } from 'Engine/Utility/Pool';
 
 export interface MatrixLike {
   [0]: [number, number, number];
   [1]: [number, number, number];
 }
 
-export class Matrix implements MatrixLike {
+export class Matrix implements MatrixLike, Recyclable {
+
+  private static pool: Pool<Matrix> = new Pool((value?: MatrixLike) => new Matrix(value), Infinity, 64);
+
+  public static Get(value?: MatrixLike): Matrix {
+    // matrix pool did not have limit
+    return (<Matrix>this.pool.get(value));
+  }
+
+  public static Put(matrix: Matrix): void { this.pool.put(matrix); }
 
   public static readonly Identity: Matrix = new Matrix();
 
@@ -22,6 +32,10 @@ export class Matrix implements MatrixLike {
 
   public get [0](): [number, number, number] { return this._value[0]; }
   public get [1](): [number, number, number] { return this._value[1]; }
+
+  private _canRecycle = false;
+
+  public get canRecycle(): boolean { return this._canRecycle; }
 
   constructor(value?: MatrixLike) {
     if (value !== void 0) {
@@ -59,12 +73,21 @@ export class Matrix implements MatrixLike {
   /**
    * Reset matrix to identity, and also clear saved states.
    */
-  public reset(): this {
+  public reset(value?: MatrixLike): this {
     this._save = [];
-    this._value = [
-      [1, 0, 0],
-      [0, 1, 0]
-    ];
+    if (value !== void 0) {
+      this._value[0][0] = value[0][0];
+      this._value[0][1] = value[0][1];
+      this._value[0][2] = value[0][2];
+      this._value[1][0] = value[1][0];
+      this._value[1][1] = value[1][1];
+      this._value[1][2] = value[1][2];
+    } else {
+      this._value = [
+        [1, 0, 0],
+        [0, 1, 0]
+      ];
+    }
     return this;
   }
 
@@ -142,7 +165,7 @@ export class Matrix implements MatrixLike {
   public multiplyToPoint(point: Vector): this {
     const x = point.x;
     const y = point.y;
-    point.setTo(
+    point.reset(
       this._value[0][0] * x + this._value[0][1] * y + this._value[0][2] * 1,
       this._value[1][0] * x + this._value[1][1] * y + this._value[1][2] * 1
     );
@@ -156,7 +179,7 @@ export class Matrix implements MatrixLike {
   public multiplyToVector(vector: Vector): this {
     const x = vector.x;
     const y = vector.y;
-    vector.setTo(
+    vector.reset(
       this._value[0][0] * x + this._value[0][1] * y + 0 * 0,
       this._value[1][0] * x + this._value[1][1] * y + 0 * 0
     );
@@ -203,6 +226,10 @@ export class Matrix implements MatrixLike {
 
   public clone(): Matrix {
     return new Matrix(this._value);
+  }
+
+  public destroy(): void {
+    this._canRecycle = true;
   }
 
   public toString(): string {

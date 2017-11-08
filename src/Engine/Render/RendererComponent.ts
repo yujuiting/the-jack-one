@@ -9,6 +9,7 @@ import { BrowserDelegate } from 'Engine/Utility/BrowserDelegate';
 import { Camera } from 'Engine/Core/Camera';
 import { Vector } from 'Engine/Math/Vector';
 import { Inject } from 'Engine/Decorator/Inject';
+import { Matrix } from 'Engine/Math/Matrix';
 
 /**
  * Base renderer
@@ -77,20 +78,18 @@ export class RendererComponent extends Component {
     let minY = Number.MAX_VALUE;
     let maxX = -Number.MAX_VALUE;
     let maxY = -Number.MAX_VALUE;
-    const e = Vector.Get(this.canvas.width * 0.5, this.canvas.height * 0.5);
-    const c = this.transform.position;
-    const s = this.transform.scale;
-    Vector.Put(e);
+
+    const dx = this.canvas.width * 0.5;
+    const dy = this.canvas.height * 0.5;
+
     [
-      Vector.Get(e.x, e.y),
-      Vector.Get(-e.x, e.y),
-      Vector.Get(-e.x, -e.y),
-      Vector.Get(e.x, -e.y)
+      Vector.Get(dx, dy),
+      Vector.Get(-dx, dy),
+      Vector.Get(-dx, -dy),
+      Vector.Get(dx, -dy)
     ].forEach(p => {
-      p.multiply(s.x, s.y);
-      // perform y-axis up rotation.
-      p.rotate(-this.transform.rotation);
-      p.add(c);
+      this.transform.toWorldMatrix.multiplyToPoint(p);
+
       if (p.x < minX) {
         minX = p.x;
       }
