@@ -3,6 +3,8 @@ import 'Engine/imports';
 import 'Engine/Core/EngineImplement';
 import 'Engine/Core/GameObjectInitializerImplement';
 import 'Engine/Core/SceneManagerImplement';
+import 'Engine/Core/LoggerImplement';
+
 import 'Engine/Display/ScreenImplement';
 
 import 'Engine/Input/KeyboardInputImplement';

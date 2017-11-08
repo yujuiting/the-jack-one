@@ -13,6 +13,12 @@ import { Vector } from 'Engine/Math/Vector';
 import { GameObjectInitializer } from 'Engine/Core/GameObjectInitializer';
 import { RenderProcess } from 'Engine/Render/RenderProcess';
 import { ifdef, DEBUG_PHYSICS, DEBUG } from 'Engine/runtime';
+import { Logger } from 'Engine/Core/Logger';
+import { Screen } from 'Engine/Display/Screen';
+import { BrowserDelegate } from 'Engine/Utility/BrowserDelegate';
+import { Subscription } from 'rxjs/Subscription';
+import { Time } from 'Engine/Time/Time';
+import { Color } from 'Engine/Display/Color';
 
 /**
  * Scene manage game objects and resources.
@@ -30,15 +36,25 @@ export class Scene extends BaseObject {
 
   private cameras: Camera[] = [];
 
+  private rightTop = new Vector();
+
+  private resizeSubscription: Subscription;
+
   public get isLoaded(): boolean { return this.resources.isLoaded; }
 
   constructor(@Inject(BroadPhaseCollisionResolver) private broadPhaseCollisionResolver: BroadPhaseCollisionResolver,
               @Inject(NarrowPhaseCollisionResolver) private narrowPhaseCollisionResolver: NarrowPhaseCollisionResolver,
               @Inject(GameObjectInitializer) private gameObjectInitializer: GameObjectInitializer,
               @Inject(RenderProcess) private renderProcess: RenderProcess,
-              @Inject(MainCamera) public mainCamera: Camera) {
+              @Inject(MainCamera) public mainCamera: Camera,
+              @Inject(Logger) private logger: Logger,
+              @Inject(Screen) private screen: Screen,
+              @Inject(BrowserDelegate) private browser: BrowserDelegate,
+              @Inject(Time) private time: Time) {
     super();
     this.add(this.mainCamera);
+    this.resizeSubscription = browser.resize$.subscribe(() => this.onResize());
+    this.rightTop.setTo(this.screen.width, 0);
   }
 
   public add(gameObject: GameObject, at?: Vector): boolean {
@@ -95,6 +111,7 @@ export class Scene extends BaseObject {
     this.gameObjects.forEachChildren(gameObject => gameObject.update());
     this.broadPhaseCollisionResolver.update();
     this.narrowPhaseCollisionResolver.resolve(this.broadPhaseCollisionResolver.pairs);
+    ifdef(DEBUG, () => this.logger.update());
   }
 
   public lateUpdate(): void {
@@ -110,6 +127,10 @@ export class Scene extends BaseObject {
     this.renderProcess.useContext(ctx, width, height);
     this.cameras.forEach(camera => this.renderProcess.render(camera, this.gameObjects));
     ifdef(DEBUG_PHYSICS, () => this.cameras.forEach(camera => this.broadPhaseCollisionResolver.debugRender(ctx, camera)));
+    ifdef(DEBUG, () => {
+      this.logger.render(ctx);
+      this.debugRender(ctx);
+    });
   }
 
   public postRender(): void {
@@ -120,13 +141,39 @@ export class Scene extends BaseObject {
     this.gameObjectInitializer.resolve();
   }
 
+  public reset(): void {
+    this.reset();
+    this.resizeSubscription = this.browser.resize$.subscribe(() => this.onResize());
+  }
+
   public destroy(): void {
     super.destroy();
     this.gameObjects.forEachChildren(gameObject => gameObject.destroy());
+    this.resizeSubscription.unsubscribe();
   }
 
   public toString(): string {
     return `Scene(${this.name})`;
+  }
+
+  private debugRender(ctx: CanvasRenderingContext2D): void {
+    const deltaTime = ((this.time.deltaTime * 100) | 0) * 0.01;
+    const fps = ((1000 / deltaTime * 100) | 0) * 0.01;
+
+    ctx.save();
+    ctx.fillStyle = Color.White.toHexString();
+
+    const deltaTimeText = `deltaTime: ${deltaTime}`;
+    const deltaTimeWidth = ctx.measureText(deltaTimeText).width;
+    ctx.fillText(deltaTimeText, this.rightTop.x - deltaTimeWidth, this.rightTop.y + 12);
+
+    const fpsText = `fps: ${fps}`;
+    const fpsWidth = ctx.measureText(fpsText).width;
+    ctx.fillText(fpsText, this.rightTop.x - fpsWidth, this.rightTop.y + 30);
+  }
+
+  private onResize(): void {
+    this.rightTop.setTo(this.screen.width, 0);
   }
 
 }
