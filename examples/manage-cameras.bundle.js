@@ -1,6 +1,6 @@
-webpackJsonp([1],{
+webpackJsonp([2],{
 
-/***/ 114:
+/***/ 12:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -28,236 +28,15 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-__webpack_require__(26);
-var GameObject_1 = __webpack_require__(6);
+var GameObject_1 = __webpack_require__(2);
 var Component_1 = __webpack_require__(10);
-var Scene_1 = __webpack_require__(33);
-var SceneManager_1 = __webpack_require__(15);
-var Screen_1 = __webpack_require__(19);
-var Camera_1 = __webpack_require__(63);
-var runtime_1 = __webpack_require__(12);
-var Class_1 = __webpack_require__(9);
-var Inject_1 = __webpack_require__(0);
-var Sprite_1 = __webpack_require__(23);
-var Color_1 = __webpack_require__(7);
-var Bounds_1 = __webpack_require__(29);
-var Texture_1 = __webpack_require__(22);
+var TransformComponent_1 = __webpack_require__(14);
 var Vector_1 = __webpack_require__(1);
-var SpriteRendererComponent_1 = __webpack_require__(24);
-var LineRendererComponent_1 = __webpack_require__(25);
-var TextRendererComponent_1 = __webpack_require__(43);
-var PointerInput_1 = __webpack_require__(40);
-var RigidbodyComponent_1 = __webpack_require__(17);
-var texture = new Texture_1.Texture('../assets/circle.png');
-var Player = (function (_super) {
-    __extends(Player, _super);
-    function Player() {
-        var _this = _super !== null && _super.apply(this, arguments) || this;
-        _this.destination = new Vector_1.Vector();
-        _this.moveSpeed = 100;
-        _this.isMoving = false;
-        return _this;
-    }
-    Player.prototype.start = function () {
-        _super.prototype.start.call(this);
-        var sprite = new Sprite_1.Sprite(texture);
-        this.transform.scale.setTo(0.25);
-        this.renderer = this.addComponent(SpriteRendererComponent_1.SpriteRendererComponent);
-        this.renderer.sprite = sprite;
-        this.body = this.addComponent(RigidbodyComponent_1.RigidbodyComponent);
-    };
-    Player.prototype.move = function (destination) {
-        this.isMoving = true;
-        this.destination.copy(destination);
-        this.body.velocity
-            .copy(destination)
-            .subtract(this.transform.position)
-            .normalize()
-            .multiply(this.moveSpeed);
-    };
-    Player.prototype.stopMove = function () {
-        this.isMoving = false;
-        this.body.velocity.reset();
-    };
-    Player.prototype.update = function () {
-        _super.prototype.update.call(this);
-        if (this.isMoving) {
-            if (this.transform.position.distanceTo(this.destination) < 10) {
-                this.stopMove();
-            }
-        }
-    };
-    Player = __decorate([
-        Class_1.Class()
-    ], Player);
-    return Player;
-}(GameObject_1.GameObject));
-var Box = (function (_super) {
-    __extends(Box, _super);
-    function Box() {
-        var _this = _super !== null && _super.apply(this, arguments) || this;
-        _this.size = 300;
-        return _this;
-    }
-    Box.prototype.start = function () {
-        _super.prototype.start.call(this);
-        var outline = this.addComponent(LineRendererComponent_1.LineRendererComponent);
-        var halfSize = this.size / 2;
-        outline.addPoint(new Vector_1.Vector(halfSize, halfSize), new Vector_1.Vector(halfSize, -halfSize), new Vector_1.Vector(-halfSize, -halfSize), new Vector_1.Vector(-halfSize, halfSize));
-        outline.closePath = true;
-        outline.strokeColor = Color_1.Color.White;
-    };
-    Box = __decorate([
-        Class_1.Class()
-    ], Box);
-    return Box;
-}(GameObject_1.GameObject));
-var Label = (function (_super) {
-    __extends(Label, _super);
-    function Label() {
-        var _this = _super !== null && _super.apply(this, arguments) || this;
-        _this.text = '';
-        return _this;
-    }
-    Label.prototype.start = function () {
-        _super.prototype.start.call(this);
-        this.renderer = this.addComponent(TextRendererComponent_1.TextRendererComponent);
-        this.renderer.text = this.text;
-    };
-    Label = __decorate([
-        Class_1.Class()
-    ], Label);
-    return Label;
-}(GameObject_1.GameObject));
-var CameraFollow = (function (_super) {
-    __extends(CameraFollow, _super);
-    function CameraFollow() {
-        var _this = _super !== null && _super.apply(this, arguments) || this;
-        _this.bounds = new Bounds_1.Bounds();
-        _this.isFollowing = false;
-        _this.relative = new Vector_1.Vector();
-        return _this;
-    }
-    CameraFollow.prototype.follow = function (target) { this.target = target; };
-    CameraFollow.prototype.update = function () {
-        if (!this.target) {
-            return;
-        }
-        var cameraPosition = this.host.transform.position;
-        var targetPosition = this.target.transform.position;
-        this.bounds.center.copy(cameraPosition);
-        if (this.isFollowing) {
-            cameraPosition.copy(targetPosition).add(this.relative);
-            if (this.bounds.containPoint(targetPosition)) {
-                this.isFollowing = false;
-            }
-        }
-        else {
-            if (!this.bounds.containPoint(targetPosition)) {
-                this.isFollowing = true;
-                this.relative.copy(cameraPosition).subtract(targetPosition);
-            }
-        }
-    };
-    CameraFollow = __decorate([
-        Class_1.Class()
-    ], CameraFollow);
-    return CameraFollow;
-}(Component_1.Component));
-var Game = (function () {
-    function Game(sceneManager, pointerInput, screen) {
-        var _this = this;
-        this.screen = screen;
-        this.player = runtime_1.instantiate(Player);
-        this.scene = runtime_1.instantiate(Scene_1.Scene);
-        this.mainCamera = this.scene.mainCamera;
-        this.subCamera = runtime_1.instantiate(Camera_1.Camera);
-        this.scene.resources.add(texture);
-        this.scene.add(this.player);
-        this.scene.add(this.subCamera);
-        this.scene.add(runtime_1.instantiate(Box));
-        sceneManager.add(this.scene);
-        this.mainCamera.backgroundColor = Color_1.Color.CreateByHexRgb('#4A687F');
-        var cameraFollow = this.mainCamera.addComponent(CameraFollow);
-        cameraFollow.bounds.extents.setTo(50, 50);
-        cameraFollow.follow(this.player);
-        var halfScreenWidth = screen.width * 0.5;
-        this.mainCamera.setSize(halfScreenWidth, screen.height);
-        this.subCamera.setSize(halfScreenWidth, screen.height);
-        this.subCamera.rect.position.setTo(halfScreenWidth, 0);
-        pointerInput.pointerStart$.subscribe(function (e) { return _this.onPointerStart(e); });
-        var mainCameraLabel = runtime_1.instantiate(Label);
-        mainCameraLabel.text = 'Main Camera, click to move';
-        mainCameraLabel.layer = 1 << 10;
-        this.scene.add(mainCameraLabel);
-        this.mainCamera.cullingMask = this.mainCamera.cullingMask | mainCameraLabel.layer;
-        var subCameraLabel = runtime_1.instantiate(Label);
-        subCameraLabel.text = 'Sub Camera';
-        subCameraLabel.layer = 1 << 11;
-        this.scene.add(subCameraLabel);
-        this.subCamera.cullingMask = this.subCamera.cullingMask | subCameraLabel.layer;
-    }
-    Game.prototype.onPointerStart = function (e) {
-        var location = e.locations[0];
-        var halfScreenWidth = this.screen.width * 0.5;
-        if (location.x > halfScreenWidth) {
-            return;
-        }
-        var worldPosition = this.mainCamera.screenToWorld(location);
-        this.player.move(worldPosition);
-    };
-    Game = __decorate([
-        Class_1.Class(),
-        __param(0, Inject_1.Inject(SceneManager_1.SceneManager)),
-        __param(1, Inject_1.Inject(PointerInput_1.PointerInput)),
-        __param(2, Inject_1.Inject(Screen_1.Screen)),
-        __metadata("design:paramtypes", [Object, Object, Object])
-    ], Game);
-    return Game;
-}());
-runtime_1.instantiate(Game);
-runtime_1.bootstrap().catch(console.error);
-
-
-/***/ }),
-
-/***/ 17:
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __metadata = (this && this.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
-var __param = (this && this.__param) || function (paramIndex, decorator) {
-    return function (target, key) { decorator(target, key, paramIndex); }
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-var GameObject_1 = __webpack_require__(6);
-var Component_1 = __webpack_require__(10);
-var TransformComponent_1 = __webpack_require__(16);
-var Vector_1 = __webpack_require__(1);
-var Engine_1 = __webpack_require__(21);
-var Time_1 = __webpack_require__(20);
-var ForceMode_1 = __webpack_require__(31);
-var UniqueComponent_1 = __webpack_require__(11);
-var RequireComponent_1 = __webpack_require__(30);
+var Engine_1 = __webpack_require__(23);
+var Time_1 = __webpack_require__(9);
+var ForceMode_1 = __webpack_require__(25);
+var UniqueComponent_1 = __webpack_require__(15);
+var RequireComponent_1 = __webpack_require__(31);
 var Inject_1 = __webpack_require__(0);
 var DoublePI = Math.PI * 2;
 var RigidbodyComponent = (function (_super) {
@@ -453,7 +232,228 @@ exports.RigidbodyComponent = RigidbodyComponent;
 
 /***/ }),
 
-/***/ 24:
+/***/ 122:
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+__webpack_require__(27);
+var GameObject_1 = __webpack_require__(2);
+var Component_1 = __webpack_require__(10);
+var Scene_1 = __webpack_require__(32);
+var SceneManager_1 = __webpack_require__(18);
+var Screen_1 = __webpack_require__(17);
+var Camera_1 = __webpack_require__(75);
+var runtime_1 = __webpack_require__(11);
+var Class_1 = __webpack_require__(6);
+var Inject_1 = __webpack_require__(0);
+var Sprite_1 = __webpack_require__(16);
+var Color_1 = __webpack_require__(8);
+var Bounds_1 = __webpack_require__(30);
+var Texture_1 = __webpack_require__(26);
+var Vector_1 = __webpack_require__(1);
+var SpriteRendererComponent_1 = __webpack_require__(20);
+var LineRendererComponent_1 = __webpack_require__(52);
+var TextRendererComponent_1 = __webpack_require__(51);
+var PointerInput_1 = __webpack_require__(41);
+var RigidbodyComponent_1 = __webpack_require__(12);
+var texture = new Texture_1.Texture('../assets/circle.png');
+var Player = (function (_super) {
+    __extends(Player, _super);
+    function Player() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.destination = new Vector_1.Vector();
+        _this.moveSpeed = 100;
+        _this.isMoving = false;
+        return _this;
+    }
+    Player.prototype.start = function () {
+        _super.prototype.start.call(this);
+        var sprite = new Sprite_1.Sprite(texture);
+        this.transform.scale.setTo(0.25);
+        this.renderer = this.addComponent(SpriteRendererComponent_1.SpriteRendererComponent);
+        this.renderer.sprite = sprite;
+        this.body = this.addComponent(RigidbodyComponent_1.RigidbodyComponent);
+    };
+    Player.prototype.move = function (destination) {
+        this.isMoving = true;
+        this.destination.copy(destination);
+        this.body.velocity
+            .copy(destination)
+            .subtract(this.transform.position)
+            .normalize()
+            .multiply(this.moveSpeed);
+    };
+    Player.prototype.stopMove = function () {
+        this.isMoving = false;
+        this.body.velocity.reset();
+    };
+    Player.prototype.update = function () {
+        _super.prototype.update.call(this);
+        if (this.isMoving) {
+            if (this.transform.position.distanceTo(this.destination) < 10) {
+                this.stopMove();
+            }
+        }
+    };
+    Player = __decorate([
+        Class_1.Class()
+    ], Player);
+    return Player;
+}(GameObject_1.GameObject));
+var Box = (function (_super) {
+    __extends(Box, _super);
+    function Box() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.size = 300;
+        return _this;
+    }
+    Box.prototype.start = function () {
+        _super.prototype.start.call(this);
+        var outline = this.addComponent(LineRendererComponent_1.LineRendererComponent);
+        var halfSize = this.size / 2;
+        outline.addPoint(new Vector_1.Vector(halfSize, halfSize), new Vector_1.Vector(halfSize, -halfSize), new Vector_1.Vector(-halfSize, -halfSize), new Vector_1.Vector(-halfSize, halfSize));
+        outline.closePath = true;
+        outline.strokeColor = Color_1.Color.White;
+    };
+    Box = __decorate([
+        Class_1.Class()
+    ], Box);
+    return Box;
+}(GameObject_1.GameObject));
+var Label = (function (_super) {
+    __extends(Label, _super);
+    function Label() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.text = '';
+        return _this;
+    }
+    Label.prototype.start = function () {
+        _super.prototype.start.call(this);
+        this.renderer = this.addComponent(TextRendererComponent_1.TextRendererComponent);
+        this.renderer.text = this.text;
+    };
+    Label = __decorate([
+        Class_1.Class()
+    ], Label);
+    return Label;
+}(GameObject_1.GameObject));
+var CameraFollow = (function (_super) {
+    __extends(CameraFollow, _super);
+    function CameraFollow() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.bounds = new Bounds_1.Bounds();
+        _this.isFollowing = false;
+        _this.relative = new Vector_1.Vector();
+        return _this;
+    }
+    CameraFollow.prototype.follow = function (target) { this.target = target; };
+    CameraFollow.prototype.update = function () {
+        if (!this.target) {
+            return;
+        }
+        var cameraPosition = this.host.transform.position;
+        var targetPosition = this.target.transform.position;
+        this.bounds.center.copy(cameraPosition);
+        if (this.isFollowing) {
+            cameraPosition.copy(targetPosition).add(this.relative);
+            if (this.bounds.containPoint(targetPosition)) {
+                this.isFollowing = false;
+            }
+        }
+        else {
+            if (!this.bounds.containPoint(targetPosition)) {
+                this.isFollowing = true;
+                this.relative.copy(cameraPosition).subtract(targetPosition);
+            }
+        }
+    };
+    CameraFollow = __decorate([
+        Class_1.Class()
+    ], CameraFollow);
+    return CameraFollow;
+}(Component_1.Component));
+var Game = (function () {
+    function Game(sceneManager, pointerInput, screen) {
+        var _this = this;
+        this.screen = screen;
+        this.player = runtime_1.instantiate(Player);
+        this.scene = runtime_1.instantiate(Scene_1.Scene);
+        this.mainCamera = this.scene.mainCamera;
+        this.subCamera = runtime_1.instantiate(Camera_1.Camera);
+        this.scene.resources.add(texture);
+        this.scene.add(this.player);
+        this.scene.add(this.subCamera);
+        this.scene.add(runtime_1.instantiate(Box));
+        sceneManager.add(this.scene);
+        this.mainCamera.backgroundColor = Color_1.Color.CreateByHexRgb('#4A687F');
+        var cameraFollow = this.mainCamera.addComponent(CameraFollow);
+        cameraFollow.bounds.extents.setTo(50, 50);
+        cameraFollow.follow(this.player);
+        var halfScreenWidth = screen.width * 0.5;
+        this.mainCamera.setSize(halfScreenWidth, screen.height);
+        this.subCamera.setSize(halfScreenWidth, screen.height);
+        this.subCamera.rect.position.setTo(halfScreenWidth, 0);
+        pointerInput.pointerStart$.subscribe(function (e) { return _this.onPointerStart(e); });
+        var mainCameraLabel = runtime_1.instantiate(Label);
+        mainCameraLabel.text = 'Main Camera, click to move';
+        mainCameraLabel.layer = 1 << 10;
+        this.scene.add(mainCameraLabel);
+        this.mainCamera.cullingMask = this.mainCamera.cullingMask | mainCameraLabel.layer;
+        var subCameraLabel = runtime_1.instantiate(Label);
+        subCameraLabel.text = 'Sub Camera';
+        subCameraLabel.layer = 1 << 11;
+        this.scene.add(subCameraLabel);
+        this.subCamera.cullingMask = this.subCamera.cullingMask | subCameraLabel.layer;
+    }
+    Game.prototype.onPointerStart = function (e) {
+        var location = e.locations[0];
+        var halfScreenWidth = this.screen.width * 0.5;
+        if (location.x > halfScreenWidth) {
+            return;
+        }
+        var worldPosition = this.mainCamera.screenToWorld(location);
+        this.player.move(worldPosition);
+    };
+    Game = __decorate([
+        Class_1.Class(),
+        __param(0, Inject_1.Inject(SceneManager_1.SceneManager)),
+        __param(1, Inject_1.Inject(PointerInput_1.PointerInput)),
+        __param(2, Inject_1.Inject(Screen_1.Screen)),
+        __metadata("design:paramtypes", [Object, Object, Object])
+    ], Game);
+    return Game;
+}());
+runtime_1.instantiate(Game);
+runtime_1.bootstrap().catch(console.error);
+
+
+/***/ }),
+
+/***/ 51:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -475,43 +475,53 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var RendererComponent_1 = __webpack_require__(8);
-var UniqueComponent_1 = __webpack_require__(11);
-var SpriteRendererComponent = (function (_super) {
-    __extends(SpriteRendererComponent, _super);
-    function SpriteRendererComponent() {
-        return _super !== null && _super.apply(this, arguments) || this;
+var RendererComponent_1 = __webpack_require__(24);
+var Color_1 = __webpack_require__(8);
+var Class_1 = __webpack_require__(6);
+var TextRendererComponent = (function (_super) {
+    __extends(TextRendererComponent, _super);
+    function TextRendererComponent() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.text = '';
+        _this.maxWidth = Number.MAX_VALUE;
+        _this.fillColor = Color_1.Color.White;
+        _this.fontSize = 16;
+        _this.fontFamily = 'Arial';
+        _this.fontWeight = 100;
+        _this.fontStyle = 'normal';
+        _this.fontVariant = 'normal';
+        _this.actualWidth = 0;
+        return _this;
     }
-    SpriteRendererComponent.prototype.update = function () {
+    TextRendererComponent.prototype.update = function () {
         _super.prototype.update.call(this);
-        if (this.sprite) {
-            var _a = this.sprite, width = _a.width, height = _a.height;
-            this.canvas.width = width;
-            this.canvas.height = height;
-        }
+        this.ctx.font = this.fontStyle + " " + this.fontVariant + " " + this.fontWeight + " " + this.fontSize + "px " + this.fontFamily;
+        this.actualWidth = this.ctx.measureText(this.text).width;
+        this.canvas.width = this.actualWidth;
+        this.canvas.height = this.fontSize;
     };
-    SpriteRendererComponent.prototype.render = function () {
-        if (!this.sprite) {
-            return;
-        }
+    TextRendererComponent.prototype.render = function () {
         var ctx = this.ctx;
-        var _a = this.canvas, width = _a.width, height = _a.height;
-        ctx.clearRect(0, 0, width, height);
-        ctx.save();
-        ctx.drawImage(this.sprite.canvas, 0, 0);
-        ctx.restore();
+        if (this.strokeColor) {
+            ctx.strokeStyle = this.strokeColor.toHexString();
+            ctx.strokeText(this.text, 0, this.fontSize, this.maxWidth);
+        }
+        if (this.fillColor) {
+            ctx.fillStyle = this.fillColor.toHexString();
+            ctx.fillText(this.text, 0, this.fontSize, this.maxWidth);
+        }
     };
-    SpriteRendererComponent = __decorate([
-        UniqueComponent_1.UniqueComponent()
-    ], SpriteRendererComponent);
-    return SpriteRendererComponent;
+    TextRendererComponent = __decorate([
+        Class_1.Class()
+    ], TextRendererComponent);
+    return TextRendererComponent;
 }(RendererComponent_1.RendererComponent));
-exports.SpriteRendererComponent = SpriteRendererComponent;
+exports.TextRendererComponent = TextRendererComponent;
 
 
 /***/ }),
 
-/***/ 25:
+/***/ 52:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -527,9 +537,9 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var RendererComponent_1 = __webpack_require__(8);
-var Color_1 = __webpack_require__(7);
-var ArrayUtility_1 = __webpack_require__(5);
+var RendererComponent_1 = __webpack_require__(24);
+var Color_1 = __webpack_require__(8);
+var ArrayUtility_1 = __webpack_require__(7);
 var LineRendererComponent = (function (_super) {
     __extends(LineRendererComponent, _super);
     function LineRendererComponent() {
@@ -620,75 +630,7 @@ var LineRendererComponent = (function (_super) {
 exports.LineRendererComponent = LineRendererComponent;
 
 
-/***/ }),
-
-/***/ 43:
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-var RendererComponent_1 = __webpack_require__(8);
-var Color_1 = __webpack_require__(7);
-var Class_1 = __webpack_require__(9);
-var TextRendererComponent = (function (_super) {
-    __extends(TextRendererComponent, _super);
-    function TextRendererComponent() {
-        var _this = _super !== null && _super.apply(this, arguments) || this;
-        _this.text = '';
-        _this.maxWidth = Number.MAX_VALUE;
-        _this.fillColor = Color_1.Color.White;
-        _this.fontSize = 16;
-        _this.fontFamily = 'Arial';
-        _this.fontWeight = 100;
-        _this.fontStyle = 'normal';
-        _this.fontVariant = 'normal';
-        _this.actualWidth = 0;
-        return _this;
-    }
-    TextRendererComponent.prototype.update = function () {
-        _super.prototype.update.call(this);
-        this.ctx.font = this.fontStyle + " " + this.fontVariant + " " + this.fontWeight + " " + this.fontSize + "px " + this.fontFamily;
-        this.actualWidth = this.ctx.measureText(this.text).width;
-        this.canvas.width = this.actualWidth;
-        this.canvas.height = this.fontSize;
-    };
-    TextRendererComponent.prototype.render = function () {
-        var ctx = this.ctx;
-        if (this.strokeColor) {
-            ctx.strokeStyle = this.strokeColor.toHexString();
-            ctx.strokeText(this.text, 0, this.fontSize, this.maxWidth);
-        }
-        if (this.fillColor) {
-            ctx.fillStyle = this.fillColor.toHexString();
-            ctx.fillText(this.text, 0, this.fontSize, this.maxWidth);
-        }
-    };
-    TextRendererComponent = __decorate([
-        Class_1.Class()
-    ], TextRendererComponent);
-    return TextRendererComponent;
-}(RendererComponent_1.RendererComponent));
-exports.TextRendererComponent = TextRendererComponent;
-
-
 /***/ })
 
-},[114]);
+},[122]);
 //# sourceMappingURL=manage-cameras.bundle.js.map

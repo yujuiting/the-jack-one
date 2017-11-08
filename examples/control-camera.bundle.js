@@ -1,6 +1,6 @@
-webpackJsonp([2],{
+webpackJsonp([3],{
 
-/***/ 17:
+/***/ 12:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -28,15 +28,15 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var GameObject_1 = __webpack_require__(6);
+var GameObject_1 = __webpack_require__(2);
 var Component_1 = __webpack_require__(10);
-var TransformComponent_1 = __webpack_require__(16);
+var TransformComponent_1 = __webpack_require__(14);
 var Vector_1 = __webpack_require__(1);
-var Engine_1 = __webpack_require__(21);
-var Time_1 = __webpack_require__(20);
-var ForceMode_1 = __webpack_require__(31);
-var UniqueComponent_1 = __webpack_require__(11);
-var RequireComponent_1 = __webpack_require__(30);
+var Engine_1 = __webpack_require__(23);
+var Time_1 = __webpack_require__(9);
+var ForceMode_1 = __webpack_require__(25);
+var UniqueComponent_1 = __webpack_require__(15);
+var RequireComponent_1 = __webpack_require__(31);
 var Inject_1 = __webpack_require__(0);
 var DoublePI = Math.PI * 2;
 var RigidbodyComponent = (function (_super) {
@@ -232,7 +232,7 @@ exports.RigidbodyComponent = RigidbodyComponent;
 
 /***/ }),
 
-/***/ 24:
+/***/ 51:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -254,43 +254,53 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var RendererComponent_1 = __webpack_require__(8);
-var UniqueComponent_1 = __webpack_require__(11);
-var SpriteRendererComponent = (function (_super) {
-    __extends(SpriteRendererComponent, _super);
-    function SpriteRendererComponent() {
-        return _super !== null && _super.apply(this, arguments) || this;
+var RendererComponent_1 = __webpack_require__(24);
+var Color_1 = __webpack_require__(8);
+var Class_1 = __webpack_require__(6);
+var TextRendererComponent = (function (_super) {
+    __extends(TextRendererComponent, _super);
+    function TextRendererComponent() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.text = '';
+        _this.maxWidth = Number.MAX_VALUE;
+        _this.fillColor = Color_1.Color.White;
+        _this.fontSize = 16;
+        _this.fontFamily = 'Arial';
+        _this.fontWeight = 100;
+        _this.fontStyle = 'normal';
+        _this.fontVariant = 'normal';
+        _this.actualWidth = 0;
+        return _this;
     }
-    SpriteRendererComponent.prototype.update = function () {
+    TextRendererComponent.prototype.update = function () {
         _super.prototype.update.call(this);
-        if (this.sprite) {
-            var _a = this.sprite, width = _a.width, height = _a.height;
-            this.canvas.width = width;
-            this.canvas.height = height;
-        }
+        this.ctx.font = this.fontStyle + " " + this.fontVariant + " " + this.fontWeight + " " + this.fontSize + "px " + this.fontFamily;
+        this.actualWidth = this.ctx.measureText(this.text).width;
+        this.canvas.width = this.actualWidth;
+        this.canvas.height = this.fontSize;
     };
-    SpriteRendererComponent.prototype.render = function () {
-        if (!this.sprite) {
-            return;
-        }
+    TextRendererComponent.prototype.render = function () {
         var ctx = this.ctx;
-        var _a = this.canvas, width = _a.width, height = _a.height;
-        ctx.clearRect(0, 0, width, height);
-        ctx.save();
-        ctx.drawImage(this.sprite.canvas, 0, 0);
-        ctx.restore();
+        if (this.strokeColor) {
+            ctx.strokeStyle = this.strokeColor.toHexString();
+            ctx.strokeText(this.text, 0, this.fontSize, this.maxWidth);
+        }
+        if (this.fillColor) {
+            ctx.fillStyle = this.fillColor.toHexString();
+            ctx.fillText(this.text, 0, this.fontSize, this.maxWidth);
+        }
     };
-    SpriteRendererComponent = __decorate([
-        UniqueComponent_1.UniqueComponent()
-    ], SpriteRendererComponent);
-    return SpriteRendererComponent;
+    TextRendererComponent = __decorate([
+        Class_1.Class()
+    ], TextRendererComponent);
+    return TextRendererComponent;
 }(RendererComponent_1.RendererComponent));
-exports.SpriteRendererComponent = SpriteRendererComponent;
+exports.TextRendererComponent = TextRendererComponent;
 
 
 /***/ }),
 
-/***/ 25:
+/***/ 52:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -306,9 +316,9 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var RendererComponent_1 = __webpack_require__(8);
-var Color_1 = __webpack_require__(7);
-var ArrayUtility_1 = __webpack_require__(5);
+var RendererComponent_1 = __webpack_require__(24);
+var Color_1 = __webpack_require__(8);
+var ArrayUtility_1 = __webpack_require__(7);
 var LineRendererComponent = (function (_super) {
     __extends(LineRendererComponent, _super);
     function LineRendererComponent() {
@@ -401,75 +411,7 @@ exports.LineRendererComponent = LineRendererComponent;
 
 /***/ }),
 
-/***/ 43:
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-var RendererComponent_1 = __webpack_require__(8);
-var Color_1 = __webpack_require__(7);
-var Class_1 = __webpack_require__(9);
-var TextRendererComponent = (function (_super) {
-    __extends(TextRendererComponent, _super);
-    function TextRendererComponent() {
-        var _this = _super !== null && _super.apply(this, arguments) || this;
-        _this.text = '';
-        _this.maxWidth = Number.MAX_VALUE;
-        _this.fillColor = Color_1.Color.White;
-        _this.fontSize = 16;
-        _this.fontFamily = 'Arial';
-        _this.fontWeight = 100;
-        _this.fontStyle = 'normal';
-        _this.fontVariant = 'normal';
-        _this.actualWidth = 0;
-        return _this;
-    }
-    TextRendererComponent.prototype.update = function () {
-        _super.prototype.update.call(this);
-        this.ctx.font = this.fontStyle + " " + this.fontVariant + " " + this.fontWeight + " " + this.fontSize + "px " + this.fontFamily;
-        this.actualWidth = this.ctx.measureText(this.text).width;
-        this.canvas.width = this.actualWidth;
-        this.canvas.height = this.fontSize;
-    };
-    TextRendererComponent.prototype.render = function () {
-        var ctx = this.ctx;
-        if (this.strokeColor) {
-            ctx.strokeStyle = this.strokeColor.toHexString();
-            ctx.strokeText(this.text, 0, this.fontSize, this.maxWidth);
-        }
-        if (this.fillColor) {
-            ctx.fillStyle = this.fillColor.toHexString();
-            ctx.fillText(this.text, 0, this.fontSize, this.maxWidth);
-        }
-    };
-    TextRendererComponent = __decorate([
-        Class_1.Class()
-    ], TextRendererComponent);
-    return TextRendererComponent;
-}(RendererComponent_1.RendererComponent));
-exports.TextRendererComponent = TextRendererComponent;
-
-
-/***/ }),
-
-/***/ 69:
+/***/ 77:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -497,23 +439,23 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-__webpack_require__(26);
-var GameObject_1 = __webpack_require__(6);
+__webpack_require__(27);
+var GameObject_1 = __webpack_require__(2);
 var Component_1 = __webpack_require__(10);
-var Scene_1 = __webpack_require__(33);
-var SceneManager_1 = __webpack_require__(15);
-var runtime_1 = __webpack_require__(12);
-var Class_1 = __webpack_require__(9);
+var Scene_1 = __webpack_require__(32);
+var SceneManager_1 = __webpack_require__(18);
+var runtime_1 = __webpack_require__(11);
+var Class_1 = __webpack_require__(6);
 var Inject_1 = __webpack_require__(0);
-var Texture_1 = __webpack_require__(22);
-var Sprite_1 = __webpack_require__(23);
-var Color_1 = __webpack_require__(7);
+var Texture_1 = __webpack_require__(26);
+var Sprite_1 = __webpack_require__(16);
+var Color_1 = __webpack_require__(8);
 var Vector_1 = __webpack_require__(1);
-var TextRendererComponent_1 = __webpack_require__(43);
-var SpriteRendererComponent_1 = __webpack_require__(24);
-var LineRendererComponent_1 = __webpack_require__(25);
-var RigidbodyComponent_1 = __webpack_require__(17);
-var KeyboardInput_1 = __webpack_require__(39);
+var TextRendererComponent_1 = __webpack_require__(51);
+var SpriteRendererComponent_1 = __webpack_require__(20);
+var LineRendererComponent_1 = __webpack_require__(52);
+var RigidbodyComponent_1 = __webpack_require__(12);
+var KeyboardInput_1 = __webpack_require__(40);
 var texture = new Texture_1.Texture('../assets/circle.png');
 var CameraController = (function (_super) {
     __extends(CameraController, _super);
@@ -612,5 +554,5 @@ runtime_1.bootstrap().catch(console.error);
 
 /***/ })
 
-},[69]);
+},[77]);
 //# sourceMappingURL=control-camera.bundle.js.map

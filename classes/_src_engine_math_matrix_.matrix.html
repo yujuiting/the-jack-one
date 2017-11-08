@@ -77,6 +77,13 @@
 					</li>
 				</ul>
 			</section>
+			<section class="tsd-panel">
+				<h3>Implements</h3>
+				<ul class="tsd-hierarchy">
+					<li><a href="../interfaces/_src_engine_math_matrix_.matrixlike.html" class="tsd-signature-type">MatrixLike</a></li>
+					<li><a href="../interfaces/_src_engine_utility_pool_.recyclable.html" class="tsd-signature-type">Recyclable</a></li>
+				</ul>
+			</section>
 			<section class="tsd-panel-group tsd-index-group">
 				<h2>Index</h2>
 				<section class="tsd-panel tsd-index-panel">
@@ -90,9 +97,11 @@
 						<section class="tsd-index-section ">
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="_src_engine_math_matrix_.matrix.html#_canrecycle" class="tsd-kind-icon">_can<wbr>Recycle</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="_src_engine_math_matrix_.matrix.html#_save" class="tsd-kind-icon">_save</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="_src_engine_math_matrix_.matrix.html#_value" class="tsd-kind-icon">_value</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-static"><a href="_src_engine_math_matrix_.matrix.html#identity" class="tsd-kind-icon">Identity</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private tsd-is-static"><a href="_src_engine_math_matrix_.matrix.html#pool" class="tsd-kind-icon">pool</a></li>
 							</ul>
 						</section>
 						<section class="tsd-index-section ">
@@ -100,12 +109,14 @@
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-get-signature tsd-parent-kind-class"><a href="_src_engine_math_matrix_.matrix.html#0" class="tsd-kind-icon">0</a></li>
 								<li class="tsd-kind-get-signature tsd-parent-kind-class"><a href="_src_engine_math_matrix_.matrix.html#1" class="tsd-kind-icon">1</a></li>
+								<li class="tsd-kind-get-signature tsd-parent-kind-class"><a href="_src_engine_math_matrix_.matrix.html#canrecycle" class="tsd-kind-icon">can<wbr>Recycle</a></li>
 							</ul>
 						</section>
 						<section class="tsd-index-section ">
 							<h3>Methods</h3>
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_src_engine_math_matrix_.matrix.html#clone" class="tsd-kind-icon">clone</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_src_engine_math_matrix_.matrix.html#destroy" class="tsd-kind-icon">destroy</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_src_engine_math_matrix_.matrix.html#equalto" class="tsd-kind-icon">equal<wbr>To</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_src_engine_math_matrix_.matrix.html#getinverse" class="tsd-kind-icon">get<wbr>Inverse</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_src_engine_math_matrix_.matrix.html#invertfrom" class="tsd-kind-icon">invert<wbr>From</a></li>
@@ -119,6 +130,8 @@
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_src_engine_math_matrix_.matrix.html#setscaling" class="tsd-kind-icon">set<wbr>Scaling</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_src_engine_math_matrix_.matrix.html#settranslation" class="tsd-kind-icon">set<wbr>Translation</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_src_engine_math_matrix_.matrix.html#tostring" class="tsd-kind-icon">to<wbr>String</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-static"><a href="_src_engine_math_matrix_.matrix.html#get" class="tsd-kind-icon">Get</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-static"><a href="_src_engine_math_matrix_.matrix.html#put" class="tsd-kind-icon">Put</a></li>
 							</ul>
 						</section>
 					</div>
@@ -130,19 +143,19 @@
 					<a name="constructor" class="tsd-anchor"></a>
 					<h3>constructor</h3>
 					<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">new <wbr>Matrix<span class="tsd-signature-symbol">(</span>value<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_src_engine_math_matrix_.matrix.html" class="tsd-signature-type">Matrix</a></li>
+						<li class="tsd-signature tsd-kind-icon">new <wbr>Matrix<span class="tsd-signature-symbol">(</span>value<span class="tsd-signature-symbol">?: </span><a href="../interfaces/_src_engine_math_matrix_.matrixlike.html" class="tsd-signature-type">MatrixLike</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_src_engine_math_matrix_.matrix.html" class="tsd-signature-type">Matrix</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/8db5d97/src/Engine/Math/Matrix.ts#L19">src/Engine/Math/Matrix.ts:19</a></li>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/e2079ec/src/Engine/Math/Matrix.ts#L38">src/Engine/Math/Matrix.ts:38</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5><span class="tsd-flag ts-flagOptional">Optional</span> value: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">[]</span></h5>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> value: <a href="../interfaces/_src_engine_math_matrix_.matrixlike.html" class="tsd-signature-type">MatrixLike</a></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <a href="_src_engine_math_matrix_.matrix.html" class="tsd-signature-type">Matrix</a></h4>
@@ -153,22 +166,32 @@
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Properties</h2>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private">
-					<a name="_save" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagPrivate">Private</span> _save</h3>
-					<div class="tsd-signature tsd-kind-icon">_save<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> =&nbsp;[]</span></div>
+					<a name="_canrecycle" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagPrivate">Private</span> _can<wbr>Recycle</h3>
+					<div class="tsd-signature tsd-kind-icon">_can<wbr>Recycle<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> =&nbsp;false</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/8db5d97/src/Engine/Math/Matrix.ts#L16">src/Engine/Math/Matrix.ts:16</a></li>
+							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/e2079ec/src/Engine/Math/Matrix.ts#L36">src/Engine/Math/Matrix.ts:36</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private">
+					<a name="_save" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagPrivate">Private</span> _save</h3>
+					<div class="tsd-signature tsd-kind-icon">_save<span class="tsd-signature-symbol">:</span> <a href="../interfaces/_src_engine_math_matrix_.matrixlike.html" class="tsd-signature-type">MatrixLike</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> =&nbsp;[]</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/e2079ec/src/Engine/Math/Matrix.ts#L31">src/Engine/Math/Matrix.ts:31</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private">
 					<a name="_value" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagPrivate">Private</span> _value</h3>
-					<div class="tsd-signature tsd-kind-icon">_value<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> =&nbsp;[[1, 0, 0],[0, 1, 0]]</span></div>
+					<div class="tsd-signature tsd-kind-icon">_value<span class="tsd-signature-symbol">:</span> <a href="../interfaces/_src_engine_math_matrix_.matrixlike.html" class="tsd-signature-type">MatrixLike</a><span class="tsd-signature-symbol"> =&nbsp;[[1, 0, 0],[0, 1, 0]]</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/8db5d97/src/Engine/Math/Matrix.ts#L11">src/Engine/Math/Matrix.ts:11</a></li>
+							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/e2079ec/src/Engine/Math/Matrix.ts#L26">src/Engine/Math/Matrix.ts:26</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -184,7 +207,17 @@
 					<div class="tsd-signature tsd-kind-icon">Identity<span class="tsd-signature-symbol">:</span> <a href="_src_engine_math_matrix_.matrix.html" class="tsd-signature-type">Matrix</a><span class="tsd-signature-symbol"> =&nbsp;new Matrix()</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/8db5d97/src/Engine/Math/Matrix.ts#L5">src/Engine/Math/Matrix.ts:5</a></li>
+							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/e2079ec/src/Engine/Math/Matrix.ts#L20">src/Engine/Math/Matrix.ts:20</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private tsd-is-static">
+					<a name="pool" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagStatic">Static</span> <span class="tsd-flag ts-flagPrivate">Private</span> pool</h3>
+					<div class="tsd-signature tsd-kind-icon">pool<span class="tsd-signature-symbol">:</span> <a href="_src_engine_utility_pool_.pool.html" class="tsd-signature-type">Pool</a><span class="tsd-signature-symbol">&lt;</span><a href="_src_engine_math_matrix_.matrix.html" class="tsd-signature-type">Matrix</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> =&nbsp;new Pool((value?: MatrixLike) &#x3D;&gt; new Matrix(value), Infinity, 64)</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/e2079ec/src/Engine/Math/Matrix.ts#L11">src/Engine/Math/Matrix.ts:11</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -195,16 +228,16 @@
 					<a name="0" class="tsd-anchor"></a>
 					<h3>0</h3>
 					<ul class="tsd-signatures tsd-kind-get-signature tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">get</span> 0<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span></li>
+						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">get</span> 0<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">]</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/8db5d97/src/Engine/Math/Matrix.ts#L18">src/Engine/Math/Matrix.ts:18</a></li>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/e2079ec/src/Engine/Math/Matrix.ts#L33">src/Engine/Math/Matrix.ts:33</a></li>
 								</ul>
 							</aside>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span></h4>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">]</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -212,16 +245,33 @@
 					<a name="1" class="tsd-anchor"></a>
 					<h3>1</h3>
 					<ul class="tsd-signatures tsd-kind-get-signature tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">get</span> 1<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span></li>
+						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">get</span> 1<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">]</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/8db5d97/src/Engine/Math/Matrix.ts#L19">src/Engine/Math/Matrix.ts:19</a></li>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/e2079ec/src/Engine/Math/Matrix.ts#L34">src/Engine/Math/Matrix.ts:34</a></li>
 								</ul>
 							</aside>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span></h4>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">]</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-get-signature tsd-parent-kind-class">
+					<a name="canrecycle" class="tsd-anchor"></a>
+					<h3>can<wbr>Recycle</h3>
+					<ul class="tsd-signatures tsd-kind-get-signature tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">get</span> canRecycle<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/e2079ec/src/Engine/Math/Matrix.ts#L38">src/Engine/Math/Matrix.ts:38</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -238,7 +288,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/8db5d97/src/Engine/Math/Matrix.ts#L199">src/Engine/Math/Matrix.ts:199</a></li>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/e2079ec/src/Engine/Math/Matrix.ts#L227">src/Engine/Math/Matrix.ts:227</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <a href="_src_engine_math_matrix_.matrix.html" class="tsd-signature-type">Matrix</a></h4>
@@ -246,22 +296,40 @@
 					</ul>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="destroy" class="tsd-anchor"></a>
+					<h3>destroy</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">destroy<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Implementation of <a href="../interfaces/_src_engine_utility_pool_.recyclable.html">Recyclable</a>.<a href="../interfaces/_src_engine_utility_pool_.recyclable.html#destroy">destroy</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/e2079ec/src/Engine/Math/Matrix.ts#L231">src/Engine/Math/Matrix.ts:231</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
 					<a name="equalto" class="tsd-anchor"></a>
 					<h3>equal<wbr>To</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">equal<wbr>To<span class="tsd-signature-symbol">(</span>another<span class="tsd-signature-symbol">: </span><a href="_src_engine_math_matrix_.matrix.html" class="tsd-signature-type">Matrix</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
+						<li class="tsd-signature tsd-kind-icon">equal<wbr>To<span class="tsd-signature-symbol">(</span>another<span class="tsd-signature-symbol">: </span><a href="../interfaces/_src_engine_math_matrix_.matrixlike.html" class="tsd-signature-type">MatrixLike</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/8db5d97/src/Engine/Math/Matrix.ts#L161">src/Engine/Math/Matrix.ts:161</a></li>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/e2079ec/src/Engine/Math/Matrix.ts#L189">src/Engine/Math/Matrix.ts:189</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>another: <a href="_src_engine_math_matrix_.matrix.html" class="tsd-signature-type">Matrix</a></h5>
+									<h5>another: <a href="../interfaces/_src_engine_math_matrix_.matrixlike.html" class="tsd-signature-type">MatrixLike</a></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
@@ -278,7 +346,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/8db5d97/src/Engine/Math/Matrix.ts#L195">src/Engine/Math/Matrix.ts:195</a></li>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/e2079ec/src/Engine/Math/Matrix.ts#L223">src/Engine/Math/Matrix.ts:223</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <a href="_src_engine_math_matrix_.matrix.html" class="tsd-signature-type">Matrix</a></h4>
@@ -289,19 +357,19 @@
 					<a name="invertfrom" class="tsd-anchor"></a>
 					<h3>invert<wbr>From</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">invert<wbr>From<span class="tsd-signature-symbol">(</span>source<span class="tsd-signature-symbol">: </span><a href="_src_engine_math_matrix_.matrix.html" class="tsd-signature-type">Matrix</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">this</span></li>
+						<li class="tsd-signature tsd-kind-icon">invert<wbr>From<span class="tsd-signature-symbol">(</span>source<span class="tsd-signature-symbol">: </span><a href="../interfaces/_src_engine_math_matrix_.matrixlike.html" class="tsd-signature-type">MatrixLike</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">this</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/8db5d97/src/Engine/Math/Matrix.ts#L170">src/Engine/Math/Matrix.ts:170</a></li>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/e2079ec/src/Engine/Math/Matrix.ts#L198">src/Engine/Math/Matrix.ts:198</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>source: <a href="_src_engine_math_matrix_.matrix.html" class="tsd-signature-type">Matrix</a></h5>
+									<h5>source: <a href="../interfaces/_src_engine_math_matrix_.matrixlike.html" class="tsd-signature-type">MatrixLike</a></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">this</span></h4>
@@ -312,19 +380,19 @@
 					<a name="multiply" class="tsd-anchor"></a>
 					<h3>multiply</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">multiply<span class="tsd-signature-symbol">(</span>other<span class="tsd-signature-symbol">: </span><a href="_src_engine_math_matrix_.matrix.html" class="tsd-signature-type">Matrix</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">this</span></li>
+						<li class="tsd-signature tsd-kind-icon">multiply<span class="tsd-signature-symbol">(</span>other<span class="tsd-signature-symbol">: </span><a href="../interfaces/_src_engine_math_matrix_.matrixlike.html" class="tsd-signature-type">MatrixLike</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">this</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/8db5d97/src/Engine/Math/Matrix.ts#L115">src/Engine/Math/Matrix.ts:115</a></li>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/e2079ec/src/Engine/Math/Matrix.ts#L143">src/Engine/Math/Matrix.ts:143</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>other: <a href="_src_engine_math_matrix_.matrix.html" class="tsd-signature-type">Matrix</a></h5>
+									<h5>other: <a href="../interfaces/_src_engine_math_matrix_.matrixlike.html" class="tsd-signature-type">MatrixLike</a></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">this</span></h4>
@@ -341,7 +409,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/8db5d97/src/Engine/Math/Matrix.ts#L137">src/Engine/Math/Matrix.ts:137</a></li>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/e2079ec/src/Engine/Math/Matrix.ts#L165">src/Engine/Math/Matrix.ts:165</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -364,7 +432,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/8db5d97/src/Engine/Math/Matrix.ts#L151">src/Engine/Math/Matrix.ts:151</a></li>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/e2079ec/src/Engine/Math/Matrix.ts#L179">src/Engine/Math/Matrix.ts:179</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -388,13 +456,13 @@
 					<a name="reset" class="tsd-anchor"></a>
 					<h3>reset</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">reset<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">this</span></li>
+						<li class="tsd-signature tsd-kind-icon">reset<span class="tsd-signature-symbol">(</span>value<span class="tsd-signature-symbol">?: </span><a href="../interfaces/_src_engine_math_matrix_.matrixlike.html" class="tsd-signature-type">MatrixLike</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">this</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/8db5d97/src/Engine/Math/Matrix.ts#L56">src/Engine/Math/Matrix.ts:56</a></li>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/e2079ec/src/Engine/Math/Matrix.ts#L76">src/Engine/Math/Matrix.ts:76</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -402,6 +470,12 @@
 									<p>Reset matrix to identity, and also clear saved states.</p>
 								</div>
 							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> value: <a href="../interfaces/_src_engine_math_matrix_.matrixlike.html" class="tsd-signature-type">MatrixLike</a></h5>
+								</li>
+							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">this</span></h4>
 						</li>
 					</ul>
@@ -416,7 +490,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/8db5d97/src/Engine/Math/Matrix.ts#L43">src/Engine/Math/Matrix.ts:43</a></li>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/e2079ec/src/Engine/Math/Matrix.ts#L63">src/Engine/Math/Matrix.ts:63</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">this</span></h4>
@@ -433,7 +507,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/8db5d97/src/Engine/Math/Matrix.ts#L35">src/Engine/Math/Matrix.ts:35</a></li>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/e2079ec/src/Engine/Math/Matrix.ts#L55">src/Engine/Math/Matrix.ts:55</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -455,7 +529,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/8db5d97/src/Engine/Math/Matrix.ts#L65">src/Engine/Math/Matrix.ts:65</a></li>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/e2079ec/src/Engine/Math/Matrix.ts#L94">src/Engine/Math/Matrix.ts:94</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -479,7 +553,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/8db5d97/src/Engine/Math/Matrix.ts#L94">src/Engine/Math/Matrix.ts:94</a></li>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/e2079ec/src/Engine/Math/Matrix.ts#L123">src/Engine/Math/Matrix.ts:123</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -493,7 +567,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/8db5d97/src/Engine/Math/Matrix.ts#L95">src/Engine/Math/Matrix.ts:95</a></li>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/e2079ec/src/Engine/Math/Matrix.ts#L124">src/Engine/Math/Matrix.ts:124</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -520,7 +594,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/8db5d97/src/Engine/Math/Matrix.ts#L73">src/Engine/Math/Matrix.ts:73</a></li>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/e2079ec/src/Engine/Math/Matrix.ts#L106">src/Engine/Math/Matrix.ts:106</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -534,7 +608,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/8db5d97/src/Engine/Math/Matrix.ts#L74">src/Engine/Math/Matrix.ts:74</a></li>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/e2079ec/src/Engine/Math/Matrix.ts#L107">src/Engine/Math/Matrix.ts:107</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -560,10 +634,56 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/8db5d97/src/Engine/Math/Matrix.ts#L203">src/Engine/Math/Matrix.ts:203</a></li>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/e2079ec/src/Engine/Math/Matrix.ts#L235">src/Engine/Math/Matrix.ts:235</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-static">
+					<a name="get" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagStatic">Static</span> Get</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-static">
+						<li class="tsd-signature tsd-kind-icon">Get<span class="tsd-signature-symbol">(</span>value<span class="tsd-signature-symbol">?: </span><a href="../interfaces/_src_engine_math_matrix_.matrixlike.html" class="tsd-signature-type">MatrixLike</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_src_engine_math_matrix_.matrix.html" class="tsd-signature-type">Matrix</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/e2079ec/src/Engine/Math/Matrix.ts#L13">src/Engine/Math/Matrix.ts:13</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> value: <a href="../interfaces/_src_engine_math_matrix_.matrixlike.html" class="tsd-signature-type">MatrixLike</a></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="_src_engine_math_matrix_.matrix.html" class="tsd-signature-type">Matrix</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-static">
+					<a name="put" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagStatic">Static</span> Put</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-static">
+						<li class="tsd-signature tsd-kind-icon">Put<span class="tsd-signature-symbol">(</span>matrix<span class="tsd-signature-symbol">: </span><a href="_src_engine_math_matrix_.matrix.html" class="tsd-signature-type">Matrix</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/e2079ec/src/Engine/Math/Matrix.ts#L18">src/Engine/Math/Matrix.ts:18</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>matrix: <a href="_src_engine_math_matrix_.matrix.html" class="tsd-signature-type">Matrix</a></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -591,6 +711,9 @@
 								<a href="_src_engine_math_matrix_.matrix.html#constructor" class="tsd-kind-icon">constructor</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
+								<a href="_src_engine_math_matrix_.matrix.html#_canrecycle" class="tsd-kind-icon">_can<wbr>Recycle</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
 								<a href="_src_engine_math_matrix_.matrix.html#_save" class="tsd-kind-icon">_save</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
@@ -599,14 +722,23 @@
 							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-static">
 								<a href="_src_engine_math_matrix_.matrix.html#identity" class="tsd-kind-icon">Identity</a>
 							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private tsd-is-static">
+								<a href="_src_engine_math_matrix_.matrix.html#pool" class="tsd-kind-icon">pool</a>
+							</li>
 							<li class=" tsd-kind-get-signature tsd-parent-kind-class">
 								<a href="_src_engine_math_matrix_.matrix.html#0" class="tsd-kind-icon">0</a>
 							</li>
 							<li class=" tsd-kind-get-signature tsd-parent-kind-class">
 								<a href="_src_engine_math_matrix_.matrix.html#1" class="tsd-kind-icon">1</a>
 							</li>
+							<li class=" tsd-kind-get-signature tsd-parent-kind-class">
+								<a href="_src_engine_math_matrix_.matrix.html#canrecycle" class="tsd-kind-icon">can<wbr>Recycle</a>
+							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="_src_engine_math_matrix_.matrix.html#clone" class="tsd-kind-icon">clone</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_src_engine_math_matrix_.matrix.html#destroy" class="tsd-kind-icon">destroy</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="_src_engine_math_matrix_.matrix.html#equalto" class="tsd-kind-icon">equal<wbr>To</a>
@@ -647,10 +779,19 @@
 							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="_src_engine_math_matrix_.matrix.html#tostring" class="tsd-kind-icon">to<wbr>String</a>
 							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-static">
+								<a href="_src_engine_math_matrix_.matrix.html#get" class="tsd-kind-icon">Get</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-static">
+								<a href="_src_engine_math_matrix_.matrix.html#put" class="tsd-kind-icon">Put</a>
+							</li>
 						</ul>
 					</li>
 				</ul>
 				<ul class="after-current">
+					<li class=" tsd-kind-interface tsd-parent-kind-external-module">
+						<a href="../interfaces/_src_engine_math_matrix_.matrixlike.html" class="tsd-kind-icon">Matrix<wbr>Like</a>
+					</li>
 				</ul>
 			</nav>
 		</div>

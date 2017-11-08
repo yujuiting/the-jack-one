@@ -100,15 +100,9 @@
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="_src_engine_utility_pool_.pool.html#_actives" class="tsd-kind-icon">_actives</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="_src_engine_utility_pool_.pool.html#_inactives" class="tsd-kind-icon">_inactives</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="_src_engine_utility_pool_.pool.html#factory" class="tsd-kind-icon">factory</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_src_engine_utility_pool_.pool.html#max" class="tsd-kind-icon">max</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="_src_engine_utility_pool_.pool.html#type" class="tsd-kind-icon">type</a></li>
-							</ul>
-						</section>
-						<section class="tsd-index-section ">
-							<h3>Accessors</h3>
-							<ul class="tsd-index-list">
-								<li class="tsd-kind-get-signature tsd-parent-kind-class"><a href="_src_engine_utility_pool_.pool.html#actives" class="tsd-kind-icon">actives</a></li>
-								<li class="tsd-kind-get-signature tsd-parent-kind-class"><a href="_src_engine_utility_pool_.pool.html#inactives" class="tsd-kind-icon">inactives</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_src_engine_utility_pool_.pool.html#size" class="tsd-kind-icon">size</a></li>
 							</ul>
 						</section>
 						<section class="tsd-index-section ">
@@ -116,7 +110,6 @@
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_src_engine_utility_pool_.pool.html#get" class="tsd-kind-icon">get</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_src_engine_utility_pool_.pool.html#put" class="tsd-kind-icon">put</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_src_engine_utility_pool_.pool.html#recycle" class="tsd-kind-icon">recycle</a></li>
 							</ul>
 						</section>
 					</div>
@@ -128,22 +121,25 @@
 					<a name="constructor" class="tsd-anchor"></a>
 					<h3>constructor</h3>
 					<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">new <wbr>Pool<span class="tsd-signature-symbol">(</span>type<span class="tsd-signature-symbol">: </span><a href="../interfaces/_src_engine_utility_type_.type.html" class="tsd-signature-type">Type</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span>, max<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_src_engine_utility_pool_.pool.html" class="tsd-signature-type">Pool</a></li>
+						<li class="tsd-signature tsd-kind-icon">new <wbr>Pool<span class="tsd-signature-symbol">(</span>factory<span class="tsd-signature-symbol">: </span><a href="../modules/_src_engine_utility_pool_.html#factory" class="tsd-signature-type">Factory</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span>, max<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span>, initSize<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_src_engine_utility_pool_.pool.html" class="tsd-signature-type">Pool</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/8db5d97/src/Engine/Utility/Pool.ts#L18">src/Engine/Utility/Pool.ts:18</a></li>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/e2079ec/src/Engine/Utility/Pool.ts#L23">src/Engine/Utility/Pool.ts:23</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>type: <a href="../interfaces/_src_engine_utility_type_.type.html" class="tsd-signature-type">Type</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></h5>
+									<h5>factory: <a href="../modules/_src_engine_utility_pool_.html#factory" class="tsd-signature-type">Factory</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></h5>
 								</li>
 								<li>
 									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> max: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> =&nbsp;Infinity</span></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> initSize: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> =&nbsp;max &lt;&#x3D; 1024 ? max : 1024</span></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <a href="_src_engine_utility_pool_.pool.html" class="tsd-signature-type">Pool</a></h4>
@@ -159,7 +155,7 @@
 					<div class="tsd-signature tsd-kind-icon">_actives<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> =&nbsp;[]</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/8db5d97/src/Engine/Utility/Pool.ts#L12">src/Engine/Utility/Pool.ts:12</a></li>
+							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/e2079ec/src/Engine/Utility/Pool.ts#L19">src/Engine/Utility/Pool.ts:19</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -169,7 +165,17 @@
 					<div class="tsd-signature tsd-kind-icon">_inactives<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> =&nbsp;[]</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/8db5d97/src/Engine/Utility/Pool.ts#L14">src/Engine/Utility/Pool.ts:14</a></li>
+							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/e2079ec/src/Engine/Utility/Pool.ts#L21">src/Engine/Utility/Pool.ts:21</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private">
+					<a name="factory" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagPrivate">Private</span> factory</h3>
+					<div class="tsd-signature tsd-kind-icon">factory<span class="tsd-signature-symbol">:</span> <a href="../modules/_src_engine_utility_pool_.html#factory" class="tsd-signature-type">Factory</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/e2079ec/src/Engine/Utility/Pool.ts#L25">src/Engine/Utility/Pool.ts:25</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -179,56 +185,19 @@
 					<div class="tsd-signature tsd-kind-icon">max<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/8db5d97/src/Engine/Utility/Pool.ts#L21">src/Engine/Utility/Pool.ts:21</a></li>
+							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/e2079ec/src/Engine/Utility/Pool.ts#L26">src/Engine/Utility/Pool.ts:26</a></li>
 						</ul>
 					</aside>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private">
-					<a name="type" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagPrivate">Private</span> type</h3>
-					<div class="tsd-signature tsd-kind-icon">type<span class="tsd-signature-symbol">:</span> <a href="../interfaces/_src_engine_utility_type_.type.html" class="tsd-signature-type">Type</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></div>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="size" class="tsd-anchor"></a>
+					<h3>size</h3>
+					<div class="tsd-signature tsd-kind-icon">size<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">0</span><span class="tsd-signature-symbol"> =&nbsp;0</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/8db5d97/src/Engine/Utility/Pool.ts#L20">src/Engine/Utility/Pool.ts:20</a></li>
+							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/e2079ec/src/Engine/Utility/Pool.ts#L23">src/Engine/Utility/Pool.ts:23</a></li>
 						</ul>
 					</aside>
-				</section>
-			</section>
-			<section class="tsd-panel-group tsd-member-group ">
-				<h2>Accessors</h2>
-				<section class="tsd-panel tsd-member tsd-kind-get-signature tsd-parent-kind-class">
-					<a name="actives" class="tsd-anchor"></a>
-					<h3>actives</h3>
-					<ul class="tsd-signatures tsd-kind-get-signature tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">get</span> actives<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">ReadonlyArray</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></li>
-					</ul>
-					<ul class="tsd-descriptions">
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<ul>
-									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/8db5d97/src/Engine/Utility/Pool.ts#L16">src/Engine/Utility/Pool.ts:16</a></li>
-								</ul>
-							</aside>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">ReadonlyArray</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></h4>
-						</li>
-					</ul>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-get-signature tsd-parent-kind-class">
-					<a name="inactives" class="tsd-anchor"></a>
-					<h3>inactives</h3>
-					<ul class="tsd-signatures tsd-kind-get-signature tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">get</span> inactives<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">ReadonlyArray</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></li>
-					</ul>
-					<ul class="tsd-descriptions">
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<ul>
-									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/8db5d97/src/Engine/Utility/Pool.ts#L18">src/Engine/Utility/Pool.ts:18</a></li>
-								</ul>
-							</aside>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">ReadonlyArray</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></h4>
-						</li>
-					</ul>
 				</section>
 			</section>
 			<section class="tsd-panel-group tsd-member-group ">
@@ -243,7 +212,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/8db5d97/src/Engine/Utility/Pool.ts#L23">src/Engine/Utility/Pool.ts:23</a></li>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/e2079ec/src/Engine/Utility/Pool.ts#L36">src/Engine/Utility/Pool.ts:36</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -269,7 +238,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/8db5d97/src/Engine/Utility/Pool.ts#L41">src/Engine/Utility/Pool.ts:41</a></li>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/e2079ec/src/Engine/Utility/Pool.ts#L52">src/Engine/Utility/Pool.ts:52</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -278,23 +247,6 @@
 									<h5>instance: <span class="tsd-signature-type">T</span></h5>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
-						</li>
-					</ul>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
-					<a name="recycle" class="tsd-anchor"></a>
-					<h3>recycle</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">recycle<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
-					</ul>
-					<ul class="tsd-descriptions">
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<ul>
-									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/8db5d97/src/Engine/Utility/Pool.ts#L47">src/Engine/Utility/Pool.ts:47</a></li>
-								</ul>
-							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
 						</li>
 					</ul>
@@ -328,17 +280,14 @@
 							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
 								<a href="_src_engine_utility_pool_.pool.html#_inactives" class="tsd-kind-icon">_inactives</a>
 							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
+								<a href="_src_engine_utility_pool_.pool.html#factory" class="tsd-kind-icon">factory</a>
+							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class">
 								<a href="_src_engine_utility_pool_.pool.html#max" class="tsd-kind-icon">max</a>
 							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
-								<a href="_src_engine_utility_pool_.pool.html#type" class="tsd-kind-icon">type</a>
-							</li>
-							<li class=" tsd-kind-get-signature tsd-parent-kind-class">
-								<a href="_src_engine_utility_pool_.pool.html#actives" class="tsd-kind-icon">actives</a>
-							</li>
-							<li class=" tsd-kind-get-signature tsd-parent-kind-class">
-								<a href="_src_engine_utility_pool_.pool.html#inactives" class="tsd-kind-icon">inactives</a>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="_src_engine_utility_pool_.pool.html#size" class="tsd-kind-icon">size</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="_src_engine_utility_pool_.pool.html#get" class="tsd-kind-icon">get</a>
@@ -346,15 +295,18 @@
 							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="_src_engine_utility_pool_.pool.html#put" class="tsd-kind-icon">put</a>
 							</li>
-							<li class=" tsd-kind-method tsd-parent-kind-class">
-								<a href="_src_engine_utility_pool_.pool.html#recycle" class="tsd-kind-icon">recycle</a>
-							</li>
 						</ul>
 					</li>
 				</ul>
 				<ul class="after-current">
+					<li class=" tsd-kind-interface tsd-parent-kind-external-module tsd-is-not-exported">
+						<a href="../interfaces/_src_engine_utility_pool_.internalpool.html" class="tsd-kind-icon">Internal<wbr>Pool</a>
+					</li>
 					<li class=" tsd-kind-interface tsd-parent-kind-external-module">
 						<a href="../interfaces/_src_engine_utility_pool_.recyclable.html" class="tsd-kind-icon">Recyclable</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-parent-kind-external-module">
+						<a href="../modules/_src_engine_utility_pool_.html#factory" class="tsd-kind-icon">Factory</a>
 					</li>
 				</ul>
 			</nav>

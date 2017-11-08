@@ -90,7 +90,7 @@
 /******/ 	
 /******/ 	
 /******/ 	var hotApplyOnUpdate = true;
-/******/ 	var hotCurrentHash = "2eac3fb3dfb22f113bab"; // eslint-disable-line no-unused-vars
+/******/ 	var hotCurrentHash = "71fcdddbe30a1ccbbff0"; // eslint-disable-line no-unused-vars
 /******/ 	var hotRequestTimeout = 10000;
 /******/ 	var hotCurrentModuleData = {};
 /******/ 	var hotCurrentChildModule; // eslint-disable-line no-unused-vars
@@ -689,7 +689,7 @@
 /******/
 /******/ 	// objects to store loaded and loading chunks
 /******/ 	var installedChunks = {
-/******/ 		4: 0
+/******/ 		5: 0
 /******/ 	};
 /******/
 /******/ 	// The require function
@@ -815,7 +815,7 @@
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var ProviderRegistry_1 = __webpack_require__(37);
+var ProviderRegistry_1 = __webpack_require__(47);
 function Inject(token) {
     return function (target, propertyKey, index) {
         if (index === void 0) {
@@ -838,7 +838,7 @@ exports.Inject = Inject;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var Pool_1 = __webpack_require__(52);
+var Pool_1 = __webpack_require__(38);
 var Vector = (function () {
     function Vector(x, y) {
         if (x === void 0) { x = 0; }
@@ -971,8 +971,10 @@ var Vector = (function () {
     Vector.prototype.translate = function (vector) {
         return this.subtract(vector);
     };
-    Vector.prototype.reset = function () {
-        return this.setTo(0, 0);
+    Vector.prototype.reset = function (x, y) {
+        if (x === void 0) { x = 0; }
+        if (y === void 0) { y = 0; }
+        return this.setTo(x, y);
     };
     Vector.prototype.rotate = function (radian) {
         var cos = Math.cos(radian);
@@ -1021,7 +1023,7 @@ var Vector = (function () {
     Vector.Left = new Vector(-1, 0);
     Vector.Up = new Vector(0, 1);
     Vector.Down = new Vector(0, -1);
-    Vector.pool = new Pool_1.Pool(Vector);
+    Vector.pool = new Pool_1.Pool(function (x, y) { return new Vector(x, y); });
     return Vector;
 }());
 exports.Vector = Vector;
@@ -1033,8 +1035,244 @@ exports.Vector = Vector;
 
 "use strict";
 
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-var ProviderRegistry_1 = __webpack_require__(37);
+var BaseObject_1 = __webpack_require__(49);
+var Type_1 = __webpack_require__(13);
+var TransformComponent_1 = __webpack_require__(14);
+var ArrayUtility_1 = __webpack_require__(7);
+var Tree_1 = __webpack_require__(71);
+var runtime_1 = __webpack_require__(11);
+var GameObjectInitializer_1 = __webpack_require__(39);
+var Class_1 = __webpack_require__(6);
+var Inject_1 = __webpack_require__(0);
+var GameObject = (function (_super) {
+    __extends(GameObject, _super);
+    function GameObject(gameObjectInitializer) {
+        var _this = _super.call(this) || this;
+        _this.layer = Type_1.BuiltInLayer.Default;
+        _this.node = new Tree_1.Tree(_this);
+        _this.components = [];
+        _this.tags = [];
+        _this.transform = _this.addComponent(TransformComponent_1.TransformComponent);
+        gameObjectInitializer.push(_this);
+        return _this;
+    }
+    GameObject_1 = GameObject;
+    GameObject.FindWithTag = function (tag) {
+        return this.GetBucketByTag(tag);
+    };
+    GameObject.AddTaggedGameObject = function (gameObject, specificTag) {
+        var _this = this;
+        if (specificTag) {
+            var bucket = this.GetBucketByTag(specificTag);
+            ArrayUtility_1.addToArray(bucket, gameObject);
+        }
+        else {
+            gameObject.tags.forEach(function (tag) {
+                var bucket = _this.GetBucketByTag(tag);
+                ArrayUtility_1.addToArray(bucket, gameObject);
+            });
+        }
+    };
+    GameObject.RemoveTaggedGameObject = function (gameObject, specificTag) {
+        var _this = this;
+        if (specificTag) {
+            var bucket = this.GetBucketByTag(specificTag);
+            ArrayUtility_1.removeFromArray(bucket, gameObject);
+        }
+        else {
+            gameObject.tags.forEach(function (tag) {
+                var bucket = _this.GetBucketByTag(tag);
+                ArrayUtility_1.removeFromArray(bucket, gameObject);
+            });
+        }
+    };
+    GameObject.GetBucketByTag = function (tag) {
+        var bucket = this.TaggedGameObjects.get(tag);
+        if (!bucket) {
+            bucket = [];
+            this.TaggedGameObjects.set(tag, bucket);
+        }
+        return bucket;
+    };
+    Object.defineProperty(GameObject.prototype, "parent", {
+        get: function () {
+            return this.node.parent ? this.node.parent.data : null;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(GameObject.prototype, "children", {
+        get: function () {
+            return this.node.children.map(function (node) { return node.data; });
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(GameObject.prototype, "isActive", {
+        get: function () {
+            if (this.parent && !this.parent.isActive) {
+                return false;
+            }
+            return this._isActive;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    GameObject.prototype.hasTag = function (tag) {
+        return ArrayUtility_1.includeInArray(this.tags, tag);
+    };
+    GameObject.prototype.addTag = function (tag) {
+        if (ArrayUtility_1.addToArray(this.tags, tag)) {
+            GameObject_1.AddTaggedGameObject(this, tag);
+        }
+    };
+    GameObject.prototype.removeTag = function (tag) {
+        if (ArrayUtility_1.removeFromArray(this.tags, tag)) {
+            GameObject_1.RemoveTaggedGameObject(this, tag);
+        }
+    };
+    GameObject.prototype.addComponent = function (ComponentType) {
+        var _this = this;
+        var isUnique = Reflect.getMetadata('component:unique', ComponentType) || false;
+        if (isUnique && this.getComponent(ComponentType)) {
+            throw new Error("Unique component " + ComponentType);
+        }
+        var RequireComponentTypes = Reflect.getMetadata('component:require', ComponentType) || [];
+        RequireComponentTypes.forEach(function (RequireComponentType) {
+            if (!_this.getComponent(RequireComponentType)) {
+                throw new Error(ComponentType + " require component " + RequireComponentType);
+            }
+        });
+        var component = runtime_1.instantiate(ComponentType, this);
+        if (this._hasStarted) {
+            component.start();
+        }
+        this.components.push(component);
+        return component;
+    };
+    GameObject.prototype.removeComponent = function (component) {
+        if (!ArrayUtility_1.removeFromArray(this.components, component)) {
+            throw new Error("Not found components, " + component);
+        }
+        component.destroy();
+    };
+    GameObject.prototype.getComponent = function (componentType) {
+        return this.components.find(function (component) { return component instanceof componentType; });
+    };
+    GameObject.prototype.getComponents = function (componentType) {
+        return this.components.filter(function (component) { return component instanceof componentType; });
+    };
+    GameObject.prototype.addChild = function (child) {
+        if (this.node.hasChild(child.node)) {
+            throw new Error("Repeatly add child, " + child);
+        }
+        if (child.node.parent) {
+            child.node.parent.remove(child.node);
+        }
+        this.node.add(child.node);
+        child.transform.localPosition.copy(child.transform.position);
+    };
+    GameObject.prototype.removeChild = function (child) {
+        if (this.node.hasChild(child.node)) {
+            throw new Error("Not found child, " + child);
+        }
+        this.node.remove(child.node);
+    };
+    GameObject.prototype.activate = function () {
+        _super.prototype.activate.call(this);
+        this.node.show();
+    };
+    GameObject.prototype.deactivate = function () {
+        _super.prototype.deactivate.call(this);
+        this.node.hide();
+    };
+    GameObject.prototype.start = function () {
+        _super.prototype.start.call(this);
+        this.components.forEach(function (component) { return component.start(); });
+    };
+    GameObject.prototype.fixedUpdate = function (alpha) {
+        if (alpha === void 0) { alpha = 1; }
+        this.components.forEach(function (component) { return component.fixedUpdate(alpha); });
+    };
+    GameObject.prototype.update = function () {
+        this.components.forEach(function (component) { return component.update(); });
+    };
+    GameObject.prototype.lateUpdate = function () {
+        this.components.forEach(function (component) { return component.lateUpdate(); });
+    };
+    GameObject.prototype.preRender = function () {
+        this.components.forEach(function (component) { return component.preRender(); });
+    };
+    GameObject.prototype.postRender = function () {
+        this.components.forEach(function (component) { return component.postRender(); });
+    };
+    GameObject.prototype.reset = function () {
+        _super.prototype.reset.call(this);
+        this.layer = Type_1.BuiltInLayer.Default;
+        this.components = [];
+        this.tags = [];
+        this._hasStarted = false;
+        this.components.forEach(function (component) { return component.reset(); });
+        this.children.forEach(function (child) { return child.reset(); });
+    };
+    GameObject.prototype.destroy = function () {
+        _super.prototype.destroy.call(this);
+        GameObject_1.RemoveTaggedGameObject(this);
+        this.components.forEach(function (component) { return component.destroy(); });
+        this.children.forEach(function (child) { return child.destroy(); });
+        if (this.node.parent) {
+            this.node.parent.remove(this.node);
+        }
+    };
+    GameObject.prototype.toString = function () {
+        return "GameObject(" + this.id + ")";
+    };
+    GameObject.prototype.initialize = function () {
+        this.start();
+    };
+    GameObject.TaggedGameObjects = new Map();
+    GameObject = GameObject_1 = __decorate([
+        Class_1.Class(),
+        __param(0, Inject_1.Inject(GameObjectInitializer_1.GameObjectInitializer)),
+        __metadata("design:paramtypes", [Object])
+    ], GameObject);
+    return GameObject;
+    var GameObject_1;
+}(BaseObject_1.BaseObject));
+exports.GameObject = GameObject;
+
+
+/***/ }),
+/* 3 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var ProviderRegistry_1 = __webpack_require__(47);
 function Service(token) {
     return function (target) {
         ProviderRegistry_1.providerRegistry.provide({ token: token || target, useClass: target });
@@ -1044,14 +1282,14 @@ exports.Service = Service;
 
 
 /***/ }),
-/* 3 */
+/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-var root_1 = __webpack_require__(18);
-var toSubscriber_1 = __webpack_require__(72);
-var observable_1 = __webpack_require__(49);
+var root_1 = __webpack_require__(28);
+var toSubscriber_1 = __webpack_require__(80);
+var observable_1 = __webpack_require__(62);
 /**
  * A representation of any set of values over any amount of time. This is the most basic building block
  * of RxJS.
@@ -1306,7 +1544,7 @@ exports.Observable = Observable;
 //# sourceMappingURL=Observable.js.map
 
 /***/ }),
-/* 4 */
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1316,7 +1554,22 @@ exports.BrowserDelegate = Symbol('BrowserDelegate');
 
 
 /***/ }),
-/* 5 */
+/* 6 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+function Class(token) {
+    return function (target) {
+        return target;
+    };
+}
+exports.Class = Class;
+
+
+/***/ }),
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1347,243 +1600,7 @@ exports.includeInArray = includeInArray;
 
 
 /***/ }),
-/* 6 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __metadata = (this && this.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
-var __param = (this && this.__param) || function (paramIndex, decorator) {
-    return function (target, key) { decorator(target, key, paramIndex); }
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-var BaseObject_1 = __webpack_require__(41);
-var Type_1 = __webpack_require__(14);
-var TransformComponent_1 = __webpack_require__(16);
-var ArrayUtility_1 = __webpack_require__(5);
-var Tree_1 = __webpack_require__(59);
-var runtime_1 = __webpack_require__(12);
-var GameObjectInitializer_1 = __webpack_require__(28);
-var Class_1 = __webpack_require__(9);
-var Inject_1 = __webpack_require__(0);
-var GameObject = (function (_super) {
-    __extends(GameObject, _super);
-    function GameObject(gameObjectInitializer) {
-        var _this = _super.call(this) || this;
-        _this.layer = Type_1.BuiltInLayer.Default;
-        _this.node = new Tree_1.Tree(_this);
-        _this.components = [];
-        _this.tags = [];
-        _this.transform = _this.addComponent(TransformComponent_1.TransformComponent);
-        gameObjectInitializer.push(_this);
-        return _this;
-    }
-    GameObject_1 = GameObject;
-    GameObject.FindWithTag = function (tag) {
-        return this.GetBucketByTag(tag);
-    };
-    GameObject.AddTaggedGameObject = function (gameObject, specificTag) {
-        var _this = this;
-        if (specificTag) {
-            var bucket = this.GetBucketByTag(specificTag);
-            ArrayUtility_1.addToArray(bucket, gameObject);
-        }
-        else {
-            gameObject.tags.forEach(function (tag) {
-                var bucket = _this.GetBucketByTag(tag);
-                ArrayUtility_1.addToArray(bucket, gameObject);
-            });
-        }
-    };
-    GameObject.RemoveTaggedGameObject = function (gameObject, specificTag) {
-        var _this = this;
-        if (specificTag) {
-            var bucket = this.GetBucketByTag(specificTag);
-            ArrayUtility_1.removeFromArray(bucket, gameObject);
-        }
-        else {
-            gameObject.tags.forEach(function (tag) {
-                var bucket = _this.GetBucketByTag(tag);
-                ArrayUtility_1.removeFromArray(bucket, gameObject);
-            });
-        }
-    };
-    GameObject.GetBucketByTag = function (tag) {
-        var bucket = this.TaggedGameObjects.get(tag);
-        if (!bucket) {
-            bucket = [];
-            this.TaggedGameObjects.set(tag, bucket);
-        }
-        return bucket;
-    };
-    Object.defineProperty(GameObject.prototype, "parent", {
-        get: function () {
-            return this.node.parent ? this.node.parent.data : null;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(GameObject.prototype, "children", {
-        get: function () {
-            return this.node.children.map(function (node) { return node.data; });
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(GameObject.prototype, "isActive", {
-        get: function () {
-            if (this.parent && !this.parent.isActive) {
-                return false;
-            }
-            return this._isActive;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    GameObject.prototype.hasTag = function (tag) {
-        return ArrayUtility_1.includeInArray(this.tags, tag);
-    };
-    GameObject.prototype.addTag = function (tag) {
-        if (ArrayUtility_1.addToArray(this.tags, tag)) {
-            GameObject_1.AddTaggedGameObject(this, tag);
-        }
-    };
-    GameObject.prototype.removeTag = function (tag) {
-        if (ArrayUtility_1.removeFromArray(this.tags, tag)) {
-            GameObject_1.RemoveTaggedGameObject(this, tag);
-        }
-    };
-    GameObject.prototype.addComponent = function (ComponentType) {
-        var _this = this;
-        var isUnique = Reflect.getMetadata('component:unique', ComponentType) || false;
-        if (isUnique && this.getComponent(ComponentType)) {
-            throw new Error("Unique component " + ComponentType);
-        }
-        var RequireComponentTypes = Reflect.getMetadata('component:require', ComponentType) || [];
-        RequireComponentTypes.forEach(function (RequireComponentType) {
-            if (!_this.getComponent(RequireComponentType)) {
-                throw new Error(ComponentType + " require component " + RequireComponentType);
-            }
-        });
-        var component = runtime_1.instantiate(ComponentType, this);
-        if (this._hasStarted) {
-            component.start();
-        }
-        this.components.push(component);
-        return component;
-    };
-    GameObject.prototype.removeComponent = function (component) {
-        if (!ArrayUtility_1.removeFromArray(this.components, component)) {
-            throw new Error("Not found components, " + component);
-        }
-        component.destroy();
-    };
-    GameObject.prototype.getComponent = function (componentType) {
-        return this.components.find(function (component) { return component instanceof componentType; });
-    };
-    GameObject.prototype.getComponents = function (componentType) {
-        return this.components.filter(function (component) { return component instanceof componentType; });
-    };
-    GameObject.prototype.addChild = function (child) {
-        if (this.node.hasChild(child.node)) {
-            throw new Error("Repeatly add child, " + child);
-        }
-        if (child.node.parent) {
-            child.node.parent.remove(child.node);
-        }
-        this.node.add(child.node);
-        child.transform.localPosition.copy(child.transform.position);
-    };
-    GameObject.prototype.removeChild = function (child) {
-        if (this.node.hasChild(child.node)) {
-            throw new Error("Not found child, " + child);
-        }
-        this.node.remove(child.node);
-    };
-    GameObject.prototype.activate = function () {
-        _super.prototype.activate.call(this);
-        this.node.show();
-    };
-    GameObject.prototype.deactivate = function () {
-        _super.prototype.deactivate.call(this);
-        this.node.hide();
-    };
-    GameObject.prototype.start = function () {
-        _super.prototype.start.call(this);
-        this.components.forEach(function (component) { return component.start(); });
-    };
-    GameObject.prototype.fixedUpdate = function (alpha) {
-        if (alpha === void 0) { alpha = 1; }
-        this.components.forEach(function (component) { return component.fixedUpdate(alpha); });
-    };
-    GameObject.prototype.update = function () {
-        this.components.forEach(function (component) { return component.update(); });
-    };
-    GameObject.prototype.lateUpdate = function () {
-        this.components.forEach(function (component) { return component.lateUpdate(); });
-    };
-    GameObject.prototype.preRender = function () {
-        this.components.forEach(function (component) { return component.preRender(); });
-    };
-    GameObject.prototype.postRender = function () {
-        this.components.forEach(function (component) { return component.postRender(); });
-    };
-    GameObject.prototype.reset = function () {
-        _super.prototype.reset.call(this);
-        this.layer = Type_1.BuiltInLayer.Default;
-        this.components = [];
-        this.tags = [];
-        this._hasStarted = false;
-        this.components.forEach(function (component) { return component.reset(); });
-        this.children.forEach(function (child) { return child.reset(); });
-    };
-    GameObject.prototype.destroy = function () {
-        _super.prototype.destroy.call(this);
-        GameObject_1.RemoveTaggedGameObject(this);
-        this.components.forEach(function (component) { return component.destroy(); });
-        this.children.forEach(function (child) { return child.destroy(); });
-        if (this.node.parent) {
-            this.node.parent.remove(this.node);
-        }
-    };
-    GameObject.prototype.toString = function () {
-        return "GameObject(" + this.id + ")";
-    };
-    GameObject.prototype.initialize = function () {
-        this.start();
-    };
-    GameObject.TaggedGameObjects = new Map();
-    GameObject = GameObject_1 = __decorate([
-        Class_1.Class(),
-        __param(0, Inject_1.Inject(GameObjectInitializer_1.GameObjectInitializer)),
-        __metadata("design:paramtypes", [Object])
-    ], GameObject);
-    return GameObject;
-    var GameObject_1;
-}(BaseObject_1.BaseObject));
-exports.GameObject = GameObject;
-
-
-/***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1665,142 +1682,13 @@ exports.Color = Color;
 
 
 /***/ }),
-/* 8 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __metadata = (this && this.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
-var __param = (this && this.__param) || function (paramIndex, decorator) {
-    return function (target, key) { decorator(target, key, paramIndex); }
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-var Subject_1 = __webpack_require__(38);
-var Component_1 = __webpack_require__(10);
-var GameObject_1 = __webpack_require__(6);
-var TransformComponent_1 = __webpack_require__(16);
-var Bounds_1 = __webpack_require__(29);
-var RequireComponent_1 = __webpack_require__(30);
-var BrowserDelegate_1 = __webpack_require__(4);
-var Vector_1 = __webpack_require__(1);
-var Inject_1 = __webpack_require__(0);
-var RendererComponent = (function (_super) {
-    __extends(RendererComponent, _super);
-    function RendererComponent(host, browserDelegate) {
-        var _this = _super.call(this, host) || this;
-        _this.bounds = new Bounds_1.Bounds();
-        _this._onBecameVisible$ = new Subject_1.Subject();
-        _this._onBecameInvisible$ = new Subject_1.Subject();
-        _this.canvas = browserDelegate.createCanvas();
-        _this.ctx = browserDelegate.getContext(_this.canvas);
-        return _this;
-    }
-    Object.defineProperty(RendererComponent.prototype, "onBecameVisible$", {
-        get: function () { return this._onBecameVisible$.asObservable(); },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(RendererComponent.prototype, "onBecameInvisible$", {
-        get: function () { return this._onBecameInvisible$.asObservable(); },
-        enumerable: true,
-        configurable: true
-    });
-    RendererComponent.prototype.start = function () {
-        _super.prototype.start.call(this);
-        this.transform = this.getComponent(TransformComponent_1.TransformComponent);
-    };
-    RendererComponent.prototype.preRender = function () {
-        _super.prototype.preRender.call(this);
-        this.calculateBounds();
-    };
-    RendererComponent.prototype.render = function () { return; };
-    RendererComponent.prototype.onBecameVisible = function (camera) {
-        this._onBecameVisible$.next(camera);
-    };
-    RendererComponent.prototype.onBecameInvisible = function (camera) {
-        this._onBecameInvisible$.next(camera);
-    };
-    RendererComponent.prototype.destroy = function () {
-        _super.prototype.destroy.call(this);
-        this._onBecameVisible$.complete();
-        this._onBecameInvisible$.complete();
-    };
-    RendererComponent.prototype.calculateBounds = function () {
-        var _this = this;
-        var minX = Number.MAX_VALUE;
-        var minY = Number.MAX_VALUE;
-        var maxX = -Number.MAX_VALUE;
-        var maxY = -Number.MAX_VALUE;
-        var e = Vector_1.Vector.Get(this.canvas.width * 0.5, this.canvas.height * 0.5);
-        var c = this.transform.position;
-        var s = this.transform.scale;
-        Vector_1.Vector.Put(e);
-        [
-            Vector_1.Vector.Get(e.x, e.y),
-            Vector_1.Vector.Get(-e.x, e.y),
-            Vector_1.Vector.Get(-e.x, -e.y),
-            Vector_1.Vector.Get(e.x, -e.y)
-        ].forEach(function (p) {
-            p.multiply(s.x, s.y);
-            p.rotate(-_this.transform.rotation);
-            p.add(c);
-            if (p.x < minX) {
-                minX = p.x;
-            }
-            if (p.x > maxX) {
-                maxX = p.x;
-            }
-            if (p.y < minY) {
-                minY = p.y;
-            }
-            if (p.y > maxY) {
-                maxY = p.y;
-            }
-            Vector_1.Vector.Put(p);
-        });
-        this.bounds.reset(minX, minY, maxX, maxY);
-    };
-    RendererComponent = __decorate([
-        RequireComponent_1.RequireComponent([TransformComponent_1.TransformComponent]),
-        __param(1, Inject_1.Inject(BrowserDelegate_1.BrowserDelegate)),
-        __metadata("design:paramtypes", [GameObject_1.GameObject, Object])
-    ], RendererComponent);
-    return RendererComponent;
-}(Component_1.Component));
-exports.RendererComponent = RendererComponent;
-
-
-/***/ }),
 /* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-function Class(token) {
-    return function (target) {
-        return target;
-    };
-}
-exports.Class = Class;
+exports.Time = Symbol('Time');
 
 
 /***/ }),
@@ -1820,7 +1708,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var BaseObject_1 = __webpack_require__(41);
+var BaseObject_1 = __webpack_require__(49);
 var Component = (function (_super) {
     __extends(Component, _super);
     function Component(host) {
@@ -1850,21 +1738,6 @@ exports.Component = Component;
 
 /***/ }),
 /* 11 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-function UniqueComponent() {
-    return function (ComponentType) {
-        Reflect.defineMetadata('component:unique', true, ComponentType);
-    };
-}
-exports.UniqueComponent = UniqueComponent;
-
-
-/***/ }),
-/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1905,8 +1778,8 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var Engine_1 = __webpack_require__(21);
-var ProviderRegistry_1 = __webpack_require__(37);
+var Engine_1 = __webpack_require__(23);
+var ProviderRegistry_1 = __webpack_require__(47);
 var engine;
 var global = new Map();
 function bootstrap() {
@@ -1965,7 +1838,318 @@ exports.DEBUG_PHYSICS = Symbol('DEBUG_PHYSICS');
 
 
 /***/ }),
+/* 12 */,
 /* 13 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+function getClass(instance) {
+    return instance.constructor;
+}
+exports.getClass = getClass;
+var BuiltInLayer;
+(function (BuiltInLayer) {
+    BuiltInLayer[BuiltInLayer["Background"] = 1] = "Background";
+    BuiltInLayer[BuiltInLayer["Default"] = 2] = "Default";
+    BuiltInLayer[BuiltInLayer["FX"] = 4] = "FX";
+    BuiltInLayer[BuiltInLayer["UI"] = 64] = "UI";
+})(BuiltInLayer = exports.BuiltInLayer || (exports.BuiltInLayer = {}));
+exports.AllBuiltInLayer = BuiltInLayer.Background |
+    BuiltInLayer.Default |
+    BuiltInLayer.FX |
+    BuiltInLayer.UI;
+function forwardRef(get) {
+    get.__forward_ref__ = get;
+    return get;
+}
+exports.forwardRef = forwardRef;
+function resolveForwardRef(ref) {
+    if (typeof ref === 'function' && ref.hasOwnProperty('__forward_ref__') && ref.__forward_ref__ === ref) {
+        return ref();
+    }
+    else {
+        return ref;
+    }
+}
+exports.resolveForwardRef = resolveForwardRef;
+
+
+/***/ }),
+/* 14 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var Component_1 = __webpack_require__(10);
+var Vector_1 = __webpack_require__(1);
+var UniqueComponent_1 = __webpack_require__(15);
+var Matrix_1 = __webpack_require__(70);
+var TransformComponent = (function (_super) {
+    __extends(TransformComponent, _super);
+    function TransformComponent() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.position = Vector_1.Vector.Get();
+        _this.localPosition = Vector_1.Vector.Get();
+        _this.scale = Vector_1.Vector.Get(1, 1);
+        _this.localScale = Vector_1.Vector.Get(1, 1);
+        _this.rotation = 0;
+        _this.localRotation = 0;
+        _this.toWorldMatrix = new Matrix_1.Matrix();
+        _this.toLocalMatrix = _this.toWorldMatrix.getInverse();
+        return _this;
+    }
+    TransformComponent.prototype.fixedUpdate = function (alpha) {
+        _super.prototype.fixedUpdate.call(this, alpha);
+        if (this.host.parent) {
+            var parentTransform = this.host.parent.transform;
+            this.position.copy(parentTransform.position);
+            this.position.add(this.localPosition);
+            this.scale.copy(parentTransform.scale);
+            this.scale.multiply(this.localScale);
+            this.rotation = parentTransform.rotation + this.localRotation;
+        }
+        this.toWorldMatrix.reset();
+        this.toWorldMatrix.setTranslation(this.position);
+        this.toWorldMatrix.setRotatation(this.rotation);
+        this.toWorldMatrix.setScaling(this.scale);
+        this.toLocalMatrix.invertFrom(this.toWorldMatrix);
+    };
+    TransformComponent.prototype.reset = function () {
+        _super.prototype.reset.call(this);
+        this.position = Vector_1.Vector.Get();
+        this.localPosition = Vector_1.Vector.Get();
+        this.scale = Vector_1.Vector.Get(1, 1);
+        this.localScale = Vector_1.Vector.Get(1, 1);
+        this.rotation = 0;
+    };
+    TransformComponent.prototype.destroy = function () {
+        _super.prototype.destroy.call(this);
+        Vector_1.Vector.Put(this.position);
+        Vector_1.Vector.Put(this.localPosition);
+        Vector_1.Vector.Put(this.scale);
+        Vector_1.Vector.Put(this.localScale);
+        delete this.position;
+        delete this.scale;
+        delete this.localScale;
+    };
+    TransformComponent = __decorate([
+        UniqueComponent_1.UniqueComponent()
+    ], TransformComponent);
+    return TransformComponent;
+}(Component_1.Component));
+exports.TransformComponent = TransformComponent;
+
+
+/***/ }),
+/* 15 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+function UniqueComponent() {
+    return function (ComponentType) {
+        Reflect.defineMetadata('component:unique', true, ComponentType);
+    };
+}
+exports.UniqueComponent = UniqueComponent;
+
+
+/***/ }),
+/* 16 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var Texture_1 = __webpack_require__(26);
+var Vector_1 = __webpack_require__(1);
+var Rect_1 = __webpack_require__(76);
+var BrowserDelegate_1 = __webpack_require__(5);
+var Inject_1 = __webpack_require__(0);
+var Class_1 = __webpack_require__(6);
+var Sprite = (function () {
+    function Sprite(texture) {
+        this.pivot = new Vector_1.Vector(0.5, 0.5);
+        this.rect = new Rect_1.Rect();
+        this.canvas = this.browser.createCanvas();
+        this.ctx = this.browser.getContext(this.canvas);
+        this.setTexture(texture);
+    }
+    Object.defineProperty(Sprite.prototype, "texture", {
+        get: function () { return this._texture; },
+        set: function (texture) { this.setTexture(texture); },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Sprite.prototype, "width", {
+        get: function () { return this.rect.width; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Sprite.prototype, "height", {
+        get: function () { return this.rect.height; },
+        enumerable: true,
+        configurable: true
+    });
+    Sprite.prototype.setTexture = function (texture) {
+        var _this = this;
+        if (this._texture === texture) {
+            return;
+        }
+        this._texture = texture;
+        if (this.textureLoaded) {
+            this.textureLoaded.unsubscribe();
+        }
+        this.textureLoaded = texture.isLoaded$.subscribe(function () {
+            return _this.onTextureLoaded();
+        });
+    };
+    Sprite.prototype.onTextureLoaded = function () {
+        if (this.rect.width === 0 && this.rect.height === 0) {
+            this.rect.width = this._texture.width;
+            this.rect.height = this._texture.height;
+            this.canvas.width = this.rect.width;
+            this.canvas.height = this.rect.height;
+        }
+        if (this.textureLoaded) {
+            this.textureLoaded.unsubscribe();
+            delete this.textureLoaded;
+        }
+        this.ctx.clearRect(0, 0, this.rect.width, this.rect.height);
+        this.ctx.drawImage(this._texture.imageBitmap, this.rect.position.x, this.rect.position.y, this.rect.width, this.rect.height, 0, 0, this.rect.width, this.rect.height);
+    };
+    __decorate([
+        Inject_1.Inject(BrowserDelegate_1.BrowserDelegate),
+        __metadata("design:type", Object)
+    ], Sprite.prototype, "browser", void 0);
+    Sprite = __decorate([
+        Class_1.Class(),
+        __metadata("design:paramtypes", [Texture_1.Texture])
+    ], Sprite);
+    return Sprite;
+}());
+exports.Sprite = Sprite;
+
+
+/***/ }),
+/* 17 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Screen = Symbol('Screen');
+
+
+/***/ }),
+/* 18 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.SceneManager = Symbol('SceneManager');
+
+
+/***/ }),
+/* 19 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.CollisionJumpTable = Symbol('CollisionJumpTable');
+
+
+/***/ }),
+/* 20 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var RendererComponent_1 = __webpack_require__(24);
+var UniqueComponent_1 = __webpack_require__(15);
+var SpriteRendererComponent = (function (_super) {
+    __extends(SpriteRendererComponent, _super);
+    function SpriteRendererComponent() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    SpriteRendererComponent.prototype.update = function () {
+        _super.prototype.update.call(this);
+        if (this.sprite) {
+            var _a = this.sprite, width = _a.width, height = _a.height;
+            this.canvas.width = width;
+            this.canvas.height = height;
+        }
+    };
+    SpriteRendererComponent.prototype.render = function () {
+        if (!this.sprite) {
+            return;
+        }
+        var ctx = this.ctx;
+        var _a = this.canvas, width = _a.width, height = _a.height;
+        ctx.clearRect(0, 0, width, height);
+        ctx.save();
+        ctx.drawImage(this.sprite.canvas, 0, 0);
+        ctx.restore();
+    };
+    SpriteRendererComponent = __decorate([
+        UniqueComponent_1.UniqueComponent()
+    ], SpriteRendererComponent);
+    return SpriteRendererComponent;
+}(RendererComponent_1.RendererComponent));
+exports.SpriteRendererComponent = SpriteRendererComponent;
+
+
+/***/ }),
+/* 21 */,
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1975,10 +2159,10 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var isFunction_1 = __webpack_require__(34);
-var Subscription_1 = __webpack_require__(27);
-var Observer_1 = __webpack_require__(48);
-var rxSubscriber_1 = __webpack_require__(36);
+var isFunction_1 = __webpack_require__(44);
+var Subscription_1 = __webpack_require__(37);
+var Observer_1 = __webpack_require__(61);
+var rxSubscriber_1 = __webpack_require__(46);
 /**
  * Implements the {@link Observer} interface and extends the
  * {@link Subscription} class. While the {@link Observer} is the public API for
@@ -2235,55 +2419,17 @@ var SafeSubscriber = (function (_super) {
 //# sourceMappingURL=Subscriber.js.map
 
 /***/ }),
-/* 14 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-function getClass(instance) {
-    return instance.constructor;
-}
-exports.getClass = getClass;
-var BuiltInLayer;
-(function (BuiltInLayer) {
-    BuiltInLayer[BuiltInLayer["Background"] = 1] = "Background";
-    BuiltInLayer[BuiltInLayer["Default"] = 2] = "Default";
-    BuiltInLayer[BuiltInLayer["FX"] = 4] = "FX";
-    BuiltInLayer[BuiltInLayer["UI"] = 64] = "UI";
-})(BuiltInLayer = exports.BuiltInLayer || (exports.BuiltInLayer = {}));
-exports.AllBuiltInLayer = BuiltInLayer.Background |
-    BuiltInLayer.Default |
-    BuiltInLayer.FX |
-    BuiltInLayer.UI;
-function forwardRef(get) {
-    get.__forward_ref__ = get;
-    return get;
-}
-exports.forwardRef = forwardRef;
-function resolveForwardRef(ref) {
-    if (typeof ref === 'function' && ref.hasOwnProperty('__forward_ref__') && ref.__forward_ref__ === ref) {
-        return ref();
-    }
-    else {
-        return ref;
-    }
-}
-exports.resolveForwardRef = resolveForwardRef;
+exports.Engine = Symbol('Engine');
 
 
 /***/ }),
-/* 15 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.SceneManager = Symbol('SceneManager');
-
-
-/***/ }),
-/* 16 */
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2304,126 +2450,125 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 Object.defineProperty(exports, "__esModule", { value: true });
+var Subject_1 = __webpack_require__(29);
 var Component_1 = __webpack_require__(10);
+var GameObject_1 = __webpack_require__(2);
+var TransformComponent_1 = __webpack_require__(14);
+var Bounds_1 = __webpack_require__(30);
+var RequireComponent_1 = __webpack_require__(31);
+var BrowserDelegate_1 = __webpack_require__(5);
 var Vector_1 = __webpack_require__(1);
-var UniqueComponent_1 = __webpack_require__(11);
-var Matrix_1 = __webpack_require__(58);
-var TransformComponent = (function (_super) {
-    __extends(TransformComponent, _super);
-    function TransformComponent() {
-        var _this = _super !== null && _super.apply(this, arguments) || this;
-        _this.position = Vector_1.Vector.Get();
-        _this.localPosition = Vector_1.Vector.Get();
-        _this.scale = Vector_1.Vector.Get(1, 1);
-        _this.localScale = Vector_1.Vector.Get(1, 1);
-        _this.rotation = 0;
-        _this.localRotation = 0;
-        _this.toWorldMatrix = new Matrix_1.Matrix();
-        _this.toLocalMatrix = _this.toWorldMatrix.getInverse();
+var Inject_1 = __webpack_require__(0);
+var RendererComponent = (function (_super) {
+    __extends(RendererComponent, _super);
+    function RendererComponent(host, browserDelegate) {
+        var _this = _super.call(this, host) || this;
+        _this.bounds = new Bounds_1.Bounds();
+        _this._onBecameVisible$ = new Subject_1.Subject();
+        _this._onBecameInvisible$ = new Subject_1.Subject();
+        _this.isVisible = false;
+        _this.canvas = browserDelegate.createCanvas();
+        _this.ctx = browserDelegate.getContext(_this.canvas);
         return _this;
     }
-    TransformComponent.prototype.fixedUpdate = function (alpha) {
-        _super.prototype.fixedUpdate.call(this, alpha);
-        if (this.host.parent) {
-            var parentTransform = this.host.parent.transform;
-            this.position.copy(parentTransform.position);
-            this.position.add(this.localPosition);
-            this.scale.copy(parentTransform.scale);
-            this.scale.multiply(this.localScale);
-            this.rotation = parentTransform.rotation + this.localRotation;
-        }
-        this.toWorldMatrix.reset();
-        this.toWorldMatrix.setTranslation(this.position);
-        this.toWorldMatrix.setRotatation(this.rotation);
-        this.toWorldMatrix.setScaling(this.scale);
-        this.toLocalMatrix.invertFrom(this.toWorldMatrix);
+    Object.defineProperty(RendererComponent.prototype, "onBecameVisible$", {
+        get: function () { return this._onBecameVisible$.asObservable(); },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(RendererComponent.prototype, "onBecameInvisible$", {
+        get: function () { return this._onBecameInvisible$.asObservable(); },
+        enumerable: true,
+        configurable: true
+    });
+    RendererComponent.prototype.start = function () {
+        _super.prototype.start.call(this);
+        this.transform = this.getComponent(TransformComponent_1.TransformComponent);
     };
-    TransformComponent.prototype.reset = function () {
-        _super.prototype.reset.call(this);
-        this.position.reset();
-        this.localPosition.reset();
-        this.scale.setTo(1, 1);
-        this.localScale.setTo(1, 1);
-        this.rotation = 0;
+    RendererComponent.prototype.preRender = function () {
+        _super.prototype.preRender.call(this);
+        this.calculateBounds();
     };
-    TransformComponent.prototype.destroy = function () {
+    RendererComponent.prototype.render = function () { return; };
+    RendererComponent.prototype.onBecameVisible = function (camera) {
+        this.isVisible = true;
+        this._onBecameVisible$.next(camera);
+    };
+    RendererComponent.prototype.onBecameInvisible = function (camera) {
+        this.isVisible = false;
+        this._onBecameInvisible$.next(camera);
+    };
+    RendererComponent.prototype.destroy = function () {
         _super.prototype.destroy.call(this);
-        Vector_1.Vector.Put(this.position);
-        Vector_1.Vector.Put(this.localPosition);
-        Vector_1.Vector.Put(this.scale);
-        Vector_1.Vector.Put(this.localScale);
-        delete this.position;
-        delete this.scale;
-        delete this.localScale;
+        this._onBecameVisible$.complete();
+        this._onBecameInvisible$.complete();
     };
-    TransformComponent = __decorate([
-        UniqueComponent_1.UniqueComponent()
-    ], TransformComponent);
-    return TransformComponent;
+    RendererComponent.prototype.calculateBounds = function () {
+        var _this = this;
+        var minX = Number.MAX_VALUE;
+        var minY = Number.MAX_VALUE;
+        var maxX = -Number.MAX_VALUE;
+        var maxY = -Number.MAX_VALUE;
+        var dx = this.canvas.width * 0.5;
+        var dy = this.canvas.height * 0.5;
+        [
+            Vector_1.Vector.Get(dx, dy),
+            Vector_1.Vector.Get(-dx, dy),
+            Vector_1.Vector.Get(-dx, -dy),
+            Vector_1.Vector.Get(dx, -dy)
+        ].forEach(function (p) {
+            _this.transform.toWorldMatrix.multiplyToPoint(p);
+            if (p.x < minX) {
+                minX = p.x;
+            }
+            if (p.x > maxX) {
+                maxX = p.x;
+            }
+            if (p.y < minY) {
+                minY = p.y;
+            }
+            if (p.y > maxY) {
+                maxY = p.y;
+            }
+            Vector_1.Vector.Put(p);
+        });
+        this.bounds.reset(minX, minY, maxX, maxY);
+    };
+    RendererComponent = __decorate([
+        RequireComponent_1.RequireComponent([TransformComponent_1.TransformComponent]),
+        __param(1, Inject_1.Inject(BrowserDelegate_1.BrowserDelegate)),
+        __metadata("design:paramtypes", [GameObject_1.GameObject, Object])
+    ], RendererComponent);
+    return RendererComponent;
 }(Component_1.Component));
-exports.TransformComponent = TransformComponent;
+exports.RendererComponent = RendererComponent;
 
 
 /***/ }),
-/* 17 */,
-/* 18 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(global) {
-// CommonJS / Node have global context exposed as "global" variable.
-// We don't want to include the whole node.d.ts this this compilation unit so we'll just fake
-// the global "global" var for now.
-var __window = typeof window !== 'undefined' && window;
-var __self = typeof self !== 'undefined' && typeof WorkerGlobalScope !== 'undefined' &&
-    self instanceof WorkerGlobalScope && self;
-var __global = typeof global !== 'undefined' && global;
-var _root = __window || __global || __self;
-exports.root = _root;
-// Workaround Closure Compiler restriction: The body of a goog.module cannot use throw.
-// This is needed when used with angular/tsickle which inserts a goog.module statement.
-// Wrap in IIFE
-(function () {
-    if (!_root) {
-        throw new Error('RxJS could not find any global context (window, self, global)');
-    }
-})();
-//# sourceMappingURL=root.js.map
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(45)))
-
-/***/ }),
-/* 19 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Screen = Symbol('Screen');
+var ForceMode;
+(function (ForceMode) {
+    ForceMode[ForceMode["Force"] = 0] = "Force";
+    ForceMode[ForceMode["Acceleration"] = 1] = "Acceleration";
+    ForceMode[ForceMode["Impulse"] = 2] = "Impulse";
+    ForceMode[ForceMode["VelocityChange"] = 3] = "VelocityChange";
+})(ForceMode = exports.ForceMode || (exports.ForceMode = {}));
 
 
 /***/ }),
-/* 20 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.Time = Symbol('Time');
-
-
-/***/ }),
-/* 21 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.Engine = Symbol('Engine');
-
-
-/***/ }),
-/* 22 */
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2483,9 +2628,9 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var Resource_1 = __webpack_require__(62);
-var DOM_1 = __webpack_require__(56);
-var BrowserDelegate_1 = __webpack_require__(4);
+var Resource_1 = __webpack_require__(74);
+var DOM_1 = __webpack_require__(68);
+var BrowserDelegate_1 = __webpack_require__(5);
 var Inject_1 = __webpack_require__(0);
 var Texture = (function (_super) {
     __extends(Texture, _super);
@@ -2593,11 +2738,380 @@ exports.Texture = Texture;
 
 
 /***/ }),
-/* 23 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
+Object.defineProperty(exports, "__esModule", { value: true });
+__webpack_require__(78);
+__webpack_require__(103);
+__webpack_require__(104);
+__webpack_require__(105);
+__webpack_require__(107);
+__webpack_require__(108);
+__webpack_require__(109);
+__webpack_require__(110);
+__webpack_require__(111);
+__webpack_require__(112);
+__webpack_require__(113);
+__webpack_require__(114);
+__webpack_require__(115);
+__webpack_require__(117);
+__webpack_require__(118);
+__webpack_require__(119);
+
+
+/***/ }),
+/* 28 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(global) {
+// CommonJS / Node have global context exposed as "global" variable.
+// We don't want to include the whole node.d.ts this this compilation unit so we'll just fake
+// the global "global" var for now.
+var __window = typeof window !== 'undefined' && window;
+var __self = typeof self !== 'undefined' && typeof WorkerGlobalScope !== 'undefined' &&
+    self instanceof WorkerGlobalScope && self;
+var __global = typeof global !== 'undefined' && global;
+var _root = __window || __global || __self;
+exports.root = _root;
+// Workaround Closure Compiler restriction: The body of a goog.module cannot use throw.
+// This is needed when used with angular/tsickle which inserts a goog.module statement.
+// Wrap in IIFE
+(function () {
+    if (!_root) {
+        throw new Error('RxJS could not find any global context (window, self, global)');
+    }
+})();
+//# sourceMappingURL=root.js.map
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(58)))
+
+/***/ }),
+/* 29 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var Observable_1 = __webpack_require__(4);
+var Subscriber_1 = __webpack_require__(22);
+var Subscription_1 = __webpack_require__(37);
+var ObjectUnsubscribedError_1 = __webpack_require__(65);
+var SubjectSubscription_1 = __webpack_require__(106);
+var rxSubscriber_1 = __webpack_require__(46);
+/**
+ * @class SubjectSubscriber<T>
+ */
+var SubjectSubscriber = (function (_super) {
+    __extends(SubjectSubscriber, _super);
+    function SubjectSubscriber(destination) {
+        _super.call(this, destination);
+        this.destination = destination;
+    }
+    return SubjectSubscriber;
+}(Subscriber_1.Subscriber));
+exports.SubjectSubscriber = SubjectSubscriber;
+/**
+ * @class Subject<T>
+ */
+var Subject = (function (_super) {
+    __extends(Subject, _super);
+    function Subject() {
+        _super.call(this);
+        this.observers = [];
+        this.closed = false;
+        this.isStopped = false;
+        this.hasError = false;
+        this.thrownError = null;
+    }
+    Subject.prototype[rxSubscriber_1.rxSubscriber] = function () {
+        return new SubjectSubscriber(this);
+    };
+    Subject.prototype.lift = function (operator) {
+        var subject = new AnonymousSubject(this, this);
+        subject.operator = operator;
+        return subject;
+    };
+    Subject.prototype.next = function (value) {
+        if (this.closed) {
+            throw new ObjectUnsubscribedError_1.ObjectUnsubscribedError();
+        }
+        if (!this.isStopped) {
+            var observers = this.observers;
+            var len = observers.length;
+            var copy = observers.slice();
+            for (var i = 0; i < len; i++) {
+                copy[i].next(value);
+            }
+        }
+    };
+    Subject.prototype.error = function (err) {
+        if (this.closed) {
+            throw new ObjectUnsubscribedError_1.ObjectUnsubscribedError();
+        }
+        this.hasError = true;
+        this.thrownError = err;
+        this.isStopped = true;
+        var observers = this.observers;
+        var len = observers.length;
+        var copy = observers.slice();
+        for (var i = 0; i < len; i++) {
+            copy[i].error(err);
+        }
+        this.observers.length = 0;
+    };
+    Subject.prototype.complete = function () {
+        if (this.closed) {
+            throw new ObjectUnsubscribedError_1.ObjectUnsubscribedError();
+        }
+        this.isStopped = true;
+        var observers = this.observers;
+        var len = observers.length;
+        var copy = observers.slice();
+        for (var i = 0; i < len; i++) {
+            copy[i].complete();
+        }
+        this.observers.length = 0;
+    };
+    Subject.prototype.unsubscribe = function () {
+        this.isStopped = true;
+        this.closed = true;
+        this.observers = null;
+    };
+    Subject.prototype._trySubscribe = function (subscriber) {
+        if (this.closed) {
+            throw new ObjectUnsubscribedError_1.ObjectUnsubscribedError();
+        }
+        else {
+            return _super.prototype._trySubscribe.call(this, subscriber);
+        }
+    };
+    Subject.prototype._subscribe = function (subscriber) {
+        if (this.closed) {
+            throw new ObjectUnsubscribedError_1.ObjectUnsubscribedError();
+        }
+        else if (this.hasError) {
+            subscriber.error(this.thrownError);
+            return Subscription_1.Subscription.EMPTY;
+        }
+        else if (this.isStopped) {
+            subscriber.complete();
+            return Subscription_1.Subscription.EMPTY;
+        }
+        else {
+            this.observers.push(subscriber);
+            return new SubjectSubscription_1.SubjectSubscription(this, subscriber);
+        }
+    };
+    Subject.prototype.asObservable = function () {
+        var observable = new Observable_1.Observable();
+        observable.source = this;
+        return observable;
+    };
+    Subject.create = function (destination, source) {
+        return new AnonymousSubject(destination, source);
+    };
+    return Subject;
+}(Observable_1.Observable));
+exports.Subject = Subject;
+/**
+ * @class AnonymousSubject<T>
+ */
+var AnonymousSubject = (function (_super) {
+    __extends(AnonymousSubject, _super);
+    function AnonymousSubject(destination, source) {
+        _super.call(this);
+        this.destination = destination;
+        this.source = source;
+    }
+    AnonymousSubject.prototype.next = function (value) {
+        var destination = this.destination;
+        if (destination && destination.next) {
+            destination.next(value);
+        }
+    };
+    AnonymousSubject.prototype.error = function (err) {
+        var destination = this.destination;
+        if (destination && destination.error) {
+            this.destination.error(err);
+        }
+    };
+    AnonymousSubject.prototype.complete = function () {
+        var destination = this.destination;
+        if (destination && destination.complete) {
+            this.destination.complete();
+        }
+    };
+    AnonymousSubject.prototype._subscribe = function (subscriber) {
+        var source = this.source;
+        if (source) {
+            return this.source.subscribe(subscriber);
+        }
+        else {
+            return Subscription_1.Subscription.EMPTY;
+        }
+    };
+    return AnonymousSubject;
+}(Subject));
+exports.AnonymousSubject = AnonymousSubject;
+//# sourceMappingURL=Subject.js.map
+
+/***/ }),
+/* 30 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var Vector_1 = __webpack_require__(1);
+var Bounds = (function () {
+    function Bounds() {
+        var args = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            args[_i] = arguments[_i];
+        }
+        this.center = Vector_1.Vector.Get();
+        this.extents = Vector_1.Vector.Get();
+        this._canRecycle = false;
+        if (args.length === 2) {
+            this.reset(args[0], args[1]);
+        }
+        else if (args.length === 4) {
+            this.reset(args[0], args[1], args[2], args[3]);
+        }
+    }
+    Object.defineProperty(Bounds.prototype, "canRecycle", {
+        get: function () { return this._canRecycle; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Bounds.prototype, "min", {
+        get: function () {
+            return this.center.clone().subtract(this.extents);
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Bounds.prototype, "max", {
+        get: function () {
+            return this.center.clone().add(this.extents);
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Bounds.prototype, "size", {
+        get: function () {
+            return this.extents.clone().multiply(2);
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Bounds.prototype, "top", {
+        get: function () { return this.center.y + this.extents.y; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Bounds.prototype, "bottom", {
+        get: function () { return this.center.y - this.extents.y; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Bounds.prototype, "right", {
+        get: function () { return this.center.x + this.extents.x; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Bounds.prototype, "left", {
+        get: function () { return this.center.x - this.extents.x; },
+        enumerable: true,
+        configurable: true
+    });
+    Bounds.prototype.containPoint = function (point) {
+        return point.greaterThanEqual(this.min) && point.lessThanEqual(this.max);
+    };
+    Bounds.prototype.intersects = function (bounds) {
+        var minA = this.min;
+        var maxA = this.max;
+        var minB = bounds.min;
+        var maxB = bounds.max;
+        if (maxA.x < minB.x || minA.x > maxB.x) {
+            return false;
+        }
+        if (maxA.y < minB.y || minA.y > maxB.y) {
+            return false;
+        }
+        return true;
+    };
+    Bounds.prototype.reset = function () {
+        var args = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            args[_i] = arguments[_i];
+        }
+        if (args.length === 2) {
+            this.center.copy(args[0]);
+            this.extents.copy(args[1]);
+        }
+        else if (args.length === 4) {
+            this.center.setTo((args[2] + args[0]) / 2, (args[3] + args[1]) / 2);
+            this.extents.setTo((args[2] - args[0]) / 2, (args[3] - args[1]) / 2);
+        }
+    };
+    Bounds.prototype.destroy = function () {
+        this._canRecycle = true;
+        this.center.destroy();
+        this.extents.destroy();
+        this.min.destroy();
+        this.max.destroy();
+        this.size.destroy();
+    };
+    Bounds.prototype.toString = function () {
+        return "Bounds (center: " + this.center + ", extents: " + this.extents + ")";
+    };
+    return Bounds;
+}());
+exports.Bounds = Bounds;
+
+
+/***/ }),
+/* 31 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var ArrayUtility_1 = __webpack_require__(7);
+function RequireComponent(RequireTypes) {
+    return function (ComponentType) {
+        var requireComponentTypes = Reflect.getMetadata('component:require', ComponentType) || [];
+        RequireTypes.forEach(function (RequireType) { return ArrayUtility_1.addToArray(requireComponentTypes, RequireType); });
+        Reflect.defineMetadata('component:require', requireComponentTypes, ComponentType);
+    };
+}
+exports.RequireComponent = RequireComponent;
+
+
+/***/ }),
+/* 32 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -2607,115 +3121,225 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-Object.defineProperty(exports, "__esModule", { value: true });
-var Texture_1 = __webpack_require__(22);
-var Vector_1 = __webpack_require__(1);
-var Rect_1 = __webpack_require__(64);
-var BrowserDelegate_1 = __webpack_require__(4);
-var Inject_1 = __webpack_require__(0);
-var Class_1 = __webpack_require__(9);
-var Sprite = (function () {
-    function Sprite(texture) {
-        this.pivot = new Vector_1.Vector(0.5, 0.5);
-        this.rect = new Rect_1.Rect();
-        this.canvas = this.browser.createCanvas();
-        this.ctx = this.browser.getContext(this.canvas);
-        this.setTexture(texture);
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __generator = (this && this.__generator) || function (thisArg, body) {
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    function verb(n) { return function (v) { return step([n, v]); }; }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while (_) try {
+            if (f = 1, y && (t = y[op[0] & 2 ? "return" : op[0] ? "throw" : "next"]) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [0, t.value];
+            switch (op[0]) {
+                case 0: case 1: t = op; break;
+                case 4: _.label++; return { value: op[1], done: false };
+                case 5: _.label++; y = op[1]; op = [0]; continue;
+                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop(); continue;
+            }
+            op = body.call(thisArg, _);
+        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
-    Object.defineProperty(Sprite.prototype, "texture", {
-        get: function () { return this._texture; },
-        set: function (texture) { this.setTexture(texture); },
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var BaseObject_1 = __webpack_require__(49);
+var Tree_1 = __webpack_require__(71);
+var Bundle_1 = __webpack_require__(120);
+var Camera_1 = __webpack_require__(75);
+var ArrayUtility_1 = __webpack_require__(7);
+var Inject_1 = __webpack_require__(0);
+var Class_1 = __webpack_require__(6);
+var BroadPhaseCollisionResolver_1 = __webpack_require__(42);
+var NarrowPhaseCollisionResolver_1 = __webpack_require__(73);
+var Vector_1 = __webpack_require__(1);
+var GameObjectInitializer_1 = __webpack_require__(39);
+var RenderProcess_1 = __webpack_require__(69);
+var runtime_1 = __webpack_require__(11);
+var Logger_1 = __webpack_require__(48);
+var Screen_1 = __webpack_require__(17);
+var BrowserDelegate_1 = __webpack_require__(5);
+var Time_1 = __webpack_require__(9);
+var Color_1 = __webpack_require__(8);
+var Scene = (function (_super) {
+    __extends(Scene, _super);
+    function Scene(broadPhaseCollisionResolver, narrowPhaseCollisionResolver, gameObjectInitializer, renderProcess, mainCamera, logger, screen, browser, time) {
+        var _this = _super.call(this) || this;
+        _this.broadPhaseCollisionResolver = broadPhaseCollisionResolver;
+        _this.narrowPhaseCollisionResolver = narrowPhaseCollisionResolver;
+        _this.gameObjectInitializer = gameObjectInitializer;
+        _this.renderProcess = renderProcess;
+        _this.mainCamera = mainCamera;
+        _this.logger = logger;
+        _this.screen = screen;
+        _this.browser = browser;
+        _this.time = time;
+        _this.resources = new Bundle_1.Bundle();
+        _this.gameObjects = new Tree_1.Tree(null);
+        _this.cameras = [];
+        _this.rightTop = new Vector_1.Vector();
+        _this.add(_this.mainCamera);
+        _this.resizeSubscription = browser.resize$.subscribe(function () { return _this.onResize(); });
+        _this.rightTop.setTo(_this.screen.width, 0);
+        return _this;
+    }
+    Object.defineProperty(Scene.prototype, "isLoaded", {
+        get: function () { return this.resources.isLoaded; },
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(Sprite.prototype, "width", {
-        get: function () { return this.rect.width; },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Sprite.prototype, "height", {
-        get: function () { return this.rect.height; },
-        enumerable: true,
-        configurable: true
-    });
-    Sprite.prototype.setTexture = function (texture) {
-        var _this = this;
-        if (this._texture === texture) {
-            return;
+    Scene.prototype.add = function (gameObject, at) {
+        if (!this.gameObjects.add(gameObject.node)) {
+            return false;
         }
-        this._texture = texture;
-        if (this.textureLoaded) {
-            this.textureLoaded.unsubscribe();
+        if (!gameObject.hasStarted) {
+            gameObject.node.hide();
         }
-        this.textureLoaded = texture.isLoaded$.subscribe(function () {
-            return _this.onTextureLoaded();
+        if (gameObject instanceof Camera_1.Camera) {
+            ArrayUtility_1.addToArray(this.cameras, gameObject);
+        }
+        if (at) {
+            gameObject.transform.position.copy(at);
+        }
+        return true;
+    };
+    Scene.prototype.remove = function (gameObject) {
+        gameObject.node.show();
+        if (!this.gameObjects.remove(gameObject.node)) {
+            return false;
+        }
+        if (gameObject instanceof Camera_1.Camera) {
+            ArrayUtility_1.removeFromArray(this.cameras, gameObject);
+        }
+        return true;
+    };
+    Scene.prototype.has = function (gameObject) {
+        return this.gameObjects.hasChild(gameObject.node);
+    };
+    Scene.prototype.load = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4, this.resources.load()];
+                    case 1:
+                        _a.sent();
+                        return [2];
+                }
+            });
         });
     };
-    Sprite.prototype.onTextureLoaded = function () {
-        if (this.rect.width === 0 && this.rect.height === 0) {
-            this.rect.width = this._texture.width;
-            this.rect.height = this._texture.height;
-            this.canvas.width = this.rect.width;
-            this.canvas.height = this.rect.height;
-        }
-        if (this.textureLoaded) {
-            this.textureLoaded.unsubscribe();
-            delete this.textureLoaded;
-        }
-        this.ctx.clearRect(0, 0, this.rect.width, this.rect.height);
-        this.ctx.drawImage(this._texture.imageBitmap, this.rect.position.x, this.rect.position.y, this.rect.width, this.rect.height, 0, 0, this.rect.width, this.rect.height);
+    Scene.prototype.fixedUpdate = function (alpha) {
+        this.gameObjects.forEachChildren(function (gameObject) { return gameObject.fixedUpdate(alpha); });
+        this.broadPhaseCollisionResolver.fixedUpdate();
+        this.narrowPhaseCollisionResolver.resolve(this.broadPhaseCollisionResolver.pairs);
     };
-    __decorate([
-        Inject_1.Inject(BrowserDelegate_1.BrowserDelegate),
-        __metadata("design:type", Object)
-    ], Sprite.prototype, "browser", void 0);
-    Sprite = __decorate([
+    Scene.prototype.update = function () {
+        var _this = this;
+        this.gameObjects.forEachChildren(function (gameObject) { return gameObject.update(); });
+        this.broadPhaseCollisionResolver.update();
+        this.narrowPhaseCollisionResolver.resolve(this.broadPhaseCollisionResolver.pairs);
+        runtime_1.ifdef(runtime_1.DEBUG, function () { return _this.logger.update(); });
+    };
+    Scene.prototype.lateUpdate = function () {
+        this.gameObjects.forEachChildren(function (gameObject) { return gameObject.lateUpdate(); });
+    };
+    Scene.prototype.preRender = function () {
+        this.gameObjects.forEachChildren(function (gameObject) { return gameObject.preRender(); });
+    };
+    Scene.prototype.render = function (ctx, width, height) {
+        var _this = this;
+        this.renderProcess.useContext(ctx, width, height);
+        this.cameras.forEach(function (camera) { return _this.renderProcess.render(camera, _this.gameObjects); });
+        runtime_1.ifdef(runtime_1.DEBUG_PHYSICS, function () { return _this.cameras.forEach(function (camera) { return _this.broadPhaseCollisionResolver.debugRender(ctx, camera); }); });
+        runtime_1.ifdef(runtime_1.DEBUG, function () {
+            _this.logger.render(ctx);
+            _this.debugRender(ctx);
+        });
+    };
+    Scene.prototype.postRender = function () {
+        this.gameObjects.forEachChildren(function (gameObject) { return gameObject.postRender(); });
+        this.gameObjectInitializer.resolve();
+    };
+    Scene.prototype.reset = function () {
+        var _this = this;
+        this.reset();
+        this.resizeSubscription = this.browser.resize$.subscribe(function () { return _this.onResize(); });
+    };
+    Scene.prototype.destroy = function () {
+        _super.prototype.destroy.call(this);
+        this.gameObjects.forEachChildren(function (gameObject) { return gameObject.destroy(); });
+        this.resizeSubscription.unsubscribe();
+    };
+    Scene.prototype.toString = function () {
+        return "Scene(" + this.name + ")";
+    };
+    Scene.prototype.debugRender = function (ctx) {
+        var deltaTime = ((this.time.deltaTime * 100) | 0) * 0.01;
+        var fps = ((1000 / deltaTime * 100) | 0) * 0.01;
+        ctx.save();
+        ctx.fillStyle = Color_1.Color.White.toHexString();
+        var deltaTimeText = "deltaTime: " + deltaTime;
+        var deltaTimeWidth = ctx.measureText(deltaTimeText).width;
+        ctx.fillText(deltaTimeText, this.rightTop.x - deltaTimeWidth, this.rightTop.y + 12);
+        var fpsText = "fps: " + fps;
+        var fpsWidth = ctx.measureText(fpsText).width;
+        ctx.fillText(fpsText, this.rightTop.x - fpsWidth, this.rightTop.y + 30);
+        ctx.restore();
+    };
+    Scene.prototype.onResize = function () {
+        this.rightTop.setTo(this.screen.width, 0);
+    };
+    Scene = __decorate([
         Class_1.Class(),
-        __metadata("design:paramtypes", [Texture_1.Texture])
-    ], Sprite);
-    return Sprite;
-}());
-exports.Sprite = Sprite;
+        __param(0, Inject_1.Inject(BroadPhaseCollisionResolver_1.BroadPhaseCollisionResolver)),
+        __param(1, Inject_1.Inject(NarrowPhaseCollisionResolver_1.NarrowPhaseCollisionResolver)),
+        __param(2, Inject_1.Inject(GameObjectInitializer_1.GameObjectInitializer)),
+        __param(3, Inject_1.Inject(RenderProcess_1.RenderProcess)),
+        __param(4, Inject_1.Inject(Camera_1.MainCamera)),
+        __param(5, Inject_1.Inject(Logger_1.Logger)),
+        __param(6, Inject_1.Inject(Screen_1.Screen)),
+        __param(7, Inject_1.Inject(BrowserDelegate_1.BrowserDelegate)),
+        __param(8, Inject_1.Inject(Time_1.Time)),
+        __metadata("design:paramtypes", [Object, Object, Object, Object, Camera_1.Camera, Object, Object, Object, Object])
+    ], Scene);
+    return Scene;
+}(BaseObject_1.BaseObject));
+exports.Scene = Scene;
 
 
 /***/ }),
-/* 24 */,
-/* 25 */,
-/* 26 */
+/* 33 */,
+/* 34 */,
+/* 35 */,
+/* 36 */,
+/* 37 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-Object.defineProperty(exports, "__esModule", { value: true });
-__webpack_require__(70);
-__webpack_require__(95);
-__webpack_require__(96);
-__webpack_require__(97);
-__webpack_require__(99);
-__webpack_require__(100);
-__webpack_require__(101);
-__webpack_require__(102);
-__webpack_require__(103);
-__webpack_require__(104);
-__webpack_require__(105);
-__webpack_require__(107);
-__webpack_require__(109);
-__webpack_require__(110);
-__webpack_require__(111);
-
-
-/***/ }),
-/* 27 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-var isArray_1 = __webpack_require__(73);
-var isObject_1 = __webpack_require__(46);
-var isFunction_1 = __webpack_require__(34);
-var tryCatch_1 = __webpack_require__(47);
-var errorObject_1 = __webpack_require__(35);
-var UnsubscriptionError_1 = __webpack_require__(74);
+var isArray_1 = __webpack_require__(81);
+var isObject_1 = __webpack_require__(59);
+var isFunction_1 = __webpack_require__(44);
+var tryCatch_1 = __webpack_require__(60);
+var errorObject_1 = __webpack_require__(45);
+var UnsubscriptionError_1 = __webpack_require__(82);
 /**
  * Represents a disposable resource, such as the execution of an Observable. A
  * Subscription has one important method, `unsubscribe`, that takes no argument
@@ -2904,7 +3528,61 @@ function flattenUnsubscriptionErrors(errors) {
 //# sourceMappingURL=Subscription.js.map
 
 /***/ }),
-/* 28 */
+/* 38 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var ArrayUtility_1 = __webpack_require__(7);
+var Pool = (function () {
+    function Pool(factory, max, initSize) {
+        if (max === void 0) { max = Infinity; }
+        if (initSize === void 0) { initSize = max <= 1024 ? max : 1024; }
+        this.factory = factory;
+        this.max = max;
+        this._actives = [];
+        this._inactives = [];
+        this.size = 0;
+        this.size = initSize;
+        for (var i = 0; i < this.size; i++) {
+            var instance = factory();
+            instance.destroy();
+            ArrayUtility_1.addToArray(this._inactives, instance);
+        }
+    }
+    Pool.prototype.get = function () {
+        var args = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            args[_i] = arguments[_i];
+        }
+        var instance = this._inactives.shift();
+        if (!instance) {
+            if (this.size < this.max) {
+                instance = this.factory.apply(this, args);
+                ArrayUtility_1.addToArray(this._actives, instance);
+                this.size++;
+            }
+        }
+        else {
+            instance.reset.apply(instance, args);
+        }
+        return instance;
+    };
+    Pool.prototype.put = function (instance) {
+        if (ArrayUtility_1.removeFromArray(this._actives, instance)) {
+            instance.destroy();
+            this._inactives.push(instance);
+            this.size--;
+        }
+    };
+    return Pool;
+}());
+exports.Pool = Pool;
+
+
+/***/ }),
+/* 39 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2914,350 +3592,38 @@ exports.GameObjectInitializer = Symbol('GameObjectInitializer');
 
 
 /***/ }),
-/* 29 */
+/* 40 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var Vector_1 = __webpack_require__(1);
-var Bounds = (function () {
-    function Bounds() {
-        var args = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            args[_i] = arguments[_i];
-        }
-        this.center = Vector_1.Vector.Get();
-        this.extents = Vector_1.Vector.Get();
-        this._canRecycle = false;
-        if (args.length === 2) {
-            this.reset(args[0], args[1]);
-        }
-        else if (args.length === 4) {
-            this.reset(args[0], args[1], args[2], args[3]);
-        }
-    }
-    Object.defineProperty(Bounds.prototype, "canRecycle", {
-        get: function () { return this._canRecycle; },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Bounds.prototype, "min", {
-        get: function () {
-            return this.center.clone().subtract(this.extents);
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Bounds.prototype, "max", {
-        get: function () {
-            return this.center.clone().add(this.extents);
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Bounds.prototype, "size", {
-        get: function () {
-            return this.extents.clone().multiply(2);
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Bounds.prototype, "top", {
-        get: function () { return this.center.y + this.extents.y; },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Bounds.prototype, "bottom", {
-        get: function () { return this.center.y - this.extents.y; },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Bounds.prototype, "right", {
-        get: function () { return this.center.x + this.extents.x; },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Bounds.prototype, "left", {
-        get: function () { return this.center.x - this.extents.x; },
-        enumerable: true,
-        configurable: true
-    });
-    Bounds.prototype.containPoint = function (point) {
-        return point.greaterThanEqual(this.min) && point.lessThanEqual(this.max);
-    };
-    Bounds.prototype.intersects = function (bounds) {
-        var minA = this.min;
-        var maxA = this.max;
-        var minB = bounds.min;
-        var maxB = bounds.max;
-        if (maxA.x < minB.x || minA.x > maxB.x) {
-            return false;
-        }
-        if (maxA.y < minB.y || minA.y > maxB.y) {
-            return false;
-        }
-        return true;
-    };
-    Bounds.prototype.reset = function () {
-        var args = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            args[_i] = arguments[_i];
-        }
-        if (args.length === 2) {
-            this.center.copy(args[0]);
-            this.extents.copy(args[1]);
-        }
-        else if (args.length === 4) {
-            this.center.setTo((args[2] + args[0]) / 2, (args[3] + args[1]) / 2);
-            this.extents.setTo((args[2] - args[0]) / 2, (args[3] - args[1]) / 2);
-        }
-    };
-    Bounds.prototype.destroy = function () {
-        this._canRecycle = true;
-        this.center.destroy();
-        this.extents.destroy();
-        this.min.destroy();
-        this.max.destroy();
-        this.size.destroy();
-    };
-    Bounds.prototype.toString = function () {
-        return "Bounds (center: " + this.center + ", extents: " + this.extents + ")";
-    };
-    return Bounds;
-}());
-exports.Bounds = Bounds;
+exports.KeyboardInput = Symbol('KeyboardInput');
 
 
 /***/ }),
-/* 30 */
+/* 41 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var ArrayUtility_1 = __webpack_require__(5);
-function RequireComponent(RequireTypes) {
-    return function (ComponentType) {
-        var requireComponentTypes = Reflect.getMetadata('component:require', ComponentType) || [];
-        RequireTypes.forEach(function (RequireType) { return ArrayUtility_1.addToArray(requireComponentTypes, RequireType); });
-        Reflect.defineMetadata('component:require', requireComponentTypes, ComponentType);
-    };
-}
-exports.RequireComponent = RequireComponent;
+exports.PointerInput = Symbol('PointerInput');
 
 
 /***/ }),
-/* 31 */
+/* 42 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var ForceMode;
-(function (ForceMode) {
-    ForceMode[ForceMode["Force"] = 0] = "Force";
-    ForceMode[ForceMode["Acceleration"] = 1] = "Acceleration";
-    ForceMode[ForceMode["Impulse"] = 2] = "Impulse";
-    ForceMode[ForceMode["VelocityChange"] = 3] = "VelocityChange";
-})(ForceMode = exports.ForceMode || (exports.ForceMode = {}));
+exports.BroadPhaseCollisionResolver = Symbol('BroadPhaseCollisionResolver');
 
 
 /***/ }),
-/* 32 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.CollisionJumpTable = Symbol('CollisionJumpTable');
-
-
-/***/ }),
-/* 33 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __metadata = (this && this.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
-var __param = (this && this.__param) || function (paramIndex, decorator) {
-    return function (target, key) { decorator(target, key, paramIndex); }
-};
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __generator = (this && this.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while (_) try {
-            if (f = 1, y && (t = y[op[0] & 2 ? "return" : op[0] ? "throw" : "next"]) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [0, t.value];
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop(); continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-    }
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-var BaseObject_1 = __webpack_require__(41);
-var Tree_1 = __webpack_require__(59);
-var Bundle_1 = __webpack_require__(112);
-var Camera_1 = __webpack_require__(63);
-var ArrayUtility_1 = __webpack_require__(5);
-var Inject_1 = __webpack_require__(0);
-var Class_1 = __webpack_require__(9);
-var BroadPhaseCollisionResolver_1 = __webpack_require__(42);
-var NarrowPhaseCollisionResolver_1 = __webpack_require__(61);
-var GameObjectInitializer_1 = __webpack_require__(28);
-var RenderProcess_1 = __webpack_require__(57);
-var runtime_1 = __webpack_require__(12);
-var Scene = (function (_super) {
-    __extends(Scene, _super);
-    function Scene(broadPhaseCollisionResolver, narrowPhaseCollisionResolver, gameObjectInitializer, renderProcess, mainCamera) {
-        var _this = _super.call(this) || this;
-        _this.broadPhaseCollisionResolver = broadPhaseCollisionResolver;
-        _this.narrowPhaseCollisionResolver = narrowPhaseCollisionResolver;
-        _this.gameObjectInitializer = gameObjectInitializer;
-        _this.renderProcess = renderProcess;
-        _this.mainCamera = mainCamera;
-        _this.resources = new Bundle_1.Bundle();
-        _this.gameObjects = new Tree_1.Tree(null);
-        _this.cameras = [];
-        _this.add(_this.mainCamera);
-        return _this;
-    }
-    Object.defineProperty(Scene.prototype, "isLoaded", {
-        get: function () { return this.resources.isLoaded; },
-        enumerable: true,
-        configurable: true
-    });
-    Scene.prototype.add = function (gameObject, at) {
-        if (!this.gameObjects.add(gameObject.node)) {
-            return false;
-        }
-        if (!gameObject.hasStarted) {
-            gameObject.node.hide();
-        }
-        if (gameObject instanceof Camera_1.Camera) {
-            ArrayUtility_1.addToArray(this.cameras, gameObject);
-        }
-        if (at) {
-            gameObject.transform.position.copy(at);
-        }
-        return true;
-    };
-    Scene.prototype.remove = function (gameObject) {
-        gameObject.node.show();
-        if (!this.gameObjects.remove(gameObject.node)) {
-            return false;
-        }
-        if (gameObject instanceof Camera_1.Camera) {
-            ArrayUtility_1.removeFromArray(this.cameras, gameObject);
-        }
-        return true;
-    };
-    Scene.prototype.has = function (gameObject) {
-        return this.gameObjects.hasChild(gameObject.node);
-    };
-    Scene.prototype.load = function () {
-        return __awaiter(this, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4, this.resources.load()];
-                    case 1:
-                        _a.sent();
-                        return [2];
-                }
-            });
-        });
-    };
-    Scene.prototype.fixedUpdate = function (alpha) {
-        this.gameObjects.forEachChildren(function (gameObject) { return gameObject.fixedUpdate(alpha); });
-        this.broadPhaseCollisionResolver.fixedUpdate();
-        this.narrowPhaseCollisionResolver.resolve(this.broadPhaseCollisionResolver.pairs);
-    };
-    Scene.prototype.update = function () {
-        this.gameObjects.forEachChildren(function (gameObject) { return gameObject.update(); });
-        this.broadPhaseCollisionResolver.update();
-        this.narrowPhaseCollisionResolver.resolve(this.broadPhaseCollisionResolver.pairs);
-    };
-    Scene.prototype.lateUpdate = function () {
-        this.gameObjects.forEachChildren(function (gameObject) { return gameObject.lateUpdate(); });
-    };
-    Scene.prototype.preRender = function () {
-        this.gameObjects.forEachChildren(function (gameObject) { return gameObject.preRender(); });
-    };
-    Scene.prototype.render = function (ctx, width, height) {
-        var _this = this;
-        this.renderProcess.useContext(ctx, width, height);
-        this.cameras.forEach(function (camera) { return _this.renderProcess.render(camera, _this.gameObjects); });
-        runtime_1.ifdef(runtime_1.DEBUG_PHYSICS, function () { return _this.cameras.forEach(function (camera) { return _this.broadPhaseCollisionResolver.debugRender(ctx, camera); }); });
-    };
-    Scene.prototype.postRender = function () {
-        this.gameObjects.forEachChildren(function (gameObject) { return gameObject.postRender(); });
-        this.gameObjectInitializer.resolve();
-    };
-    Scene.prototype.destroy = function () {
-        _super.prototype.destroy.call(this);
-        this.gameObjects.forEachChildren(function (gameObject) { return gameObject.destroy(); });
-    };
-    Scene.prototype.toString = function () {
-        return "Scene(" + this.name + ")";
-    };
-    Scene = __decorate([
-        Class_1.Class(),
-        __param(0, Inject_1.Inject(BroadPhaseCollisionResolver_1.BroadPhaseCollisionResolver)),
-        __param(1, Inject_1.Inject(NarrowPhaseCollisionResolver_1.NarrowPhaseCollisionResolver)),
-        __param(2, Inject_1.Inject(GameObjectInitializer_1.GameObjectInitializer)),
-        __param(3, Inject_1.Inject(RenderProcess_1.RenderProcess)),
-        __param(4, Inject_1.Inject(Camera_1.MainCamera)),
-        __metadata("design:paramtypes", [Object, Object, Object, Object, Camera_1.Camera])
-    ], Scene);
-    return Scene;
-}(BaseObject_1.BaseObject));
-exports.Scene = Scene;
-
-
-/***/ }),
-/* 34 */
+/* 43 */,
+/* 44 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3269,7 +3635,7 @@ exports.isFunction = isFunction;
 //# sourceMappingURL=isFunction.js.map
 
 /***/ }),
-/* 35 */
+/* 45 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3279,12 +3645,12 @@ exports.errorObject = { e: {} };
 //# sourceMappingURL=errorObject.js.map
 
 /***/ }),
-/* 36 */
+/* 46 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-var root_1 = __webpack_require__(18);
+var root_1 = __webpack_require__(28);
 var Symbol = root_1.root.Symbol;
 exports.rxSubscriber = (typeof Symbol === 'function' && typeof Symbol.for === 'function') ?
     Symbol.for('rxSubscriber') : '@@rxSubscriber';
@@ -3295,14 +3661,14 @@ exports.$$rxSubscriber = exports.rxSubscriber;
 //# sourceMappingURL=rxSubscriber.js.map
 
 /***/ }),
-/* 37 */
+/* 47 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-__webpack_require__(51);
-var Type_1 = __webpack_require__(14);
+__webpack_require__(64);
+var Type_1 = __webpack_require__(13);
 var ProviderRegistry = (function () {
     function ProviderRegistry() {
         this.providers = new Map();
@@ -3370,201 +3736,17 @@ exports.providerRegistry = new ProviderRegistry();
 
 
 /***/ }),
-/* 38 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
-var Observable_1 = __webpack_require__(3);
-var Subscriber_1 = __webpack_require__(13);
-var Subscription_1 = __webpack_require__(27);
-var ObjectUnsubscribedError_1 = __webpack_require__(53);
-var SubjectSubscription_1 = __webpack_require__(98);
-var rxSubscriber_1 = __webpack_require__(36);
-/**
- * @class SubjectSubscriber<T>
- */
-var SubjectSubscriber = (function (_super) {
-    __extends(SubjectSubscriber, _super);
-    function SubjectSubscriber(destination) {
-        _super.call(this, destination);
-        this.destination = destination;
-    }
-    return SubjectSubscriber;
-}(Subscriber_1.Subscriber));
-exports.SubjectSubscriber = SubjectSubscriber;
-/**
- * @class Subject<T>
- */
-var Subject = (function (_super) {
-    __extends(Subject, _super);
-    function Subject() {
-        _super.call(this);
-        this.observers = [];
-        this.closed = false;
-        this.isStopped = false;
-        this.hasError = false;
-        this.thrownError = null;
-    }
-    Subject.prototype[rxSubscriber_1.rxSubscriber] = function () {
-        return new SubjectSubscriber(this);
-    };
-    Subject.prototype.lift = function (operator) {
-        var subject = new AnonymousSubject(this, this);
-        subject.operator = operator;
-        return subject;
-    };
-    Subject.prototype.next = function (value) {
-        if (this.closed) {
-            throw new ObjectUnsubscribedError_1.ObjectUnsubscribedError();
-        }
-        if (!this.isStopped) {
-            var observers = this.observers;
-            var len = observers.length;
-            var copy = observers.slice();
-            for (var i = 0; i < len; i++) {
-                copy[i].next(value);
-            }
-        }
-    };
-    Subject.prototype.error = function (err) {
-        if (this.closed) {
-            throw new ObjectUnsubscribedError_1.ObjectUnsubscribedError();
-        }
-        this.hasError = true;
-        this.thrownError = err;
-        this.isStopped = true;
-        var observers = this.observers;
-        var len = observers.length;
-        var copy = observers.slice();
-        for (var i = 0; i < len; i++) {
-            copy[i].error(err);
-        }
-        this.observers.length = 0;
-    };
-    Subject.prototype.complete = function () {
-        if (this.closed) {
-            throw new ObjectUnsubscribedError_1.ObjectUnsubscribedError();
-        }
-        this.isStopped = true;
-        var observers = this.observers;
-        var len = observers.length;
-        var copy = observers.slice();
-        for (var i = 0; i < len; i++) {
-            copy[i].complete();
-        }
-        this.observers.length = 0;
-    };
-    Subject.prototype.unsubscribe = function () {
-        this.isStopped = true;
-        this.closed = true;
-        this.observers = null;
-    };
-    Subject.prototype._trySubscribe = function (subscriber) {
-        if (this.closed) {
-            throw new ObjectUnsubscribedError_1.ObjectUnsubscribedError();
-        }
-        else {
-            return _super.prototype._trySubscribe.call(this, subscriber);
-        }
-    };
-    Subject.prototype._subscribe = function (subscriber) {
-        if (this.closed) {
-            throw new ObjectUnsubscribedError_1.ObjectUnsubscribedError();
-        }
-        else if (this.hasError) {
-            subscriber.error(this.thrownError);
-            return Subscription_1.Subscription.EMPTY;
-        }
-        else if (this.isStopped) {
-            subscriber.complete();
-            return Subscription_1.Subscription.EMPTY;
-        }
-        else {
-            this.observers.push(subscriber);
-            return new SubjectSubscription_1.SubjectSubscription(this, subscriber);
-        }
-    };
-    Subject.prototype.asObservable = function () {
-        var observable = new Observable_1.Observable();
-        observable.source = this;
-        return observable;
-    };
-    Subject.create = function (destination, source) {
-        return new AnonymousSubject(destination, source);
-    };
-    return Subject;
-}(Observable_1.Observable));
-exports.Subject = Subject;
-/**
- * @class AnonymousSubject<T>
- */
-var AnonymousSubject = (function (_super) {
-    __extends(AnonymousSubject, _super);
-    function AnonymousSubject(destination, source) {
-        _super.call(this);
-        this.destination = destination;
-        this.source = source;
-    }
-    AnonymousSubject.prototype.next = function (value) {
-        var destination = this.destination;
-        if (destination && destination.next) {
-            destination.next(value);
-        }
-    };
-    AnonymousSubject.prototype.error = function (err) {
-        var destination = this.destination;
-        if (destination && destination.error) {
-            this.destination.error(err);
-        }
-    };
-    AnonymousSubject.prototype.complete = function () {
-        var destination = this.destination;
-        if (destination && destination.complete) {
-            this.destination.complete();
-        }
-    };
-    AnonymousSubject.prototype._subscribe = function (subscriber) {
-        var source = this.source;
-        if (source) {
-            return this.source.subscribe(subscriber);
-        }
-        else {
-            return Subscription_1.Subscription.EMPTY;
-        }
-    };
-    return AnonymousSubject;
-}(Subject));
-exports.AnonymousSubject = AnonymousSubject;
-//# sourceMappingURL=Subject.js.map
-
-/***/ }),
-/* 39 */
+/* 48 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.KeyboardInput = Symbol('KeyboardInput');
+exports.Logger = Symbol('Logger');
 
 
 /***/ }),
-/* 40 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.PointerInput = Symbol('PointerInput');
-
-
-/***/ }),
-/* 41 */
+/* 49 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3628,19 +3810,71 @@ exports.BaseObject = BaseObject;
 
 
 /***/ }),
-/* 42 */
+/* 50 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.BroadPhaseCollisionResolver = Symbol('BroadPhaseCollisionResolver');
+var Vector_1 = __webpack_require__(1);
+var Ray = (function () {
+    function Ray(origin, direction) {
+        if (origin === void 0) { origin = new Vector_1.Vector(); }
+        if (direction === void 0) { direction = new Vector_1.Vector(); }
+        this.origin = origin;
+        this.direction = direction;
+        this.direction.normalize();
+    }
+    Ray.prototype.getPoint = function (distance) {
+        return this.direction.clone().multiply(distance).add(this.origin);
+    };
+    Ray.prototype.intersect = function (another) {
+        var p = this.origin;
+        var r = this.direction;
+        var q;
+        var s;
+        var l = 0;
+        if (another instanceof Ray) {
+            q = another.origin;
+            s = another.direction;
+        }
+        else {
+            q = another.begin;
+            s = another.getDirection();
+            l = another.length;
+        }
+        var pq = q.clone().subtract(p);
+        var r_x_s = r.cross(s);
+        var pq_x_r = pq.cross(r);
+        if (r_x_s === 0) {
+            return -1;
+        }
+        else {
+            var t = pq.cross(s) / r_x_s;
+            var u = pq_x_r / r_x_s;
+            if (l && u > l) {
+                return -1;
+            }
+            if (u >= 0 && t >= 0) {
+                return t;
+            }
+        }
+        return -1;
+    };
+    return Ray;
+}());
+exports.Ray = Ray;
 
 
 /***/ }),
-/* 43 */,
-/* 44 */,
-/* 45 */
+/* 51 */,
+/* 52 */,
+/* 53 */,
+/* 54 */,
+/* 55 */,
+/* 56 */,
+/* 57 */,
+/* 58 */
 /***/ (function(module, exports) {
 
 var g;
@@ -3667,7 +3901,7 @@ module.exports = g;
 
 
 /***/ }),
-/* 46 */
+/* 59 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3679,12 +3913,12 @@ exports.isObject = isObject;
 //# sourceMappingURL=isObject.js.map
 
 /***/ }),
-/* 47 */
+/* 60 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-var errorObject_1 = __webpack_require__(35);
+var errorObject_1 = __webpack_require__(45);
 var tryCatchTarget;
 function tryCatcher() {
     try {
@@ -3704,7 +3938,7 @@ exports.tryCatch = tryCatch;
 //# sourceMappingURL=tryCatch.js.map
 
 /***/ }),
-/* 48 */
+/* 61 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3718,12 +3952,12 @@ exports.empty = {
 //# sourceMappingURL=Observer.js.map
 
 /***/ }),
-/* 49 */
+/* 62 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-var root_1 = __webpack_require__(18);
+var root_1 = __webpack_require__(28);
 function getSymbolObservable(context) {
     var $$observable;
     var Symbol = context.Symbol;
@@ -3750,7 +3984,7 @@ exports.$$observable = exports.observable;
 //# sourceMappingURL=observable.js.map
 
 /***/ }),
-/* 50 */
+/* 63 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3762,7 +3996,7 @@ exports.isScheduler = isScheduler;
 //# sourceMappingURL=isScheduler.js.map
 
 /***/ }),
-/* 51 */
+/* 64 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(process, global) {/*! *****************************************************************************
@@ -4890,74 +5124,10 @@ var Reflect;
             Function("return this;")());
 })(Reflect || (Reflect = {}));
 //# sourceMappingURL=Reflect.js.map
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(94), __webpack_require__(45)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(102), __webpack_require__(58)))
 
 /***/ }),
-/* 52 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-var ArrayUtility_1 = __webpack_require__(5);
-var Pool = (function () {
-    function Pool(type, max) {
-        if (max === void 0) { max = Infinity; }
-        this.type = type;
-        this.max = max;
-        this._actives = [];
-        this._inactives = [];
-    }
-    Object.defineProperty(Pool.prototype, "actives", {
-        get: function () { return this._actives; },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Pool.prototype, "inactives", {
-        get: function () { return this._inactives; },
-        enumerable: true,
-        configurable: true
-    });
-    Pool.prototype.get = function () {
-        var args = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            args[_i] = arguments[_i];
-        }
-        if (this._inactives.length === 0) {
-            this.recycle();
-        }
-        var instance = this._inactives.shift();
-        if (!instance) {
-            if (this._actives.length < this.max) {
-                instance = new ((_a = this.type).bind.apply(_a, [void 0].concat(args)))();
-                this._actives.push(instance);
-                ArrayUtility_1.addToArray(this._actives, instance);
-            }
-        }
-        return instance;
-        var _a;
-    };
-    Pool.prototype.put = function (instance) {
-        if (ArrayUtility_1.removeFromArray(this._actives, instance)) {
-            instance.destroy();
-        }
-    };
-    Pool.prototype.recycle = function () {
-        for (var i = this._actives.length - 1; i >= 0; i--) {
-            if (this._actives[i].canRecycle) {
-                var item = this._actives[i];
-                this._actives.splice(i, 1);
-                this._inactives.push(item);
-            }
-        }
-    };
-    return Pool;
-}());
-exports.Pool = Pool;
-
-
-/***/ }),
-/* 53 */
+/* 65 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4990,7 +5160,7 @@ exports.ObjectUnsubscribedError = ObjectUnsubscribedError;
 //# sourceMappingURL=ObjectUnsubscribedError.js.map
 
 /***/ }),
-/* 54 */
+/* 66 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5000,7 +5170,7 @@ exports.MouseInput = Symbol('MouseInput');
 
 
 /***/ }),
-/* 55 */
+/* 67 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5010,7 +5180,7 @@ exports.TouchInput = Symbol('TouchInput');
 
 
 /***/ }),
-/* 56 */
+/* 68 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5051,7 +5221,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var Observable_1 = __webpack_require__(3);
+var Observable_1 = __webpack_require__(4);
 function onceEvent(node, eventName) {
     return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {
@@ -5100,7 +5270,7 @@ exports.listToArray = listToArray;
 
 
 /***/ }),
-/* 57 */
+/* 69 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5110,13 +5280,14 @@ exports.RenderProcess = Symbol('RenderProcess');
 
 
 /***/ }),
-/* 58 */
+/* 70 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
 var Vector_1 = __webpack_require__(1);
+var Pool_1 = __webpack_require__(38);
 var Matrix = (function () {
     function Matrix(value) {
         this._value = [
@@ -5124,15 +5295,21 @@ var Matrix = (function () {
             [0, 1, 0]
         ];
         this._save = [];
+        this._canRecycle = false;
         if (value !== void 0) {
-            for (var i = 0; i < 2; i++) {
-                for (var j = 0; j < 3; j++) {
-                    this._value[i][j] = value[i][j] || this._value[i][j];
-                }
-            }
+            this._value[0][0] = value[0][0];
+            this._value[0][1] = value[0][1];
+            this._value[0][2] = value[0][2];
+            this._value[1][0] = value[1][0];
+            this._value[1][1] = value[1][1];
+            this._value[1][2] = value[1][2];
         }
         this.save();
     }
+    Matrix.Get = function (value) {
+        return this.pool.get(value);
+    };
+    Matrix.Put = function (matrix) { this.pool.put(matrix); };
     Object.defineProperty(Matrix.prototype, 0, {
         get: function () { return this._value[0]; },
         enumerable: true,
@@ -5140,6 +5317,11 @@ var Matrix = (function () {
     });
     Object.defineProperty(Matrix.prototype, 1, {
         get: function () { return this._value[1]; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Matrix.prototype, "canRecycle", {
+        get: function () { return this._canRecycle; },
         enumerable: true,
         configurable: true
     });
@@ -5160,99 +5342,102 @@ var Matrix = (function () {
         }
         return this;
     };
-    Matrix.prototype.reset = function () {
+    Matrix.prototype.reset = function (value) {
         this._save = [];
-        this._value = [
-            [1, 0, 0],
-            [0, 1, 0]
-        ];
+        if (value !== void 0) {
+            this._value[0][0] = value[0][0];
+            this._value[0][1] = value[0][1];
+            this._value[0][2] = value[0][2];
+            this._value[1][0] = value[1][0];
+            this._value[1][1] = value[1][1];
+            this._value[1][2] = value[1][2];
+        }
+        else {
+            this._value = [
+                [1, 0, 0],
+                [0, 1, 0]
+            ];
+        }
         return this;
     };
     Matrix.prototype.setRotatation = function (radian) {
-        var rotation = new Matrix([
-            [Math.cos(radian), -Math.sin(radian)],
-            [Math.sin(radian), Math.cos(radian)]
+        var cos = Math.cos(radian) || 1;
+        var sin = Math.sin(radian);
+        return this.multiply([
+            [cos, -sin, 0],
+            [sin, cos, 0]
         ]);
-        return this.multiply(rotation);
     };
     Matrix.prototype.setTranslation = function (positionOrX, y) {
-        var translation;
         if (positionOrX instanceof Vector_1.Vector) {
-            translation = new Matrix([
+            return this.multiply([
                 [1, 0, positionOrX.x],
                 [0, 1, positionOrX.y]
             ]);
         }
         else if (y !== void 0) {
-            translation = new Matrix([
+            return this.multiply([
                 [1, 0, positionOrX],
                 [0, 1, y]
             ]);
         }
-        else {
-            return this;
-        }
-        return this.multiply(translation);
+        return this;
     };
     Matrix.prototype.setScaling = function (magnificationOrX, y) {
-        var scaling;
         if (magnificationOrX instanceof Vector_1.Vector) {
-            scaling = new Matrix([
-                [magnificationOrX.x, 0],
-                [0, magnificationOrX.y]
+            return this.multiply([
+                [magnificationOrX.x || 1, 0, 0],
+                [0, magnificationOrX.y || 1, 0]
             ]);
         }
         else if (y !== void 0) {
-            scaling = new Matrix([
-                [magnificationOrX, 0],
-                [0, y]
+            return this.multiply([
+                [magnificationOrX || 1, 0, 0],
+                [0, y || 1, 0]
             ]);
         }
-        else {
-            return this;
-        }
-        return this.multiply(scaling);
+        return this;
     };
     Matrix.prototype.multiply = function (other) {
-        var a1 = this[0][0];
-        var b1 = this[0][1];
-        var c1 = this[0][2];
-        var d1 = this[1][0];
-        var e1 = this[1][1];
-        var f1 = this[1][2];
+        var a1 = this._value[0][0];
+        var b1 = this._value[0][1];
+        var c1 = this._value[0][2];
+        var d1 = this._value[1][0];
+        var e1 = this._value[1][1];
+        var f1 = this._value[1][2];
         var a2 = other[0][0];
         var b2 = other[0][1];
         var c2 = other[0][2];
         var d2 = other[1][0];
         var e2 = other[1][1];
         var f2 = other[1][2];
-        this[0][0] = a1 * a2 + b1 * d2;
-        this[0][1] = a1 * b2 + b1 * e2;
-        this[0][2] = a1 * c2 + b1 * f2 + c1;
-        this[1][0] = d1 * a2 + e1 * d2;
-        this[1][1] = d1 * b2 + e1 * e2;
-        this[1][2] = d1 * c2 + e1 * f2 + f1;
+        this._value[0][0] = a1 * a2 + b1 * d2;
+        this._value[0][1] = a1 * b2 + b1 * e2;
+        this._value[0][2] = a1 * c2 + b1 * f2 + c1;
+        this._value[1][0] = d1 * a2 + e1 * d2;
+        this._value[1][1] = d1 * b2 + e1 * e2;
+        this._value[1][2] = d1 * c2 + e1 * f2 + f1;
         return this;
     };
     Matrix.prototype.multiplyToPoint = function (point) {
         var x = point.x;
         var y = point.y;
-        point.setTo(this[0][0] * x + this[0][1] * y + this[0][2] * 1, this[1][0] * x + this[1][1] * y + this[1][2] * 1);
+        point.reset(this._value[0][0] * x + this._value[0][1] * y + this._value[0][2] * 1, this._value[1][0] * x + this._value[1][1] * y + this._value[1][2] * 1);
         return this;
     };
     Matrix.prototype.multiplyToVector = function (vector) {
         var x = vector.x;
         var y = vector.y;
-        vector.setTo(this[0][0] * x + this[0][1] * y + 0 * 0, this[1][0] * x + this[1][1] * y + 0 * 0);
+        vector.reset(this._value[0][0] * x + this._value[0][1] * y + 0 * 0, this._value[1][0] * x + this._value[1][1] * y + 0 * 0);
         return this;
     };
     Matrix.prototype.equalTo = function (another) {
-        return this[0][0] === another[0][0] &&
-            this[0][1] === another[0][1] &&
-            this[0][2] === another[0][2] &&
-            this[1][0] === another[1][0] &&
-            this[1][1] === another[1][1] &&
-            this[1][2] === another[1][2];
+        return this._value[0][0] === another[0][0] &&
+            this._value[0][1] === another[0][1] &&
+            this._value[0][2] === another[0][2] &&
+            this._value[1][0] === another[1][0] &&
+            this._value[1][1] === another[1][1] &&
+            this._value[1][2] === another[1][2];
     };
     Matrix.prototype.invertFrom = function (source) {
         var a_minor = source[1][1] * 1 - source[1][2] * 0;
@@ -5263,12 +5448,12 @@ var Matrix = (function () {
         var g_minor = source[0][1] * source[1][2] - source[0][2] * source[1][1];
         var h_minor = source[0][0] * source[1][2] - source[0][2] * source[1][0];
         var inverseDeterminant = 1 / (source[0][0] * a_minor - source[0][1] * b_minor + source[0][2] * c_minor);
-        this[0][0] = inverseDeterminant * a_minor;
-        this[0][1] = inverseDeterminant * -d_minor;
-        this[0][2] = inverseDeterminant * g_minor;
-        this[1][0] = inverseDeterminant * -b_minor;
-        this[1][1] = inverseDeterminant * e_minor;
-        this[1][2] = inverseDeterminant * -h_minor;
+        this._value[0][0] = inverseDeterminant * a_minor;
+        this._value[0][1] = inverseDeterminant * -d_minor;
+        this._value[0][2] = inverseDeterminant * g_minor;
+        this._value[1][0] = inverseDeterminant * -b_minor;
+        this._value[1][1] = inverseDeterminant * e_minor;
+        this._value[1][2] = inverseDeterminant * -h_minor;
         return this;
     };
     Matrix.prototype.getInverse = function () {
@@ -5277,12 +5462,14 @@ var Matrix = (function () {
     Matrix.prototype.clone = function () {
         return new Matrix(this._value);
     };
+    Matrix.prototype.destroy = function () {
+        this._canRecycle = true;
+    };
     Matrix.prototype.toString = function () {
-        var matrixString = this._value
-            .map(function (row) { return row.join(','); })
-            .reduce(function (prev, curr) { return prev += "[" + curr + "]"; }, '');
+        var matrixString = "[" + this[0] + "][" + this[1] + "]";
         return "Matrix " + matrixString;
     };
+    Matrix.pool = new Pool_1.Pool(function (value) { return new Matrix(value); }, Infinity, 64);
     Matrix.Identity = new Matrix();
     return Matrix;
 }());
@@ -5290,7 +5477,7 @@ exports.Matrix = Matrix;
 
 
 /***/ }),
-/* 59 */
+/* 71 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5306,7 +5493,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var ArrayUtility_1 = __webpack_require__(5);
+var ArrayUtility_1 = __webpack_require__(7);
 var ReadonlyTree = (function () {
     function ReadonlyTree(data, _children) {
         if (_children === void 0) { _children = []; }
@@ -5410,64 +5597,147 @@ exports.Tree = Tree;
 
 
 /***/ }),
-/* 60 */
+/* 72 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
 var Vector_1 = __webpack_require__(1);
-var Ray = (function () {
-    function Ray(origin, direction) {
-        if (origin === void 0) { origin = new Vector_1.Vector(); }
-        if (direction === void 0) { direction = new Vector_1.Vector(); }
-        this.origin = origin;
-        this.direction = direction;
-        this.direction.normalize();
+var Pool_1 = __webpack_require__(38);
+var ForceMode_1 = __webpack_require__(25);
+var CollisionContact = (function () {
+    function CollisionContact(colliderA, colliderB, mtv, point, normal) {
+        this.colliderA = colliderA;
+        this.colliderB = colliderB;
+        this.mtv = mtv;
+        this.point = point;
+        this.normal = normal;
+        this._canRecycle = false;
+        this._resolved = false;
     }
-    Ray.prototype.getPoint = function (distance) {
-        return this.direction.clone().multiply(distance).add(this.origin);
+    CollisionContact.Get = function (colliderA, colliderB, mtv, point, normal) {
+        return this.pool.get(colliderA, colliderB, mtv, point, normal);
     };
-    Ray.prototype.intersect = function (another) {
-        var p = this.origin;
-        var r = this.direction;
-        var q;
-        var s;
-        var l = 0;
-        if (another instanceof Ray) {
-            q = another.origin;
-            s = another.direction;
+    CollisionContact.Put = function (collisionContact) { this.pool.put(collisionContact); };
+    Object.defineProperty(CollisionContact.prototype, "canRecycle", {
+        get: function () { return this._canRecycle; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(CollisionContact.prototype, "resolved", {
+        get: function () { return this._resolved; },
+        enumerable: true,
+        configurable: true
+    });
+    CollisionContact.prototype.resolve = function () {
+        if (this._resolved) {
+            return;
+        }
+        var a = this.colliderA;
+        var b = this.colliderB;
+        var bodyA = a.rigidbody;
+        var bodyB = b.rigidbody;
+        var shouldAwakeBodyA = bodyB ? !bodyB.isSleeping : false;
+        var shouldAwakeBodyB = bodyA ? !bodyA.isSleeping : false;
+        if (!bodyA && !bodyB) {
+            return;
+        }
+        var velocityA = bodyA ? bodyA.velocity : Vector_1.Vector.Zero;
+        var velocityB = bodyB ? bodyB.velocity : Vector_1.Vector.Zero;
+        var angularVelocityA = bodyA ? bodyA.angularVelocity : 0;
+        var angularVelocityB = bodyB ? bodyB.angularVelocity : 0;
+        var relativeA = this.point.clone().subtract(a.bounds.center);
+        var relativeB = this.point.clone().subtract(b.bounds.center);
+        var relativeVelocity = velocityB.clone()
+            .add(relativeB.cross(-angularVelocityB))
+            .subtract(velocityA)
+            .subtract(relativeA.cross(-angularVelocityA));
+        var rvDotNormal = relativeVelocity.dot(this.normal);
+        if (rvDotNormal > 0) {
+            return;
+        }
+        var restitution = Math.min(this.colliderA.restitution, this.colliderB.restitution);
+        var inverseMassA = bodyA ? bodyA.inverseMass : 0;
+        var inverseMassB = bodyB ? bodyB.inverseMass : 0;
+        var sumOfInverseMass = inverseMassA + inverseMassB;
+        var inverseMoiA = bodyA ? bodyA.inverseMoi : 0;
+        var inverseMoiB = bodyB ? bodyB.inverseMoi : 0;
+        var j_moi_a = Vector_1.Vector.Cross(relativeA.cross(this.normal), relativeA).multiply(inverseMoiA);
+        var j_moi_b = Vector_1.Vector.Cross(relativeB.cross(this.normal), relativeB).multiply(inverseMoiB);
+        var j_moi = j_moi_a.add(j_moi_b).dot(this.normal);
+        var j = -(1 + restitution) * rvDotNormal / (sumOfInverseMass + j_moi);
+        var impulse = this.normal.clone().multiply(j);
+        if (bodyA && bodyB) {
+            this.mtv.multiply(0.5);
+        }
+        if (bodyA) {
+            if (shouldAwakeBodyA && bodyA.isSleeping) {
+                bodyA.awake();
+            }
+            bodyA.host.transform.position.add(this.mtv.clone().multiply(-1));
+            bodyA.addForce(impulse.clone().multiply(-1), ForceMode_1.ForceMode.Impulse);
+        }
+        if (bodyB) {
+            if (shouldAwakeBodyB && bodyB.isSleeping) {
+                bodyB.awake();
+            }
+            bodyB.host.transform.position.add(this.mtv);
+            bodyB.addForce(impulse, ForceMode_1.ForceMode.Impulse);
+        }
+        var tangent = this.normal.normal();
+        var frictionImpulse;
+        var jt_moi_a = Vector_1.Vector.Cross(relativeA.cross(tangent), relativeA).multiply(inverseMoiA);
+        var jt_moi_b = Vector_1.Vector.Cross(relativeB.cross(tangent), relativeB).multiply(inverseMoiB);
+        var jt_moi = jt_moi_a.add(jt_moi_b).dot(tangent);
+        var t = relativeVelocity.clone().subtract(this.normal.clone().multiply(rvDotNormal)).normalize();
+        var jt = -relativeVelocity.dot(t) / (sumOfInverseMass + jt_moi);
+        var mu = Math.sqrt(Math.pow(this.colliderA.friction, 2) + Math.pow(this.colliderB.friction, 2));
+        if (Math.abs(jt) < j * mu) {
+            frictionImpulse = t.clone().multiply(jt);
         }
         else {
-            q = another.begin;
-            s = another.getDirection();
-            l = another.length;
+            frictionImpulse = t.clone().multiply(-j * mu);
         }
-        var pq = q.clone().subtract(p);
-        var r_x_s = r.cross(s);
-        var pq_x_r = pq.cross(r);
-        if (r_x_s === 0) {
-            return -1;
+        if (bodyA) {
+            bodyA.addForce(frictionImpulse.clone().multiply(-1), ForceMode_1.ForceMode.Impulse);
+            bodyA.addTorque(-frictionImpulse.dot(t) * relativeA.cross(t), ForceMode_1.ForceMode.Impulse);
+        }
+        if (bodyB) {
+            bodyB.addForce(frictionImpulse, ForceMode_1.ForceMode.Impulse);
+            bodyB.addTorque(frictionImpulse.dot(t) * relativeB.cross(t), ForceMode_1.ForceMode.Impulse);
+        }
+        if (this.colliderA.isTigger) {
+            this.colliderA.onTrigger(this.colliderB);
         }
         else {
-            var t = pq.cross(s) / r_x_s;
-            var u = pq_x_r / r_x_s;
-            if (l && u > l) {
-                return -1;
-            }
-            if (u >= 0 && t >= 0) {
-                return t;
-            }
+            this.colliderA.onCollide(this);
         }
-        return -1;
+        if (this.colliderB.isTigger) {
+            this.colliderB.onTrigger(this.colliderA);
+        }
+        else {
+            this.colliderB.onCollide(this);
+        }
     };
-    return Ray;
+    CollisionContact.prototype.destroy = function () {
+        this._canRecycle = true;
+    };
+    CollisionContact.prototype.reset = function (colliderA, colliderB, mtv, point, normal) {
+        this.colliderA = colliderA;
+        this.colliderB = colliderB;
+        this.mtv = mtv;
+        this.point = point;
+        this.normal = normal;
+    };
+    CollisionContact.pool = new Pool_1.Pool(function (colliderA, colliderB, mtv, point, normal) { return new CollisionContact(colliderA, colliderB, mtv, point, normal); });
+    return CollisionContact;
 }());
-exports.Ray = Ray;
+exports.CollisionContact = CollisionContact;
 
 
 /***/ }),
-/* 61 */
+/* 73 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5477,13 +5747,13 @@ exports.NarrowPhaseCollisionResolver = Symbol('NarrowPhaseCollisionResolver');
 
 
 /***/ }),
-/* 62 */
+/* 74 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var BehaviorSubject_1 = __webpack_require__(113);
+var BehaviorSubject_1 = __webpack_require__(121);
 var Resource = (function () {
     function Resource() {
         this._isLoaded = new BehaviorSubject_1.BehaviorSubject(false);
@@ -5511,7 +5781,7 @@ exports.Resource = Resource;
 
 
 /***/ }),
-/* 63 */
+/* 75 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5539,16 +5809,16 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var GameObject_1 = __webpack_require__(6);
-var Screen_1 = __webpack_require__(19);
-var GameObjectInitializer_1 = __webpack_require__(28);
-var Color_1 = __webpack_require__(7);
-var Bounds_1 = __webpack_require__(29);
-var Rect_1 = __webpack_require__(64);
-var Matrix_1 = __webpack_require__(58);
-var Type_1 = __webpack_require__(14);
-var BrowserDelegate_1 = __webpack_require__(4);
-var Service_1 = __webpack_require__(2);
+var GameObject_1 = __webpack_require__(2);
+var Screen_1 = __webpack_require__(17);
+var GameObjectInitializer_1 = __webpack_require__(39);
+var Color_1 = __webpack_require__(8);
+var Bounds_1 = __webpack_require__(30);
+var Rect_1 = __webpack_require__(76);
+var Matrix_1 = __webpack_require__(70);
+var Type_1 = __webpack_require__(13);
+var BrowserDelegate_1 = __webpack_require__(5);
+var Service_1 = __webpack_require__(3);
 var Inject_1 = __webpack_require__(0);
 exports.MainCamera = Symbol('MainCamera');
 var Camera = (function (_super) {
@@ -5612,7 +5882,7 @@ exports.Camera = Camera;
 
 
 /***/ }),
-/* 64 */
+/* 76 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5699,44 +5969,40 @@ exports.Rect = Rect;
 
 
 /***/ }),
-/* 65 */,
-/* 66 */,
-/* 67 */,
-/* 68 */,
-/* 69 */,
-/* 70 */
+/* 77 */,
+/* 78 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-__webpack_require__(71);
-__webpack_require__(87);
-__webpack_require__(90);
-__webpack_require__(92);
-__webpack_require__(51);
+__webpack_require__(79);
+__webpack_require__(95);
+__webpack_require__(98);
+__webpack_require__(100);
+__webpack_require__(64);
 
 
 /***/ }),
-/* 71 */
+/* 79 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-var Observable_1 = __webpack_require__(3);
-var merge_1 = __webpack_require__(75);
+var Observable_1 = __webpack_require__(4);
+var merge_1 = __webpack_require__(83);
 Observable_1.Observable.merge = merge_1.merge;
 //# sourceMappingURL=merge.js.map
 
 /***/ }),
-/* 72 */
+/* 80 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-var Subscriber_1 = __webpack_require__(13);
-var rxSubscriber_1 = __webpack_require__(36);
-var Observer_1 = __webpack_require__(48);
+var Subscriber_1 = __webpack_require__(22);
+var rxSubscriber_1 = __webpack_require__(46);
+var Observer_1 = __webpack_require__(61);
 function toSubscriber(nextOrObserver, error, complete) {
     if (nextOrObserver) {
         if (nextOrObserver instanceof Subscriber_1.Subscriber) {
@@ -5755,7 +6021,7 @@ exports.toSubscriber = toSubscriber;
 //# sourceMappingURL=toSubscriber.js.map
 
 /***/ }),
-/* 73 */
+/* 81 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5764,7 +6030,7 @@ exports.isArray = Array.isArray || (function (x) { return x && typeof x.length =
 //# sourceMappingURL=isArray.js.map
 
 /***/ }),
-/* 74 */
+/* 82 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5795,25 +6061,25 @@ exports.UnsubscriptionError = UnsubscriptionError;
 //# sourceMappingURL=UnsubscriptionError.js.map
 
 /***/ }),
-/* 75 */
+/* 83 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-var merge_1 = __webpack_require__(76);
+var merge_1 = __webpack_require__(84);
 exports.merge = merge_1.mergeStatic;
 //# sourceMappingURL=merge.js.map
 
 /***/ }),
-/* 76 */
+/* 84 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-var Observable_1 = __webpack_require__(3);
-var ArrayObservable_1 = __webpack_require__(77);
-var mergeAll_1 = __webpack_require__(80);
-var isScheduler_1 = __webpack_require__(50);
+var Observable_1 = __webpack_require__(4);
+var ArrayObservable_1 = __webpack_require__(85);
+var mergeAll_1 = __webpack_require__(88);
+var isScheduler_1 = __webpack_require__(63);
 /* tslint:enable:max-line-length */
 /**
  * Creates an output Observable which concurrently emits all values from every
@@ -5956,7 +6222,7 @@ exports.mergeStatic = mergeStatic;
 //# sourceMappingURL=merge.js.map
 
 /***/ }),
-/* 77 */
+/* 85 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5966,10 +6232,10 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var Observable_1 = __webpack_require__(3);
-var ScalarObservable_1 = __webpack_require__(78);
-var EmptyObservable_1 = __webpack_require__(79);
-var isScheduler_1 = __webpack_require__(50);
+var Observable_1 = __webpack_require__(4);
+var ScalarObservable_1 = __webpack_require__(86);
+var EmptyObservable_1 = __webpack_require__(87);
+var isScheduler_1 = __webpack_require__(63);
 /**
  * We need this JSDoc comment for affecting ESDoc.
  * @extends {Ignored}
@@ -6084,7 +6350,7 @@ exports.ArrayObservable = ArrayObservable;
 //# sourceMappingURL=ArrayObservable.js.map
 
 /***/ }),
-/* 78 */
+/* 86 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6094,7 +6360,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var Observable_1 = __webpack_require__(3);
+var Observable_1 = __webpack_require__(4);
 /**
  * We need this JSDoc comment for affecting ESDoc.
  * @extends {Ignored}
@@ -6148,7 +6414,7 @@ exports.ScalarObservable = ScalarObservable;
 //# sourceMappingURL=ScalarObservable.js.map
 
 /***/ }),
-/* 79 */
+/* 87 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6158,7 +6424,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var Observable_1 = __webpack_require__(3);
+var Observable_1 = __webpack_require__(4);
 /**
  * We need this JSDoc comment for affecting ESDoc.
  * @extends {Ignored}
@@ -6235,7 +6501,7 @@ exports.EmptyObservable = EmptyObservable;
 //# sourceMappingURL=EmptyObservable.js.map
 
 /***/ }),
-/* 80 */
+/* 88 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6245,8 +6511,8 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var OuterSubscriber_1 = __webpack_require__(81);
-var subscribeToResult_1 = __webpack_require__(82);
+var OuterSubscriber_1 = __webpack_require__(89);
+var subscribeToResult_1 = __webpack_require__(90);
 /**
  * Converts a higher-order Observable into a first-order Observable which
  * concurrently delivers all values that are emitted on the inner Observables.
@@ -6352,7 +6618,7 @@ exports.MergeAllSubscriber = MergeAllSubscriber;
 //# sourceMappingURL=mergeAll.js.map
 
 /***/ }),
-/* 81 */
+/* 89 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6362,7 +6628,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var Subscriber_1 = __webpack_require__(13);
+var Subscriber_1 = __webpack_require__(22);
 /**
  * We need this JSDoc comment for affecting ESDoc.
  * @ignore
@@ -6388,19 +6654,19 @@ exports.OuterSubscriber = OuterSubscriber;
 //# sourceMappingURL=OuterSubscriber.js.map
 
 /***/ }),
-/* 82 */
+/* 90 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-var root_1 = __webpack_require__(18);
-var isArrayLike_1 = __webpack_require__(83);
-var isPromise_1 = __webpack_require__(84);
-var isObject_1 = __webpack_require__(46);
-var Observable_1 = __webpack_require__(3);
-var iterator_1 = __webpack_require__(85);
-var InnerSubscriber_1 = __webpack_require__(86);
-var observable_1 = __webpack_require__(49);
+var root_1 = __webpack_require__(28);
+var isArrayLike_1 = __webpack_require__(91);
+var isPromise_1 = __webpack_require__(92);
+var isObject_1 = __webpack_require__(59);
+var Observable_1 = __webpack_require__(4);
+var iterator_1 = __webpack_require__(93);
+var InnerSubscriber_1 = __webpack_require__(94);
+var observable_1 = __webpack_require__(62);
 function subscribeToResult(outerSubscriber, result, outerValue, outerIndex) {
     var destination = new InnerSubscriber_1.InnerSubscriber(outerSubscriber, outerValue, outerIndex);
     if (destination.closed) {
@@ -6472,7 +6738,7 @@ exports.subscribeToResult = subscribeToResult;
 //# sourceMappingURL=subscribeToResult.js.map
 
 /***/ }),
-/* 83 */
+/* 91 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6481,7 +6747,7 @@ exports.isArrayLike = (function (x) { return x && typeof x.length === 'number'; 
 //# sourceMappingURL=isArrayLike.js.map
 
 /***/ }),
-/* 84 */
+/* 92 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6493,12 +6759,12 @@ exports.isPromise = isPromise;
 //# sourceMappingURL=isPromise.js.map
 
 /***/ }),
-/* 85 */
+/* 93 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-var root_1 = __webpack_require__(18);
+var root_1 = __webpack_require__(28);
 function symbolIteratorPonyfill(root) {
     var Symbol = root.Symbol;
     if (typeof Symbol === 'function') {
@@ -6537,7 +6803,7 @@ exports.$$iterator = exports.iterator;
 //# sourceMappingURL=iterator.js.map
 
 /***/ }),
-/* 86 */
+/* 94 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6547,7 +6813,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var Subscriber_1 = __webpack_require__(13);
+var Subscriber_1 = __webpack_require__(22);
 /**
  * We need this JSDoc comment for affecting ESDoc.
  * @ignore
@@ -6579,28 +6845,28 @@ exports.InnerSubscriber = InnerSubscriber;
 //# sourceMappingURL=InnerSubscriber.js.map
 
 /***/ }),
-/* 87 */
+/* 95 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-var Observable_1 = __webpack_require__(3);
-var fromEvent_1 = __webpack_require__(88);
+var Observable_1 = __webpack_require__(4);
+var fromEvent_1 = __webpack_require__(96);
 Observable_1.Observable.fromEvent = fromEvent_1.fromEvent;
 //# sourceMappingURL=fromEvent.js.map
 
 /***/ }),
-/* 88 */
+/* 96 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-var FromEventObservable_1 = __webpack_require__(89);
+var FromEventObservable_1 = __webpack_require__(97);
 exports.fromEvent = FromEventObservable_1.FromEventObservable.create;
 //# sourceMappingURL=fromEvent.js.map
 
 /***/ }),
-/* 89 */
+/* 97 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6610,11 +6876,11 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var Observable_1 = __webpack_require__(3);
-var tryCatch_1 = __webpack_require__(47);
-var isFunction_1 = __webpack_require__(34);
-var errorObject_1 = __webpack_require__(35);
-var Subscription_1 = __webpack_require__(27);
+var Observable_1 = __webpack_require__(4);
+var tryCatch_1 = __webpack_require__(60);
+var isFunction_1 = __webpack_require__(44);
+var errorObject_1 = __webpack_require__(45);
+var Subscription_1 = __webpack_require__(37);
 var toString = Object.prototype.toString;
 function isNodeStyleEventEmitter(sourceObj) {
     return !!sourceObj && typeof sourceObj.addListener === 'function' && typeof sourceObj.removeListener === 'function';
@@ -6746,18 +7012,18 @@ exports.FromEventObservable = FromEventObservable;
 //# sourceMappingURL=FromEventObservable.js.map
 
 /***/ }),
-/* 90 */
+/* 98 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-var Observable_1 = __webpack_require__(3);
-var map_1 = __webpack_require__(91);
+var Observable_1 = __webpack_require__(4);
+var map_1 = __webpack_require__(99);
 Observable_1.Observable.prototype.map = map_1.map;
 //# sourceMappingURL=map.js.map
 
 /***/ }),
-/* 91 */
+/* 99 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6767,7 +7033,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var Subscriber_1 = __webpack_require__(13);
+var Subscriber_1 = __webpack_require__(22);
 /**
  * Applies a given `project` function to each value emitted by the source
  * Observable, and emits the resulting values as an Observable.
@@ -6850,18 +7116,18 @@ var MapSubscriber = (function (_super) {
 //# sourceMappingURL=map.js.map
 
 /***/ }),
-/* 92 */
+/* 100 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-var Observable_1 = __webpack_require__(3);
-var filter_1 = __webpack_require__(93);
+var Observable_1 = __webpack_require__(4);
+var filter_1 = __webpack_require__(101);
 Observable_1.Observable.prototype.filter = filter_1.filter;
 //# sourceMappingURL=filter.js.map
 
 /***/ }),
-/* 93 */
+/* 101 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6871,7 +7137,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var Subscriber_1 = __webpack_require__(13);
+var Subscriber_1 = __webpack_require__(22);
 /* tslint:enable:max-line-length */
 /**
  * Filter items emitted by the source Observable by only emitting those that
@@ -6959,7 +7225,7 @@ var FilterSubscriber = (function (_super) {
 //# sourceMappingURL=filter.js.map
 
 /***/ }),
-/* 94 */
+/* 102 */
 /***/ (function(module, exports) {
 
 // shim for using process in browser
@@ -7149,7 +7415,7 @@ process.umask = function() { return 0; };
 
 
 /***/ }),
-/* 95 */
+/* 103 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7203,20 +7469,20 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var Inject_1 = __webpack_require__(0);
-var Screen_1 = __webpack_require__(19);
-var SceneManager_1 = __webpack_require__(15);
-var BrowserDelegate_1 = __webpack_require__(4);
-var Time_1 = __webpack_require__(20);
+var Screen_1 = __webpack_require__(17);
+var SceneManager_1 = __webpack_require__(18);
+var BrowserDelegate_1 = __webpack_require__(5);
+var Time_1 = __webpack_require__(9);
 var Vector_1 = __webpack_require__(1);
-var Service_1 = __webpack_require__(2);
-var Engine_1 = __webpack_require__(21);
+var Service_1 = __webpack_require__(3);
+var Engine_1 = __webpack_require__(23);
 var EngineImplement = (function () {
     function EngineImplement(screen, time, sceneManager, browser) {
         this.screen = screen;
         this.time = time;
         this.sceneManager = sceneManager;
         this.browser = browser;
-        this.gravity = Vector_1.Vector.Get(0, -100);
+        this.gravity = Vector_1.Vector.Get(0, -10);
         this.accumulator = 0;
         this._isPaused = true;
         this.isInitialized = false;
@@ -7326,7 +7592,7 @@ exports.EngineImplement = EngineImplement;
 
 
 /***/ }),
-/* 96 */
+/* 104 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7338,8 +7604,8 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var Service_1 = __webpack_require__(2);
-var GameObjectInitializer_1 = __webpack_require__(28);
+var Service_1 = __webpack_require__(3);
+var GameObjectInitializer_1 = __webpack_require__(39);
 var GameObjectInitializerImplement = (function () {
     function GameObjectInitializerImplement() {
         this.queue = [];
@@ -7368,7 +7634,7 @@ exports.GameObjectInitializerImplement = GameObjectInitializerImplement;
 
 
 /***/ }),
-/* 97 */
+/* 105 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7415,10 +7681,10 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var Subject_1 = __webpack_require__(38);
-var ArrayUtility_1 = __webpack_require__(5);
-var Service_1 = __webpack_require__(2);
-var SceneManager_1 = __webpack_require__(15);
+var Subject_1 = __webpack_require__(29);
+var ArrayUtility_1 = __webpack_require__(7);
+var Service_1 = __webpack_require__(3);
+var SceneManager_1 = __webpack_require__(18);
 var SceneManagerImplement = (function () {
     function SceneManagerImplement() {
         this.scenes = [];
@@ -7507,7 +7773,7 @@ exports.SceneManagerImplement = SceneManagerImplement;
 
 
 /***/ }),
-/* 98 */
+/* 106 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7517,7 +7783,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var Subscription_1 = __webpack_require__(27);
+var Subscription_1 = __webpack_require__(37);
 /**
  * We need this JSDoc comment for affecting ESDoc.
  * @ignore
@@ -7553,7 +7819,7 @@ exports.SubjectSubscription = SubjectSubscription;
 //# sourceMappingURL=SubjectSubscription.js.map
 
 /***/ }),
-/* 99 */
+/* 107 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7571,9 +7837,83 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var BrowserDelegate_1 = __webpack_require__(4);
-var Service_1 = __webpack_require__(2);
-var Screen_1 = __webpack_require__(19);
+var Service_1 = __webpack_require__(3);
+var Logger_1 = __webpack_require__(48);
+var Color_1 = __webpack_require__(8);
+var Inject_1 = __webpack_require__(0);
+var Time_1 = __webpack_require__(9);
+var LoggerImplement = (function () {
+    function LoggerImplement(time) {
+        this.time = time;
+        this._logs = [];
+        this.defaultColor = Color_1.Color.White;
+        this.fontSize = 12;
+    }
+    Object.defineProperty(LoggerImplement.prototype, "logs", {
+        get: function () { return this._logs; },
+        enumerable: true,
+        configurable: true
+    });
+    LoggerImplement.prototype.log = function (message, color) {
+        if (color === void 0) { color = this.defaultColor; }
+        var log = { message: message, color: color, lifeTime: 10000 };
+        this._logs.push(log);
+    };
+    LoggerImplement.prototype.update = function () {
+        var deltaTime = this.time.deltaTime;
+        for (var i = this._logs.length - 1; i >= 0; i--) {
+            if (this.updateLog(this._logs[i], deltaTime)) {
+                this._logs.splice(i, 1);
+            }
+        }
+    };
+    LoggerImplement.prototype.render = function (ctx) {
+        var _this = this;
+        ctx.save();
+        this._logs.forEach(function (log, index) { return _this.renderLog(ctx, log, index); });
+        ctx.restore();
+    };
+    LoggerImplement.prototype.renderLog = function (ctx, log, index) {
+        ctx.fillStyle = log.color.toHexString();
+        ctx.font = this.fontSize + "px";
+        ctx.fillText(log.message, 0, 0 + (index + 1) * this.fontSize * 1.4);
+    };
+    LoggerImplement.prototype.updateLog = function (log, deltaTime) {
+        log.lifeTime -= deltaTime;
+        return log.lifeTime < 0;
+    };
+    LoggerImplement = __decorate([
+        Service_1.Service(Logger_1.Logger),
+        __param(0, Inject_1.Inject(Time_1.Time)),
+        __metadata("design:paramtypes", [Object])
+    ], LoggerImplement);
+    return LoggerImplement;
+}());
+exports.LoggerImplement = LoggerImplement;
+
+
+/***/ }),
+/* 108 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var BrowserDelegate_1 = __webpack_require__(5);
+var Service_1 = __webpack_require__(3);
+var Screen_1 = __webpack_require__(17);
 var Inject_1 = __webpack_require__(0);
 var ScreenImplement = (function () {
     function ScreenImplement(browserDelegate) {
@@ -7618,7 +7958,7 @@ exports.ScreenImplement = ScreenImplement;
 
 
 /***/ }),
-/* 100 */
+/* 109 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7636,9 +7976,9 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var BrowserDelegate_1 = __webpack_require__(4);
-var Service_1 = __webpack_require__(2);
-var KeyboardInput_1 = __webpack_require__(39);
+var BrowserDelegate_1 = __webpack_require__(5);
+var Service_1 = __webpack_require__(3);
+var KeyboardInput_1 = __webpack_require__(40);
 var Inject_1 = __webpack_require__(0);
 var KeyboardInputImplement = (function () {
     function KeyboardInputImplement(browserDelegate) {
@@ -7665,7 +8005,7 @@ exports.KeyboardInputImplement = KeyboardInputImplement;
 
 
 /***/ }),
-/* 101 */
+/* 110 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7683,9 +8023,9 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var BrowserDelegate_1 = __webpack_require__(4);
-var Service_1 = __webpack_require__(2);
-var MouseInput_1 = __webpack_require__(54);
+var BrowserDelegate_1 = __webpack_require__(5);
+var Service_1 = __webpack_require__(3);
+var MouseInput_1 = __webpack_require__(66);
 var Inject_1 = __webpack_require__(0);
 var MouseInputImplement = (function () {
     function MouseInputImplement(browserDelegate) {
@@ -7727,7 +8067,7 @@ exports.MouseInputImplement = MouseInputImplement;
 
 
 /***/ }),
-/* 102 */
+/* 111 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7745,9 +8085,9 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var BrowserDelegate_1 = __webpack_require__(4);
-var Service_1 = __webpack_require__(2);
-var TouchInput_1 = __webpack_require__(55);
+var BrowserDelegate_1 = __webpack_require__(5);
+var Service_1 = __webpack_require__(3);
+var TouchInput_1 = __webpack_require__(67);
 var Inject_1 = __webpack_require__(0);
 var TouchInputImplement = (function () {
     function TouchInputImplement(browserDelegate) {
@@ -7784,7 +8124,7 @@ exports.TouchInputImplement = TouchInputImplement;
 
 
 /***/ }),
-/* 103 */
+/* 112 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7802,13 +8142,13 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var Observable_1 = __webpack_require__(3);
-var MouseInput_1 = __webpack_require__(54);
-var TouchInput_1 = __webpack_require__(55);
-var DOM_1 = __webpack_require__(56);
+var Observable_1 = __webpack_require__(4);
+var MouseInput_1 = __webpack_require__(66);
+var TouchInput_1 = __webpack_require__(67);
+var DOM_1 = __webpack_require__(68);
 var Vector_1 = __webpack_require__(1);
-var Service_1 = __webpack_require__(2);
-var PointerInput_1 = __webpack_require__(40);
+var Service_1 = __webpack_require__(3);
+var PointerInput_1 = __webpack_require__(41);
 var Inject_1 = __webpack_require__(0);
 var PointerInputImplement = (function () {
     function PointerInputImplement(mouseInput, touchInput) {
@@ -7875,7 +8215,7 @@ exports.PointerInputImplement = PointerInputImplement;
 
 
 /***/ }),
-/* 104 */
+/* 113 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7893,13 +8233,13 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var RenderProcess_1 = __webpack_require__(57);
-var RendererComponent_1 = __webpack_require__(8);
-var Service_1 = __webpack_require__(2);
+var RenderProcess_1 = __webpack_require__(69);
+var RendererComponent_1 = __webpack_require__(24);
+var Service_1 = __webpack_require__(3);
 var Vector_1 = __webpack_require__(1);
-var runtime_1 = __webpack_require__(12);
+var runtime_1 = __webpack_require__(11);
 var Inject_1 = __webpack_require__(0);
-var BrowserDelegate_1 = __webpack_require__(4);
+var BrowserDelegate_1 = __webpack_require__(5);
 var RenderProcessImplement = (function () {
     function RenderProcessImplement(browserDelegate) {
         this.browserDelegate = browserDelegate;
@@ -7944,6 +8284,15 @@ var RenderProcessImplement = (function () {
         var position = Vector_1.Vector.Get().copy(worldPosition);
         camera.toScreenMatrix.multiplyToPoint(position);
         renderers.forEach(function (renderer) {
+            if (!camera.bounds.intersects(renderer.bounds)) {
+                if (renderer.isVisible) {
+                    renderer.onBecameInvisible(camera);
+                }
+                return;
+            }
+            if (!renderer.isVisible) {
+                renderer.onBecameVisible(camera);
+            }
             renderer.render();
             var image = renderer.canvas;
             var width = image.width, height = image.height;
@@ -7993,7 +8342,7 @@ exports.RenderProcessImplement = RenderProcessImplement;
 
 
 /***/ }),
-/* 105 */
+/* 114 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8005,9 +8354,9 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var Service_1 = __webpack_require__(2);
-var CollisionContact_1 = __webpack_require__(106);
-var CollisionJumpTable_1 = __webpack_require__(32);
+var Service_1 = __webpack_require__(3);
+var CollisionContact_1 = __webpack_require__(72);
+var CollisionJumpTable_1 = __webpack_require__(19);
 var CollisionJumpTableImplement = (function () {
     function CollisionJumpTableImplement() {
     }
@@ -8023,7 +8372,7 @@ var CollisionJumpTableImplement = (function () {
         var point = positionA.clone().add(normal);
         normal.normalize();
         var mtv = normal.clone().multiply(maxDistance - distance);
-        return new CollisionContact_1.CollisionContact(colliderA, colliderB, mtv, point, normal);
+        return CollisionContact_1.CollisionContact.Get(colliderA, colliderB, mtv, point, normal);
     };
     CollisionJumpTableImplement.prototype.circlePolygon = function (colliderA, colliderB) {
         var positionA = colliderA.bounds.center;
@@ -8055,7 +8404,7 @@ var CollisionJumpTableImplement = (function () {
         else {
             contactPoint = pointA.add(pointB).multiply(0.5);
         }
-        return new CollisionContact_1.CollisionContact(colliderA, colliderB, minAxis, contactPoint, normal);
+        return CollisionContact_1.CollisionContact.Get(colliderA, colliderB, minAxis, contactPoint, normal);
     };
     CollisionJumpTableImplement.prototype.polygonPolygon = function (colliderA, colliderB) {
         var positionA = colliderA.bounds.center;
@@ -8087,7 +8436,7 @@ var CollisionJumpTableImplement = (function () {
         else {
             contactPoint = pointA.clone().add(pointB).multiply(0.5);
         }
-        return new CollisionContact_1.CollisionContact(colliderA, colliderB, minAxis, contactPoint, normal);
+        return CollisionContact_1.CollisionContact.Get(colliderA, colliderB, minAxis, contactPoint, normal);
     };
     CollisionJumpTableImplement.prototype.polygonPolygonSAT = function (colliderA, colliderB) {
         var axes = colliderA.calculatedAxes.concat(colliderB.calculatedAxes).map(function (axis) { return axis.normal(); });
@@ -8136,122 +8485,7 @@ exports.CollisionJumpTableImplement = CollisionJumpTableImplement;
 
 
 /***/ }),
-/* 106 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-var Vector_1 = __webpack_require__(1);
-var ForceMode_1 = __webpack_require__(31);
-var CollisionContact = (function () {
-    function CollisionContact(colliderA, colliderB, mtv, point, normal) {
-        this.colliderA = colliderA;
-        this.colliderB = colliderB;
-        this.mtv = mtv;
-        this.point = point;
-        this.normal = normal;
-        this._canRecycle = false;
-        this._resolved = false;
-    }
-    Object.defineProperty(CollisionContact.prototype, "canRecycle", {
-        get: function () { return this._canRecycle; },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(CollisionContact.prototype, "resolved", {
-        get: function () { return this._resolved; },
-        enumerable: true,
-        configurable: true
-    });
-    CollisionContact.prototype.resolve = function () {
-        if (this._resolved) {
-            return;
-        }
-        var a = this.colliderA;
-        var b = this.colliderB;
-        var bodyA = a.rigidbody;
-        var bodyB = b.rigidbody;
-        var shouldAwakeBodyA = bodyB ? !bodyB.isSleeping : false;
-        var shouldAwakeBodyB = bodyA ? !bodyA.isSleeping : false;
-        if (!bodyA && !bodyB) {
-            return;
-        }
-        var velocityA = bodyA ? bodyA.velocity : Vector_1.Vector.Zero;
-        var velocityB = bodyB ? bodyB.velocity : Vector_1.Vector.Zero;
-        var angularVelocityA = bodyA ? bodyA.angularVelocity : 0;
-        var angularVelocityB = bodyB ? bodyB.angularVelocity : 0;
-        var relativeA = this.point.clone().subtract(a.bounds.center);
-        var relativeB = this.point.clone().subtract(b.bounds.center);
-        var relativeVelocity = velocityB.clone()
-            .add(relativeB.cross(-angularVelocityB))
-            .subtract(velocityA)
-            .subtract(relativeA.cross(-angularVelocityA));
-        var rvDotNormal = relativeVelocity.dot(this.normal);
-        if (rvDotNormal > 0) {
-            return;
-        }
-        var restitution = Math.min(this.colliderA.restitution, this.colliderB.restitution);
-        var inverseMassA = bodyA ? bodyA.inverseMass : 0;
-        var inverseMassB = bodyB ? bodyB.inverseMass : 0;
-        var sumOfInverseMass = inverseMassA + inverseMassB;
-        var inverseMoiA = bodyA ? bodyA.inverseMoi : 0;
-        var inverseMoiB = bodyB ? bodyB.inverseMoi : 0;
-        var j_moi_a = Vector_1.Vector.Cross(relativeA.cross(this.normal), relativeA).multiply(inverseMoiA);
-        var j_moi_b = Vector_1.Vector.Cross(relativeB.cross(this.normal), relativeB).multiply(inverseMoiB);
-        var j_moi = j_moi_a.add(j_moi_b).dot(this.normal);
-        var j = -(1 + restitution) * rvDotNormal / (sumOfInverseMass + j_moi);
-        var impulse = this.normal.clone().multiply(j);
-        if (bodyA && bodyB) {
-            this.mtv.multiply(0.5);
-        }
-        if (bodyA) {
-            if (shouldAwakeBodyA && bodyA.isSleeping) {
-                bodyA.awake();
-            }
-            bodyA.host.transform.position.add(this.mtv.clone().multiply(-1));
-            bodyA.addForce(impulse.clone().multiply(-1), ForceMode_1.ForceMode.Impulse);
-        }
-        if (bodyB) {
-            if (shouldAwakeBodyB && bodyB.isSleeping) {
-                bodyB.awake();
-            }
-            bodyB.host.transform.position.add(this.mtv);
-            bodyB.addForce(impulse, ForceMode_1.ForceMode.Impulse);
-        }
-        var tangent = this.normal.normal();
-        var frictionImpulse;
-        var jt_moi_a = Vector_1.Vector.Cross(relativeA.cross(tangent), relativeA).multiply(inverseMoiA);
-        var jt_moi_b = Vector_1.Vector.Cross(relativeB.cross(tangent), relativeB).multiply(inverseMoiB);
-        var jt_moi = jt_moi_a.add(jt_moi_b).dot(tangent);
-        var t = relativeVelocity.clone().subtract(this.normal.clone().multiply(rvDotNormal)).normalize();
-        var jt = -relativeVelocity.dot(t) / (sumOfInverseMass + jt_moi);
-        var mu = Math.sqrt(Math.pow(this.colliderA.friction, 2) + Math.pow(this.colliderB.friction, 2));
-        if (Math.abs(jt) < j * mu) {
-            frictionImpulse = t.clone().multiply(jt);
-        }
-        else {
-            frictionImpulse = t.clone().multiply(-j * mu);
-        }
-        if (bodyA) {
-            bodyA.addForce(frictionImpulse.clone().multiply(-1), ForceMode_1.ForceMode.Impulse);
-            bodyA.addTorque(-frictionImpulse.dot(t) * relativeA.cross(t), ForceMode_1.ForceMode.Impulse);
-        }
-        if (bodyB) {
-            bodyB.addForce(frictionImpulse, ForceMode_1.ForceMode.Impulse);
-            bodyB.addTorque(frictionImpulse.dot(t) * relativeB.cross(t), ForceMode_1.ForceMode.Impulse);
-        }
-    };
-    CollisionContact.prototype.destroy = function () {
-        this._canRecycle = true;
-    };
-    return CollisionContact;
-}());
-exports.CollisionContact = CollisionContact;
-
-
-/***/ }),
-/* 107 */
+/* 115 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8263,13 +8497,13 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var ArrayUtility_1 = __webpack_require__(5);
-var Pair_1 = __webpack_require__(108);
-var Service_1 = __webpack_require__(2);
+var ArrayUtility_1 = __webpack_require__(7);
+var Pair_1 = __webpack_require__(116);
+var Service_1 = __webpack_require__(3);
 var BroadPhaseCollisionResolver_1 = __webpack_require__(42);
 var Vector_1 = __webpack_require__(1);
-var Color_1 = __webpack_require__(7);
-var Ray_1 = __webpack_require__(60);
+var Color_1 = __webpack_require__(8);
+var Ray_1 = __webpack_require__(50);
 var BroadPhaseCollisionResolverImplement = (function () {
     function BroadPhaseCollisionResolverImplement() {
         this.awakeColliders = [];
@@ -8413,13 +8647,13 @@ exports.BroadPhaseCollisionResolverImplement = BroadPhaseCollisionResolverImplem
 
 
 /***/ }),
-/* 108 */
+/* 116 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var Pool_1 = __webpack_require__(52);
+var Pool_1 = __webpack_require__(38);
 var Pair = (function () {
     function Pair(_bodyA, _bodyB) {
         this._bodyA = _bodyA;
@@ -8451,14 +8685,14 @@ var Pair = (function () {
     Pair.prototype.destroy = function () {
         this._canRecycle = true;
     };
-    Pair.Instances = new Pool_1.Pool(Pair);
+    Pair.Instances = new Pool_1.Pool(function (a, b) { return new Pair(a, b); });
     return Pair;
 }());
 exports.Pair = Pair;
 
 
 /***/ }),
-/* 109 */
+/* 117 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8470,8 +8704,9 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var Service_1 = __webpack_require__(2);
-var NarrowPhaseCollisionResolver_1 = __webpack_require__(61);
+var Service_1 = __webpack_require__(3);
+var NarrowPhaseCollisionResolver_1 = __webpack_require__(73);
+var CollisionContact_1 = __webpack_require__(72);
 var NarrowPhaseCollisionResolverImplement = (function () {
     function NarrowPhaseCollisionResolverImplement() {
     }
@@ -8484,6 +8719,7 @@ var NarrowPhaseCollisionResolverImplement = (function () {
         var collisionConctact = bodyA.collide(bodyB);
         if (collisionConctact) {
             collisionConctact.resolve();
+            CollisionContact_1.CollisionContact.Put(collisionConctact);
         }
     };
     NarrowPhaseCollisionResolverImplement = __decorate([
@@ -8495,7 +8731,7 @@ exports.NarrowPhaseCollisionResolverImplement = NarrowPhaseCollisionResolverImpl
 
 
 /***/ }),
-/* 110 */
+/* 118 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8507,8 +8743,8 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var Service_1 = __webpack_require__(2);
-var Time_1 = __webpack_require__(20);
+var Service_1 = __webpack_require__(3);
+var Time_1 = __webpack_require__(9);
 var TimeImplement = (function () {
     function TimeImplement() {
         this.deltaTime = 0;
@@ -8527,7 +8763,7 @@ exports.TimeImplement = TimeImplement;
 
 
 /***/ }),
-/* 111 */
+/* 119 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8542,9 +8778,9 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var Observable_1 = __webpack_require__(3);
-var Service_1 = __webpack_require__(2);
-var BrowserDelegate_1 = __webpack_require__(4);
+var Observable_1 = __webpack_require__(4);
+var Service_1 = __webpack_require__(3);
+var BrowserDelegate_1 = __webpack_require__(5);
 var BrowserDelegateImplement = (function () {
     function BrowserDelegateImplement() {
         this.window = window;
@@ -8565,7 +8801,7 @@ var BrowserDelegateImplement = (function () {
         this.document.body.style.margin = '0';
         this.document.body.style.width = '100%';
         this.document.body.style.height = '100%';
-        this.document.body.style.overflow = 'auto';
+        this.document.body.style.overflow = 'hidden';
     }
     BrowserDelegateImplement.prototype.createCanvas = function () {
         return this.document.createElement('canvas');
@@ -8583,7 +8819,7 @@ exports.BrowserDelegateImplement = BrowserDelegateImplement;
 
 
 /***/ }),
-/* 112 */
+/* 120 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8634,8 +8870,8 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var Resource_1 = __webpack_require__(62);
-var ArrayUtility_1 = __webpack_require__(5);
+var Resource_1 = __webpack_require__(74);
+var ArrayUtility_1 = __webpack_require__(7);
 var Bundle = (function (_super) {
     __extends(Bundle, _super);
     function Bundle(resources) {
@@ -8675,7 +8911,7 @@ exports.Bundle = Bundle;
 
 
 /***/ }),
-/* 113 */
+/* 121 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8685,8 +8921,8 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var Subject_1 = __webpack_require__(38);
-var ObjectUnsubscribedError_1 = __webpack_require__(53);
+var Subject_1 = __webpack_require__(29);
+var ObjectUnsubscribedError_1 = __webpack_require__(65);
 /**
  * @class BehaviorSubject<T>
  */

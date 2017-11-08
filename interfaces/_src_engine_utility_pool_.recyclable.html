@@ -80,10 +80,12 @@
 			<section class="tsd-panel">
 				<h3>Implemented by</h3>
 				<ul class="tsd-hierarchy">
+					<li><a href="../classes/_src_examples_flappy_bird_background_.background.html" class="tsd-signature-type">Background</a></li>
 					<li><a href="../classes/_src_engine_core_baseobject_.baseobject.html" class="tsd-signature-type">BaseObject</a></li>
+					<li><a href="../classes/_src_examples_flappy_bird_bird_.bird.html" class="tsd-signature-type">Bird</a></li>
 					<li><a href="../classes/_src_engine_display_bounds_.bounds.html" class="tsd-signature-type">Bounds</a></li>
-					<li><a href="../classes/_src_examples_manage_cameras_.box.html" class="tsd-signature-type">Box</a></li>
 					<li><a href="../classes/_src_examples_physics_.box.html" class="tsd-signature-type">Box</a></li>
+					<li><a href="../classes/_src_examples_manage_cameras_.box.html" class="tsd-signature-type">Box</a></li>
 					<li><a href="../classes/_src_engine_physics_boxcollidercomponent_.boxcollidercomponent.html" class="tsd-signature-type">BoxColliderComponent</a></li>
 					<li><a href="../classes/_src_engine_core_camera_.camera.html" class="tsd-signature-type">Camera</a></li>
 					<li><a href="../classes/_src_examples_control_camera_.cameracontroller.html" class="tsd-signature-type">CameraController</a></li>
@@ -100,7 +102,10 @@
 					<li><a href="../classes/_src_examples_control_camera_.jack.html" class="tsd-signature-type">Jack</a></li>
 					<li><a href="../classes/_src_examples_manage_cameras_.label.html" class="tsd-signature-type">Label</a></li>
 					<li><a href="../classes/_src_engine_render_linerenderercomponent_.linerenderercomponent.html" class="tsd-signature-type">LineRendererComponent</a></li>
+					<li><a href="../classes/_src_engine_math_matrix_.matrix.html" class="tsd-signature-type">Matrix</a></li>
 					<li><a href="../classes/_src_engine_physics_pair_.pair.html" class="tsd-signature-type">Pair</a></li>
+					<li><a href="../classes/_src_examples_flappy_bird_pipe_.pipe.html" class="tsd-signature-type">Pipe</a></li>
+					<li><a href="../classes/_src_examples_flappy_bird_pipe_.pipeobject.html" class="tsd-signature-type">PipeObject</a></li>
 					<li><a href="../classes/_src_examples_manage_cameras_.player.html" class="tsd-signature-type">Player</a></li>
 					<li><a href="../classes/_src_engine_physics_polygoncollidercomponent_.polygoncollidercomponent.html" class="tsd-signature-type">PolygonColliderComponent</a></li>
 					<li><a href="../classes/_src_engine_math_projection_.projection.html" class="tsd-signature-type">Projection</a></li>
@@ -132,6 +137,7 @@
 							<h3>Methods</h3>
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_src_engine_utility_pool_.recyclable.html#destroy" class="tsd-kind-icon">destroy</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_src_engine_utility_pool_.recyclable.html#reset" class="tsd-kind-icon">reset</a></li>
 							</ul>
 						</section>
 					</div>
@@ -145,7 +151,7 @@
 					<div class="tsd-signature tsd-kind-icon">can<wbr>Recycle<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/8db5d97/src/Engine/Utility/Pool.ts#L6">src/Engine/Utility/Pool.ts:6</a></li>
+							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/e2079ec/src/Engine/Utility/Pool.ts#L6">src/Engine/Utility/Pool.ts:6</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -162,9 +168,32 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/8db5d97/src/Engine/Utility/Pool.ts#L7">src/Engine/Utility/Pool.ts:7</a></li>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/e2079ec/src/Engine/Utility/Pool.ts#L7">src/Engine/Utility/Pool.ts:7</a></li>
 								</ul>
 							</aside>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
+					<a name="reset" class="tsd-anchor"></a>
+					<h3>reset</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
+						<li class="tsd-signature tsd-kind-icon">reset<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">...</span>args<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/e2079ec/src/Engine/Utility/Pool.ts#L8">src/Engine/Utility/Pool.ts:8</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5><span class="tsd-flag ts-flagRest">Rest</span> <span class="tsd-signature-symbol">...</span>args: <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span></h5>
+								</li>
+							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
 						</li>
 					</ul>
@@ -187,6 +216,9 @@
 					<li class=" tsd-kind-class tsd-parent-kind-external-module tsd-has-type-parameter">
 						<a href="../classes/_src_engine_utility_pool_.pool.html" class="tsd-kind-icon">Pool</a>
 					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-external-module tsd-is-not-exported">
+						<a href="_src_engine_utility_pool_.internalpool.html" class="tsd-kind-icon">Internal<wbr>Pool</a>
+					</li>
 				</ul>
 				<ul class="current">
 					<li class="current tsd-kind-interface tsd-parent-kind-external-module">
@@ -198,10 +230,16 @@
 							<li class=" tsd-kind-method tsd-parent-kind-interface">
 								<a href="_src_engine_utility_pool_.recyclable.html#destroy" class="tsd-kind-icon">destroy</a>
 							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-interface">
+								<a href="_src_engine_utility_pool_.recyclable.html#reset" class="tsd-kind-icon">reset</a>
+							</li>
 						</ul>
 					</li>
 				</ul>
 				<ul class="after-current">
+					<li class=" tsd-kind-type-alias tsd-parent-kind-external-module">
+						<a href="../modules/_src_engine_utility_pool_.html#factory" class="tsd-kind-icon">Factory</a>
+					</li>
 				</ul>
 			</nav>
 		</div>
