@@ -1,6 +1,7 @@
 import { Pair } from 'Engine/Physics/Pair';
 import { Service } from 'Engine/Decorator/Service';
 import { NarrowPhaseCollisionResolver } from 'Engine/Physics/NarrowPhaseCollisionResolver';
+import { CollisionContact } from 'Engine/Physics/CollisionContact';
 
 @Service(NarrowPhaseCollisionResolver)
 export class NarrowPhaseCollisionResolverImplement implements NarrowPhaseCollisionResolver {
@@ -14,6 +15,7 @@ export class NarrowPhaseCollisionResolverImplement implements NarrowPhaseCollisi
     const collisionConctact = bodyA.collide(bodyB);
     if (collisionConctact) {
       collisionConctact.resolve();
+      CollisionContact.Put(collisionConctact);
     }
   }
 

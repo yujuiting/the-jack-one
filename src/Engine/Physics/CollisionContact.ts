@@ -1,10 +1,30 @@
 // tslint:disable max-func-body-length cyclomatic-complexity
 import { ColliderComponent } from 'Engine/Physics/ColliderComponent';
 import { Vector } from 'Engine/Math/Vector';
-import { Recyclable } from 'Engine/Utility/Pool';
+import { Recyclable, Pool, Factory } from 'Engine/Utility/Pool';
 import { ForceMode } from 'Engine/Physics/ForceMode';
 
 export class CollisionContact implements Recyclable {
+
+  private static pool: Pool<CollisionContact> = new Pool((
+    colliderA: ColliderComponent,
+    colliderB: ColliderComponent,
+    mtv: Vector,
+    point: Vector,
+    normal: Vector
+  ) => new CollisionContact(colliderA, colliderB, mtv, point, normal));
+
+  public static Get(
+    colliderA: ColliderComponent,
+    colliderB: ColliderComponent,
+    mtv: Vector,
+    point: Vector,
+    normal: Vector
+  ): CollisionContact {
+    return (<CollisionContact>this.pool.get(colliderA, colliderB, mtv, point, normal));
+  }
+
+  public static Put(collisionContact: CollisionContact): void { this.pool.put(collisionContact); }
 
   private _canRecycle: boolean = false;
 

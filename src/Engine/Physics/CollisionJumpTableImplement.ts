@@ -28,7 +28,7 @@ export class CollisionJumpTableImplement implements CollisionJumpTable {
 
     const mtv = normal.clone().multiply(maxDistance - distance);
 
-    return new CollisionContact(colliderA, colliderB, mtv, point, normal);
+    return CollisionContact.Get(colliderA, colliderB, mtv, point, normal);
   }
 
   public circlePolygon(colliderA: CircleColliderComponent, colliderB: PolygonColliderComponent): CollisionContact|undefined  {
@@ -67,7 +67,7 @@ export class CollisionJumpTableImplement implements CollisionJumpTable {
       contactPoint = pointA.add(pointB).multiply(0.5);
     }
 
-    return new CollisionContact(colliderA, colliderB, minAxis, contactPoint, normal);
+    return CollisionContact.Get(colliderA, colliderB, minAxis, contactPoint, normal);
   }
 
   public polygonPolygon(colliderA: PolygonColliderComponent, colliderB: PolygonColliderComponent): CollisionContact|undefined  {
@@ -106,7 +106,7 @@ export class CollisionJumpTableImplement implements CollisionJumpTable {
       contactPoint = pointA.clone().add(pointB).multiply(0.5);
     }
 
-    return new CollisionContact(colliderA, colliderB, minAxis, contactPoint, normal);
+    return CollisionContact.Get(colliderA, colliderB, minAxis, contactPoint, normal);
   }
 
   /**
