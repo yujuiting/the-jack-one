@@ -25,12 +25,12 @@ export class Matrix implements MatrixLike {
 
   constructor(value?: MatrixLike) {
     if (value !== void 0) {
-      this[0][0] = value[0][0];
-      this[0][1] = value[0][1];
-      this[0][2] = value[0][2];
-      this[1][0] = value[1][0];
-      this[1][1] = value[1][1];
-      this[1][2] = value[1][2];
+      this._value[0][0] = value[0][0];
+      this._value[0][1] = value[0][1];
+      this._value[0][2] = value[0][2];
+      this._value[1][0] = value[1][0];
+      this._value[1][1] = value[1][1];
+      this._value[1][2] = value[1][2];
     }
     this.save();
   }
@@ -118,24 +118,24 @@ export class Matrix implements MatrixLike {
   }
 
   public multiply(other: MatrixLike): this {
-    const a1 = this[0][0];
-    const b1 = this[0][1];
-    const c1 = this[0][2];
-    const d1 = this[1][0];
-    const e1 = this[1][1];
-    const f1 = this[1][2];
+    const a1 = this._value[0][0];
+    const b1 = this._value[0][1];
+    const c1 = this._value[0][2];
+    const d1 = this._value[1][0];
+    const e1 = this._value[1][1];
+    const f1 = this._value[1][2];
     const a2 = other[0][0];
     const b2 = other[0][1];
     const c2 = other[0][2];
     const d2 = other[1][0];
     const e2 = other[1][1];
     const f2 = other[1][2];
-    this[0][0] = a1 * a2 + b1 * d2;
-    this[0][1] = a1 * b2 + b1 * e2;
-    this[0][2] = a1 * c2 + b1 * f2 + c1;
-    this[1][0] = d1 * a2 + e1 * d2;
-    this[1][1] = d1 * b2 + e1 * e2;
-    this[1][2] = d1 * c2 + e1 * f2 + f1;
+    this._value[0][0] = a1 * a2 + b1 * d2;
+    this._value[0][1] = a1 * b2 + b1 * e2;
+    this._value[0][2] = a1 * c2 + b1 * f2 + c1;
+    this._value[1][0] = d1 * a2 + e1 * d2;
+    this._value[1][1] = d1 * b2 + e1 * e2;
+    this._value[1][2] = d1 * c2 + e1 * f2 + f1;
     return this;
   }
 
@@ -143,8 +143,8 @@ export class Matrix implements MatrixLike {
     const x = point.x;
     const y = point.y;
     point.setTo(
-      this[0][0] * x + this[0][1] * y + this[0][2] * 1,
-      this[1][0] * x + this[1][1] * y + this[1][2] * 1
+      this._value[0][0] * x + this._value[0][1] * y + this._value[0][2] * 1,
+      this._value[1][0] * x + this._value[1][1] * y + this._value[1][2] * 1
     );
     return this;
   }
@@ -157,19 +157,19 @@ export class Matrix implements MatrixLike {
     const x = vector.x;
     const y = vector.y;
     vector.setTo(
-      this[0][0] * x + this[0][1] * y + 0 * 0,
-      this[1][0] * x + this[1][1] * y + 0 * 0
+      this._value[0][0] * x + this._value[0][1] * y + 0 * 0,
+      this._value[1][0] * x + this._value[1][1] * y + 0 * 0
     );
     return this;
   }
 
   public equalTo(another: MatrixLike): boolean {
-    return this[0][0] === another[0][0] &&
-           this[0][1] === another[0][1] &&
-           this[0][2] === another[0][2] &&
-           this[1][0] === another[1][0] &&
-           this[1][1] === another[1][1] &&
-           this[1][2] === another[1][2];
+    return this._value[0][0] === another[0][0] &&
+           this._value[0][1] === another[0][1] &&
+           this._value[0][2] === another[0][2] &&
+           this._value[1][0] === another[1][0] &&
+           this._value[1][1] === another[1][1] &&
+           this._value[1][2] === another[1][2];
   }
 
   public invertFrom(source: MatrixLike): this {
@@ -188,12 +188,12 @@ export class Matrix implements MatrixLike {
     const h_minor = source[0][0] * source[1][2] - source[0][2] * source[1][0];
     // const i_minor = source[0][0] * source[1][1] - source[0][1] * source[1][0];
     const inverseDeterminant = 1 / (source[0][0] * a_minor - source[0][1] * b_minor + source[0][2] * c_minor);
-    this[0][0] = inverseDeterminant * a_minor;
-    this[0][1] = inverseDeterminant * -d_minor;
-    this[0][2] = inverseDeterminant * g_minor;
-    this[1][0] = inverseDeterminant * -b_minor;
-    this[1][1] = inverseDeterminant * e_minor;
-    this[1][2] = inverseDeterminant * -h_minor;
+    this._value[0][0] = inverseDeterminant * a_minor;
+    this._value[0][1] = inverseDeterminant * -d_minor;
+    this._value[0][2] = inverseDeterminant * g_minor;
+    this._value[1][0] = inverseDeterminant * -b_minor;
+    this._value[1][1] = inverseDeterminant * e_minor;
+    this._value[1][2] = inverseDeterminant * -h_minor;
     return this;
   }
 
