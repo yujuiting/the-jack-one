@@ -1113,10 +1113,10 @@ exports.CircleColliderComponent = CircleColliderComponent;
 
 Object.defineProperty(exports, "__esModule", { value: true });
 var Texture_1 = __webpack_require__(26);
-exports.birdTexture = new Texture_1.Texture('../Assets/flappy-bird/bird.png');
-exports.pipeTexture = new Texture_1.Texture('../Assets/flappy-bird/pipe.png');
-exports.backgroundTexture = new Texture_1.Texture('../Assets/flappy-bird/background.png');
-exports.groundTexture = new Texture_1.Texture('../Assets/flappy-bird/ground.png');
+exports.birdTexture = new Texture_1.Texture('../assets/flappy-bird/bird.png');
+exports.pipeTexture = new Texture_1.Texture('../assets/flappy-bird/pipe.png');
+exports.backgroundTexture = new Texture_1.Texture('../assets/flappy-bird/background.png');
+exports.groundTexture = new Texture_1.Texture('../assets/flappy-bird/ground.png');
 
 
 /***/ }),
