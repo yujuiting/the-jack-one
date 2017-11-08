@@ -11,7 +11,7 @@ import { Engine } from 'Engine/Core/Engine';
 @Service(Engine)
 export class EngineImplement implements Engine {
 
-  public readonly gravity: Vector = Vector.Get(0, -100);
+  public readonly gravity: Vector = Vector.Get(0, -10);
 
   private accumulator: number = 0;
 

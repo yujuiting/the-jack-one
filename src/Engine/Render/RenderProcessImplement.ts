@@ -93,6 +93,7 @@ export class RenderProcessImplement implements RenderProcess {
 
       const image = renderer.canvas;
       const { width, height } = image;
+      // TODO: use matrix
       ctx.save();
       // move to position
       ctx.translate(position.x, position.y);

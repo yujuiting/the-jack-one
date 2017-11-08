@@ -1,7 +1,8 @@
 // tslint:disable max-classes-per-file
 import 'Engine/preset';
-import { instantiate, bootstrap, def, DEBUG_PHYSICS } from 'Engine/runtime';
-def(DEBUG_PHYSICS);
+import { instantiate, bootstrap, def, DEBUG_PHYSICS, DEBUG } from 'Engine/runtime';
+// def(DEBUG_PHYSICS);
+def(DEBUG);
 
 import { GameObject } from 'Engine/Core/GameObject';
 import { Scene } from 'Engine/Core/Scene';

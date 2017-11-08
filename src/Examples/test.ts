@@ -1,8 +1,9 @@
 // tslint:disable max-classes-per-file no-stateless-class
 import 'Engine/preset';
 
-import { instantiate, bootstrap, def, DEBUG } from 'Engine/runtime';
+import { instantiate, bootstrap, def, DEBUG, DEBUG_RENDERER } from 'Engine/runtime';
 def(DEBUG);
+def(DEBUG_RENDERER);
 
 import { GameObject } from 'Engine/Core/GameObject';
 import { Scene } from 'Engine/Core/Scene';
@@ -20,27 +21,29 @@ import { Inject } from 'Engine/Decorator/Inject';
 import { LineRendererComponent } from 'Engine/Render/LineRendererComponent';
 import { Vector } from 'Engine/Math/Vector';
 import { Color } from 'Engine/Display/Color';
+import { Logger } from 'Engine/Core/Logger';
 
 @Class()
 class Subject extends GameObject {
   // public renderer = this.addComponent(TextRendererComponent);
   // public renderer = this.addComponent(SpriteRendererComponent);
-  // public renderer = this.addComponent(SpriteSheetRendererComponent);
-  public renderer = this.addComponent(LineRendererComponent);
+  public renderer = this.addComponent(SpriteSheetRendererComponent);
+  // public renderer = this.addComponent(LineRendererComponent);
 }
 
 @Class()
 class World {
 
   constructor(@Inject(SceneManager) sceneManager: SceneManager,
-              @Inject(KeyboardInput) keyboardInput: KeyboardInput) {
+              @Inject(KeyboardInput) keyboardInput: KeyboardInput,
+              @Inject(Logger) logger: Logger) {
     const scene = instantiate(Scene);
     sceneManager.add(scene);
 
     // const texture = new Texture('/Assets/rect.png');
     const texture = new Texture('/Assets/flappy-bird/bird.png');
     const sprite = new Sprite(texture);
-    sprite.rect.position.setTo(0, 0);
+    sprite.rect.position.reset(0, 0);
     sprite.rect.width = 210;
     sprite.rect.height = 200;
     const spritesheet = new SpriteSheet(
@@ -58,18 +61,18 @@ class World {
     const subject = instantiate(Subject);
     // subject.renderer.text = 'Hello Engine';
     // subject.renderer.sprite = sprite;
-    // subject.renderer.spriteSheet = spritesheet;
+    subject.renderer.spriteSheet = spritesheet;
     // subject.renderer.sprite = <Sprite>spritesheet.getSprite('default', 0);
     // subject.transform.scale.setTo(1.4, 1);
-    subject.renderer.addPoint(
-      new Vector(100, 100),
-      new Vector(100, -100),
-      new Vector(-100, -100),
-      new Vector(-100, 100)
-    );
-    subject.renderer.closePath = true;
-    subject.renderer.strokeColor = Color.Blue;
-    subject.transform.position.setTo(100, 0);
+    // subject.renderer.addPoint(
+    //   new Vector(100, 100),
+    //   new Vector(100, -100),
+    //   new Vector(-100, -100),
+    //   new Vector(-100, 100)
+    // );
+    // subject.renderer.closePath = true;
+    // subject.renderer.strokeColor = Color.Blue;
+    // subject.transform.position.reset(100, 0);
     scene.add(subject);
 
     const onKeyDown$ = keyboardInput.keyDown$.map(e => e.key);
@@ -81,6 +84,8 @@ class World {
     onKeyDown$.filter(code => code === 'e').subscribe(() => subject.transform.rotation -= Math.PI / 6);
     onKeyDown$.filter(code => code === 'c').subscribe(() => subject.transform.scale.add(0.1));
     onKeyDown$.filter(code => code === 'z').subscribe(() => subject.transform.scale.add(-0.1));
+
+    onKeyDown$.subscribe(key => logger.log(`key down: ${key}`));
   }
 
 }
