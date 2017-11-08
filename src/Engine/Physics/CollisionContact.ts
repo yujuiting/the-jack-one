@@ -151,4 +151,16 @@ export class CollisionContact implements Recyclable {
     this._canRecycle = true;
   }
 
+  public reset(colliderA: ColliderComponent,
+               colliderB: ColliderComponent,
+               mtv: Vector,
+               point: Vector,
+               normal: Vector): void {
+    this.colliderA = colliderA;
+    this.colliderB = colliderB;
+    this.mtv = mtv;
+    this.point = point;
+    this.normal = normal;
+  }
+
 }

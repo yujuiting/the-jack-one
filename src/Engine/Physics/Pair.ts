@@ -3,7 +3,7 @@ import { Recyclable, Pool } from 'Engine/Utility/Pool';
 
 export class Pair implements Recyclable {
 
-  private static Instances: Pool<Pair> = new Pool(Pair);
+  private static Instances: Pool<Pair> = new Pool((a, b) => new Pair(a, b));
 
   public static Get(colliderA: ColliderComponent, colliderB: ColliderComponent): Pair|undefined {
     return this.Instances.get(colliderA, colliderB);

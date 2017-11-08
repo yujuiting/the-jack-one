@@ -25,6 +25,11 @@ export class Projection implements Recyclable {
     this._canRecycle = true;
   }
 
+  public reset(min: number = 0, max: number = 0): void {
+    this.min = min;
+    this.max = max;
+  }
+
   public toString(): string {
     return `Projection (${this.min}, ${this.max})`;
   }

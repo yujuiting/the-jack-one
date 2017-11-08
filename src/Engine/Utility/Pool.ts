@@ -5,11 +5,14 @@ import { addToArray,
 export interface Recyclable {
   canRecycle: boolean;
   destroy(): void;
+  reset(...args: any[]): void;
 }
 
 interface InternalPool {
   size: number;
 }
+
+export type Factory<T> = (...args: any[]) => T;
 
 export class Pool<T extends Recyclable> {
 
@@ -19,18 +22,27 @@ export class Pool<T extends Recyclable> {
 
   public readonly size = 0;
 
-  constructor(private type: Type<T>,
-              public readonly max: number = Infinity) {}
+  constructor(private factory: Factory<T>,
+              public readonly max: number = Infinity) {
+    (<InternalPool>this).size = max <= 1024 ? max : 1024;
+    for (let i = 0; i < this.size; i++) {
+      const instance = factory();
+      instance.destroy();
+      addToArray(this._inactives, instance);
+    }
+  }
 
   public get(...args: any[]): T|undefined {
     let instance: T|undefined = this._inactives.shift();
 
     if (!instance) {
       if (this.size < this.max) {
-        instance = new this.type(...args);
+        instance = this.factory(...args);
         addToArray(this._actives, instance);
         (<InternalPool>this).size++;
       }
+    } else {
+      instance.reset(...args);
     }
 
     return instance;

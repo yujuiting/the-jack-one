@@ -34,7 +34,7 @@ export class Vector implements Recyclable {
     return;
   }
 
-  private static pool: Pool<Vector> = new Pool(Vector);
+  private static pool: Pool<Vector> = new Pool((x, y) => new Vector(x, y));
 
   public static Get(x: number = 0, y: number = 0): Vector {
     // vector pool did not have limit
@@ -160,8 +160,8 @@ export class Vector implements Recyclable {
     return this.subtract(vector);
   }
 
-  public reset(): this {
-    return this.setTo(0, 0);
+  public reset(x = 0, y = 0): this {
+    return this.setTo(x, y);
   }
 
   public rotate(radian: number): this {
