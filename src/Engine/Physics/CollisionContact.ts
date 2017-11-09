@@ -79,6 +79,22 @@ export class CollisionContact implements Recyclable {
       return;
     }
 
+    const aIsTrigger = this.colliderA.isTigger;
+    const bIsTrigger = this.colliderB.isTigger;
+
+    if (aIsTrigger || bIsTrigger) {
+      if (aIsTrigger) {
+        this.colliderA.onTrigger(this.colliderB);
+      }
+      if (bIsTrigger) {
+        this.colliderB.onTrigger(this.colliderA);
+      }
+      /**
+       * If any one is trigger, do not apply collision force.
+       */
+      return;
+    }
+
     const restitution = Math.min(this.colliderA.restitution, this.colliderB.restitution);
 
     const inverseMassA = bodyA ? bodyA.inverseMass : 0;
@@ -165,6 +181,9 @@ export class CollisionContact implements Recyclable {
       bodyB.addForce(frictionImpulse, ForceMode.Impulse);
       bodyB.addTorque(frictionImpulse.dot(t) * relativeB.cross(t) , ForceMode.Impulse);
     }
+
+    this.colliderA.onCollide(this);
+    this.colliderB.onCollide(this);
   }
 
   public destroy(): void {

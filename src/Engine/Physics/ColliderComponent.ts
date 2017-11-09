@@ -9,6 +9,8 @@ import { Projection } from 'Engine/Math/Projection';
 import { ColliderType } from 'Engine/Physics/ColliderType';
 import { BroadPhaseCollisionResolver } from 'Engine/Physics/BroadPhaseCollisionResolver';
 import { TransformComponent } from 'Engine/Display/TransformComponent';
+import { Subject } from 'rxjs/Subject';
+import { Observable } from 'rxjs/Observable';
 
 interface InternalColliderComponent {
   rigidbody: RigidbodyComponent|undefined;
@@ -41,6 +43,8 @@ export class ColliderComponent extends Component {
   public friction: number = 0.99;
 
   public isKinematic: boolean = false;
+
+  public isTigger: boolean = false;
 
   public readonly type: ColliderType = ColliderType.Static;
 
@@ -81,6 +85,14 @@ export class ColliderComponent extends Component {
    */
   public getFurthestPoint(direction: Vector): Vector { return this.bounds.center.clone(); }
 
+  private _onCollide$ = new Subject<CollisionContact>();
+
+  private _onTirgger$ = new Subject<ColliderComponent>();
+
+  public get onCollide$(): Observable<CollisionContact> { return this._onCollide$.asObservable(); }
+
+  public get onTrigger$(): Observable<ColliderComponent> { return this._onTirgger$.asObservable(); }
+
   public start(): void {
     super.start();
     (<InternalColliderComponent>this).rigidbody = this.getComponent(RigidbodyComponent);
@@ -99,6 +111,25 @@ export class ColliderComponent extends Component {
      * TODO: track after checked target has been added to scene
      */
     this.broadPhaseCollisionResolver.track(this);
+  }
+
+  public onCollide(collisionContact: CollisionContact): void {
+    this._onCollide$.next(collisionContact);
+  }
+
+  public onTrigger(other: ColliderComponent): void {
+    this._onTirgger$.next(other);
+  }
+
+  public reset(): void {
+    this._onCollide$ = new Subject<CollisionContact>();
+    this._onTirgger$ = new Subject<ColliderComponent>();
+  }
+
+  public destroy(): void {
+    super.destroy();
+    this._onCollide$.complete();
+    this._onTirgger$.complete();
   }
 
 }
