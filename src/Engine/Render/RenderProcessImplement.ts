@@ -14,6 +14,7 @@ import { BrowserDelegate } from 'Engine/Utility/BrowserDelegate';
 interface RenderProcessCache {
   canvas: HTMLCanvasElement;
   ctx: CanvasRenderingContext2D;
+  visibility: WeakSet<RendererComponent>;
 }
 
 @Service(RenderProcess)
@@ -25,7 +26,7 @@ export class RenderProcessImplement implements RenderProcess {
 
   private height = 0;
 
-  private caches = new Map<Camera, RenderProcessCache>();
+  private caches = new WeakMap<Camera, RenderProcessCache>();
 
   constructor(@Inject(BrowserDelegate) private browserDelegate: BrowserDelegate) {}
 
@@ -37,7 +38,7 @@ export class RenderProcessImplement implements RenderProcess {
 
   /**
    * @param camera Current render camera.
-   * @param gameObjects Game objects this camera has visibility.
+   * @param gameObjects Game objects in current scene.
    */
   public render(camera: Camera, gameObjects: ReadonlyTree<GameObject>): void {
     if (!this.ctx) {
@@ -69,7 +70,7 @@ export class RenderProcessImplement implements RenderProcess {
     // render game objects
     gameObjects.forEachChildren(gameObject => {
       if (gameObject.layer & camera.cullingMask) {
-        this.renderGameObject(cache.ctx, camera, gameObject);
+        this.renderGameObject(cache, camera, gameObject);
       }
     });
 
@@ -80,7 +81,8 @@ export class RenderProcessImplement implements RenderProcess {
     ctx.drawImage(cache.canvas, 0, 0, width, height, x, y, width, height);
   }
 
-  private renderGameObject(ctx: CanvasRenderingContext2D, camera: Camera, gameObject: GameObject): void {
+  private renderGameObject(cache: RenderProcessCache, camera: Camera, gameObject: GameObject): void {
+    const { ctx, visibility } = cache;
     const renderers = gameObject.getComponents(<Type<RendererComponent>>RendererComponent);
 
     const { rotation, scale, position: worldPosition } = gameObject.transform;
@@ -89,6 +91,19 @@ export class RenderProcessImplement implements RenderProcess {
     camera.toScreenMatrix.multiplyToPoint(position);
 
     renderers.forEach(renderer => {
+      if (!camera.bounds.intersects(renderer.bounds)) {
+        if (visibility.has(renderer)) {
+          visibility.delete(renderer);
+          renderer.onBecameInvisible(camera);
+        }
+        return;
+      }
+
+      if (!visibility.has(renderer)) {
+        visibility.add(renderer);
+        renderer.onBecameVisible(camera);
+      }
+
       renderer.render();
 
       const image = renderer.canvas;
@@ -136,7 +151,8 @@ export class RenderProcessImplement implements RenderProcess {
     if (!cache) {
       const canvas = this.browserDelegate.createCanvas();
       const ctx = this.browserDelegate.getContext(canvas);
-      cache = { canvas, ctx };
+      const visibility = new WeakSet<RendererComponent>();
+      cache = { canvas, ctx, visibility };
       this.caches.set(camera, cache);
     }
 
