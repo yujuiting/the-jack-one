@@ -64,9 +64,9 @@ export class Camera extends GameObject {
     const halfHeight = height * 0.5;
 
     // set center as zero point.
-    this.toScreenMatrix.setTranslation(halfWidth, halfHeight);
+    this.toScreenMatrix.translate(halfWidth, halfHeight);
     // reverse Y axis
-    this.toScreenMatrix.setScaling(0, -1);
+    this.toScreenMatrix.scale(0, -1);
 
     this.bounds.extents.setTo(halfWidth, halfHeight);
   }
@@ -78,9 +78,9 @@ export class Camera extends GameObject {
      * Save those transform and restore after render.
      */
     this.toScreenMatrix.save();
-    this.toScreenMatrix.setTranslation(-this.transform.position.x, -this.transform.position.y);
-    this.toScreenMatrix.setRotatation(this.transform.rotation);
-    this.toScreenMatrix.setScaling(this.transform.scale);
+    this.toScreenMatrix.translate(-this.transform.position.x, -this.transform.position.y);
+    this.toScreenMatrix.rotate(this.transform.rotation);
+    this.toScreenMatrix.scale(this.transform.scale);
 
     this.toWorldMatrix.invertFrom(this.toScreenMatrix);
 

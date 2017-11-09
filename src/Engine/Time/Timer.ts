@@ -6,32 +6,40 @@ import { Class } from 'Engine/Decorator/Class';
 import { GameObjectInitializer } from 'Engine/Core/GameObjectInitializer';
 import { Inject } from 'Engine/Decorator/Inject';
 
-interface InternalTimer {
-  timestamp: number;
-}
-
 /**
  * Timer
  */
 @Class()
 export class Timer extends GameObject {
 
-  public readonly timestamp: number = 0;
+  private _timestamp: number;
 
-  public interval: number = 1000;
+  public interval: number;
 
-  private accumulation: number = 0;
+  private accumulation: number;
 
-  private timeEvent: Subject<number> = new Subject<number>();
+  private timeEvent: Subject<number>;
+
+  public get timestamp(): number { return this._timestamp; }
+
+  public get timeEvent$(): Observable<number> { return this.timeEvent.asObservable(); }
 
   constructor(@Inject(Time) private time: Time,
               @Inject(GameObjectInitializer) gameObjectInitializer: GameObjectInitializer) {
     super(gameObjectInitializer);
-    this.pause();
   }
 
-  public get timeEvent$(): Observable<number> {
-    return this.timeEvent.asObservable();
+  public reset(): void {
+    super.reset();
+    this._timestamp = 0;
+    this.interval = 1000;
+    this.accumulation = 0;
+    this.timeEvent = new Subject<number>();
+  }
+
+  public destroy(): void {
+    super.destroy();
+    this.timeEvent.complete();
   }
 
   public pause(): void {
@@ -43,30 +51,13 @@ export class Timer extends GameObject {
   }
 
   public update(): void {
-    (<InternalTimer>this).timestamp += this.time.deltaTime;
+    this._timestamp += this.time.deltaTime;
     this.accumulation += this.time.deltaTime;
 
     if (this.accumulation >= this.interval) {
       this.accumulation -= this.interval;
-      this.timeEvent.next(this.timestamp - this.accumulation);
+      this.timeEvent.next(this._timestamp - this.accumulation);
     }
-  }
-
-  public reset(): void {
-    (<InternalTimer>this).timestamp = 0;
-    this.accumulation = 0;
-
-    /**
-     * If timer has destroyed, create new timeEvent
-     */
-    if (this.isDestroyed) {
-      this.timeEvent = new Subject<number>();
-    }
-  }
-
-  public destroy(): void {
-    super.destroy();
-    this.timeEvent.complete();
   }
 
 }

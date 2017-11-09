@@ -3,9 +3,9 @@ import { addToArray,
 
 export class ReadonlyTree<T> {
 
-  protected _parent: Tree<T>|null = null;
+  protected _parent: Tree<T>|undefined;
 
-  public get parent(): Tree<T>|null { return this._parent; }
+  public get parent(): Tree<T>|undefined { return this._parent; }
 
   public get isRoot(): boolean { return !this._parent; }
 
@@ -74,7 +74,7 @@ export class Tree<T> extends ReadonlyTree<T> {
   }
 
   public remove(child: Tree<T>): boolean {
-    child._parent = null;
+    child._parent = undefined;
 
     return removeFromArray(this._children, child);
   }
@@ -99,6 +99,13 @@ export class Tree<T> extends ReadonlyTree<T> {
     }
 
     return addToArray(this.parent._children, this);
+  }
+
+  public clear(): void {
+    this._children.forEach(child => this.remove(child));
+    if (this._parent) {
+      this._parent.remove(this);
+    }
   }
 
 }

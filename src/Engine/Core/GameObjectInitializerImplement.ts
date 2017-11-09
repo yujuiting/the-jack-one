@@ -16,7 +16,7 @@ export class GameObjectInitializerImplement implements GameObjectInitializer {
   public resolve(): void {
     let gameObject = this.queue.shift();
     while (gameObject) {
-      gameObject.initialize();
+      GameObject.Initialize(gameObject);
       gameObject = this.queue.shift();
     }
   }

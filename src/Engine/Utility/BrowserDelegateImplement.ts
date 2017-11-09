@@ -39,7 +39,8 @@ export class BrowserDelegateImplement implements BrowserDelegate {
     this.document.body.style.margin = '0';
     this.document.body.style.width = '100%';
     this.document.body.style.height = '100%';
-    this.document.body.style.overflow = 'auto';
+    // prevent bounce scrolling in device
+    this.document.body.style.overflow = 'hidden';
   }
 
   public createCanvas(): HTMLCanvasElement {

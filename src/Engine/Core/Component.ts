@@ -23,7 +23,7 @@ export abstract class Component extends BaseObject {
     return this.host.getComponent(componentType);
   }
 
-  public getComponents<T extends Component>(componentType: Type<T>): T[] {
+  public getComponents<T extends Component>(componentType: Type<T>): ReadonlySet<T> {
     return this.host.getComponents(componentType);
   }
 

@@ -8,19 +8,37 @@ export class SpriteRendererComponent extends RendererComponent {
   /**
    * The sprite to render.
    */
-  public sprite: Sprite|undefined;
+  private _sprite: Sprite|undefined;
+
+  /**
+   * Only re-render if is dirty.
+   */
+  private _isDirty = false;
+
+  get sprite(): Sprite|undefined { return this._sprite; }
+
+  set sprite(value: Sprite|undefined) {
+    this._isDirty = true;
+    this._sprite = value;
+  }
+
+  get isDirty(): boolean { return this._isDirty; }
 
   public update(): void {
     super.update();
-    if (this.sprite) {
-      const { width, height } = this.sprite;
+    if (this._sprite) {
+      const { width, height } = this._sprite;
       this.canvas.width = width;
       this.canvas.height = height;
     }
   }
 
   public render(): void {
-    if (!this.sprite) {
+    if (!this._sprite) {
+      return;
+    }
+
+    if (!this._isDirty) {
       return;
     }
 
@@ -32,7 +50,7 @@ export class SpriteRendererComponent extends RendererComponent {
 
     ctx.save();
 
-    ctx.drawImage(this.sprite.canvas, 0, 0);
+    ctx.drawImage(this._sprite.canvas, 0, 0);
 
     ctx.restore();
   }

@@ -3,10 +3,10 @@ import { Recyclable, Pool } from 'Engine/Utility/Pool';
 
 export class Pair implements Recyclable {
 
-  private static Instances: Pool<Pair> = new Pool((a, b) => new Pair(a, b));
+  private static Instances: Pool<Pair> = new Pool(Pair, Infinity, 128);
 
   public static Get(colliderA: ColliderComponent, colliderB: ColliderComponent): Pair|undefined {
-    return this.Instances.get(colliderA, colliderB);
+    return (<Pair>this.Instances.get()).reset(colliderA, colliderB);
   }
 
   public static Put(pair: Pair): void { this.Instances.put(pair); }
@@ -22,9 +22,10 @@ export class Pair implements Recyclable {
   constructor(private _bodyA: ColliderComponent,
               private _bodyB: ColliderComponent) {}
 
-  public reset(bodyA: ColliderComponent, bodyB: ColliderComponent): void {
-    this._bodyA = bodyA;
-    this._bodyB = bodyB;
+  public reset(bodyA?: ColliderComponent, bodyB?: ColliderComponent): this {
+    this._bodyA = bodyA || this._bodyA;
+    this._bodyB = bodyB || this._bodyB;
+    return this;
   }
 
   public destroy(): void {

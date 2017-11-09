@@ -26,19 +26,26 @@ import { Vector } from './Vector';
     expect(m[1][1]).to.equal(4);
   }
 
-  @test 'should set rotation' () {
+  @test 'should rotate' () {
     const m = new Matrix();
-    m.setRotatation(Math.PI); // rotate 180 degree
+    m.rotate(Math.PI); // rotate 180 degree
     expect(m[0][0]).to.equal(-1);
     expect(m[0][1]).to.closeTo(0, 1e-10);
     expect(m[1][0]).to.closeTo(0, 1e-10);
     expect(m[1][1]).to.equal(-1);
+
+    const m2 = new Matrix();
+    m.rotate(Math.PI / 2); // rotate 90 degree
+    const p = new Vector(10, 0);
+    m.multiplyToPoint(p);
+    expect(p.x).closeTo(0, 1e-10);
+    expect(p.y).to.equal(-10);
   }
 
-  @test 'should set translation' () {
+  @test 'should translate' () {
     const m = new Matrix();
     const v = new Vector(10, 5);
-    m.setTranslation(v);
+    m.translate(v);
     expect(m[0][0]).to.equal(1);
     expect(m[0][1]).to.equal(0);
     expect(m[0][2]).to.equal(v.x);
@@ -47,10 +54,10 @@ import { Vector } from './Vector';
     expect(m[1][2]).to.equal(v.y);
   }
 
-  @test 'should set scaling' () {
+  @test 'should scale' () {
     const m = new Matrix();
     const v = new Vector(2, 3);
-    m.setScaling(v);
+    m.scale(v);
     expect(m[0][0]).to.equal(v.x);
     expect(m[0][1]).to.equal(0);
     expect(m[1][0]).to.equal(0);
@@ -76,8 +83,8 @@ import { Vector } from './Vector';
   @test 'should multiply to pointer' () {
     const m = new Matrix();
     const p = new Vector(4, 4);
-    m.setTranslation(new Vector(3, 3));
-    m.setScaling(new Vector(2, 2));
+    m.translate(new Vector(3, 3));
+    m.scale(new Vector(2, 2));
     m.multiplyToPoint(p);
     expect(p.x).to.equal(11);
     expect(p.y).to.equal(11);
@@ -86,9 +93,9 @@ import { Vector } from './Vector';
   @test 'should multiply to vector' () {
     const m = new Matrix();
     const v = new Vector(4, 0);
-    m.setTranslation(new Vector(3, 3)); // should not perform translation
-    m.setScaling(new Vector(2, 2));
-    m.setRotatation(Math.PI / 2); // rotate 90 degree on anticlockwise
+    m.translate(new Vector(3, 3)); // should not perform translation
+    m.scale(new Vector(2, 2));
+    m.rotate(Math.PI / 2); // rotate 90 degree on anticlockwise
     m.multiplyToVector(v);
     expect(v.x).to.closeTo(0, 1e-10);
     expect(v.y).to.equal(8);
@@ -125,7 +132,7 @@ import { Vector } from './Vector';
       [3, 4, 0]
     ]);
 
-    m.setTranslation(new Vector(5, 6));
+    m.translate(new Vector(5, 6));
 
     const i = new Matrix().invertFrom(m);
 
@@ -145,7 +152,7 @@ import { Vector } from './Vector';
       [3, 4, 0]
     ]);
 
-    m.setTranslation(new Vector(5, 6));
+    m.translate(new Vector(5, 6));
 
     const i = m.getInverse();
 

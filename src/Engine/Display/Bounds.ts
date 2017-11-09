@@ -72,9 +72,10 @@ export class Bounds implements Recyclable {
     return true;
   }
 
-  public reset(center: Vector, extents: Vector): void;
-  public reset(minX: number, minY: number, maxX: number, maxY: number): void;
-  public reset(...args: any[]): void {
+  public reset(): this;
+  public reset(center: Vector, extents: Vector): this;
+  public reset(minX: number, minY: number, maxX: number, maxY: number): this;
+  public reset(...args: any[]): this {
     if (args.length === 2) {
       this.center.copy(args[0]);
       this.extents.copy(args[1]);
@@ -87,7 +88,12 @@ export class Bounds implements Recyclable {
         (args[2] - args[0]) / 2,
         (args[3] - args[1]) / 2
       );
+    } else {
+      this.center.reset();
+      this.extents.reset();
     }
+
+    return this;
   }
 
   public destroy(): void {

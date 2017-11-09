@@ -14,7 +14,7 @@ export class SpriteSheetRendererComponent extends SpriteRendererComponent {
 
   private currentIndex: number = 0;
 
-  private sprites: ReadonlyArray<Sprite>;
+  private sprites: ReadonlyArray<Sprite>|undefined;
 
   private accumulator: number = 0;
 
@@ -33,6 +33,11 @@ export class SpriteSheetRendererComponent extends SpriteRendererComponent {
   }
 
   public update(): void {
+    if (!this.sprites) {
+      this.sprite = undefined;
+      return;
+    }
+
     this.accumulator += this.time.deltaTime;
 
     if (this.accumulator > this._spriteSheet.frameTime) {

@@ -3,7 +3,7 @@ export interface Type<T> extends Function {
   name: string;
 }
 
-export function getClass<T>(instance: T): Type<T> {
+export function getType<T>(instance: T): Type<T> {
   return (<any>instance).constructor;
 }
 

@@ -34,11 +34,11 @@ export class Vector implements Recyclable {
     return;
   }
 
-  private static pool: Pool<Vector> = new Pool((x, y) => new Vector(x, y));
+  private static pool: Pool<Vector> = new Pool(Vector);
 
   public static Get(x: number = 0, y: number = 0): Vector {
     // vector pool did not have limit
-    return (<Vector>this.pool.get()).setTo(x, y);
+    return (<Vector>this.pool.get()).reset(x, y);
   }
 
   public static Put(vector: Vector): void { this.pool.put(vector); }

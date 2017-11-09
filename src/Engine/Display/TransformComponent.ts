@@ -12,19 +12,19 @@ export class TransformComponent extends Component {
   /**
    * Position in world space.
    */
-  public position: Vector = Vector.Get();
+  private _position: Vector = Vector.Get();
 
   /**
    * Local position, relative to parent.
    */
-  public localPosition: Vector = Vector.Get();
+  private _localPosition: Vector = Vector.Get();
 
   /**
    * Scale in world space.
    */
-  public scale: Vector = Vector.Get(1, 1);
+  private _scale: Vector = Vector.Get(1, 1);
 
-  public localScale: Vector = Vector.Get(1, 1);
+  private _localScale: Vector = Vector.Get(1, 1);
 
   /**
    * Rotation in world space.
@@ -36,26 +36,38 @@ export class TransformComponent extends Component {
   /**
    * calculate every fixed update
    */
-  public readonly toWorldMatrix: Matrix = new Matrix();
+  private _toWorldMatrix: Matrix = Matrix.Get();
 
   /**
    * inverse matrix of `toWorldMatrix`
    */
-  public readonly toLocalMatrix: Matrix = this.toWorldMatrix.getInverse();
+  private _toLocalMatrix: Matrix = Matrix.Get();
+
+  public get position(): Vector { return this._position; }
+
+  public get localPosition(): Vector { return this._localPosition; }
+
+  public get scale(): Vector { return this._scale; }
+
+  public get localScale(): Vector { return this._localScale; }
+
+  public get toWorldMatrix(): Matrix { return this._toWorldMatrix; }
+
+  public get toLocalMatrix(): Matrix { return this._toLocalMatrix; }
 
   public fixedUpdate(alpha: number): void {
     super.fixedUpdate(alpha);
 
     if (this.host.parent) {
       const parentTransform = this.host.parent.transform;
-      this.position.copy(parentTransform.position);
-      this.position.add(this.localPosition);
-      this.scale.copy(parentTransform.scale);
-      this.scale.multiply(this.localScale);
+      this._position.copy(parentTransform._position);
+      this._position.add(this._localPosition);
+      this._scale.copy(parentTransform._scale);
+      this._scale.multiply(this._localScale);
       this.rotation = parentTransform.rotation + this.localRotation;
     }
 
-    this.toWorldMatrix.reset();
+    this._toWorldMatrix.reset();
     /**
      * transform order:
      * 1. scale
@@ -63,31 +75,38 @@ export class TransformComponent extends Component {
      * 3. translate
      * 4. optional, check parent
      */
-    this.toWorldMatrix.setTranslation(this.position);
-    this.toWorldMatrix.setRotatation(this.rotation);
-    this.toWorldMatrix.setScaling(this.scale);
+    this._toWorldMatrix.translate(this._position);
+    this._toWorldMatrix.rotate(this.rotation);
+    this._toWorldMatrix.scale(this._scale);
 
-    this.toLocalMatrix.invertFrom(this.toWorldMatrix);
+    this._toLocalMatrix.invertFrom(this._toWorldMatrix);
   }
 
   public reset(): void {
     super.reset();
-    this.position.reset();
-    this.localPosition.reset();
-    this.scale.setTo(1, 1);
-    this.localScale.setTo(1, 1);
+    this._position = Vector.Get();
+    this._localPosition = Vector.Get();
+    this._scale = Vector.Get(1, 1);
+    this._localScale = Vector.Get(1, 1);
     this.rotation = 0;
+    this._toWorldMatrix = Matrix.Get();
+    this._toLocalMatrix = Matrix.Get();
   }
 
   public destroy(): void {
     super.destroy();
-    Vector.Put(this.position);
-    Vector.Put(this.localPosition);
-    Vector.Put(this.scale);
-    Vector.Put(this.localScale);
-    delete this.position;
-    delete this.scale;
-    delete this.localScale;
+    Vector.Put(this._position);
+    Vector.Put(this._localPosition);
+    Vector.Put(this._scale);
+    Vector.Put(this._localScale);
+    Matrix.Put(this._toWorldMatrix);
+    Matrix.Put(this._toLocalMatrix);
+    delete this._position;
+    delete this._localPosition;
+    delete this._scale;
+    delete this._localScale;
+    delete this._toWorldMatrix;
+    delete this._toLocalMatrix;
   }
 
 }

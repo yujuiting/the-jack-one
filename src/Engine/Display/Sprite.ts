@@ -30,7 +30,8 @@ export class Sprite {
 
   get texture(): Texture { return this._texture; }
 
-  set texture(texture: Texture) { this.setTexture(texture); }
+  // TODO: dynamic texture
+  // set texture(texture: Texture) { this.setTexture(texture); }
 
   get width(): number { return this.rect.width; }
 

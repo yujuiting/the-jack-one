@@ -8,11 +8,11 @@ export interface MatrixLike {
 
 export class Matrix implements MatrixLike, Recyclable {
 
-  private static pool: Pool<Matrix> = new Pool((value?: MatrixLike) => new Matrix(value), Infinity, 64);
+  private static pool: Pool<Matrix> = new Pool(Matrix, Infinity, 64);
 
   public static Get(value?: MatrixLike): Matrix {
     // matrix pool did not have limit
-    return (<Matrix>this.pool.get(value));
+    return (<Matrix>this.pool.get()).reset(value);
   }
 
   public static Put(matrix: Matrix): void { this.pool.put(matrix); }
@@ -91,7 +91,7 @@ export class Matrix implements MatrixLike, Recyclable {
     return this;
   }
 
-  public setRotatation(radian: number): this {
+  public rotate(radian: number): this {
     /**
      * TODO: m11, m22 has default value 1, that should be a bug?
      */
@@ -103,9 +103,9 @@ export class Matrix implements MatrixLike, Recyclable {
     ]);
   }
 
-  public setTranslation(position: Vector): this;
-  public setTranslation(x: number, y: number): this;
-  public setTranslation(positionOrX: Vector|number, y?: number): this {
+  public translate(position: Vector): this;
+  public translate(x: number, y: number): this;
+  public translate(positionOrX: Vector|number, y?: number): this {
     if (positionOrX instanceof Vector) {
       return this.multiply([
         [1, 0, positionOrX.x],
@@ -120,9 +120,9 @@ export class Matrix implements MatrixLike, Recyclable {
     return this;
   }
 
-  public setScaling(magnification: Vector): this;
-  public setScaling(x: number, y: number): this;
-  public setScaling(magnificationOrX: Vector|number, y?: number): this {
+  public scale(magnification: Vector): this;
+  public scale(x: number, y: number): this;
+  public scale(magnificationOrX: Vector|number, y?: number): this {
     /**
      * TODO: m11, m22 has default value 1, that should be a bug?
      */

@@ -1,59 +1,60 @@
 import { Type } from 'Engine/Utility/Type';
 import { addToArray,
          removeFromArray } from 'Engine/Utility/ArrayUtility';
+import { instantiate } from 'Engine/runtime';
 
 export interface Recyclable {
   canRecycle: boolean;
   destroy(): void;
-  reset(...args: any[]): void;
+  reset(): any;
 }
-
-interface InternalPool {
-  size: number;
-}
-
-export type Factory<T> = (...args: any[]) => T;
 
 export class Pool<T extends Recyclable> {
 
-  private readonly _actives: T[] = [];
+  private readonly actives = new Set();
 
-  private readonly _inactives: T[] = [];
+  private readonly inactives = new Set();
 
-  public readonly size = 0;
+  private _size = 0;
 
-  constructor(private factory: Factory<T>,
+  get size(): number { return this._size; }
+
+  constructor(private EntityType: Type<T>,
               public readonly max: number = Infinity,
               initSize: number = max <= 1024 ? max : 1024) {
-    (<InternalPool>this).size = initSize;
-    for (let i = 0; i < this.size; i++) {
-      const instance = factory();
+    this._size = initSize;
+    for (let i = 0; i < this._size; i++) {
+      const instance = instantiate(EntityType);
       instance.destroy();
-      addToArray(this._inactives, instance);
+      // addToArray(this._inactives, instance);
+      this.inactives.add(instance);
     }
   }
 
-  public get(...args: any[]): T|undefined {
-    let instance: T|undefined = this._inactives.shift();
-
-    if (!instance) {
-      if (this.size < this.max) {
-        instance = this.factory(...args);
-        addToArray(this._actives, instance);
-        (<InternalPool>this).size++;
+  public get(): T|undefined {
+    if (this.inactives.size === 0) {
+      if (this._size < this.max) {
+        const instance = instantiate(this.EntityType);
+        this.actives.add(instance);
+        this._size++;
+        return instance;
+      } else {
+        return;
       }
     } else {
-      instance.reset(...args);
+      const instance = this.inactives.values().next().value;
+      this.inactives.delete(instance);
+      this.actives.add(instance);
+      return instance;
     }
 
-    return instance;
   }
 
   public put(instance: T): void {
-    if (removeFromArray(this._actives, instance)) {
+    if (this.actives.has(instance)) {
       instance.destroy();
-      this._inactives.push(instance);
-      (<InternalPool>this).size--;
+      this.actives.delete(instance);
+      this.inactives.add(instance);
     }
   }
 

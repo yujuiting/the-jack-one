@@ -26,21 +26,23 @@ import { Color } from 'Engine/Display/Color';
 @Class()
 export class Scene extends BaseObject {
 
-  public readonly resources: Bundle = new Bundle();
+  private _resources: Bundle;
 
   /**
    * Game objects store as a tree.
    * If a parent was deactivated, all children of it will be deactivated.
    */
-  private readonly gameObjects: Tree<GameObject> = new Tree<GameObject>(<any>null);
+  private gameObjects: Tree<GameObject>;
 
-  private cameras: Camera[] = [];
+  private cameras: Camera[];
 
-  private rightTop = new Vector();
+  private rightTop: Vector;
 
   private resizeSubscription: Subscription;
 
-  public get isLoaded(): boolean { return this.resources.isLoaded; }
+  public get isLoaded(): boolean { return this._resources.isLoaded; }
+
+  public get resources(): Bundle { return this._resources; }
 
   constructor(@Inject(BroadPhaseCollisionResolver) private broadPhaseCollisionResolver: BroadPhaseCollisionResolver,
               @Inject(NarrowPhaseCollisionResolver) private narrowPhaseCollisionResolver: NarrowPhaseCollisionResolver,
@@ -52,9 +54,39 @@ export class Scene extends BaseObject {
               @Inject(BrowserDelegate) private browser: BrowserDelegate,
               @Inject(Time) private time: Time) {
     super();
+  }
+
+  public reset(): void {
+    super.reset();
+    this._resources = new Bundle();
+    this.gameObjects = new Tree<GameObject>(<any>null);
+    this.cameras = [];
+    this.rightTop = Vector.Get();
+  }
+
+  public start(): void {
+    if (this.hasStarted) {
+      return;
+    }
+
+    super.start();
     this.add(this.mainCamera);
-    this.resizeSubscription = browser.resize$.subscribe(() => this.onResize());
+    this.resizeSubscription = this.browser.resize$.subscribe(() => this.onResize());
     this.rightTop.setTo(this.screen.width, 0);
+  }
+
+  public destroy(): void {
+    super.destroy();
+
+    if (this.hasStarted) {
+      this.gameObjects.forEachChildren(gameObject => gameObject.destroy());
+      this.resizeSubscription.unsubscribe();
+    }
+
+    this.gameObjects.clear();
+
+    Vector.Put(this.rightTop);
+    delete this.rightTop;
   }
 
   public add(gameObject: GameObject, at?: Vector): boolean {
@@ -98,7 +130,7 @@ export class Scene extends BaseObject {
   }
 
   public async load(): Promise<void> {
-    await this.resources.load();
+    await this._resources.load();
   }
 
   public fixedUpdate(alpha: number): void {
@@ -136,20 +168,9 @@ export class Scene extends BaseObject {
   public postRender(): void {
     this.gameObjects.forEachChildren(gameObject => gameObject.postRender());
     /**
-     * Resove all game object initialization at final step to ensure their cycle start at update call.
+     * Resove all game object initialization at final step to ensure their cycle start before first update call.
      */
     this.gameObjectInitializer.resolve();
-  }
-
-  public reset(): void {
-    this.reset();
-    this.resizeSubscription = this.browser.resize$.subscribe(() => this.onResize());
-  }
-
-  public destroy(): void {
-    super.destroy();
-    this.gameObjects.forEachChildren(gameObject => gameObject.destroy());
-    this.resizeSubscription.unsubscribe();
   }
 
   public toString(): string {
@@ -170,6 +191,7 @@ export class Scene extends BaseObject {
     const fpsText = `fps: ${fps}`;
     const fpsWidth = ctx.measureText(fpsText).width;
     ctx.fillText(fpsText, this.rightTop.x - fpsWidth, this.rightTop.y + 30);
+    ctx.restore();
   }
 
   private onResize(): void {

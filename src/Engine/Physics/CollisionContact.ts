@@ -1,18 +1,12 @@
 // tslint:disable max-func-body-length cyclomatic-complexity
 import { ColliderComponent } from 'Engine/Physics/ColliderComponent';
 import { Vector } from 'Engine/Math/Vector';
-import { Recyclable, Pool, Factory } from 'Engine/Utility/Pool';
+import { Recyclable, Pool } from 'Engine/Utility/Pool';
 import { ForceMode } from 'Engine/Physics/ForceMode';
 
 export class CollisionContact implements Recyclable {
 
-  private static pool: Pool<CollisionContact> = new Pool((
-    colliderA: ColliderComponent,
-    colliderB: ColliderComponent,
-    mtv: Vector,
-    point: Vector,
-    normal: Vector
-  ) => new CollisionContact(colliderA, colliderB, mtv, point, normal));
+  private static pool: Pool<CollisionContact> = new Pool(CollisionContact, Infinity, 128);
 
   public static Get(
     colliderA: ColliderComponent,
@@ -21,7 +15,7 @@ export class CollisionContact implements Recyclable {
     point: Vector,
     normal: Vector
   ): CollisionContact {
-    return (<CollisionContact>this.pool.get(colliderA, colliderB, mtv, point, normal));
+    return (<CollisionContact>this.pool.get()).reset(colliderA, colliderB, mtv, point, normal);
   }
 
   public static Put(collisionContact: CollisionContact): void { this.pool.put(collisionContact); }
@@ -190,16 +184,17 @@ export class CollisionContact implements Recyclable {
     this._canRecycle = true;
   }
 
-  public reset(colliderA: ColliderComponent,
-               colliderB: ColliderComponent,
-               mtv: Vector,
-               point: Vector,
-               normal: Vector): void {
-    this.colliderA = colliderA;
-    this.colliderB = colliderB;
-    this.mtv = mtv;
-    this.point = point;
-    this.normal = normal;
+  public reset(colliderA?: ColliderComponent,
+               colliderB?: ColliderComponent,
+               mtv?: Vector,
+               point?: Vector,
+               normal?: Vector): this {
+    this.colliderA = colliderA || this.colliderA;
+    this.colliderB = colliderB || this.colliderB;
+    this.mtv = mtv || this.mtv;
+    this.point = point || this.point;
+    this.normal = normal || this.normal;
+    return this;
   }
 
 }

@@ -19,8 +19,7 @@
     "baseUrl": "src",
     "paths": {
       "*": ["*"]
-    },
-    "outDir": "build"
+    }
   },
   "exclude": [
     "webpack.config.ts",
