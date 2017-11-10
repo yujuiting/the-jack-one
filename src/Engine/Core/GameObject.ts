@@ -40,18 +40,14 @@ export class GameObject extends BaseObject {
 
   private static TaggedGameObjects: Map<Tag, Set<GameObject>> = new Map();
 
-  private static AddTaggedGameObject(gameObject: GameObject, specificTag: Tag): void {
-    const bucket = this.GetBucketByTag(specificTag);
-    if (!bucket.has(gameObject)) {
-      bucket.add(gameObject);
-    }
+  private static AddTaggedGameObject(gameObject: GameObject, tag: Tag): ReadonlySet<GameObject> {
+    const bucket = this.GetBucketByTag(tag);
+    return bucket.add(gameObject);
   }
 
-  private static RemoveTaggedGameObject(gameObject: GameObject, specificTag: Tag): void {
-    const bucket = this.GetBucketByTag(specificTag);
-    if (bucket.has(gameObject)) {
-      bucket.delete(gameObject);
-    }
+  private static RemoveTaggedGameObject(gameObject: GameObject, tag: Tag): boolean {
+    const bucket = this.GetBucketByTag(tag);
+    return bucket.delete(gameObject);
   }
 
   private static GetBucketByTag(tag: Tag): Set<GameObject> {
@@ -72,7 +68,7 @@ export class GameObject extends BaseObject {
 
   private components: Map<Type<Component>, Set<Component>>;
 
-  private tags: Tag[];
+  private tags: Set<Tag>;
 
   public get node(): Tree<GameObject> { return this._node; }
 
@@ -108,7 +104,7 @@ export class GameObject extends BaseObject {
     this.layer = BuiltInLayer.Default;
     this._node = new Tree(this);
     this.components = new Map();
-    this.tags = [];
+    this.tags = new Set();
     this._transform = this.addComponent(TransformComponent);
   }
 
@@ -130,17 +126,16 @@ export class GameObject extends BaseObject {
   }
 
   public hasTag(tag: Tag): boolean {
-    return includeInArray(this.tags, tag);
+    return this.tags.has(tag);
   }
 
   public addTag(tag: Tag): void {
-    if (addToArray(this.tags, tag)) {
-      GameObject.AddTaggedGameObject(this, tag);
-    }
+    this.tags.add(tag);
+    GameObject.AddTaggedGameObject(this, tag);
   }
 
   public removeTag(tag: Tag): void {
-    if (removeFromArray(this.tags, tag)) {
+    if (this.tags.delete(tag)) {
       GameObject.RemoveTaggedGameObject(this, tag);
     }
   }

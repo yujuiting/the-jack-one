@@ -10,7 +10,7 @@ import { Component } from 'Engine/Core/Component';
 import { UniqueComponent } from 'Engine/Decorator/UniqueComponent';
 import { RequireComponent } from 'Engine/Decorator/RequireComponent';
 
-@suite class Constructor_TestSuite {
+@suite('GameObject') class TestSuite_1 {
 
   gameObject: GameObject;
 
@@ -22,34 +22,45 @@ import { RequireComponent } from 'Engine/Decorator/RequireComponent';
     this.gameObject.destroy();
   }
 
-  @test 'should not be active' () {
+  @test 'should not be active initially' () {
     expect(this.gameObject.isActive).to.be.false;
   }
 
-  @test 'should not be destroyed' () {
+  @test 'should not be destroyed initially' () {
     expect(this.gameObject.isDestroyed).to.be.false;
   }
 
-  @test 'should not had started' () {
+  @test 'should not had started initially' () {
     expect(this.gameObject.hasStarted).to.be.false;
   }
 
-  @test 'should stay in default layer' () {
+  @test 'should stay in default layer initially' () {
     expect(this.gameObject.layer).to.equal(BuiltInLayer.Default);
   }
 
-  @test 'should not have parent' () {
+  @test 'should not have parent initially' () {
     expect(this.gameObject.parent).to.be.undefined;
   }
 
-  @test 'should have a transform component' () {
+  @test 'should have a transform component initially' () {
     expect(this.gameObject.getComponent(TransformComponent)).to.be.instanceOf(TransformComponent);
     expect(this.gameObject.getComponents(TransformComponent).size).to.equal(1);
   }
 
+  @test 'should deactivate' () {
+    const nodeHide = stub(this.gameObject.node, 'hide');
+    this.gameObject.deactivate();
+    expect(this.gameObject.isActive).to.be.false;
+    expect(nodeHide).calledOnce;
+  }
+
+  @test 'should return identified string' () {
+    expect(this.gameObject.toString()).to.match(/GameObject\(\d+\)/);
+  }
+
 }
 
-@suite class Tag_TestSuite {
+@suite('GameObject tag control') class TestSuite2 {
 
   gameObject: GameObject;
 
@@ -90,7 +101,7 @@ class TestUniqueComponent extends Component {}
 @RequireComponent([TestComponent])
 class TestRequireComponent extends Component {}
 
-@suite class Component_TestSuite {
+@suite('GameObject Component') class TestSuite3 {
 
   gameObject: GameObject;
 
@@ -165,9 +176,15 @@ class TestRequireComponent extends Component {}
     expect(components.size).to.equal(3);
   }
 
+  @test 'should throw if not found component' () {
+    const component = instantiate(TestComponent);
+    const should_throw = () => this.gameObject.removeComponent(component);
+    expect(should_throw).to.throw;
+  }
+
 }
 
-@suite class Component_LifeCycle_TestSuite {
+@suite('Component Lifecycle') class TestSuite4 {
 
   gameObject: GameObject;
 
@@ -223,9 +240,16 @@ class TestRequireComponent extends Component {}
     this.gameObject.postRender();
     expect(componentStart).to.be.calledOnce;
   }
+
+  @test 'should start immediately if host is started' () {
+    this.gameObject.start();
+    const componentStart = stub(TestComponent.prototype, 'start');
+    this.gameObject.addComponent(TestComponent);
+    expect(componentStart).to.be.calledOnce;
+  }
 }
 
-@suite class Children_TestSuite {
+@suite('GameObject Children') class TestSuite5 {
 
   parent: GameObject;
 
@@ -258,6 +282,34 @@ class TestRequireComponent extends Component {}
     this.parent.addChild(this.child);
     this.parent.removeChild(this.child);
     expect(this.child.parent).to.be.undefined;
+  }
+
+  @test 'should lookup for checking active' () {
+    // before child add to parent
+    this.child.activate();
+    expect(this.child.isActive).to.be.true;
+
+    // add to parent
+    this.parent.addChild(this.child);
+    expect(this.child.isActive).to.be.false;
+
+    // activate parent
+    this.parent.activate();
+    expect(this.child.isActive).to.be.true;
+  }
+
+  @test 'should throw if add repeatly' () {
+    this.parent.addChild(this.child);
+    const should_throw = () => this.parent.addChild(this.child);
+    expect(should_throw).to.throw;
+  }
+
+  @test 'should throw if not found child' () {
+    const should_throw = () => this.parent.removeChild(this.child);
+    const should_not_throw = () => this.parent.removeChild(this.child);
+    expect(should_throw).to.throw;
+    this.parent.addChild(this.child);
+    expect(should_not_throw).not.to.throw;
   }
 
 }
