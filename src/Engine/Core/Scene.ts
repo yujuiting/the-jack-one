@@ -58,7 +58,7 @@ export class Scene extends BaseObject {
 
   public reset(): void {
     super.reset();
-    this._resources = new Bundle();
+    this._resources = new Bundle('default');
     this.gameObjects = new Tree<GameObject>(<any>null);
     this.cameras = [];
     this.rightTop = Vector.Get();

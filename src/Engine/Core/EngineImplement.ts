@@ -23,7 +23,7 @@ export class EngineImplement implements Engine {
 
   private isInitialized: boolean = false;
 
-  private currentScene: Scene;
+  private currentScene: Scene|undefined;
 
   private bindedmainloop: () => void = this.mainloop.bind(this);
 
@@ -44,8 +44,6 @@ export class EngineImplement implements Engine {
       throw new Error('Repeated engine initialization.');
     }
 
-    this.check();
-
     this.isInitialized = true;
 
     const { width, height } = this.screen;
@@ -57,13 +55,6 @@ export class EngineImplement implements Engine {
 
     this.sceneManager.sceneLoaded$.subscribe(s => this.onSceneLoaded(s));
 
-    try {
-      await this.sceneManager.currentScene.load();
-    } catch (err) {
-      console.error(err);
-    }
-
-    this.currentScene = this.sceneManager.currentScene;
     this.resume();
   }
 
@@ -74,12 +65,6 @@ export class EngineImplement implements Engine {
   public resume() {
     this._isPaused = false;
     requestAnimationFrame(this.bindedmainloop);
-  }
-
-  private check(): void {
-    if (!this.sceneManager.currentScene) {
-      throw new Error('No active scene');
-    }
   }
 
   private mainloop(timestamp: number) {
@@ -96,6 +81,11 @@ export class EngineImplement implements Engine {
      */
     if (this.accumulator > 200) {
       this.accumulator = 200;
+    }
+
+    if (!this.currentScene) {
+      requestAnimationFrame(this.bindedmainloop);
+      return;
     }
 
     while (this.accumulator > this.time.fixedDeltaTime) {

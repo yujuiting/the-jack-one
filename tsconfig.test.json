@@ -22,7 +22,6 @@
     }
   },
   "exclude": [
-    "webpack.config.ts",
     "node_modules",
     "build",
     "dist"

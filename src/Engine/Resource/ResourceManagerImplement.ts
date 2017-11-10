@@ -6,7 +6,7 @@ import { ResourceManager } from 'Engine/Resource/ResourceManager';
 @Service()
 export class ResourceManagerImplement implements ResourceManager {
 
-  private bundle: Bundle = new Bundle();
+  private bundle: Bundle = new Bundle('default');
 
   public add(resource: Resource): void {
     this.bundle.add(resource);

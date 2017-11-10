@@ -14,10 +14,7 @@
     "lib": [
       "es7", "dom"
     ],
-    "baseUrl": "src",
-    "paths": {
-      "*": ["*"]
-    }
+    "baseUrl": "src"
   },
   "exclude": [
     "node_modules",

@@ -145,7 +145,7 @@ export class GameObject extends BaseObject {
 
     RequireComponentTypes.forEach(RequireComponentType => {
       if (!this.getComponent(RequireComponentType)) {
-        throw new Error(`${ComponentType} require component ${RequireComponentType}`);
+        throw new Error(`${ComponentType.name} require component ${RequireComponentType.name}`);
       }
     });
 
@@ -153,7 +153,7 @@ export class GameObject extends BaseObject {
     const isUnique = Reflect.getMetadata('component:unique', ComponentType) || false;
 
     if (isUnique && components.size > 0) {
-      throw new Error(`Unique component ${ComponentType}`);
+      throw new Error(`Unique component ${ComponentType.name}`);
     }
 
     const component = instantiate(ComponentType, this);
@@ -164,6 +164,8 @@ export class GameObject extends BaseObject {
 
     components.add(component);
 
+    this.components.set(ComponentType, components);
+
     return component;
   }
 
@@ -171,7 +173,7 @@ export class GameObject extends BaseObject {
     const ComponentType = getType(component);
     const components = this.components.get(ComponentType);
     if (!components || !components.has(component)) {
-      throw new Error(`Not found components, ${component}`);
+      throw new Error(`Not found components, ${component.name}`);
     }
     components.delete(component);
     component.destroy();
@@ -191,7 +193,17 @@ export class GameObject extends BaseObject {
       return <Set<T>>this.components.get(ComponentType);
     } else {
       const components = new Set<T>();
-      this.components.set(ComponentType, components);
+      const componentTypes = this.components.keys();
+      let iteratorResult = componentTypes.next();
+      while (!iteratorResult.done) {
+        // key of this.components if class type
+        // use prototype to check it is descendants of searched component type
+        if (iteratorResult.value.prototype instanceof ComponentType) {
+          (<Set<Component>>this.components.get(iteratorResult.value))
+            .forEach(component => components.add(<T>component));
+        }
+        iteratorResult = componentTypes.next();
+      }
       return components;
     }
   }

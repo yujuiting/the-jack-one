@@ -52,11 +52,14 @@ export class Sprite {
       this.textureLoaded.unsubscribe();
     }
 
-    this.textureLoaded = texture.isLoaded$.subscribe(() =>
-      this.onTextureLoaded());
+    if (texture.isLoaded) {
+      this.drawTexture();
+    } else {
+      this.textureLoaded = texture.onLoad$.subscribe(() => this.drawTexture());
+    }
   }
 
-  private onTextureLoaded(): void {
+  private drawTexture(): void {
     if (this.rect.width === 0 && this.rect.height === 0) {
       this.rect.width = this._texture.width;
       this.rect.height = this._texture.height;
@@ -71,7 +74,7 @@ export class Sprite {
 
     this.ctx.clearRect(0, 0, this.rect.width, this.rect.height);
     this.ctx.drawImage(
-      this._texture.imageBitmap,
+      this._texture.data,
       this.rect.position.x,
       this.rect.position.y,
       this.rect.width,

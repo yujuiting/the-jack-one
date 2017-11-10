@@ -1,4 +1,5 @@
 // tslint:disable member-access no-unused-expression class-name max-classes-per-file
+import 'Engine/preset';
 import { expect } from 'chai';
 import { suite, test } from 'mocha-typescript';
 import { stub } from 'sinon';
@@ -101,6 +102,8 @@ class TestUniqueComponent extends Component {}
 @RequireComponent([TestComponent])
 class TestRequireComponent extends Component {}
 
+class TestAnotherComponent extends TestComponent {}
+
 @suite('GameObject Component') class TestSuite3 {
 
   gameObject: GameObject;
@@ -180,6 +183,13 @@ class TestRequireComponent extends Component {}
     const component = instantiate(TestComponent);
     const should_throw = () => this.gameObject.removeComponent(component);
     expect(should_throw).to.throw;
+  }
+
+  @test 'should get all components of same descendant type' () {
+    this.gameObject.addComponent(TestAnotherComponent);
+    this.gameObject.addComponent(TestAnotherComponent);
+    const components = this.gameObject.getComponents(TestComponent);
+    expect(components.size).to.equal(2);
   }
 
 }

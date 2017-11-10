@@ -6,83 +6,64 @@ import { Inject } from 'Engine/Decorator/Inject';
 /**
  * Basic texture
  */
-export class Texture extends Resource {
-
-  private source: HTMLImageElement;
+export class Texture extends Resource<HTMLCanvasElement> {
 
   @Inject(BrowserDelegate)
   private browser: BrowserDelegate;
 
-  private canvas: HTMLCanvasElement = this.browser.document.createElement('canvas');
-
-  private ctx: CanvasRenderingContext2D = <CanvasRenderingContext2D>this.canvas.getContext('2d');
-
   private isDirty: boolean = false;
 
-  public get width(): number { return this.canvas.width; }
+  private source: HTMLImageElement;
+
+  private _width = 0;
+
+  private _height = 0;
+
+  public get width(): number { return this._width; }
 
   public set width(value: number) {
-    this.canvas.width = value;
+    this._width = value;
     this.markAsDirty();
   }
 
-  public get height(): number { return this.canvas.height; }
+  public get height(): number { return this._height; }
 
   public set height(value: number) {
-    this.canvas.height = value;
+    this._height = value;
     this.markAsDirty();
   }
 
-  public get imageBitmap(): ImageBitmap|HTMLCanvasElement { return this.canvas; }
-
-  constructor(public readonly path: string,
-              imageData?: ImageData) {
-    super();
-    if (imageData) {
-      this.canvas.width = imageData.width;
-      this.canvas.height = imageData.height;
-      this.setImageData(imageData);
-    } else {
-      this.canvas.width = 0;
-      this.canvas.height = 0;
-    }
+  constructor(path: string) {
+    super(path);
   }
 
   public async load(): Promise<void> {
     if (this.isLoaded) {
-      return Promise.resolve();
+      return;
     }
 
-    this.source = new Image();
-    this.source.src = this.path;
-
-    return onceEvent(this.source, 'load').then(e => this.draw());
-  }
-
-  public getImageData(sx: number = 0,
-                      sy: number = 0,
-                      sw: number = this.width,
-                      sh: number = this.height): ImageData {
-    return this.ctx.getImageData(sx, sy, sw, sh);
-  }
-
-  public setImageData(imageData: ImageData,
-                      dx: number = 0,
-                      dy: number = 0,
-                      dirtyX: number = 0,
-                      dirtyY: number = 0,
-                      dirtyWidth: number = imageData.width,
-                      dirtyHeight: number = imageData.height): void {
-    this.ctx.putImageData(
-      imageData,
-      dx, dy,
-      dirtyX, dirtyY,
-      dirtyWidth, dirtyHeight
-    );
+    return new Promise<void>(resolve => {
+      const request = new Image();
+      request.src = this.path;
+      request.onprogress = this.onprogress;
+      request.onerror = this.onerror;
+      request.onloadstart = this.onloadstart;
+      request.onload = () => {
+        this._data = this.processData(request);
+        this._isLoaded = true;
+        this.onLoad.next();
+        resolve();
+      };
+    });
   }
 
   public clone(): Texture {
-    return new Texture(this.path, this.getImageData());
+    const texture = new Texture(this.path);
+    texture.source = this.source;
+    texture._width = this._width;
+    texture._height = this._height;
+    texture._isLoaded = this._isLoaded;
+    return texture;
   }
 
   public markAsDirty(): void {
@@ -96,29 +77,34 @@ export class Texture extends Resource {
       return;
     }
 
-    setTimeout(() => this.draw());
+    // setTimeout(() => this.draw());
+    this.processData(this.source);
   }
 
-  private draw(): void {
+  protected processData(image: HTMLImageElement): HTMLCanvasElement {
+    const data = this.data || this.browser.createCanvas();
+    const ctx = <CanvasRenderingContext2D>data.getContext('2d');
+
     if (this.width === 0 && this.height === 0) {
-      this.canvas.width = this.source.width;
-      this.canvas.height = this.source.height;
+      data.width = this._width = image.width;
+      data.height = this._height = image.height;
     }
 
-    this.ctx.drawImage(
-      this.source,
+    ctx.drawImage(
+      image,
       0, 0,
-      this.source.width,
-      this.source.height,
+      image.width,
+      image.height,
       0, 0,
-      this.width,
-      this.height
+      this._width,
+      this._height
     );
 
     this.isDirty = false;
-    if (!this.isLoaded) {
-      this._isLoaded.next(true);
-    }
+
+    this.source = image;
+
+    return data;
   }
 
 }

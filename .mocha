@@ -3,4 +3,5 @@
 --require tsconfig-paths/register
 --require ./scripts/test-environment.js
 --compilers ts:ts-node/register
+--recursive
 src/Engine/**/*.spec.ts

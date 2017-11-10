@@ -10,19 +10,19 @@ import { SceneManager } from 'Engine/Core/SceneManager';
 @Service(SceneManager)
 export class SceneManagerImplement implements SceneManager {
 
-  private readonly scenes: Scene[] = [];
+  private readonly scenes = new Set();
 
   private _currentScene: Scene;
 
-  private _isLoading: boolean = false;
+  private _isLoading = false;
 
-  private sceneLoaded: Subject<Scene> = new Subject<Scene>();
+  private sceneLoaded = new Subject<Scene>();
 
-  private sceneUnloaded: Subject<Scene> = new Subject<Scene>();
+  private sceneUnloaded = new Subject<Scene>();
 
-  private sceneWillLoad: Subject<Scene> = new Subject<Scene>();
+  private sceneWillLoad = new Subject<Scene>();
 
-  private sceneWillUnload: Subject<Scene> = new Subject<Scene>();
+  private sceneWillUnload = new Subject<Scene>();
 
   public get isLoading(): boolean { return this._isLoading; }
 
@@ -49,13 +49,11 @@ export class SceneManagerImplement implements SceneManager {
   public get currentScene(): Scene { return this._currentScene; }
 
   public add(scene: Scene): boolean {
-    if (!addToArray(this.scenes, scene)) {
+    if (!this.scenes.has(scene)) {
       return false;
     }
 
-    if (!this._currentScene) {
-      this._currentScene = scene;
-    }
+    this.scenes.add(scene);
 
     return true;
   }
@@ -65,33 +63,38 @@ export class SceneManagerImplement implements SceneManager {
       throw new Error('Cannot remove current scene.');
     }
 
-    return removeFromArray(this.scenes, scene);
+    return this.scenes.delete(scene);
   }
 
   public async switchTo(scene: Scene): Promise<void> {
-    if (!includeInArray(this.scenes, scene)) {
+    if (this._isLoading) {
+      throw new Error('Cannot switch scene while loading');
+    }
+
+    if (!this.scenes.has(scene)) {
       this.add(scene);
     }
 
     if (this._currentScene === scene) {
-      return Promise.resolve();
+      return;
     }
 
-    this._isLoading = true;
+    if (!scene.isLoaded) {
+      this._isLoading = true;
+      this.sceneWillLoad.next(scene);
+      await scene.load();
+    }
 
     if (this._currentScene) {
       this.sceneWillUnload.next(this._currentScene);
-    }
-
-    this.sceneWillLoad.next(scene);
-
-    return (scene.isLoaded ? Promise.resolve() : scene.load()).then(() => {
       this._currentScene.deactivate();
       this.sceneUnloaded.next(this._currentScene);
-      this._currentScene = scene;
-      this._isLoading = false;
-      this.sceneLoaded.next(this._currentScene);
-    });
+    }
+
+    this._isLoading = false;
+    this._currentScene = scene;
+    scene.start();
+    this.sceneLoaded.next(scene);
   }
 
 }
