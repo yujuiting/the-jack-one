@@ -19,6 +19,7 @@ import { BrowserDelegate } from 'Engine/Utility/BrowserDelegate';
 import { Subscription } from 'rxjs/Subscription';
 import { Time } from 'Engine/Time/Time';
 import { Color } from 'Engine/Display/Color';
+import { PointerInput } from 'Engine/Input/PointerInput';
 
 /**
  * Scene manage game objects and resources.
@@ -32,27 +33,28 @@ export class Scene extends BaseObject {
    * Game objects store as a tree.
    * If a parent was deactivated, all children of it will be deactivated.
    */
-  private gameObjects: Tree<GameObject>;
+  protected gameObjects: Tree<GameObject>;
 
-  private cameras: Camera[];
+  protected cameras: Camera[];
 
-  private rightTop: Vector;
+  protected rightTop: Vector;
 
-  private resizeSubscription: Subscription;
+  protected resizeSubscription: Subscription;
 
   public get isLoaded(): boolean { return this._resources.isLoaded; }
 
   public get resources(): Bundle { return this._resources; }
 
-  constructor(@Inject(BroadPhaseCollisionResolver) private broadPhaseCollisionResolver: BroadPhaseCollisionResolver,
-              @Inject(NarrowPhaseCollisionResolver) private narrowPhaseCollisionResolver: NarrowPhaseCollisionResolver,
-              @Inject(GameObjectInitializer) private gameObjectInitializer: GameObjectInitializer,
-              @Inject(RenderProcess) private renderProcess: RenderProcess,
+  constructor(@Inject(BroadPhaseCollisionResolver) protected broadPhaseCollisionResolver: BroadPhaseCollisionResolver,
+              @Inject(NarrowPhaseCollisionResolver) protected narrowPhaseCollisionResolver: NarrowPhaseCollisionResolver,
+              @Inject(GameObjectInitializer) protected gameObjectInitializer: GameObjectInitializer,
+              @Inject(RenderProcess) protected renderProcess: RenderProcess,
               @Inject(MainCamera) public mainCamera: Camera,
-              @Inject(Logger) private logger: Logger,
-              @Inject(Screen) private screen: Screen,
-              @Inject(BrowserDelegate) private browser: BrowserDelegate,
-              @Inject(Time) private time: Time) {
+              @Inject(Logger) protected logger: Logger,
+              @Inject(Screen) protected screen: Screen,
+              @Inject(BrowserDelegate) protected browser: BrowserDelegate,
+              @Inject(Time) protected time: Time,
+              @Inject(PointerInput) protected pointInput: PointerInput) {
     super();
   }
 
@@ -87,6 +89,8 @@ export class Scene extends BaseObject {
 
     Vector.Put(this.rightTop);
     delete this.rightTop;
+
+    this._resources.destroy();
   }
 
   public add(gameObject: GameObject, at?: Vector): boolean {
@@ -177,7 +181,7 @@ export class Scene extends BaseObject {
     return `Scene(${this.name})`;
   }
 
-  private debugRender(ctx: CanvasRenderingContext2D): void {
+  protected debugRender(ctx: CanvasRenderingContext2D): void {
     const deltaTime = ((this.time.deltaTime * 100) | 0) * 0.01;
     const fps = ((1000 / deltaTime * 100) | 0) * 0.01;
 
@@ -191,10 +195,21 @@ export class Scene extends BaseObject {
     const fpsText = `fps: ${fps}`;
     const fpsWidth = ctx.measureText(fpsText).width;
     ctx.fillText(fpsText, this.rightTop.x - fpsWidth, this.rightTop.y + 30);
+
+    const screenPositionText = `screen: ${this.pointInput.lastPointerPosition.x}, ${this.pointInput.lastPointerPosition.y}`;
+    const screenPositionWidth = ctx.measureText(screenPositionText).width;
+    ctx.fillText(screenPositionText, this.rightTop.x - screenPositionWidth, this.rightTop.y + 48);
+
+    const worldPosition = this.pointInput.lastPointerPosition.clone();
+    this.mainCamera.toWorldMatrix.multiplyToPoint(worldPosition);
+    const worldPositionText = `world: ${worldPosition.x}, ${worldPosition.y}`;
+    const worldPositionWidth = ctx.measureText(worldPositionText).width;
+    ctx.fillText(worldPositionText, this.rightTop.x - worldPositionWidth, this.rightTop.y + 66);
+
     ctx.restore();
   }
 
-  private onResize(): void {
+  protected onResize(): void {
     this.rightTop.setTo(this.screen.width, 0);
   }
 

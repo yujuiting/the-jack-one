@@ -3,6 +3,7 @@ import { Observable } from 'rxjs/Observable';
 import { Service } from 'Engine/Decorator/Service';
 import { TouchInput } from 'Engine/Input/TouchInput';
 import { Inject } from 'Engine/Decorator/Inject';
+import { Vector } from 'Engine/Math/Vector';
 
 @Service(TouchInput)
 export class TouchInputImplement implements TouchInput {

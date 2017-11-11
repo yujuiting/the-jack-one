@@ -3,6 +3,7 @@ import { Observable } from 'rxjs/Observable';
 import { Service } from 'Engine/Decorator/Service';
 import { MouseInput } from 'Engine/Input/MouseInput';
 import { Inject } from 'Engine/Decorator/Inject';
+import { Vector } from 'Engine/Math/Vector';
 
 @Service(MouseInput)
 export class MouseInputImplement implements MouseInput {

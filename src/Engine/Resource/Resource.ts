@@ -17,9 +17,9 @@ export class Resource<T = any> {
 
   protected onLoad: Subject<void> = new Subject();
 
-  protected onError: Subject<ErrorEvent> = new Subject();
+  protected onError: Subject<any> = new Subject();
 
-  private _responseType: XMLHttpRequestResponseType = '';
+  protected _responseType: XMLHttpRequestResponseType = '';
 
   public get data(): T { return this._data; }
 
@@ -29,7 +29,7 @@ export class Resource<T = any> {
 
   public get onLoad$(): Observable<void> { return this.onLoad.asObservable(); }
 
-  public get onError$(): Observable<ErrorEvent> { return this.onError.asObservable(); }
+  public get onError$(): Observable<any> { return this.onError.asObservable(); }
 
   public get responseType(): XMLHttpRequestResponseType { return this._responseType; }
 
@@ -51,8 +51,6 @@ export class Resource<T = any> {
 
       const request = new XMLHttpRequest();
 
-      request.open('GET', this.path, true);
-
       request.responseType = this._responseType;
 
       request.onloadstart = this.onloadstart;
@@ -61,18 +59,26 @@ export class Resource<T = any> {
 
       request.onerror = this.onerror;
 
-      request.onload = () => {
-        this._data = this.processData(request.response);
-        this._isLoaded = true;
-        this.onLoad.next();
+      request.onload = async () => {
+        try {
+          this._data = await this.processData(request.response);
+          this._isLoaded = true;
+          this.onLoad.next();
+        } catch (err) {
+          this.onerror(err);
+        }
         resolve();
       };
 
       request.onloadend = this.onloadend;
+
+      request.open('GET', this.path, true);
+
+      request.send();
     });
   }
 
-  protected processData(data: any): any {
+  protected async processData(data: any): Promise<any> {
     if (this._responseType === 'blob') {
       return URL.createObjectURL(data);
     }
@@ -89,9 +95,9 @@ export class Resource<T = any> {
 
   protected onprogress = (e: ProgressEvent) => this.onProgress.next(e);
 
-  protected onerror = (e: ErrorEvent) => {
-    this.logger.log(`error loading resource ${this.path}`);
-    this.onError.next(e);
+  protected onerror = (err: any) => {
+    this.logger.log(`error loading resource PATH: ${this.path}, ERROR: ${err}`);
+    this.onError.next(err);
   }
 
   protected onloadend = () => this.logger.log(`complete loading resource ${this.path}`);

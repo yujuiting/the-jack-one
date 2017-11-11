@@ -41,4 +41,6 @@ export interface BrowserDelegate {
 
   getContext(canvas: HTMLCanvasElement): CanvasRenderingContext2D;
 
+  getAudioContext(): AudioContext;
+
 }

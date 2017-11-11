@@ -51,4 +51,12 @@ export class BrowserDelegateImplement implements BrowserDelegate {
     return <CanvasRenderingContext2D>canvas.getContext('2d');
   }
 
+  public getAudioContext(): AudioContext {
+    try {
+      return new (AudioContext || (<any>window).webkitAudioContext)();
+    } catch (err) {
+      throw new Error('Not support audio context');
+    }
+  }
+
 }

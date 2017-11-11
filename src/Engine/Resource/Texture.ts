@@ -48,10 +48,14 @@ export class Texture extends Resource<HTMLCanvasElement> {
       request.onprogress = this.onprogress;
       request.onerror = this.onerror;
       request.onloadstart = this.onloadstart;
-      request.onload = () => {
-        this._data = this.processData(request);
-        this._isLoaded = true;
-        this.onLoad.next();
+      request.onload = async () => {
+        try {
+          this._data = await this.processData(request);
+          this._isLoaded = true;
+          this.onLoad.next();
+        } catch (err) {
+          this.onerror(err);
+        }
         resolve();
       };
     });
@@ -77,11 +81,10 @@ export class Texture extends Resource<HTMLCanvasElement> {
       return;
     }
 
-    // setTimeout(() => this.draw());
     this.processData(this.source);
   }
 
-  protected processData(image: HTMLImageElement): HTMLCanvasElement {
+  protected async processData(image: HTMLImageElement): Promise<HTMLCanvasElement> {
     const data = this.data || this.browser.createCanvas();
     const ctx = <CanvasRenderingContext2D>data.getContext('2d');
 

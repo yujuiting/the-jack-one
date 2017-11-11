@@ -1,4 +1,5 @@
 import { Observable } from 'rxjs/Observable';
+import { Vector } from 'Engine/Math/Vector';
 
 export const TouchInput = Symbol('TouchInput');
 

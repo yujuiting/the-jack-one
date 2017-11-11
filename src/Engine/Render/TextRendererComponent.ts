@@ -28,6 +28,7 @@ export class TextRendererComponent extends RendererComponent {
   public update(): void {
     super.update();
 
+    // Set font for measure text width.
     this.ctx.font = `${this.fontStyle} ${this.fontVariant} ${this.fontWeight} ${this.fontSize}px ${this.fontFamily}`;
 
     this.actualWidth = this.ctx.measureText(this.text).width;
@@ -40,6 +41,9 @@ export class TextRendererComponent extends RendererComponent {
 
   public render(): void {
     const ctx = this.ctx;
+
+    // Set font again, because after resize canvas, it will be restore.
+    this.ctx.font = `${this.fontStyle} ${this.fontVariant} ${this.fontWeight} ${this.fontSize}px ${this.fontFamily}`;
 
     if (this.strokeColor) {
       ctx.strokeStyle = this.strokeColor.toHexString();

@@ -97,7 +97,7 @@ export class GameObject extends BaseObject {
   }
 
   /**
-   * @inheritdoc
+   * Reset game object, ensure reset after destroy.
    */
   public reset(): void {
     super.reset();
@@ -109,7 +109,7 @@ export class GameObject extends BaseObject {
   }
 
   /**
-   * @inheritdoc
+   * Destroy all children and components and release references.
    */
   public destroy(): void {
     super.destroy();
@@ -180,6 +180,10 @@ export class GameObject extends BaseObject {
   }
 
   public getComponent<T extends Component>(ComponentType: Type<T>): T|undefined {
+    /**
+     * If you occur error `Uncaught TypeError: Cannot read property 'get' of undefined`.
+     * It's probably you forgot to call super.reset() in you reset method.
+     */
     const components = this.components.get(ComponentType);
     if (!components) {
       return;

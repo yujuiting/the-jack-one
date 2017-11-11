@@ -57,7 +57,7 @@ const config: Configuration = {
     new CheckerPlugin(),
 
     new CopyWebpackPlugin([
-      { from: 'Assets', to: 'Assets' }
+      { from: 'Examples/Assets', to: 'examples/assets' }
     ]),
 
     new HotModuleReplacementPlugin(),
@@ -81,6 +81,7 @@ const config: Configuration = {
 
   devServer: {
     contentBase: path.join(__dirname, 'dist'),
+    publicPath: '/',
     compress: true,
     port: 9000,
     hot: true,

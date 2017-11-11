@@ -31,8 +31,21 @@ export class PointerInputImplement implements PointerInput {
     );
   }
 
+  public readonly lastPointerPosition = new Vector();
+
   constructor(@Inject(MouseInput) private mouseInput: MouseInput,
-              @Inject(TouchInput) private touchInput: TouchInput) {}
+              @Inject(TouchInput) private touchInput: TouchInput) {
+    Observable.merge(
+      this.pointerStart$,
+      this.pointerMove$,
+      this.pointerEnd$
+    ).subscribe(e => {
+      if (e.locations.length > 0) {
+        const p = e.locations[0];
+        this.lastPointerPosition.copy(p);
+      }
+    });
+  }
 
   private parseMouseEvent(e: MouseEvent): PointerEvent {
     return {

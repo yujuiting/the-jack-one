@@ -1,4 +1,5 @@
 import { Observable } from 'rxjs/Observable';
+import { Vector } from 'Engine/Math/Vector';
 
 export const MouseInput = Symbol('MouseInput');
 

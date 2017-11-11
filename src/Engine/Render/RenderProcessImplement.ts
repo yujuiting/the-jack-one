@@ -91,6 +91,10 @@ export class RenderProcessImplement implements RenderProcess {
     camera.toScreenMatrix.multiplyToPoint(position);
 
     renderers.forEach(renderer => {
+      if (!renderer.isActive) {
+        return;
+      }
+
       if (!camera.bounds.intersects(renderer.bounds)) {
         if (visibility.has(renderer)) {
           visibility.delete(renderer);

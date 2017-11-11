@@ -19,4 +19,6 @@ export interface PointerInput {
 
   readonly pointerMove$: Observable<PointerEvent>;
 
+  readonly lastPointerPosition: Vector;
+
 }
