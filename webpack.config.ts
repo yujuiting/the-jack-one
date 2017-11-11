@@ -6,14 +6,12 @@ import * as CopyWebpackPlugin from 'copy-webpack-plugin';
 
 const context = path.join(__dirname, 'src');
 
-const games = {
-};
-
 const examples = {
   'examples/control-camera': 'Examples/control-camera.ts',
   'examples/manage-cameras': 'Examples/manage-cameras.ts',
   'examples/physics': 'Examples/physics.ts',
-  'examples/test': 'Examples/test.ts'
+  'examples/test': 'Examples/test.ts',
+  'examples/flappy-bird': 'Examples/flappy-bird/main.ts'
 };
 
 const config: Configuration = {
@@ -21,10 +19,6 @@ const config: Configuration = {
   context,
 
   entry: {
-    // Web
-    // index: 'Web/main.ts',
-    // Games
-    ...games,
     ...examples
   },
 
@@ -62,18 +56,12 @@ const config: Configuration = {
 
     new HotModuleReplacementPlugin(),
 
-    // new HtmlWebpackPlugin({ chunks: ['commons', 'index'] }),
-
-    ...Object.keys(games).map(name =>
-      new HtmlWebpackPlugin({ chunks: ['commons', name], filename: `${name}.html` })),
-
     ...Object.keys(examples).map(name =>
       new HtmlWebpackPlugin({ chunks: ['commons', name], filename: `${name}.html` })),
 
     new optimize.CommonsChunkPlugin({
       name: 'commons',
       chunks: [
-        ...Object.keys(games),
         ...Object.keys(examples)
       ]
     })

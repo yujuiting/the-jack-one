@@ -9,8 +9,6 @@ import { Screen } from 'Engine/Display/Screen';
 import { Camera } from 'Engine/Core/Camera';
 import { instantiate, bootstrap } from 'Engine/runtime';
 
-// import { Time } from 'Engine/Time/Time';
-
 import { Class } from 'Engine/Decorator/Class';
 import { Inject } from 'Engine/Decorator/Inject';
 
@@ -30,7 +28,7 @@ import { PointerInput, PointerEvent } from 'Engine/Input/PointerInput';
 
 import { RigidbodyComponent } from 'Engine/Physics/RigidbodyComponent';
 
-const texture: Texture = new Texture('../assets/circle.png');
+const texture: Texture = new Texture('./assets/circle.png');
 
 @Class()
 class Player extends GameObject {
@@ -165,49 +163,50 @@ class CameraFollow extends Component {
 }
 
 @Class()
-class Game {
+class Game extends Scene {
 
   private player: Player = instantiate(Player);
 
-  private scene: Scene = instantiate(Scene);
+  // private scene: Scene = instantiate(Scene);
 
-  private mainCamera: Camera = this.scene.mainCamera;
+  // private mainCamera: Camera = this.scene.mainCamera;
 
   private subCamera: Camera = instantiate(Camera);
 
-  constructor(@Inject(SceneManager) sceneManager: SceneManager,
-              @Inject(PointerInput) pointerInput: PointerInput,
-              @Inject(Screen) private screen: Screen) {
-    this.scene.resources.add(texture);
-    this.scene.add(this.player);
-    this.scene.add(this.subCamera);
-    this.scene.add(instantiate(Box));
-    sceneManager.add(this.scene);
+  @Inject(SceneManager) private sceneManager: SceneManager;
+  @Inject(PointerInput) private pointerInput: PointerInput;
+
+  public start(): void {
+    super.start();
+
+    this.add(this.player);
+    this.add(this.subCamera);
+    this.add(instantiate(Box));
 
     this.mainCamera.backgroundColor = Color.CreateByHexRgb('#4A687F');
     const cameraFollow = this.mainCamera.addComponent(CameraFollow);
     cameraFollow.bounds.extents.setTo(50, 50);
     cameraFollow.follow(this.player);
 
-    const halfScreenWidth = screen.width * 0.5;
+    const halfScreenWidth = this.screen.width * 0.5;
 
     // split screen
     this.mainCamera.setSize(halfScreenWidth, screen.height);
     this.subCamera.setSize(halfScreenWidth, screen.height);
     this.subCamera.rect.position.setTo(halfScreenWidth, 0);
 
-    pointerInput.pointerStart$.subscribe(e => this.onPointerStart(e));
+    this.pointerInput.pointerStart$.subscribe(e => this.onPointerStart(e));
 
     const mainCameraLabel: Label = instantiate(Label);
     mainCameraLabel.text = 'Main Camera, click to move';
     mainCameraLabel.layer = 1 << 10;
-    this.scene.add(mainCameraLabel);
+    this.add(mainCameraLabel);
     this.mainCamera.cullingMask = this.mainCamera.cullingMask | mainCameraLabel.layer;
 
     const subCameraLabel: Label = instantiate(Label);
     subCameraLabel.text = 'Sub Camera';
     subCameraLabel.layer = 1 << 11;
-    this.scene.add(subCameraLabel);
+    this.add(subCameraLabel);
     this.subCamera.cullingMask = this.subCamera.cullingMask | subCameraLabel.layer;
   }
 
@@ -223,7 +222,6 @@ class Game {
   }
 
 }
-
-instantiate(Game);
-
-bootstrap().catch(console.error);
+const scene = instantiate(Game);
+scene.resources.add(texture);
+bootstrap(scene).catch(console.error);

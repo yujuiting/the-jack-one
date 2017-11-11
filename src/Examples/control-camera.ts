@@ -26,7 +26,7 @@ import { RigidbodyComponent } from 'Engine/Physics/RigidbodyComponent';
 
 import { KeyboardInput } from 'Engine/Input/KeyboardInput';
 
-const texture: Texture = new Texture('../assets/circle.png');
+const texture: Texture = new Texture('./assets/circle.png');
 
 @Class()
 class CameraController extends Component {
@@ -121,25 +121,18 @@ class Jack extends GameObject {
 }
 
 @Class()
-class Game {
+class Game extends Scene {
 
-  private scene: Scene = instantiate(Scene);
-
-  private camera: Camera = this.scene.mainCamera;
-
-  constructor(@Inject(SceneManager) sceneManager: SceneManager) {
-    this.scene.resources.add(texture);
-
-    sceneManager.add(this.scene);
-
-    this.camera.backgroundColor = Color.CreateByHexRgb('#4A687F');
-    this.camera.addComponent(CameraController);
-
-    this.scene.add(instantiate(Jack));
+  public start(): void {
+    super.start();
+    this.mainCamera.backgroundColor = Color.CreateByHexRgb('#4A687F');
+    this.mainCamera.addComponent(CameraController);
+    this.add(instantiate(Jack));
   }
 
 }
 
-instantiate(Game);
+const scene = instantiate(Game);
+scene.resources.add(texture);
 
-bootstrap().catch(console.error);
+bootstrap(scene).catch(console.error);

@@ -34,8 +34,8 @@ import { CircleColliderComponent } from 'Engine/Physics/CircleColliderComponent'
 
 import { PointerInput, PointerEvent } from 'Engine/Input/PointerInput';
 
-const rectTexture = new Texture('../assets/rect.png');
-const circleTexture = new Texture('../assets/circle.png');
+const rectTexture = new Texture('./assets/rect.png');
+const circleTexture = new Texture('./assets/circle.png');
 
 @Class()
 class Shape extends GameObject {
@@ -140,9 +140,7 @@ class GameManager extends GameObject {
 const ShapeTypes: Type<Shape>[] = [Box, Circle];
 
 @Class()
-class Game {
-
-  private scene: Scene;
+class Game extends Scene {
 
   private gameManager: GameManager;
 
@@ -151,53 +149,45 @@ class Game {
   private wallRight: Wall;
   private wallLeft: Wall;
 
-  constructor(@Inject(SceneManager) private sceneManager: SceneManager,
-              @Inject(PointerInput) private pointerInput: PointerInput,
-              @Inject(BrowserDelegate) private browserDelegate: BrowserDelegate,
-              @Inject(Screen) private screen: Screen) {
-    // create scene
-    this.scene = instantiate(Scene);
-    this.sceneManager.add(this.scene);
+  @Inject(SceneManager) private sceneManager: SceneManager;
+  @Inject(PointerInput) private pointerInput: PointerInput;
+  @Inject(BrowserDelegate) private browserDelegate: BrowserDelegate;
+
+  public start(): void {
+    super.start();
 
     // setup background color
-    this.scene.mainCamera.backgroundColor = Color.CreateByHexRgb('#4A687F');
-
-    // prepare resource
-    this.scene.resources.add(rectTexture);
-    this.scene.resources.add(circleTexture);
+    this.mainCamera.backgroundColor = Color.CreateByHexRgb('#4A687F');
 
     // walls
     this.wallTop = instantiate(Wall);
-    this.scene.add(this.wallTop);
+    this.add(this.wallTop);
 
     this.wallBottom = instantiate(Wall);
-    this.scene.add(this.wallBottom);
+    this.add(this.wallBottom);
 
     this.wallRight = instantiate(Wall);
     this.wallRight.transform.rotation = Math.PI / 2;
-    this.scene.add(this.wallRight);
+    this.add(this.wallRight);
 
     this.wallLeft = instantiate(Wall);
     this.wallLeft.transform.rotation = Math.PI / 2;
-    this.scene.add(this.wallLeft);
+    this.add(this.wallLeft);
 
     this.adjustWalls();
 
     // game manager
     this.gameManager = instantiate(GameManager);
-    this.gameManager.scene = this.scene;
-    this.scene.add(this.gameManager);
+    this.gameManager.scene = this;
+    this.add(this.gameManager);
 
     // pointer input event
     this.pointerInput.pointerStart$.subscribe(e => this.onPointerStart(e));
-
-    // resize event
-    this.browserDelegate.resize$.subscribe(e => this.onResize(e));
   }
 
   private onPointerStart(e: PointerEvent): void {
     e.locations.forEach(location => {
-      const worldPosition = this.scene.mainCamera.screenToWorld(location);
+      const worldPosition = this.mainCamera.screenToWorld(location);
       this.gameManager.createShapeAt(worldPosition);
     });
   }
@@ -211,16 +201,17 @@ class Game {
     this.wallLeft.transform.position.setTo(-halfWidth, 0);
   }
 
-  private onResize(e: Event): void {
-    this.scene.mainCamera.setSize(
-      this.screen.width,
-      this.screen.height
-    );
+  protected onResize(): void {
+    super.onResize();
+    this.mainCamera.setSize(this.screen.width, this.screen.height);
     this.adjustWalls();
   }
 
 }
 
-instantiate(Game);
+const scene = instantiate(Game);
+// prepare resource
+scene.resources.add(rectTexture);
+scene.resources.add(circleTexture);
 
-bootstrap().catch(console.error);
+bootstrap(scene).catch(console.error);
