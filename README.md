@@ -15,7 +15,7 @@ Dedicated to Jack.
 `The Jack One` is an [ECS](https://en.wikipedia.org/wiki/Entity–component–system) game engine.
 This project focus on custom engine development, game is a side project for quick concept and function testing.
 
-Aim to create a highly modularized and elegant game engine.
+Aim to create a highly modularized and elegant game engine.
 
 ## Examples
 
