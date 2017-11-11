@@ -728,7 +728,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var Resource_1 = __webpack_require__(15);
-var ArrayUtility_1 = __webpack_require__(10);
+var ArrayUtility_1 = __webpack_require__(11);
 var Bundle = (function (_super) {
     __extends(Bundle, _super);
     function Bundle(bundleName, resources) {
@@ -812,7 +812,7 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var GameObject_1 = __webpack_require__(3);
-var Screen_1 = __webpack_require__(11);
+var Screen_1 = __webpack_require__(10);
 var GameObjectInitializer_1 = __webpack_require__(20);
 var Color_1 = __webpack_require__(6);
 var Bounds_1 = __webpack_require__(25);
@@ -1000,7 +1000,7 @@ var BaseObject_1 = __webpack_require__(37);
 var Tree_1 = __webpack_require__(44);
 var Bundle_1 = __webpack_require__(26);
 var Camera_1 = __webpack_require__(27);
-var ArrayUtility_1 = __webpack_require__(10);
+var ArrayUtility_1 = __webpack_require__(11);
 var Inject_1 = __webpack_require__(0);
 var Class_1 = __webpack_require__(4);
 var BroadPhaseCollisionResolver_1 = __webpack_require__(32);
@@ -1010,7 +1010,7 @@ var GameObjectInitializer_1 = __webpack_require__(20);
 var RenderProcess_1 = __webpack_require__(46);
 var runtime_1 = __webpack_require__(9);
 var Logger_1 = __webpack_require__(30);
-var Screen_1 = __webpack_require__(11);
+var Screen_1 = __webpack_require__(10);
 var BrowserDelegate_1 = __webpack_require__(2);
 var Time_1 = __webpack_require__(12);
 var Color_1 = __webpack_require__(6);
@@ -2241,9 +2241,12 @@ exports.Sound = Sound;
 Object.defineProperty(exports, "__esModule", { value: true });
 __webpack_require__(40);
 var runtime_1 = __webpack_require__(9);
+var Screen_1 = __webpack_require__(10);
 runtime_1.def(runtime_1.DEBUG);
 var MainScene_1 = __webpack_require__(126);
 var resource_1 = __webpack_require__(28);
+var screen = runtime_1.getService(Screen_1.Screen);
+screen.setSize(375, 667);
 var mainScene = runtime_1.instantiate(MainScene_1.MainScene);
 mainScene.resources.add(resource_1.bundle);
 runtime_1.bootstrap(mainScene);
@@ -2364,7 +2367,7 @@ var PointerInput_1 = __webpack_require__(24);
 var KeyboardInput_1 = __webpack_require__(60);
 var Inject_1 = __webpack_require__(0);
 var Vector_1 = __webpack_require__(1);
-var Screen_1 = __webpack_require__(11);
+var Screen_1 = __webpack_require__(10);
 var Random_1 = __webpack_require__(62);
 var AudioPlayerComponent_1 = __webpack_require__(56);
 var resource_1 = __webpack_require__(28);
@@ -3291,12 +3294,12 @@ var Class_1 = __webpack_require__(4);
 var GameObject_1 = __webpack_require__(3);
 var SpriteRendererComponent_1 = __webpack_require__(18);
 var Sprite_1 = __webpack_require__(17);
-var resource_1 = __webpack_require__(28);
+var BoxColliderComponent_1 = __webpack_require__(55);
+var Time_1 = __webpack_require__(12);
 var runtime_1 = __webpack_require__(9);
 var Inject_1 = __webpack_require__(0);
-var Screen_1 = __webpack_require__(11);
-var Time_1 = __webpack_require__(12);
-var BoxColliderComponent_1 = __webpack_require__(55);
+var Screen_1 = __webpack_require__(10);
+var resource_1 = __webpack_require__(28);
 var Background = (function (_super) {
     __extends(Background, _super);
     function Background() {
@@ -3517,13 +3520,10 @@ var PipeObject = (function (_super) {
     function PipeObject() {
         return _super !== null && _super.apply(this, arguments) || this;
     }
-    PipeObject.prototype.reset = function () {
-        _super.prototype.reset.call(this);
-        this.renderer = this.addComponent(SpriteRendererComponent_1.SpriteRendererComponent);
-        this.collider = this.addComponent(BoxColliderComponent_1.BoxColliderComponent);
-    };
     PipeObject.prototype.start = function () {
         _super.prototype.start.call(this);
+        this.renderer = this.addComponent(SpriteRendererComponent_1.SpriteRendererComponent);
+        this.collider = this.addComponent(BoxColliderComponent_1.BoxColliderComponent);
         this.renderer.sprite = new Sprite_1.Sprite(resource_1.texture_pipe);
         this.collider.size.setTo(138, 1000);
     };
@@ -3546,11 +3546,11 @@ var Pipe = (function (_super) {
         _super.prototype.reset.call(this);
         this.upper = runtime_1.instantiate(PipeObject);
         this.lower = runtime_1.instantiate(PipeObject);
-        this.body = this.addComponent(RigidbodyComponent_1.RigidbodyComponent);
         this.scored = false;
     };
     Pipe.prototype.start = function () {
         _super.prototype.start.call(this);
+        this.body = this.addComponent(RigidbodyComponent_1.RigidbodyComponent);
         this.upper.transform.localScale.setTo(1, -1);
         this.upper.transform.position.setTo(0, 325);
         this.lower.transform.position.setTo(0, -325);
@@ -3605,11 +3605,11 @@ var CircleColliderComponent_1 = __webpack_require__(52);
 var Vector_1 = __webpack_require__(1);
 var SpriteSheetRendererComponent_1 = __webpack_require__(142);
 var SpriteSheet_1 = __webpack_require__(143);
-var resource_1 = __webpack_require__(28);
 var ForceMode_1 = __webpack_require__(38);
 var AudioPlayerComponent_1 = __webpack_require__(56);
 var Inject_1 = __webpack_require__(0);
-var Screen_1 = __webpack_require__(11);
+var Screen_1 = __webpack_require__(10);
+var resource_1 = __webpack_require__(28);
 var Bird = (function (_super) {
     __extends(Bird, _super);
     function Bird() {

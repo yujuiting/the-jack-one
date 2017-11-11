@@ -32,7 +32,7 @@ var GameObject_1 = __webpack_require__(3);
 var Scene_1 = __webpack_require__(33);
 var SceneManager_1 = __webpack_require__(42);
 var BrowserDelegate_1 = __webpack_require__(2);
-var ArrayUtility_1 = __webpack_require__(10);
+var ArrayUtility_1 = __webpack_require__(11);
 var Class_1 = __webpack_require__(4);
 var Inject_1 = __webpack_require__(0);
 var Texture_1 = __webpack_require__(16);
@@ -938,7 +938,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var Resource_1 = __webpack_require__(15);
-var ArrayUtility_1 = __webpack_require__(10);
+var ArrayUtility_1 = __webpack_require__(11);
 var Bundle = (function (_super) {
     __extends(Bundle, _super);
     function Bundle(bundleName, resources) {
@@ -1023,7 +1023,7 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var GameObject_1 = __webpack_require__(3);
-var Screen_1 = __webpack_require__(11);
+var Screen_1 = __webpack_require__(10);
 var GameObjectInitializer_1 = __webpack_require__(20);
 var Color_1 = __webpack_require__(6);
 var Bounds_1 = __webpack_require__(25);
@@ -1163,7 +1163,7 @@ var BaseObject_1 = __webpack_require__(37);
 var Tree_1 = __webpack_require__(44);
 var Bundle_1 = __webpack_require__(26);
 var Camera_1 = __webpack_require__(27);
-var ArrayUtility_1 = __webpack_require__(10);
+var ArrayUtility_1 = __webpack_require__(11);
 var Inject_1 = __webpack_require__(0);
 var Class_1 = __webpack_require__(4);
 var BroadPhaseCollisionResolver_1 = __webpack_require__(32);
@@ -1173,7 +1173,7 @@ var GameObjectInitializer_1 = __webpack_require__(20);
 var RenderProcess_1 = __webpack_require__(46);
 var runtime_1 = __webpack_require__(9);
 var Logger_1 = __webpack_require__(30);
-var Screen_1 = __webpack_require__(11);
+var Screen_1 = __webpack_require__(10);
 var BrowserDelegate_1 = __webpack_require__(2);
 var Time_1 = __webpack_require__(12);
 var Color_1 = __webpack_require__(6);

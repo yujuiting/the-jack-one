@@ -90,7 +90,7 @@
 /******/ 	
 /******/ 	
 /******/ 	var hotApplyOnUpdate = true;
-/******/ 	var hotCurrentHash = "f5bf76f7934f27761d4d"; // eslint-disable-line no-unused-vars
+/******/ 	var hotCurrentHash = "8a4890aece7acb73a514"; // eslint-disable-line no-unused-vars
 /******/ 	var hotRequestTimeout = 10000;
 /******/ 	var hotCurrentModuleData = {};
 /******/ 	var hotCurrentChildModule; // eslint-disable-line no-unused-vars
@@ -1807,6 +1807,16 @@ exports.DEBUG_PHYSICS = Symbol('DEBUG_PHYSICS');
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.Screen = Symbol('Screen');
+
+
+/***/ }),
+/* 11 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
 function removeFromArray(array, item) {
     var index = array.indexOf(item);
     if (index === -1) {
@@ -1829,16 +1839,6 @@ function includeInArray(array, item) {
     return array.includes(item);
 }
 exports.includeInArray = includeInArray;
-
-
-/***/ }),
-/* 11 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.Screen = Symbol('Screen');
 
 
 /***/ }),
@@ -3345,7 +3345,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var ArrayUtility_1 = __webpack_require__(10);
+var ArrayUtility_1 = __webpack_require__(11);
 var ReadonlyTree = (function () {
     function ReadonlyTree(data, _children) {
         if (_children === void 0) { _children = []; }
@@ -3649,7 +3649,7 @@ exports.RenderProcess = Symbol('RenderProcess');
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var ArrayUtility_1 = __webpack_require__(10);
+var ArrayUtility_1 = __webpack_require__(11);
 function RequireComponent(RequireTypes) {
     return function (ComponentType) {
         var requireComponentTypes = Reflect.getMetadata('component:require', ComponentType) || [];
@@ -6846,7 +6846,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var Inject_1 = __webpack_require__(0);
-var Screen_1 = __webpack_require__(11);
+var Screen_1 = __webpack_require__(10);
 var SceneManager_1 = __webpack_require__(42);
 var BrowserDelegate_1 = __webpack_require__(2);
 var Time_1 = __webpack_require__(12);
@@ -6888,6 +6888,12 @@ var EngineImplement = (function () {
                         this.canvas.width = width;
                         this.canvas.height = height;
                         this.browser.document.body.appendChild(this.canvas);
+                        this.canvas.style.marginLeft = "-" + width / 2 + "px";
+                        this.canvas.style.marginTop = "-" + height / 2 + "px";
+                        this.canvas.style.position = 'absolute';
+                        this.canvas.style.left = '50%';
+                        this.canvas.style.top = '50%';
+                        this.browser.document.body.style.backgroundColor = '#000';
                         this.browser.resize$.subscribe(function (e) { return _this.onResize(e); });
                         this.sceneManager.sceneLoaded$.subscribe(function (s) { return _this.onSceneLoaded(s); });
                         return [4, this.sceneManager.switchTo(initialScene)];
@@ -7319,15 +7325,20 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var BrowserDelegate_1 = __webpack_require__(2);
 var Service_1 = __webpack_require__(5);
-var Screen_1 = __webpack_require__(11);
+var Screen_1 = __webpack_require__(10);
 var Inject_1 = __webpack_require__(0);
 var ScreenImplement = (function () {
     function ScreenImplement(browserDelegate) {
         this.browserDelegate = browserDelegate;
         this._isFullScreen = false;
+        this._width = 0;
+        this._height = 0;
     }
     Object.defineProperty(ScreenImplement.prototype, "width", {
         get: function () {
+            if (this._width) {
+                return this._width;
+            }
             return this._isFullScreen ?
                 this.browserDelegate.screen.width :
                 this.browserDelegate.window.innerWidth;
@@ -7337,6 +7348,9 @@ var ScreenImplement = (function () {
     });
     Object.defineProperty(ScreenImplement.prototype, "height", {
         get: function () {
+            if (this._height) {
+                return this._height;
+            }
             return this._isFullScreen ?
                 this.browserDelegate.screen.height :
                 this.browserDelegate.window.innerHeight;
@@ -7352,6 +7366,10 @@ var ScreenImplement = (function () {
     ScreenImplement.prototype.setFullScreen = function (enable) {
         if (enable === void 0) { enable = true; }
         this._isFullScreen = enable;
+    };
+    ScreenImplement.prototype.setSize = function (width, height) {
+        this._width = width > 0 ? width : 0;
+        this._height = height > 0 ? height : 0;
     };
     ScreenImplement = __decorate([
         Service_1.Service(Screen_1.Screen),
@@ -8013,7 +8031,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var ArrayUtility_1 = __webpack_require__(10);
+var ArrayUtility_1 = __webpack_require__(11);
 var Pair_1 = __webpack_require__(117);
 var Service_1 = __webpack_require__(5);
 var BroadPhaseCollisionResolver_1 = __webpack_require__(32);
