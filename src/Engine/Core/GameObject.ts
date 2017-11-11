@@ -258,8 +258,8 @@ export class GameObject extends BaseObject {
   /**
    * @inheritdoc
    */
-  public fixedUpdate(alpha: number = 1): void {
-    this.components.forEach(components => components.forEach(component => component.fixedUpdate(alpha)));
+  public fixedUpdate(): void {
+    this.components.forEach(components => components.forEach(component => component.fixedUpdate()));
   }
 
   /**

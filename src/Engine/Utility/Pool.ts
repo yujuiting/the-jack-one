@@ -1,7 +1,7 @@
 import { Type } from 'Engine/Utility/Type';
 import { addToArray,
          removeFromArray } from 'Engine/Utility/ArrayUtility';
-import { instantiate } from 'Engine/runtime';
+import { providerRegistry } from 'Engine/Core/ProviderRegistry';
 
 export interface Recyclable {
   canRecycle: boolean;
@@ -24,17 +24,17 @@ export class Pool<T extends Recyclable> {
               initSize: number = max <= 1024 ? max : 1024) {
     this._size = initSize;
     for (let i = 0; i < this._size; i++) {
-      const instance = instantiate(EntityType);
+      const instance = providerRegistry.instantiate(EntityType);
       instance.destroy();
       // addToArray(this._inactives, instance);
       this.inactives.add(instance);
     }
   }
 
-  public get(): T|undefined {
+public get(): T|undefined {
     if (this.inactives.size === 0) {
       if (this._size < this.max) {
-        const instance = instantiate(this.EntityType);
+        const instance = providerRegistry.instantiate(this.EntityType);
         this.actives.add(instance);
         this._size++;
         return instance;

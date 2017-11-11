@@ -126,10 +126,10 @@ export class RigidbodyComponent extends Component {
     this.sleepTimer = 0;
   }
 
-  public fixedUpdate(alpha: number): void {
-    super.fixedUpdate(alpha);
+  public fixedUpdate(): void {
+    super.fixedUpdate();
 
-    const deltaTimeInSecond = this.time.fixedDeltaTimeInSecond * alpha;
+    const deltaTimeInSecond = this.time.fixedDeltaTimeInSecond;
 
     if (this.useGravity && !this.isSleeping) {
       this.addForce(this.engine.gravity, ForceMode.Acceleration);

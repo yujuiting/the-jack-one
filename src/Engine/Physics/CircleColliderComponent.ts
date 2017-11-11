@@ -35,8 +35,8 @@ export class CircleColliderComponent extends ColliderComponent {
     super(host);
   }
 
-  public fixedUpdate(alpha: number): void {
-    super.fixedUpdate(alpha);
+  public fixedUpdate(): void {
+    super.fixedUpdate();
 
     const scale = (this.transform.scale.x + this.transform.scale.y) * 0.5;
     (<InternalCircleColliderComponent>this).calculatedRadius = this.radius * scale;

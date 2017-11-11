@@ -1,28 +1,39 @@
 import { Service } from 'Engine/Decorator/Service';
 import { Time } from 'Engine/Time/Time';
 
-interface InternalTime extends Time {
-  deltaTime: number;
-  fixedDeltaTime: number;
-}
-
 @Service(Time)
 export class TimeImplement implements Time {
 
   /**
    * In millisecond
    */
-  public readonly deltaTime: number = 0;
+  private _deltaTime = 0;
+
+  private _deltaTimeInSecond = 0;
 
   /**
    * Fix update time in milliseconds
    */
-  public readonly fixedDeltaTime: number = 1000 / 60;
+  private _fixedDeltaTime = 1000 / 60;
 
-  public readonly fixedDeltaTimeInSecond: number = 1 / 60;
+  private _fixedDeltaTimeInSecond = 1 / 60;
 
-  public tick(deltaTime: number): void {
-    (<InternalTime>this).deltaTime = deltaTime;
+  public get deltaTime(): number { return this._deltaTime; }
+
+  public get deltaTimeInSecond(): number { return this._deltaTimeInSecond; }
+
+  public get fixedDeltaTime(): number { return this._fixedDeltaTime; }
+
+  public get fixedDeltaTimeInSecond(): number { return this._fixedDeltaTimeInSecond; }
+
+  public fixedUpdate(deltaTime: number, alpha: number): void {
+    this._fixedDeltaTime = deltaTime * alpha;
+    this._fixedDeltaTimeInSecond = this._fixedDeltaTime * 0.001;
+  }
+
+  public update(frameTime: number): void {
+    this._deltaTime = frameTime;
+    this._deltaTimeInSecond = frameTime * 0.001;
   }
 
 }

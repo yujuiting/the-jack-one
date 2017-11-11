@@ -23,7 +23,7 @@ export class EngineImplement implements Engine {
 
   private isInitialized: boolean = false;
 
-  private currentScene: Scene|undefined;
+  private currentScene: Scene;
 
   private bindedmainloop: () => void = this.mainloop.bind(this);
 
@@ -39,7 +39,7 @@ export class EngineImplement implements Engine {
     this.ctx = <CanvasRenderingContext2D>this.canvas.getContext('2d');
   }
 
-  public async initialize(): Promise<void> {
+  public async initialize(initialScene: Scene): Promise<void> {
     if (this.isInitialized) {
       throw new Error('Repeated engine initialization.');
     }
@@ -54,6 +54,10 @@ export class EngineImplement implements Engine {
     this.browser.resize$.subscribe(e => this.onResize(e));
 
     this.sceneManager.sceneLoaded$.subscribe(s => this.onSceneLoaded(s));
+
+    await this.sceneManager.switchTo(initialScene);
+
+    this.currentScene = initialScene;
 
     this.resume();
   }
@@ -83,24 +87,23 @@ export class EngineImplement implements Engine {
       this.accumulator = 200;
     }
 
-    if (!this.currentScene) {
-      requestAnimationFrame(this.bindedmainloop);
-      return;
-    }
-
     while (this.accumulator > this.time.fixedDeltaTime) {
 
-      this.time.tick(frameTime);
+      this.time.fixedUpdate(frameTime, 1);
 
-      this.currentScene.fixedUpdate(1);
+      this.currentScene.fixedUpdate();
 
       this.accumulator -= this.time.fixedDeltaTime;
 
     }
 
-    this.currentScene.fixedUpdate(this.accumulator / this.time.fixedDeltaTime);
+    this.time.fixedUpdate(frameTime, this.accumulator / this.time.fixedDeltaTime);
+
+    this.currentScene.fixedUpdate();
 
     this.accumulator = 0;
+
+    this.time.update(frameTime);
 
     this.currentScene.update();
 

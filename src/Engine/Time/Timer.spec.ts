@@ -24,11 +24,11 @@ use(sinonChai);
   }
 
   @test 'it should update timestamp' () {
-    this.time.tick(1);
+    this.time.update(1);
     this.timer.update();
     expect(this.timer.timestamp).to.equal(1);
 
-    this.time.tick(1);
+    this.time.update(1);
     this.timer.update();
     expect(this.timer.timestamp).to.equal(2);
   }
@@ -37,7 +37,7 @@ use(sinonChai);
     const onTimeEvent = spy();
     this.timer.timeEvent$.subscribe(onTimeEvent);
 
-    this.time.tick(1000);
+    this.time.update(1000);
     this.timer.update();
 
     expect(onTimeEvent).to.be.calledOnce;

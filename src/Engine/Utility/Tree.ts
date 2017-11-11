@@ -108,19 +108,9 @@ export class Tree<T> extends ReadonlyTree<T> {
     }
   }
 
-}
+  public sort(callback: (a: Tree<T>, b: Tree<T>) => number): void {
+    this._children.sort(callback);
+    this._children.forEach(child => child.sort(callback));
+  }
 
-// class TreeIterator implements Iterator<Tree<any>|null> {
-//   private pointer: number = 0;
-//   constructor(private source: Tree<any>) {}
-//   public next(): IteratorResult<Tree<any>|null> {
-//     if (this.pointer < this.source.length) {
-//       return {
-//         done: false,
-//         value: (<any>this.source).children[this.pointer]
-//       };
-//     } else {
-//       return { done: true, value: null };
-//     }
-//   }
-// }
+}

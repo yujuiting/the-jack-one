@@ -7,6 +7,8 @@ export interface Time {
    */
   readonly deltaTime: number;
 
+  readonly deltaTimeInSecond: number;
+
   /**
    * Fix update time in milliseconds
    */
@@ -14,6 +16,8 @@ export interface Time {
 
   readonly fixedDeltaTimeInSecond: number;
 
-  tick(deltaTime: number): void;
+  fixedUpdate(deltaTime: number, alpha: number): void;
+
+  update(frameTime: number): void;
 
 }

@@ -39,8 +39,16 @@ export class BrowserDelegateImplement implements BrowserDelegate {
     this.document.body.style.margin = '0';
     this.document.body.style.width = '100%';
     this.document.body.style.height = '100%';
+
     // prevent bounce scrolling in device
     this.document.body.style.overflow = 'hidden';
+
+    // TODO: handle window.devicePixelRatio
+    // Lock device scale currently.
+    const meta = this.document.createElement('meta');
+    meta.name = 'viewport';
+    meta.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0';
+    this.document.head.appendChild(meta);
   }
 
   public createCanvas(): HTMLCanvasElement {

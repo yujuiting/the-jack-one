@@ -137,8 +137,8 @@ export class Scene extends BaseObject {
     await this._resources.load();
   }
 
-  public fixedUpdate(alpha: number): void {
-    this.gameObjects.forEachChildren(gameObject => gameObject.fixedUpdate(alpha));
+  public fixedUpdate(): void {
+    this.gameObjects.forEachChildren(gameObject => gameObject.fixedUpdate());
     this.broadPhaseCollisionResolver.fixedUpdate();
     this.narrowPhaseCollisionResolver.resolve(this.broadPhaseCollisionResolver.pairs);
   }
@@ -156,6 +156,10 @@ export class Scene extends BaseObject {
 
   public preRender(): void {
     this.gameObjects.forEachChildren(gameObject => gameObject.preRender());
+    /**
+     * TODO: It is a heavy move, should find some way to handle object layering.
+     */
+    this.gameObjects.sort((a, b) => b.data.layer - a.data.layer);
   }
 
   public render(ctx: CanvasRenderingContext2D, width: number, height: number): void {

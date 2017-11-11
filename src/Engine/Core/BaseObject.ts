@@ -77,9 +77,9 @@ export abstract class BaseObject implements Recyclable {
 
   /**
    * Guarantee update with 60 times per second.
-   * In common case, alpha is always 1.
+   * Exactly delta time can get from Time service
    */
-  public fixedUpdate(alpha: number): void { return; }
+  public fixedUpdate(): void { return; }
 
   /**
    * Update per frame.

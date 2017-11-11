@@ -11,12 +11,6 @@ export class Sprite {
 
   public pivot: Vector = new Vector(0.5, 0.5);
 
-  /**
-   * Location of the Sprite on the original Texture, specified in pixels.
-   * Default, it will set to whole texture when texture loaded.
-   */
-  public rect: Rect = new Rect();
-
   @Inject(BrowserDelegate)
   private browser: BrowserDelegate;
 
@@ -37,7 +31,12 @@ export class Sprite {
 
   get height(): number { return this.rect.height; }
 
-  constructor(texture: Texture) {
+  constructor(texture: Texture,
+              /**
+               * Location of the Sprite on the original Texture, specified in pixels.
+               * Default, it will set to whole texture when texture loaded.
+               */
+              public rect: Rect = new Rect()) {
     this.setTexture(texture);
   }
 
@@ -63,9 +62,10 @@ export class Sprite {
     if (this.rect.width === 0 && this.rect.height === 0) {
       this.rect.width = this._texture.width;
       this.rect.height = this._texture.height;
-      this.canvas.width = this.rect.width;
-      this.canvas.height = this.rect.height;
     }
+
+    this.canvas.width = this.rect.width;
+    this.canvas.height = this.rect.height;
 
     if (this.textureLoaded) {
       this.textureLoaded.unsubscribe();

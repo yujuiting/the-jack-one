@@ -40,8 +40,8 @@ export class PolygonColliderComponent extends ColliderComponent {
     super(host);
   }
 
-  public fixedUpdate(alpha: number): void {
-    super.fixedUpdate(alpha);
+  public fixedUpdate(): void {
+    super.fixedUpdate();
     this.calculate();
   }
 

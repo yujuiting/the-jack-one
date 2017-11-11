@@ -38,9 +38,9 @@ export class SpriteRendererComponent extends RendererComponent {
       return;
     }
 
-    if (!this._isDirty) {
-      return;
-    }
+    // if (!this._isDirty) {
+    //   return;
+    // }
 
     const ctx = this.ctx;
 
@@ -53,6 +53,9 @@ export class SpriteRendererComponent extends RendererComponent {
     ctx.drawImage(this._sprite.canvas, 0, 0);
 
     ctx.restore();
+
+    // TODO: check texture of sprite has loaded.
+    // this._isDirty = false;
   }
 
 }

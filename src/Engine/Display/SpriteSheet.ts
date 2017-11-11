@@ -1,5 +1,7 @@
 import { Texture } from 'Engine/Resource/Texture';
 import { Sprite } from 'Engine/Display/Sprite';
+import { Rect } from 'Engine/Math/Rect';
+import { Vector } from 'Engine/Math/Vector';
 
 export interface SpriteSheetCell {
   x?: number;
@@ -68,10 +70,7 @@ export class SpriteSheet {
   private makeSprites(texture: Texture, cells: SpriteSheetCells): Sprite[] {
     const sprites: Sprite[] = [];
     cells.forEach(cell => {
-      const sprite = new Sprite(texture);
-      sprite.rect.position.setTo(cell.x || 0, cell.y || 0);
-      sprite.rect.width = cell.width;
-      sprite.rect.height = cell.height;
+      const sprite = new Sprite(texture, new Rect(new Vector(cell.x || 0, cell.y || 0), cell.width, cell.height));
       sprites.push(sprite);
     });
     return sprites;

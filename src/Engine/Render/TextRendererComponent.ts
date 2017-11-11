@@ -5,31 +5,33 @@ import { Class } from 'Engine/Decorator/Class';
 @Class()
 export class TextRendererComponent extends RendererComponent {
 
-  public text: string = '';
+  public text = '';
 
-  public maxWidth: number = Number.MAX_VALUE;
+  public maxWidth = Number.MAX_VALUE;
 
   public strokeColor: Color|undefined;
 
   public fillColor: Color|undefined = Color.White;
 
-  public fontSize: number = 16;
+  public fontSize = 16;
 
-  public fontFamily: string = 'Arial';
+  public lineWidth = 1;
 
-  public fontWeight: number = 100;
+  public fontFamily = 'Arial';
 
-  public fontStyle: 'normal'|'italic'|'oblique' = 'normal';
+  public fontWeight = 100;
 
-  public fontVariant: 'normal'|'small-caps' = 'normal';
+  public fontStyle: 'normal'|'italic'|'oblique'|'' = '';
 
-  private actualWidth: number = 0;
+  public fontVariant: 'normal'|'small-caps'|'' = '';
+
+  private actualWidth = 0;
 
   public update(): void {
     super.update();
 
     // Set font for measure text width.
-    this.ctx.font = `${this.fontStyle} ${this.fontVariant} ${this.fontWeight} ${this.fontSize}px ${this.fontFamily}`;
+    this.ctx.font = `${this.fontStyle} ${this.fontVariant} ${this.fontWeight} ${this.fontSize}px ${this.fontFamily}`.trim();
 
     this.actualWidth = this.ctx.measureText(this.text).width;
 
@@ -41,18 +43,20 @@ export class TextRendererComponent extends RendererComponent {
 
   public render(): void {
     const ctx = this.ctx;
+    ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
     // Set font again, because after resize canvas, it will be restore.
     this.ctx.font = `${this.fontStyle} ${this.fontVariant} ${this.fontWeight} ${this.fontSize}px ${this.fontFamily}`;
 
-    if (this.strokeColor) {
-      ctx.strokeStyle = this.strokeColor.toHexString();
-      ctx.strokeText(this.text, 0, this.fontSize, this.maxWidth);
-    }
-
     if (this.fillColor) {
       ctx.fillStyle = this.fillColor.toHexString();
       ctx.fillText(this.text, 0, this.fontSize, this.maxWidth);
+    }
+
+    if (this.strokeColor) {
+      ctx.strokeStyle = this.strokeColor.toHexString();
+      ctx.lineWidth = this.lineWidth;
+      ctx.strokeText(this.text, 0, this.fontSize, this.maxWidth);
     }
   }
 

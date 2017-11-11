@@ -55,8 +55,8 @@ export class TransformComponent extends Component {
 
   public get toLocalMatrix(): Matrix { return this._toLocalMatrix; }
 
-  public fixedUpdate(alpha: number): void {
-    super.fixedUpdate(alpha);
+  public fixedUpdate(): void {
+    super.fixedUpdate();
 
     if (this.host.parent) {
       const parentTransform = this.host.parent.transform;

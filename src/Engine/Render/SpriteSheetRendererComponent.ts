@@ -45,7 +45,7 @@ export class SpriteSheetRendererComponent extends SpriteRendererComponent {
       this.accumulator %= this._spriteSheet.frameTime;
       this.currentIndex += times;
       if (this.currentIndex >= this.sprites.length) {
-        this.currentIndex = 0;
+        this.currentIndex %= this.sprites.length;
       }
     }
 
