@@ -74,11 +74,6 @@
 				<ul class="tsd-hierarchy">
 					<li>
 						<span class="target">Time</span>
-						<ul class="tsd-hierarchy">
-							<li>
-								<a href="_src_engine_time_timeimplement_.internaltime.html" class="tsd-signature-type">InternalTime</a>
-							</li>
-						</ul>
 					</li>
 				</ul>
 			</section>
@@ -96,6 +91,7 @@
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_src_engine_time_time_.time.html#deltatime" class="tsd-kind-icon">delta<wbr>Time</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_src_engine_time_time_.time.html#deltatimeinsecond" class="tsd-kind-icon">delta<wbr>Time<wbr>InSecond</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_src_engine_time_time_.time.html#fixeddeltatime" class="tsd-kind-icon">fixed<wbr>Delta<wbr>Time</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_src_engine_time_time_.time.html#fixeddeltatimeinsecond" class="tsd-kind-icon">fixed<wbr>Delta<wbr>Time<wbr>InSecond</a></li>
 							</ul>
@@ -103,7 +99,8 @@
 						<section class="tsd-index-section ">
 							<h3>Methods</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_src_engine_time_time_.time.html#tick" class="tsd-kind-icon">tick</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_src_engine_time_time_.time.html#fixedupdate" class="tsd-kind-icon">fixed<wbr>Update</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_src_engine_time_time_.time.html#update" class="tsd-kind-icon">update</a></li>
 							</ul>
 						</section>
 					</div>
@@ -117,7 +114,7 @@
 					<div class="tsd-signature tsd-kind-icon">delta<wbr>Time<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/e2079ec/src/Engine/Time/Time.ts#L8">src/Engine/Time/Time.ts:8</a></li>
+							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/0952ca4/src/Engine/Time/Time.ts#L8">src/Engine/Time/Time.ts:8</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -127,12 +124,22 @@
 					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+					<a name="deltatimeinsecond" class="tsd-anchor"></a>
+					<h3>delta<wbr>Time<wbr>InSecond</h3>
+					<div class="tsd-signature tsd-kind-icon">delta<wbr>Time<wbr>InSecond<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/0952ca4/src/Engine/Time/Time.ts#L10">src/Engine/Time/Time.ts:10</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="fixeddeltatime" class="tsd-anchor"></a>
 					<h3>fixed<wbr>Delta<wbr>Time</h3>
 					<div class="tsd-signature tsd-kind-icon">fixed<wbr>Delta<wbr>Time<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/e2079ec/src/Engine/Time/Time.ts#L13">src/Engine/Time/Time.ts:13</a></li>
+							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/0952ca4/src/Engine/Time/Time.ts#L15">src/Engine/Time/Time.ts:15</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -147,7 +154,7 @@
 					<div class="tsd-signature tsd-kind-icon">fixed<wbr>Delta<wbr>Time<wbr>InSecond<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/e2079ec/src/Engine/Time/Time.ts#L15">src/Engine/Time/Time.ts:15</a></li>
+							<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/0952ca4/src/Engine/Time/Time.ts#L17">src/Engine/Time/Time.ts:17</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -155,22 +162,48 @@
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Methods</h2>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
-					<a name="tick" class="tsd-anchor"></a>
-					<h3>tick</h3>
+					<a name="fixedupdate" class="tsd-anchor"></a>
+					<h3>fixed<wbr>Update</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
-						<li class="tsd-signature tsd-kind-icon">tick<span class="tsd-signature-symbol">(</span>deltaTime<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+						<li class="tsd-signature tsd-kind-icon">fixed<wbr>Update<span class="tsd-signature-symbol">(</span>deltaTime<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, alpha<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/e2079ec/src/Engine/Time/Time.ts#L17">src/Engine/Time/Time.ts:17</a></li>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/0952ca4/src/Engine/Time/Time.ts#L19">src/Engine/Time/Time.ts:19</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
 									<h5>deltaTime: <span class="tsd-signature-type">number</span></h5>
+								</li>
+								<li>
+									<h5>alpha: <span class="tsd-signature-type">number</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
+					<a name="update" class="tsd-anchor"></a>
+					<h3>update</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
+						<li class="tsd-signature tsd-kind-icon">update<span class="tsd-signature-symbol">(</span>frameTime<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/yujuiting/the-jake-one/blob/0952ca4/src/Engine/Time/Time.ts#L21">src/Engine/Time/Time.ts:21</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>frameTime: <span class="tsd-signature-type">number</span></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -201,13 +234,19 @@
 								<a href="_src_engine_time_time_.time.html#deltatime" class="tsd-kind-icon">delta<wbr>Time</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
+								<a href="_src_engine_time_time_.time.html#deltatimeinsecond" class="tsd-kind-icon">delta<wbr>Time<wbr>InSecond</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-interface">
 								<a href="_src_engine_time_time_.time.html#fixeddeltatime" class="tsd-kind-icon">fixed<wbr>Delta<wbr>Time</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
 								<a href="_src_engine_time_time_.time.html#fixeddeltatimeinsecond" class="tsd-kind-icon">fixed<wbr>Delta<wbr>Time<wbr>InSecond</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-interface">
-								<a href="_src_engine_time_time_.time.html#tick" class="tsd-kind-icon">tick</a>
+								<a href="_src_engine_time_time_.time.html#fixedupdate" class="tsd-kind-icon">fixed<wbr>Update</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-interface">
+								<a href="_src_engine_time_time_.time.html#update" class="tsd-kind-icon">update</a>
 							</li>
 						</ul>
 					</li>

@@ -1,6 +1,435 @@
 webpackJsonp([3],{
 
-/***/ 12:
+/***/ 14:
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var Vector_1 = __webpack_require__(1);
+var Rect = (function () {
+    function Rect(position, width, height) {
+        if (position === void 0) { position = new Vector_1.Vector(); }
+        if (width === void 0) { width = 0; }
+        if (height === void 0) { height = 0; }
+        this.position = position;
+        this.width = width;
+        this.height = height;
+    }
+    Object.defineProperty(Rect.prototype, "center", {
+        get: function () {
+            return new Vector_1.Vector(this.position.x + this.width / 2, this.position.y + this.height / 2);
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Rect.prototype, "xMin", {
+        get: function () { return this.position.x; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Rect.prototype, "xMax", {
+        get: function () { return this.position.x + this.width; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Rect.prototype, "yMin", {
+        get: function () { return this.position.y; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Rect.prototype, "yMax", {
+        get: function () { return this.position.y + this.height; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Rect.prototype, "min", {
+        get: function () {
+            return new Vector_1.Vector(this.xMin, this.yMin);
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Rect.prototype, "max", {
+        get: function () {
+            return new Vector_1.Vector(this.xMax, this.yMax);
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Rect.prototype.contains = function (point) {
+        if (point.x < this.position.x) {
+            return false;
+        }
+        if (point.y < this.position.y) {
+            return false;
+        }
+        if (point.x > this.position.x + this.width) {
+            return false;
+        }
+        if (point.y > this.position.y + this.height) {
+            return false;
+        }
+        return true;
+    };
+    Rect.prototype.overlap = function (another) {
+        if (this.xMax < another.xMin || this.xMin > another.xMax) {
+            return false;
+        }
+        if (this.yMax < another.yMin || this.yMin > another.yMax) {
+            return false;
+        }
+        return true;
+    };
+    return Rect;
+}());
+exports.Rect = Rect;
+
+
+/***/ }),
+
+/***/ 16:
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __generator = (this && this.__generator) || function (thisArg, body) {
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    function verb(n) { return function (v) { return step([n, v]); }; }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while (_) try {
+            if (f = 1, y && (t = y[op[0] & 2 ? "return" : op[0] ? "throw" : "next"]) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [0, t.value];
+            switch (op[0]) {
+                case 0: case 1: t = op; break;
+                case 4: _.label++; return { value: op[1], done: false };
+                case 5: _.label++; y = op[1]; op = [0]; continue;
+                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop(); continue;
+            }
+            op = body.call(thisArg, _);
+        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+    }
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var Resource_1 = __webpack_require__(15);
+var BrowserDelegate_1 = __webpack_require__(2);
+var Inject_1 = __webpack_require__(0);
+var Texture = (function (_super) {
+    __extends(Texture, _super);
+    function Texture(path) {
+        var _this = _super.call(this, path) || this;
+        _this.isDirty = false;
+        _this._width = 0;
+        _this._height = 0;
+        return _this;
+    }
+    Object.defineProperty(Texture.prototype, "width", {
+        get: function () { return this._width; },
+        set: function (value) {
+            this._width = value;
+            this.markAsDirty();
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Texture.prototype, "height", {
+        get: function () { return this._height; },
+        set: function (value) {
+            this._height = value;
+            this.markAsDirty();
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Texture.prototype.load = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var _this = this;
+            return __generator(this, function (_a) {
+                if (this.isLoaded) {
+                    return [2];
+                }
+                return [2, new Promise(function (resolve) {
+                        var request = new Image();
+                        request.src = _this.path;
+                        request.onprogress = _this.onprogress;
+                        request.onerror = _this.onerror;
+                        request.onloadstart = _this.onloadstart;
+                        request.onload = function () { return __awaiter(_this, void 0, void 0, function () {
+                            var _a, err_1;
+                            return __generator(this, function (_b) {
+                                switch (_b.label) {
+                                    case 0:
+                                        _b.trys.push([0, 2, , 3]);
+                                        _a = this;
+                                        return [4, this.processData(request)];
+                                    case 1:
+                                        _a._data = _b.sent();
+                                        this._isLoaded = true;
+                                        this.onLoad.next();
+                                        return [3, 3];
+                                    case 2:
+                                        err_1 = _b.sent();
+                                        this.onerror(err_1);
+                                        return [3, 3];
+                                    case 3:
+                                        resolve();
+                                        return [2];
+                                }
+                            });
+                        }); };
+                    })];
+            });
+        });
+    };
+    Texture.prototype.clone = function () {
+        var texture = new Texture(this.path);
+        texture.source = this.source;
+        texture._width = this._width;
+        texture._height = this._height;
+        texture._isLoaded = this._isLoaded;
+        return texture;
+    };
+    Texture.prototype.markAsDirty = function () {
+        if (this.isDirty) {
+            return;
+        }
+        this.isDirty = true;
+        if (!this.isLoaded) {
+            return;
+        }
+        this.processData(this.source);
+    };
+    Texture.prototype.processData = function (image) {
+        return __awaiter(this, void 0, void 0, function () {
+            var data, ctx;
+            return __generator(this, function (_a) {
+                data = this.data || this.browser.createCanvas();
+                ctx = data.getContext('2d');
+                if (this.width === 0 && this.height === 0) {
+                    data.width = this._width = image.width;
+                    data.height = this._height = image.height;
+                }
+                ctx.drawImage(image, 0, 0, image.width, image.height, 0, 0, this._width, this._height);
+                this.isDirty = false;
+                this.source = image;
+                return [2, data];
+            });
+        });
+    };
+    __decorate([
+        Inject_1.Inject(BrowserDelegate_1.BrowserDelegate),
+        __metadata("design:type", Object)
+    ], Texture.prototype, "browser", void 0);
+    return Texture;
+}(Resource_1.Resource));
+exports.Texture = Texture;
+
+
+/***/ }),
+
+/***/ 17:
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var Texture_1 = __webpack_require__(16);
+var Vector_1 = __webpack_require__(1);
+var Rect_1 = __webpack_require__(14);
+var BrowserDelegate_1 = __webpack_require__(2);
+var Inject_1 = __webpack_require__(0);
+var Class_1 = __webpack_require__(4);
+var Sprite = (function () {
+    function Sprite(texture, rect) {
+        if (rect === void 0) { rect = new Rect_1.Rect(); }
+        this.rect = rect;
+        this.pivot = new Vector_1.Vector(0.5, 0.5);
+        this.canvas = this.browser.createCanvas();
+        this.ctx = this.browser.getContext(this.canvas);
+        this.setTexture(texture);
+    }
+    Object.defineProperty(Sprite.prototype, "texture", {
+        get: function () { return this._texture; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Sprite.prototype, "width", {
+        get: function () { return this.rect.width; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Sprite.prototype, "height", {
+        get: function () { return this.rect.height; },
+        enumerable: true,
+        configurable: true
+    });
+    Sprite.prototype.setTexture = function (texture) {
+        var _this = this;
+        if (this._texture === texture) {
+            return;
+        }
+        this._texture = texture;
+        if (this.textureLoaded) {
+            this.textureLoaded.unsubscribe();
+        }
+        if (texture.isLoaded) {
+            this.drawTexture();
+        }
+        else {
+            this.textureLoaded = texture.onLoad$.subscribe(function () { return _this.drawTexture(); });
+        }
+    };
+    Sprite.prototype.drawTexture = function () {
+        if (this.rect.width === 0 && this.rect.height === 0) {
+            this.rect.width = this._texture.width;
+            this.rect.height = this._texture.height;
+        }
+        this.canvas.width = this.rect.width;
+        this.canvas.height = this.rect.height;
+        if (this.textureLoaded) {
+            this.textureLoaded.unsubscribe();
+            delete this.textureLoaded;
+        }
+        this.ctx.clearRect(0, 0, this.rect.width, this.rect.height);
+        this.ctx.drawImage(this._texture.data, this.rect.position.x, this.rect.position.y, this.rect.width, this.rect.height, 0, 0, this.rect.width, this.rect.height);
+    };
+    __decorate([
+        Inject_1.Inject(BrowserDelegate_1.BrowserDelegate),
+        __metadata("design:type", Object)
+    ], Sprite.prototype, "browser", void 0);
+    Sprite = __decorate([
+        Class_1.Class(),
+        __metadata("design:paramtypes", [Texture_1.Texture,
+            Rect_1.Rect])
+    ], Sprite);
+    return Sprite;
+}());
+exports.Sprite = Sprite;
+
+
+/***/ }),
+
+/***/ 18:
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var RendererComponent_1 = __webpack_require__(21);
+var UniqueComponent_1 = __webpack_require__(19);
+var SpriteRendererComponent = (function (_super) {
+    __extends(SpriteRendererComponent, _super);
+    function SpriteRendererComponent() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this._isDirty = false;
+        return _this;
+    }
+    Object.defineProperty(SpriteRendererComponent.prototype, "sprite", {
+        get: function () { return this._sprite; },
+        set: function (value) {
+            this._isDirty = true;
+            this._sprite = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(SpriteRendererComponent.prototype, "isDirty", {
+        get: function () { return this._isDirty; },
+        enumerable: true,
+        configurable: true
+    });
+    SpriteRendererComponent.prototype.update = function () {
+        _super.prototype.update.call(this);
+        if (this._sprite) {
+            var _a = this._sprite, width = _a.width, height = _a.height;
+            this.canvas.width = width;
+            this.canvas.height = height;
+        }
+    };
+    SpriteRendererComponent.prototype.render = function () {
+        if (!this._sprite) {
+            return;
+        }
+        var ctx = this.ctx;
+        var _a = this.canvas, width = _a.width, height = _a.height;
+        ctx.clearRect(0, 0, width, height);
+        ctx.save();
+        ctx.drawImage(this._sprite.canvas, 0, 0);
+        ctx.restore();
+    };
+    SpriteRendererComponent = __decorate([
+        UniqueComponent_1.UniqueComponent()
+    ], SpriteRendererComponent);
+    return SpriteRendererComponent;
+}(RendererComponent_1.RendererComponent));
+exports.SpriteRendererComponent = SpriteRendererComponent;
+
+
+/***/ }),
+
+/***/ 22:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -28,15 +457,15 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var GameObject_1 = __webpack_require__(2);
-var Component_1 = __webpack_require__(10);
-var TransformComponent_1 = __webpack_require__(14);
+var GameObject_1 = __webpack_require__(3);
+var Component_1 = __webpack_require__(13);
+var TransformComponent_1 = __webpack_require__(23);
 var Vector_1 = __webpack_require__(1);
-var Engine_1 = __webpack_require__(23);
-var Time_1 = __webpack_require__(9);
-var ForceMode_1 = __webpack_require__(25);
-var UniqueComponent_1 = __webpack_require__(15);
-var RequireComponent_1 = __webpack_require__(31);
+var Engine_1 = __webpack_require__(36);
+var Time_1 = __webpack_require__(12);
+var ForceMode_1 = __webpack_require__(38);
+var UniqueComponent_1 = __webpack_require__(19);
+var RequireComponent_1 = __webpack_require__(47);
 var Inject_1 = __webpack_require__(0);
 var DoublePI = Math.PI * 2;
 var RigidbodyComponent = (function (_super) {
@@ -113,9 +542,9 @@ var RigidbodyComponent = (function (_super) {
         this.isSleeping = false;
         this.sleepTimer = 0;
     };
-    RigidbodyComponent.prototype.fixedUpdate = function (alpha) {
-        _super.prototype.fixedUpdate.call(this, alpha);
-        var deltaTimeInSecond = this.time.fixedDeltaTimeInSecond * alpha;
+    RigidbodyComponent.prototype.fixedUpdate = function () {
+        _super.prototype.fixedUpdate.call(this);
+        var deltaTimeInSecond = this.time.fixedDeltaTimeInSecond;
         if (this.useGravity && !this.isSleeping) {
             this.addForce(this.engine.gravity, ForceMode_1.ForceMode.Acceleration);
         }
@@ -232,7 +661,474 @@ exports.RigidbodyComponent = RigidbodyComponent;
 
 /***/ }),
 
-/***/ 51:
+/***/ 26:
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __generator = (this && this.__generator) || function (thisArg, body) {
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    function verb(n) { return function (v) { return step([n, v]); }; }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while (_) try {
+            if (f = 1, y && (t = y[op[0] & 2 ? "return" : op[0] ? "throw" : "next"]) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [0, t.value];
+            switch (op[0]) {
+                case 0: case 1: t = op; break;
+                case 4: _.label++; return { value: op[1], done: false };
+                case 5: _.label++; y = op[1]; op = [0]; continue;
+                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop(); continue;
+            }
+            op = body.call(thisArg, _);
+        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+    }
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var Resource_1 = __webpack_require__(15);
+var ArrayUtility_1 = __webpack_require__(10);
+var Bundle = (function (_super) {
+    __extends(Bundle, _super);
+    function Bundle(bundleName, resources) {
+        if (resources === void 0) { resources = []; }
+        var _this = _super.call(this, bundleName) || this;
+        _this.resources = resources;
+        return _this;
+    }
+    Bundle.prototype.add = function (resource) {
+        if (ArrayUtility_1.addToArray(this.resources, resource)) {
+            this._isLoaded = false;
+        }
+        resource.onProgress$.subscribe(this.onProgress);
+    };
+    Bundle.prototype.load = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var _this = this;
+            var err_1;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        if (this._isLoaded) {
+                            return [2];
+                        }
+                        _a.label = 1;
+                    case 1:
+                        _a.trys.push([1, 3, , 4]);
+                        return [4, Promise.all(this.resources.map(function (resource) { return __awaiter(_this, void 0, void 0, function () { return __generator(this, function (_a) {
+                                return [2, resource.load()];
+                            }); }); }))];
+                    case 2:
+                        _a.sent();
+                        return [3, 4];
+                    case 3:
+                        err_1 = _a.sent();
+                        this.onError.next(err_1);
+                        return [3, 4];
+                    case 4:
+                        this._isLoaded = true;
+                        this.onLoad.next();
+                        return [2];
+                }
+            });
+        });
+    };
+    Bundle.prototype.destroy = function () {
+        this.resources.forEach(function (resource) { return resource.destroy(); });
+    };
+    return Bundle;
+}(Resource_1.Resource));
+exports.Bundle = Bundle;
+
+
+/***/ }),
+
+/***/ 27:
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var GameObject_1 = __webpack_require__(3);
+var Screen_1 = __webpack_require__(11);
+var GameObjectInitializer_1 = __webpack_require__(20);
+var Color_1 = __webpack_require__(6);
+var Bounds_1 = __webpack_require__(25);
+var Rect_1 = __webpack_require__(14);
+var Matrix_1 = __webpack_require__(43);
+var Type_1 = __webpack_require__(8);
+var BrowserDelegate_1 = __webpack_require__(2);
+var Service_1 = __webpack_require__(5);
+var Inject_1 = __webpack_require__(0);
+exports.MainCamera = Symbol('MainCamera');
+var Camera = (function (_super) {
+    __extends(Camera, _super);
+    function Camera(browser, screen, gameObjectInitializer) {
+        var _this = _super.call(this, gameObjectInitializer) || this;
+        _this.aspect = 16 / 9;
+        _this.backgroundColor = Color_1.Color.Black;
+        _this.toWorldMatrix = new Matrix_1.Matrix();
+        _this.toScreenMatrix = new Matrix_1.Matrix();
+        _this.cullingMask = Type_1.AllBuiltInLayer;
+        _this.eventMask = Type_1.AllBuiltInLayer;
+        _this.rect = new Rect_1.Rect();
+        _this.bounds = new Bounds_1.Bounds();
+        _this.setSize(screen.width, screen.height);
+        return _this;
+    }
+    Camera.prototype.setSize = function (width, height) {
+        this.toScreenMatrix.reset();
+        this.rect.width = width;
+        this.rect.height = height;
+        var halfWidth = width * 0.5;
+        var halfHeight = height * 0.5;
+        this.toScreenMatrix.translate(halfWidth, halfHeight);
+        this.toScreenMatrix.scale(0, -1);
+        this.bounds.extents.setTo(halfWidth, halfHeight);
+    };
+    Camera.prototype.update = function () {
+        _super.prototype.update.call(this);
+        this.toScreenMatrix.save();
+        this.toScreenMatrix.translate(-this.transform.position.x, -this.transform.position.y);
+        this.toScreenMatrix.rotate(this.transform.rotation);
+        this.toScreenMatrix.scale(this.transform.scale);
+        this.toWorldMatrix.invertFrom(this.toScreenMatrix);
+        this.bounds.center.copy(this.transform.position);
+    };
+    Camera.prototype.postRender = function () {
+        _super.prototype.postRender.call(this);
+        this.toScreenMatrix.restore();
+    };
+    Camera.prototype.screenToWorld = function (point) {
+        var result = point.clone();
+        this.toWorldMatrix.multiplyToPoint(result);
+        return result;
+    };
+    Camera.prototype.worldToScreen = function (point) {
+        var result = point.clone();
+        this.toScreenMatrix.multiplyToPoint(result);
+        return result;
+    };
+    Camera = __decorate([
+        Service_1.Service(exports.MainCamera),
+        __param(0, Inject_1.Inject(BrowserDelegate_1.BrowserDelegate)),
+        __param(1, Inject_1.Inject(Screen_1.Screen)),
+        __param(2, Inject_1.Inject(GameObjectInitializer_1.GameObjectInitializer)),
+        __metadata("design:paramtypes", [Object, Object, Object])
+    ], Camera);
+    return Camera;
+}(GameObject_1.GameObject));
+exports.Camera = Camera;
+
+
+/***/ }),
+
+/***/ 33:
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __generator = (this && this.__generator) || function (thisArg, body) {
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    function verb(n) { return function (v) { return step([n, v]); }; }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while (_) try {
+            if (f = 1, y && (t = y[op[0] & 2 ? "return" : op[0] ? "throw" : "next"]) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [0, t.value];
+            switch (op[0]) {
+                case 0: case 1: t = op; break;
+                case 4: _.label++; return { value: op[1], done: false };
+                case 5: _.label++; y = op[1]; op = [0]; continue;
+                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop(); continue;
+            }
+            op = body.call(thisArg, _);
+        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+    }
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var BaseObject_1 = __webpack_require__(37);
+var Tree_1 = __webpack_require__(44);
+var Bundle_1 = __webpack_require__(26);
+var Camera_1 = __webpack_require__(27);
+var ArrayUtility_1 = __webpack_require__(10);
+var Inject_1 = __webpack_require__(0);
+var Class_1 = __webpack_require__(4);
+var BroadPhaseCollisionResolver_1 = __webpack_require__(32);
+var NarrowPhaseCollisionResolver_1 = __webpack_require__(48);
+var Vector_1 = __webpack_require__(1);
+var GameObjectInitializer_1 = __webpack_require__(20);
+var RenderProcess_1 = __webpack_require__(46);
+var runtime_1 = __webpack_require__(9);
+var Logger_1 = __webpack_require__(30);
+var Screen_1 = __webpack_require__(11);
+var BrowserDelegate_1 = __webpack_require__(2);
+var Time_1 = __webpack_require__(12);
+var Color_1 = __webpack_require__(6);
+var PointerInput_1 = __webpack_require__(24);
+var Scene = (function (_super) {
+    __extends(Scene, _super);
+    function Scene(broadPhaseCollisionResolver, narrowPhaseCollisionResolver, gameObjectInitializer, renderProcess, mainCamera, logger, screen, browser, time, pointInput) {
+        var _this = _super.call(this) || this;
+        _this.broadPhaseCollisionResolver = broadPhaseCollisionResolver;
+        _this.narrowPhaseCollisionResolver = narrowPhaseCollisionResolver;
+        _this.gameObjectInitializer = gameObjectInitializer;
+        _this.renderProcess = renderProcess;
+        _this.mainCamera = mainCamera;
+        _this.logger = logger;
+        _this.screen = screen;
+        _this.browser = browser;
+        _this.time = time;
+        _this.pointInput = pointInput;
+        return _this;
+    }
+    Object.defineProperty(Scene.prototype, "isLoaded", {
+        get: function () { return this._resources.isLoaded; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Scene.prototype, "resources", {
+        get: function () { return this._resources; },
+        enumerable: true,
+        configurable: true
+    });
+    Scene.prototype.reset = function () {
+        _super.prototype.reset.call(this);
+        this._resources = new Bundle_1.Bundle('default');
+        this.gameObjects = new Tree_1.Tree(null);
+        this.cameras = [];
+        this.rightTop = Vector_1.Vector.Get();
+    };
+    Scene.prototype.start = function () {
+        var _this = this;
+        if (this.hasStarted) {
+            return;
+        }
+        _super.prototype.start.call(this);
+        this.add(this.mainCamera);
+        this.resizeSubscription = this.browser.resize$.subscribe(function () { return _this.onResize(); });
+        this.rightTop.setTo(this.screen.width, 0);
+    };
+    Scene.prototype.destroy = function () {
+        _super.prototype.destroy.call(this);
+        if (this.hasStarted) {
+            this.gameObjects.forEachChildren(function (gameObject) { return gameObject.destroy(); });
+            this.resizeSubscription.unsubscribe();
+        }
+        this.gameObjects.clear();
+        Vector_1.Vector.Put(this.rightTop);
+        delete this.rightTop;
+        this._resources.destroy();
+    };
+    Scene.prototype.add = function (gameObject, at) {
+        if (!this.gameObjects.add(gameObject.node)) {
+            return false;
+        }
+        if (!gameObject.hasStarted) {
+            gameObject.node.hide();
+        }
+        if (gameObject instanceof Camera_1.Camera) {
+            ArrayUtility_1.addToArray(this.cameras, gameObject);
+        }
+        if (at) {
+            gameObject.transform.position.copy(at);
+        }
+        return true;
+    };
+    Scene.prototype.remove = function (gameObject) {
+        gameObject.node.show();
+        if (!this.gameObjects.remove(gameObject.node)) {
+            return false;
+        }
+        if (gameObject instanceof Camera_1.Camera) {
+            ArrayUtility_1.removeFromArray(this.cameras, gameObject);
+        }
+        return true;
+    };
+    Scene.prototype.has = function (gameObject) {
+        return this.gameObjects.hasChild(gameObject.node);
+    };
+    Scene.prototype.load = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4, this._resources.load()];
+                    case 1:
+                        _a.sent();
+                        return [2];
+                }
+            });
+        });
+    };
+    Scene.prototype.fixedUpdate = function () {
+        this.gameObjects.forEachChildren(function (gameObject) { return gameObject.fixedUpdate(); });
+        this.broadPhaseCollisionResolver.fixedUpdate();
+        this.narrowPhaseCollisionResolver.resolve(this.broadPhaseCollisionResolver.pairs);
+    };
+    Scene.prototype.update = function () {
+        var _this = this;
+        this.gameObjects.forEachChildren(function (gameObject) { return gameObject.update(); });
+        this.broadPhaseCollisionResolver.update();
+        this.narrowPhaseCollisionResolver.resolve(this.broadPhaseCollisionResolver.pairs);
+        runtime_1.ifdef(runtime_1.DEBUG, function () { return _this.logger.update(); });
+    };
+    Scene.prototype.lateUpdate = function () {
+        this.gameObjects.forEachChildren(function (gameObject) { return gameObject.lateUpdate(); });
+    };
+    Scene.prototype.preRender = function () {
+        this.gameObjects.forEachChildren(function (gameObject) { return gameObject.preRender(); });
+        this.gameObjects.sort(function (a, b) { return b.data.layer - a.data.layer; });
+    };
+    Scene.prototype.render = function (ctx, width, height) {
+        var _this = this;
+        this.renderProcess.useContext(ctx, width, height);
+        this.cameras.forEach(function (camera) { return _this.renderProcess.render(camera, _this.gameObjects); });
+        runtime_1.ifdef(runtime_1.DEBUG_PHYSICS, function () { return _this.cameras.forEach(function (camera) { return _this.broadPhaseCollisionResolver.debugRender(ctx, camera); }); });
+        runtime_1.ifdef(runtime_1.DEBUG, function () {
+            _this.logger.render(ctx);
+            _this.debugRender(ctx);
+        });
+    };
+    Scene.prototype.postRender = function () {
+        this.gameObjects.forEachChildren(function (gameObject) { return gameObject.postRender(); });
+        this.gameObjectInitializer.resolve();
+    };
+    Scene.prototype.toString = function () {
+        return "Scene(" + this.name + ")";
+    };
+    Scene.prototype.debugRender = function (ctx) {
+        var deltaTime = ((this.time.deltaTime * 100) | 0) * 0.01;
+        var fps = ((1000 / deltaTime * 100) | 0) * 0.01;
+        ctx.save();
+        ctx.fillStyle = Color_1.Color.White.toHexString();
+        var deltaTimeText = "deltaTime: " + deltaTime;
+        var deltaTimeWidth = ctx.measureText(deltaTimeText).width;
+        ctx.fillText(deltaTimeText, this.rightTop.x - deltaTimeWidth, this.rightTop.y + 12);
+        var fpsText = "fps: " + fps;
+        var fpsWidth = ctx.measureText(fpsText).width;
+        ctx.fillText(fpsText, this.rightTop.x - fpsWidth, this.rightTop.y + 30);
+        var screenPositionText = "screen: " + this.pointInput.lastPointerPosition.x + ", " + this.pointInput.lastPointerPosition.y;
+        var screenPositionWidth = ctx.measureText(screenPositionText).width;
+        ctx.fillText(screenPositionText, this.rightTop.x - screenPositionWidth, this.rightTop.y + 48);
+        var worldPosition = this.pointInput.lastPointerPosition.clone();
+        this.mainCamera.toWorldMatrix.multiplyToPoint(worldPosition);
+        var worldPositionText = "world: " + worldPosition.x + ", " + worldPosition.y;
+        var worldPositionWidth = ctx.measureText(worldPositionText).width;
+        ctx.fillText(worldPositionText, this.rightTop.x - worldPositionWidth, this.rightTop.y + 66);
+        ctx.restore();
+    };
+    Scene.prototype.onResize = function () {
+        this.rightTop.setTo(this.screen.width, 0);
+    };
+    Scene = __decorate([
+        Class_1.Class(),
+        __param(0, Inject_1.Inject(BroadPhaseCollisionResolver_1.BroadPhaseCollisionResolver)),
+        __param(1, Inject_1.Inject(NarrowPhaseCollisionResolver_1.NarrowPhaseCollisionResolver)),
+        __param(2, Inject_1.Inject(GameObjectInitializer_1.GameObjectInitializer)),
+        __param(3, Inject_1.Inject(RenderProcess_1.RenderProcess)),
+        __param(4, Inject_1.Inject(Camera_1.MainCamera)),
+        __param(5, Inject_1.Inject(Logger_1.Logger)),
+        __param(6, Inject_1.Inject(Screen_1.Screen)),
+        __param(7, Inject_1.Inject(BrowserDelegate_1.BrowserDelegate)),
+        __param(8, Inject_1.Inject(Time_1.Time)),
+        __param(9, Inject_1.Inject(PointerInput_1.PointerInput)),
+        __metadata("design:paramtypes", [Object, Object, Object, Object, Camera_1.Camera, Object, Object, Object, Object, Object])
+    ], Scene);
+    return Scene;
+}(BaseObject_1.BaseObject));
+exports.Scene = Scene;
+
+
+/***/ }),
+
+/***/ 39:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -254,9 +1150,9 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var RendererComponent_1 = __webpack_require__(24);
-var Color_1 = __webpack_require__(8);
-var Class_1 = __webpack_require__(6);
+var RendererComponent_1 = __webpack_require__(21);
+var Color_1 = __webpack_require__(6);
+var Class_1 = __webpack_require__(4);
 var TextRendererComponent = (function (_super) {
     __extends(TextRendererComponent, _super);
     function TextRendererComponent() {
@@ -265,29 +1161,33 @@ var TextRendererComponent = (function (_super) {
         _this.maxWidth = Number.MAX_VALUE;
         _this.fillColor = Color_1.Color.White;
         _this.fontSize = 16;
+        _this.lineWidth = 1;
         _this.fontFamily = 'Arial';
         _this.fontWeight = 100;
-        _this.fontStyle = 'normal';
-        _this.fontVariant = 'normal';
+        _this.fontStyle = '';
+        _this.fontVariant = '';
         _this.actualWidth = 0;
         return _this;
     }
     TextRendererComponent.prototype.update = function () {
         _super.prototype.update.call(this);
-        this.ctx.font = this.fontStyle + " " + this.fontVariant + " " + this.fontWeight + " " + this.fontSize + "px " + this.fontFamily;
+        this.ctx.font = (this.fontStyle + " " + this.fontVariant + " " + this.fontWeight + " " + this.fontSize + "px " + this.fontFamily).trim();
         this.actualWidth = this.ctx.measureText(this.text).width;
         this.canvas.width = this.actualWidth;
         this.canvas.height = this.fontSize;
     };
     TextRendererComponent.prototype.render = function () {
         var ctx = this.ctx;
-        if (this.strokeColor) {
-            ctx.strokeStyle = this.strokeColor.toHexString();
-            ctx.strokeText(this.text, 0, this.fontSize, this.maxWidth);
-        }
+        ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        this.ctx.font = this.fontStyle + " " + this.fontVariant + " " + this.fontWeight + " " + this.fontSize + "px " + this.fontFamily;
         if (this.fillColor) {
             ctx.fillStyle = this.fillColor.toHexString();
             ctx.fillText(this.text, 0, this.fontSize, this.maxWidth);
+        }
+        if (this.strokeColor) {
+            ctx.strokeStyle = this.strokeColor.toHexString();
+            ctx.lineWidth = this.lineWidth;
+            ctx.strokeText(this.text, 0, this.fontSize, this.maxWidth);
         }
     };
     TextRendererComponent = __decorate([
@@ -300,7 +1200,7 @@ exports.TextRendererComponent = TextRendererComponent;
 
 /***/ }),
 
-/***/ 52:
+/***/ 62:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -316,9 +1216,9 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var RendererComponent_1 = __webpack_require__(24);
-var Color_1 = __webpack_require__(8);
-var ArrayUtility_1 = __webpack_require__(7);
+var RendererComponent_1 = __webpack_require__(21);
+var Color_1 = __webpack_require__(6);
+var ArrayUtility_1 = __webpack_require__(10);
 var LineRendererComponent = (function (_super) {
     __extends(LineRendererComponent, _super);
     function LineRendererComponent() {
@@ -411,7 +1311,7 @@ exports.LineRendererComponent = LineRendererComponent;
 
 /***/ }),
 
-/***/ 77:
+/***/ 78:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -435,28 +1335,24 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var __param = (this && this.__param) || function (paramIndex, decorator) {
-    return function (target, key) { decorator(target, key, paramIndex); }
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-__webpack_require__(27);
-var GameObject_1 = __webpack_require__(2);
-var Component_1 = __webpack_require__(10);
-var Scene_1 = __webpack_require__(32);
-var SceneManager_1 = __webpack_require__(18);
-var runtime_1 = __webpack_require__(11);
-var Class_1 = __webpack_require__(6);
+__webpack_require__(40);
+var GameObject_1 = __webpack_require__(3);
+var Component_1 = __webpack_require__(13);
+var Scene_1 = __webpack_require__(33);
+var runtime_1 = __webpack_require__(9);
+var Class_1 = __webpack_require__(4);
 var Inject_1 = __webpack_require__(0);
-var Texture_1 = __webpack_require__(26);
-var Sprite_1 = __webpack_require__(16);
-var Color_1 = __webpack_require__(8);
+var Texture_1 = __webpack_require__(16);
+var Sprite_1 = __webpack_require__(17);
+var Color_1 = __webpack_require__(6);
 var Vector_1 = __webpack_require__(1);
-var TextRendererComponent_1 = __webpack_require__(51);
-var SpriteRendererComponent_1 = __webpack_require__(20);
-var LineRendererComponent_1 = __webpack_require__(52);
-var RigidbodyComponent_1 = __webpack_require__(12);
-var KeyboardInput_1 = __webpack_require__(40);
-var texture = new Texture_1.Texture('../assets/circle.png');
+var TextRendererComponent_1 = __webpack_require__(39);
+var SpriteRendererComponent_1 = __webpack_require__(18);
+var LineRendererComponent_1 = __webpack_require__(62);
+var RigidbodyComponent_1 = __webpack_require__(22);
+var KeyboardInput_1 = __webpack_require__(60);
+var texture = new Texture_1.Texture('./assets/circle.png');
 var CameraController = (function (_super) {
     __extends(CameraController, _super);
     function CameraController() {
@@ -531,28 +1427,28 @@ var Jack = (function (_super) {
     ], Jack);
     return Jack;
 }(GameObject_1.GameObject));
-var Game = (function () {
-    function Game(sceneManager) {
-        this.scene = runtime_1.instantiate(Scene_1.Scene);
-        this.camera = this.scene.mainCamera;
-        this.scene.resources.add(texture);
-        sceneManager.add(this.scene);
-        this.camera.backgroundColor = Color_1.Color.CreateByHexRgb('#4A687F');
-        this.camera.addComponent(CameraController);
-        this.scene.add(runtime_1.instantiate(Jack));
+var Game = (function (_super) {
+    __extends(Game, _super);
+    function Game() {
+        return _super !== null && _super.apply(this, arguments) || this;
     }
+    Game.prototype.start = function () {
+        _super.prototype.start.call(this);
+        this.mainCamera.backgroundColor = Color_1.Color.CreateByHexRgb('#4A687F');
+        this.mainCamera.addComponent(CameraController);
+        this.add(runtime_1.instantiate(Jack));
+    };
     Game = __decorate([
-        Class_1.Class(),
-        __param(0, Inject_1.Inject(SceneManager_1.SceneManager)),
-        __metadata("design:paramtypes", [Object])
+        Class_1.Class()
     ], Game);
     return Game;
-}());
-runtime_1.instantiate(Game);
-runtime_1.bootstrap().catch(console.error);
+}(Scene_1.Scene));
+var scene = runtime_1.instantiate(Game);
+scene.resources.add(texture);
+runtime_1.bootstrap(scene).catch(console.error);
 
 
 /***/ })
 
-},[77]);
+},[78]);
 //# sourceMappingURL=control-camera.bundle.js.map

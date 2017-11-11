@@ -90,7 +90,7 @@
 /******/ 	
 /******/ 	
 /******/ 	var hotApplyOnUpdate = true;
-/******/ 	var hotCurrentHash = "3973f0dab236323813db"; // eslint-disable-line no-unused-vars
+/******/ 	var hotCurrentHash = "df9e51b0a9bcc8f70433"; // eslint-disable-line no-unused-vars
 /******/ 	var hotRequestTimeout = 10000;
 /******/ 	var hotCurrentModuleData = {};
 /******/ 	var hotCurrentChildModule; // eslint-disable-line no-unused-vars
@@ -815,7 +815,7 @@
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var ProviderRegistry_1 = __webpack_require__(47);
+var ProviderRegistry_1 = __webpack_require__(53);
 function Inject(token) {
     return function (target, propertyKey, index) {
         if (index === void 0) {
@@ -838,7 +838,7 @@ exports.Inject = Inject;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var Pool_1 = __webpack_require__(38);
+var Pool_1 = __webpack_require__(54);
 var Vector = (function () {
     function Vector(x, y) {
         if (x === void 0) { x = 0; }
@@ -866,7 +866,7 @@ var Vector = (function () {
     Vector.Get = function (x, y) {
         if (x === void 0) { x = 0; }
         if (y === void 0) { y = 0; }
-        return this.pool.get().setTo(x, y);
+        return this.pool.get().reset(x, y);
     };
     Vector.Put = function (vector) { this.pool.put(vector); };
     Object.defineProperty(Vector.prototype, "canRecycle", {
@@ -1023,7 +1023,7 @@ var Vector = (function () {
     Vector.Left = new Vector(-1, 0);
     Vector.Up = new Vector(0, 1);
     Vector.Down = new Vector(0, -1);
-    Vector.pool = new Pool_1.Pool(function (x, y) { return new Vector(x, y); });
+    Vector.pool = new Pool_1.Pool(Vector);
     return Vector;
 }());
 exports.Vector = Vector;
@@ -1031,6 +1031,16 @@ exports.Vector = Vector;
 
 /***/ }),
 /* 2 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.BrowserDelegate = Symbol('BrowserDelegate');
+
+
+/***/ }),
+/* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1058,24 +1068,18 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var BaseObject_1 = __webpack_require__(49);
-var Type_1 = __webpack_require__(13);
-var TransformComponent_1 = __webpack_require__(14);
-var ArrayUtility_1 = __webpack_require__(7);
-var Tree_1 = __webpack_require__(71);
-var runtime_1 = __webpack_require__(11);
-var GameObjectInitializer_1 = __webpack_require__(39);
-var Class_1 = __webpack_require__(6);
+var BaseObject_1 = __webpack_require__(37);
+var Type_1 = __webpack_require__(8);
+var TransformComponent_1 = __webpack_require__(23);
+var Tree_1 = __webpack_require__(44);
+var runtime_1 = __webpack_require__(9);
+var GameObjectInitializer_1 = __webpack_require__(20);
+var Class_1 = __webpack_require__(4);
 var Inject_1 = __webpack_require__(0);
 var GameObject = (function (_super) {
     __extends(GameObject, _super);
     function GameObject(gameObjectInitializer) {
         var _this = _super.call(this) || this;
-        _this.layer = Type_1.BuiltInLayer.Default;
-        _this.node = new Tree_1.Tree(_this);
-        _this.components = [];
-        _this.tags = [];
-        _this.transform = _this.addComponent(TransformComponent_1.TransformComponent);
         gameObjectInitializer.push(_this);
         return _this;
     }
@@ -1083,50 +1087,45 @@ var GameObject = (function (_super) {
     GameObject.FindWithTag = function (tag) {
         return this.GetBucketByTag(tag);
     };
-    GameObject.AddTaggedGameObject = function (gameObject, specificTag) {
-        var _this = this;
-        if (specificTag) {
-            var bucket = this.GetBucketByTag(specificTag);
-            ArrayUtility_1.addToArray(bucket, gameObject);
-        }
-        else {
-            gameObject.tags.forEach(function (tag) {
-                var bucket = _this.GetBucketByTag(tag);
-                ArrayUtility_1.addToArray(bucket, gameObject);
-            });
-        }
+    GameObject.Initialize = function (gameObject) {
+        gameObject.initialize();
     };
-    GameObject.RemoveTaggedGameObject = function (gameObject, specificTag) {
-        var _this = this;
-        if (specificTag) {
-            var bucket = this.GetBucketByTag(specificTag);
-            ArrayUtility_1.removeFromArray(bucket, gameObject);
-        }
-        else {
-            gameObject.tags.forEach(function (tag) {
-                var bucket = _this.GetBucketByTag(tag);
-                ArrayUtility_1.removeFromArray(bucket, gameObject);
-            });
-        }
+    GameObject.AddTaggedGameObject = function (gameObject, tag) {
+        var bucket = this.GetBucketByTag(tag);
+        return bucket.add(gameObject);
+    };
+    GameObject.RemoveTaggedGameObject = function (gameObject, tag) {
+        var bucket = this.GetBucketByTag(tag);
+        return bucket.delete(gameObject);
     };
     GameObject.GetBucketByTag = function (tag) {
         var bucket = this.TaggedGameObjects.get(tag);
         if (!bucket) {
-            bucket = [];
+            bucket = new Set();
             this.TaggedGameObjects.set(tag, bucket);
         }
         return bucket;
     };
+    Object.defineProperty(GameObject.prototype, "node", {
+        get: function () { return this._node; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(GameObject.prototype, "transform", {
+        get: function () { return this._transform; },
+        enumerable: true,
+        configurable: true
+    });
     Object.defineProperty(GameObject.prototype, "parent", {
         get: function () {
-            return this.node.parent ? this.node.parent.data : null;
+            return this._node.parent ? this._node.parent.data : undefined;
         },
         enumerable: true,
         configurable: true
     });
     Object.defineProperty(GameObject.prototype, "children", {
         get: function () {
-            return this.node.children.map(function (node) { return node.data; });
+            return this._node.children.map(function (node) { return node.data; });
         },
         enumerable: true,
         configurable: true
@@ -1141,69 +1140,110 @@ var GameObject = (function (_super) {
         enumerable: true,
         configurable: true
     });
+    GameObject.prototype.reset = function () {
+        _super.prototype.reset.call(this);
+        this.layer = Type_1.BuiltInLayer.Default;
+        this._node = new Tree_1.Tree(this);
+        this.components = new Map();
+        this.tags = new Set();
+        this._transform = this.addComponent(TransformComponent_1.TransformComponent);
+    };
+    GameObject.prototype.destroy = function () {
+        var _this = this;
+        _super.prototype.destroy.call(this);
+        this.children.forEach(function (child) { return child.destroy(); });
+        this._node.clear();
+        delete this._transform;
+        this.components.forEach(function (components) { return components.forEach(function (component) { return component.destroy(); }); });
+        this.components.clear();
+        this.tags.forEach(function (tag) { return GameObject_1.RemoveTaggedGameObject(_this, tag); });
+    };
     GameObject.prototype.hasTag = function (tag) {
-        return ArrayUtility_1.includeInArray(this.tags, tag);
+        return this.tags.has(tag);
     };
     GameObject.prototype.addTag = function (tag) {
-        if (ArrayUtility_1.addToArray(this.tags, tag)) {
-            GameObject_1.AddTaggedGameObject(this, tag);
-        }
+        this.tags.add(tag);
+        GameObject_1.AddTaggedGameObject(this, tag);
     };
     GameObject.prototype.removeTag = function (tag) {
-        if (ArrayUtility_1.removeFromArray(this.tags, tag)) {
+        if (this.tags.delete(tag)) {
             GameObject_1.RemoveTaggedGameObject(this, tag);
         }
     };
     GameObject.prototype.addComponent = function (ComponentType) {
         var _this = this;
-        var isUnique = Reflect.getMetadata('component:unique', ComponentType) || false;
-        if (isUnique && this.getComponent(ComponentType)) {
-            throw new Error("Unique component " + ComponentType);
-        }
         var RequireComponentTypes = Reflect.getMetadata('component:require', ComponentType) || [];
         RequireComponentTypes.forEach(function (RequireComponentType) {
             if (!_this.getComponent(RequireComponentType)) {
-                throw new Error(ComponentType + " require component " + RequireComponentType);
+                throw new Error(ComponentType.name + " require component " + RequireComponentType.name);
             }
         });
+        var components = this.getComponents(ComponentType);
+        var isUnique = Reflect.getMetadata('component:unique', ComponentType) || false;
+        if (isUnique && components.size > 0) {
+            throw new Error("Unique component " + ComponentType.name);
+        }
         var component = runtime_1.instantiate(ComponentType, this);
-        if (this._hasStarted) {
+        if (this.hasStarted) {
             component.start();
         }
-        this.components.push(component);
+        components.add(component);
+        this.components.set(ComponentType, components);
         return component;
     };
     GameObject.prototype.removeComponent = function (component) {
-        if (!ArrayUtility_1.removeFromArray(this.components, component)) {
-            throw new Error("Not found components, " + component);
+        var ComponentType = Type_1.getType(component);
+        var components = this.components.get(ComponentType);
+        if (!components || !components.has(component)) {
+            throw new Error("Not found components, " + component.name);
         }
+        components.delete(component);
         component.destroy();
     };
-    GameObject.prototype.getComponent = function (componentType) {
-        return this.components.find(function (component) { return component instanceof componentType; });
+    GameObject.prototype.getComponent = function (ComponentType) {
+        var components = this.components.get(ComponentType);
+        if (!components) {
+            return;
+        }
+        return components.values().next().value;
     };
-    GameObject.prototype.getComponents = function (componentType) {
-        return this.components.filter(function (component) { return component instanceof componentType; });
+    GameObject.prototype.getComponents = function (ComponentType) {
+        if (this.components.has(ComponentType)) {
+            return this.components.get(ComponentType);
+        }
+        else {
+            var components_1 = new Set();
+            var componentTypes = this.components.keys();
+            var iteratorResult = componentTypes.next();
+            while (!iteratorResult.done) {
+                if (iteratorResult.value.prototype instanceof ComponentType) {
+                    this.components.get(iteratorResult.value)
+                        .forEach(function (component) { return components_1.add(component); });
+                }
+                iteratorResult = componentTypes.next();
+            }
+            return components_1;
+        }
     };
     GameObject.prototype.addChild = function (child) {
-        if (this.node.hasChild(child.node)) {
+        if (this._node.hasChild(child._node)) {
             throw new Error("Repeatly add child, " + child);
         }
-        if (child.node.parent) {
-            child.node.parent.remove(child.node);
+        if (child._node.parent) {
+            child._node.parent.remove(child._node);
         }
-        this.node.add(child.node);
-        child.transform.localPosition.copy(child.transform.position);
+        this._node.add(child._node);
+        child._transform.localPosition.copy(child._transform.position);
     };
     GameObject.prototype.removeChild = function (child) {
-        if (this.node.hasChild(child.node)) {
+        if (!this._node.hasChild(child._node)) {
             throw new Error("Not found child, " + child);
         }
-        this.node.remove(child.node);
+        this._node.remove(child._node);
     };
     GameObject.prototype.activate = function () {
         _super.prototype.activate.call(this);
-        this.node.show();
+        this._node.show();
     };
     GameObject.prototype.deactivate = function () {
         _super.prototype.deactivate.call(this);
@@ -1211,41 +1251,22 @@ var GameObject = (function (_super) {
     };
     GameObject.prototype.start = function () {
         _super.prototype.start.call(this);
-        this.components.forEach(function (component) { return component.start(); });
+        this.components.forEach(function (components) { return components.forEach(function (component) { return component.start(); }); });
     };
-    GameObject.prototype.fixedUpdate = function (alpha) {
-        if (alpha === void 0) { alpha = 1; }
-        this.components.forEach(function (component) { return component.fixedUpdate(alpha); });
+    GameObject.prototype.fixedUpdate = function () {
+        this.components.forEach(function (components) { return components.forEach(function (component) { return component.fixedUpdate(); }); });
     };
     GameObject.prototype.update = function () {
-        this.components.forEach(function (component) { return component.update(); });
+        this.components.forEach(function (components) { return components.forEach(function (component) { return component.update(); }); });
     };
     GameObject.prototype.lateUpdate = function () {
-        this.components.forEach(function (component) { return component.lateUpdate(); });
+        this.components.forEach(function (components) { return components.forEach(function (component) { return component.lateUpdate(); }); });
     };
     GameObject.prototype.preRender = function () {
-        this.components.forEach(function (component) { return component.preRender(); });
+        this.components.forEach(function (components) { return components.forEach(function (component) { return component.preRender(); }); });
     };
     GameObject.prototype.postRender = function () {
-        this.components.forEach(function (component) { return component.postRender(); });
-    };
-    GameObject.prototype.reset = function () {
-        _super.prototype.reset.call(this);
-        this.layer = Type_1.BuiltInLayer.Default;
-        this.components = [];
-        this.tags = [];
-        this._hasStarted = false;
-        this.components.forEach(function (component) { return component.reset(); });
-        this.children.forEach(function (child) { return child.reset(); });
-    };
-    GameObject.prototype.destroy = function () {
-        _super.prototype.destroy.call(this);
-        GameObject_1.RemoveTaggedGameObject(this);
-        this.components.forEach(function (component) { return component.destroy(); });
-        this.children.forEach(function (child) { return child.destroy(); });
-        if (this.node.parent) {
-            this.node.parent.remove(this.node);
-        }
+        this.components.forEach(function (components) { return components.forEach(function (component) { return component.postRender(); }); });
     };
     GameObject.prototype.toString = function () {
         return "GameObject(" + this.id + ")";
@@ -1266,13 +1287,28 @@ exports.GameObject = GameObject;
 
 
 /***/ }),
-/* 3 */
+/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var ProviderRegistry_1 = __webpack_require__(47);
+function Class(token) {
+    return function (target) {
+        return target;
+    };
+}
+exports.Class = Class;
+
+
+/***/ }),
+/* 5 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var ProviderRegistry_1 = __webpack_require__(53);
 function Service(token) {
     return function (target) {
         ProviderRegistry_1.providerRegistry.provide({ token: token || target, useClass: target });
@@ -1282,14 +1318,96 @@ exports.Service = Service;
 
 
 /***/ }),
-/* 4 */
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-var root_1 = __webpack_require__(28);
-var toSubscriber_1 = __webpack_require__(80);
-var observable_1 = __webpack_require__(62);
+Object.defineProperty(exports, "__esModule", { value: true });
+var Color = (function () {
+    function Color(red, green, blue, alpha) {
+        if (red === void 0) { red = 255; }
+        if (green === void 0) { green = 255; }
+        if (blue === void 0) { blue = 255; }
+        if (alpha === void 0) { alpha = 1; }
+        this.red = red;
+        this.green = green;
+        this.blue = blue;
+        this.alpha = alpha;
+        this.setAlpha(alpha);
+    }
+    Color.Parse = function (colorString) {
+        colorString = colorString.replace(/\s/g, '');
+        var hexRegex = /#[0-9a-fA-F]{3,6}/;
+        var rgbRegex = /rgb.?([0-9.]+),([0-9.]+),([0-9.]+)/;
+        var rgbaRegex = /rgba.?([0-9.]+),([0-9.]+),([0-9.]+),([0-9.]+)/;
+        if (hexRegex.test(colorString)) {
+            return Color.CreateByHexRgb(colorString);
+        }
+        if (rgbaRegex.test(colorString)) {
+            var match = colorString.match(rgbaRegex);
+            if (match !== null) {
+                return new Color(parseInt(match[1], 10), parseInt(match[2], 10), parseInt(match[3], 10), parseFloat(match[4]));
+            }
+        }
+        if (rgbRegex.test(colorString)) {
+            var match = colorString.match(rgbRegex);
+            if (match !== null) {
+                return new Color(parseInt(match[1], 10), parseInt(match[2], 10), parseInt(match[3], 10));
+            }
+        }
+        throw new TypeError("unknown color " + colorString);
+    };
+    Color.CreateByHexRgb = function (hexColorString) {
+        hexColorString = hexColorString.replace(' ', '').replace('#', '');
+        if (hexColorString.length === 3) {
+            return new Color(parseInt(hexColorString[0] + hexColorString[0], 16), parseInt(hexColorString[1] + hexColorString[1], 16), parseInt(hexColorString[2] + hexColorString[2], 16));
+        }
+        else {
+            for (var i = 0; i < (6 - hexColorString.length); i++) {
+                hexColorString += 'f';
+            }
+            return new Color(parseInt(hexColorString.slice(0, 2), 16), parseInt(hexColorString.slice(2, 4), 16), parseInt(hexColorString.slice(4, 6), 16));
+        }
+    };
+    Color.prototype.toString = function () {
+        return "rgba(" + this.red + "," + this.green + "," + this.blue + "," + this.alpha + ")";
+    };
+    Color.prototype.toHexString = function () {
+        var r = ("0" + this.red.toString(16)).slice(-2);
+        var g = ("0" + this.green.toString(16)).slice(-2);
+        var b = ("0" + this.blue.toString(16)).slice(-2);
+        var a = ("0" + this.alpha.toString(16)).slice(-2);
+        return "#" + r + g + b;
+    };
+    Color.prototype.setAlpha = function (alpha) {
+        if (alpha <= 1) {
+            alpha = Math.floor(alpha * 255);
+        }
+        this.alpha = alpha;
+    };
+    Color.White = new Color(255, 255, 255);
+    Color.Black = new Color(0, 0, 0);
+    Color.Red = new Color(255, 0, 0);
+    Color.Green = new Color(0, 255, 0);
+    Color.Blue = new Color(0, 0, 255);
+    Color.Yellow = new Color(255, 255, 0);
+    Color.Cyan = new Color(0, 255, 255);
+    Color.Purple = new Color(255, 0, 255);
+    return Color;
+}());
+exports.Color = Color;
+
+
+/***/ }),
+/* 7 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var root_1 = __webpack_require__(35);
+var toSubscriber_1 = __webpack_require__(81);
+var observable_1 = __webpack_require__(70);
 /**
  * A representation of any set of values over any amount of time. This is the most basic building block
  * of RxJS.
@@ -1544,200 +1662,45 @@ exports.Observable = Observable;
 //# sourceMappingURL=Observable.js.map
 
 /***/ }),
-/* 5 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.BrowserDelegate = Symbol('BrowserDelegate');
-
-
-/***/ }),
-/* 6 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-function Class(token) {
-    return function (target) {
-        return target;
-    };
-}
-exports.Class = Class;
-
-
-/***/ }),
-/* 7 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-function removeFromArray(array, item) {
-    var index = array.indexOf(item);
-    if (index === -1) {
-        return false;
-    }
-    array.splice(index, 1);
-    return true;
-}
-exports.removeFromArray = removeFromArray;
-function addToArray(array, item) {
-    var index = array.indexOf(item);
-    if (index !== -1) {
-        return false;
-    }
-    array.push(item);
-    return true;
-}
-exports.addToArray = addToArray;
-function includeInArray(array, item) {
-    return array.includes(item);
-}
-exports.includeInArray = includeInArray;
-
-
-/***/ }),
 /* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var Color = (function () {
-    function Color(red, green, blue, alpha) {
-        if (red === void 0) { red = 255; }
-        if (green === void 0) { green = 255; }
-        if (blue === void 0) { blue = 255; }
-        if (alpha === void 0) { alpha = 1; }
-        this.red = red;
-        this.green = green;
-        this.blue = blue;
-        this.alpha = alpha;
-        this.setAlpha(alpha);
+function getType(instance) {
+    return instance.constructor;
+}
+exports.getType = getType;
+var BuiltInLayer;
+(function (BuiltInLayer) {
+    BuiltInLayer[BuiltInLayer["Background"] = 1] = "Background";
+    BuiltInLayer[BuiltInLayer["Default"] = 2] = "Default";
+    BuiltInLayer[BuiltInLayer["FX"] = 4] = "FX";
+    BuiltInLayer[BuiltInLayer["UI"] = 64] = "UI";
+})(BuiltInLayer = exports.BuiltInLayer || (exports.BuiltInLayer = {}));
+exports.AllBuiltInLayer = BuiltInLayer.Background |
+    BuiltInLayer.Default |
+    BuiltInLayer.FX |
+    BuiltInLayer.UI;
+function forwardRef(get) {
+    get.__forward_ref__ = get;
+    return get;
+}
+exports.forwardRef = forwardRef;
+function resolveForwardRef(ref) {
+    if (typeof ref === 'function' && ref.hasOwnProperty('__forward_ref__') && ref.__forward_ref__ === ref) {
+        return ref();
     }
-    Color.Parse = function (colorString) {
-        colorString = colorString.replace(/\s/g, '');
-        var hexRegex = /#[0-9a-fA-F]{3,6}/;
-        var rgbRegex = /rgb.?([0-9.]+),([0-9.]+),([0-9.]+)/;
-        var rgbaRegex = /rgba.?([0-9.]+),([0-9.]+),([0-9.]+),([0-9.]+)/;
-        if (hexRegex.test(colorString)) {
-            return Color.CreateByHexRgb(colorString);
-        }
-        if (rgbaRegex.test(colorString)) {
-            var match = colorString.match(rgbaRegex);
-            if (match !== null) {
-                return new Color(parseInt(match[1], 10), parseInt(match[2], 10), parseInt(match[3], 10), parseFloat(match[4]));
-            }
-        }
-        if (rgbRegex.test(colorString)) {
-            var match = colorString.match(rgbRegex);
-            if (match !== null) {
-                return new Color(parseInt(match[1], 10), parseInt(match[2], 10), parseInt(match[3], 10));
-            }
-        }
-        throw new TypeError("unknown color " + colorString);
-    };
-    Color.CreateByHexRgb = function (hexColorString) {
-        hexColorString = hexColorString.replace(' ', '').replace('#', '');
-        if (hexColorString.length === 3) {
-            return new Color(parseInt(hexColorString[0] + hexColorString[0], 16), parseInt(hexColorString[1] + hexColorString[1], 16), parseInt(hexColorString[2] + hexColorString[2], 16));
-        }
-        else {
-            for (var i = 0; i < (6 - hexColorString.length); i++) {
-                hexColorString += 'f';
-            }
-            return new Color(parseInt(hexColorString.slice(0, 2), 16), parseInt(hexColorString.slice(2, 4), 16), parseInt(hexColorString.slice(4, 6), 16));
-        }
-    };
-    Color.prototype.toString = function () {
-        return "rgba(" + this.red + "," + this.green + "," + this.blue + "," + this.alpha + ")";
-    };
-    Color.prototype.toHexString = function () {
-        var r = ("0" + this.red.toString(16)).slice(-2);
-        var g = ("0" + this.green.toString(16)).slice(-2);
-        var b = ("0" + this.blue.toString(16)).slice(-2);
-        var a = ("0" + this.alpha.toString(16)).slice(-2);
-        return "#" + r + g + b;
-    };
-    Color.prototype.setAlpha = function (alpha) {
-        if (alpha <= 1) {
-            alpha = Math.floor(alpha * 255);
-        }
-        this.alpha = alpha;
-    };
-    Color.White = new Color(255, 255, 255);
-    Color.Black = new Color(0, 0, 0);
-    Color.Red = new Color(255, 0, 0);
-    Color.Green = new Color(0, 255, 0);
-    Color.Blue = new Color(0, 0, 255);
-    Color.Yellow = new Color(255, 255, 0);
-    Color.Cyan = new Color(0, 255, 255);
-    Color.Purple = new Color(255, 0, 255);
-    return Color;
-}());
-exports.Color = Color;
+    else {
+        return ref;
+    }
+}
+exports.resolveForwardRef = resolveForwardRef;
 
 
 /***/ }),
 /* 9 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.Time = Symbol('Time');
-
-
-/***/ }),
-/* 10 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-Object.defineProperty(exports, "__esModule", { value: true });
-var BaseObject_1 = __webpack_require__(49);
-var Component = (function (_super) {
-    __extends(Component, _super);
-    function Component(host) {
-        var _this = _super.call(this) || this;
-        _this.host = host;
-        return _this;
-    }
-    Component.prototype.addComponent = function (componentType) {
-        return this.host.addComponent(componentType);
-    };
-    Component.prototype.removeComponent = function (component) {
-        this.host.removeComponent(component);
-    };
-    Component.prototype.getComponent = function (componentType) {
-        return this.host.getComponent(componentType);
-    };
-    Component.prototype.getComponents = function (componentType) {
-        return this.host.getComponents(componentType);
-    };
-    Component.prototype.toString = function () {
-        return "GameComponent(" + this.id + ")";
-    };
-    return Component;
-}(BaseObject_1.BaseObject));
-exports.Component = Component;
-
-
-/***/ }),
-/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1778,15 +1741,15 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var Engine_1 = __webpack_require__(23);
-var ProviderRegistry_1 = __webpack_require__(47);
+var Engine_1 = __webpack_require__(36);
+var ProviderRegistry_1 = __webpack_require__(53);
 var engine;
 var global = new Map();
-function bootstrap() {
+function bootstrap(initialScene) {
     return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {
             engine = ProviderRegistry_1.providerRegistry.get(Engine_1.Engine);
-            return [2, engine.initialize()];
+            return [2, engine.initialize(initialScene)];
         });
     });
 }
@@ -1838,46 +1801,58 @@ exports.DEBUG_PHYSICS = Symbol('DEBUG_PHYSICS');
 
 
 /***/ }),
-/* 12 */,
-/* 13 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-function getClass(instance) {
-    return instance.constructor;
-}
-exports.getClass = getClass;
-var BuiltInLayer;
-(function (BuiltInLayer) {
-    BuiltInLayer[BuiltInLayer["Background"] = 1] = "Background";
-    BuiltInLayer[BuiltInLayer["Default"] = 2] = "Default";
-    BuiltInLayer[BuiltInLayer["FX"] = 4] = "FX";
-    BuiltInLayer[BuiltInLayer["UI"] = 64] = "UI";
-})(BuiltInLayer = exports.BuiltInLayer || (exports.BuiltInLayer = {}));
-exports.AllBuiltInLayer = BuiltInLayer.Background |
-    BuiltInLayer.Default |
-    BuiltInLayer.FX |
-    BuiltInLayer.UI;
-function forwardRef(get) {
-    get.__forward_ref__ = get;
-    return get;
-}
-exports.forwardRef = forwardRef;
-function resolveForwardRef(ref) {
-    if (typeof ref === 'function' && ref.hasOwnProperty('__forward_ref__') && ref.__forward_ref__ === ref) {
-        return ref();
+function removeFromArray(array, item) {
+    var index = array.indexOf(item);
+    if (index === -1) {
+        return false;
     }
-    else {
-        return ref;
-    }
+    array.splice(index, 1);
+    return true;
 }
-exports.resolveForwardRef = resolveForwardRef;
+exports.removeFromArray = removeFromArray;
+function addToArray(array, item) {
+    var index = array.indexOf(item);
+    if (index !== -1) {
+        return false;
+    }
+    array.push(item);
+    return true;
+}
+exports.addToArray = addToArray;
+function includeInArray(array, item) {
+    return array.includes(item);
+}
+exports.includeInArray = includeInArray;
 
 
 /***/ }),
-/* 14 */
+/* 11 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Screen = Symbol('Screen');
+
+
+/***/ }),
+/* 12 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Time = Symbol('Time');
+
+
+/***/ }),
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1892,75 +1867,215 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
+Object.defineProperty(exports, "__esModule", { value: true });
+var BaseObject_1 = __webpack_require__(37);
+var Component = (function (_super) {
+    __extends(Component, _super);
+    function Component(host) {
+        var _this = _super.call(this) || this;
+        _this.host = host;
+        return _this;
+    }
+    Component.prototype.addComponent = function (componentType) {
+        return this.host.addComponent(componentType);
+    };
+    Component.prototype.removeComponent = function (component) {
+        this.host.removeComponent(component);
+    };
+    Component.prototype.getComponent = function (componentType) {
+        return this.host.getComponent(componentType);
+    };
+    Component.prototype.getComponents = function (componentType) {
+        return this.host.getComponents(componentType);
+    };
+    Component.prototype.toString = function () {
+        return "GameComponent(" + this.id + ")";
+    };
+    return Component;
+}(BaseObject_1.BaseObject));
+exports.Component = Component;
+
+
+/***/ }),
+/* 14 */,
+/* 15 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
-Object.defineProperty(exports, "__esModule", { value: true });
-var Component_1 = __webpack_require__(10);
-var Vector_1 = __webpack_require__(1);
-var UniqueComponent_1 = __webpack_require__(15);
-var Matrix_1 = __webpack_require__(70);
-var TransformComponent = (function (_super) {
-    __extends(TransformComponent, _super);
-    function TransformComponent() {
-        var _this = _super !== null && _super.apply(this, arguments) || this;
-        _this.position = Vector_1.Vector.Get();
-        _this.localPosition = Vector_1.Vector.Get();
-        _this.scale = Vector_1.Vector.Get(1, 1);
-        _this.localScale = Vector_1.Vector.Get(1, 1);
-        _this.rotation = 0;
-        _this.localRotation = 0;
-        _this.toWorldMatrix = new Matrix_1.Matrix();
-        _this.toLocalMatrix = _this.toWorldMatrix.getInverse();
-        return _this;
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __generator = (this && this.__generator) || function (thisArg, body) {
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    function verb(n) { return function (v) { return step([n, v]); }; }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while (_) try {
+            if (f = 1, y && (t = y[op[0] & 2 ? "return" : op[0] ? "throw" : "next"]) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [0, t.value];
+            switch (op[0]) {
+                case 0: case 1: t = op; break;
+                case 4: _.label++; return { value: op[1], done: false };
+                case 5: _.label++; y = op[1]; op = [0]; continue;
+                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop(); continue;
+            }
+            op = body.call(thisArg, _);
+        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
-    TransformComponent.prototype.fixedUpdate = function (alpha) {
-        _super.prototype.fixedUpdate.call(this, alpha);
-        if (this.host.parent) {
-            var parentTransform = this.host.parent.transform;
-            this.position.copy(parentTransform.position);
-            this.position.add(this.localPosition);
-            this.scale.copy(parentTransform.scale);
-            this.scale.multiply(this.localScale);
-            this.rotation = parentTransform.rotation + this.localRotation;
-        }
-        this.toWorldMatrix.reset();
-        this.toWorldMatrix.setTranslation(this.position);
-        this.toWorldMatrix.setRotatation(this.rotation);
-        this.toWorldMatrix.setScaling(this.scale);
-        this.toLocalMatrix.invertFrom(this.toWorldMatrix);
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var Subject_1 = __webpack_require__(45);
+var Inject_1 = __webpack_require__(0);
+var Logger_1 = __webpack_require__(30);
+var Resource = (function () {
+    function Resource(path) {
+        var _this = this;
+        this.path = path;
+        this._isLoaded = false;
+        this.onProgress = new Subject_1.Subject();
+        this.onLoad = new Subject_1.Subject();
+        this.onError = new Subject_1.Subject();
+        this._responseType = '';
+        this.onloadstart = function () { return _this.logger.log("start loading resource " + _this.path); };
+        this.onprogress = function (e) { return _this.onProgress.next(e); };
+        this.onerror = function (err) {
+            _this.logger.log("error loading resource PATH: " + _this.path + ", ERROR: " + err);
+            _this.onError.next(err);
+        };
+        this.onloadend = function () { return _this.logger.log("complete loading resource " + _this.path); };
+    }
+    Object.defineProperty(Resource.prototype, "data", {
+        get: function () { return this._data; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Resource.prototype, "isLoaded", {
+        get: function () { return this._isLoaded; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Resource.prototype, "onProgress$", {
+        get: function () { return this.onProgress.asObservable(); },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Resource.prototype, "onLoad$", {
+        get: function () { return this.onLoad.asObservable(); },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Resource.prototype, "onError$", {
+        get: function () { return this.onError.asObservable(); },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Resource.prototype, "responseType", {
+        get: function () { return this._responseType; },
+        set: function (value) {
+            if (this._isLoaded) {
+                throw new Error('Cannot set responseType after resource loaded.');
+            }
+            this._responseType = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Resource.prototype.load = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var _this = this;
+            return __generator(this, function (_a) {
+                if (this._isLoaded) {
+                    return [2];
+                }
+                return [2, new Promise(function (resolve) {
+                        var request = new XMLHttpRequest();
+                        request.responseType = _this._responseType;
+                        request.onloadstart = _this.onloadstart;
+                        request.onprogress = _this.onprogress;
+                        request.onerror = _this.onerror;
+                        request.onload = function () { return __awaiter(_this, void 0, void 0, function () {
+                            var _a, err_1;
+                            return __generator(this, function (_b) {
+                                switch (_b.label) {
+                                    case 0:
+                                        _b.trys.push([0, 2, , 3]);
+                                        _a = this;
+                                        return [4, this.processData(request.response)];
+                                    case 1:
+                                        _a._data = _b.sent();
+                                        this._isLoaded = true;
+                                        this.onLoad.next();
+                                        return [3, 3];
+                                    case 2:
+                                        err_1 = _b.sent();
+                                        this.onerror(err_1);
+                                        return [3, 3];
+                                    case 3:
+                                        resolve();
+                                        return [2];
+                                }
+                            });
+                        }); };
+                        request.onloadend = _this.onloadend;
+                        request.open('GET', _this.path, true);
+                        request.send();
+                    })];
+            });
+        });
     };
-    TransformComponent.prototype.reset = function () {
-        _super.prototype.reset.call(this);
-        this.position = Vector_1.Vector.Get();
-        this.localPosition = Vector_1.Vector.Get();
-        this.scale = Vector_1.Vector.Get(1, 1);
-        this.localScale = Vector_1.Vector.Get(1, 1);
-        this.rotation = 0;
+    Resource.prototype.processData = function (data) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                if (this._responseType === 'blob') {
+                    return [2, URL.createObjectURL(data)];
+                }
+                return [2, data];
+            });
+        });
     };
-    TransformComponent.prototype.destroy = function () {
-        _super.prototype.destroy.call(this);
-        Vector_1.Vector.Put(this.position);
-        Vector_1.Vector.Put(this.localPosition);
-        Vector_1.Vector.Put(this.scale);
-        Vector_1.Vector.Put(this.localScale);
-        delete this.position;
-        delete this.scale;
-        delete this.localScale;
+    Resource.prototype.destroy = function () {
+        this.onProgress.complete();
+        this.onLoad.complete();
+        this.onError.complete();
     };
-    TransformComponent = __decorate([
-        UniqueComponent_1.UniqueComponent()
-    ], TransformComponent);
-    return TransformComponent;
-}(Component_1.Component));
-exports.TransformComponent = TransformComponent;
+    __decorate([
+        Inject_1.Inject(Logger_1.Logger),
+        __metadata("design:type", Object)
+    ], Resource.prototype, "logger", void 0);
+    return Resource;
+}());
+exports.Resource = Resource;
 
 
 /***/ }),
-/* 15 */
+/* 16 */,
+/* 17 */,
+/* 18 */,
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1975,11 +2090,31 @@ exports.UniqueComponent = UniqueComponent;
 
 
 /***/ }),
-/* 16 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.GameObjectInitializer = Symbol('GameObjectInitializer');
+
+
+/***/ }),
+/* 21 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -1989,109 +2124,104 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-var Texture_1 = __webpack_require__(26);
+var Subject_1 = __webpack_require__(45);
+var Component_1 = __webpack_require__(13);
+var GameObject_1 = __webpack_require__(3);
+var TransformComponent_1 = __webpack_require__(23);
+var Bounds_1 = __webpack_require__(25);
+var RequireComponent_1 = __webpack_require__(47);
+var BrowserDelegate_1 = __webpack_require__(2);
 var Vector_1 = __webpack_require__(1);
-var Rect_1 = __webpack_require__(76);
-var BrowserDelegate_1 = __webpack_require__(5);
 var Inject_1 = __webpack_require__(0);
-var Class_1 = __webpack_require__(6);
-var Sprite = (function () {
-    function Sprite(texture) {
-        this.pivot = new Vector_1.Vector(0.5, 0.5);
-        this.rect = new Rect_1.Rect();
-        this.canvas = this.browser.createCanvas();
-        this.ctx = this.browser.getContext(this.canvas);
-        this.setTexture(texture);
+var RendererComponent = (function (_super) {
+    __extends(RendererComponent, _super);
+    function RendererComponent(host, browserDelegate) {
+        var _this = _super.call(this, host) || this;
+        _this.bounds = new Bounds_1.Bounds();
+        _this._onBecameVisible$ = new Subject_1.Subject();
+        _this._onBecameInvisible$ = new Subject_1.Subject();
+        _this.canvas = browserDelegate.createCanvas();
+        _this.ctx = browserDelegate.getContext(_this.canvas);
+        return _this;
     }
-    Object.defineProperty(Sprite.prototype, "texture", {
-        get: function () { return this._texture; },
-        set: function (texture) { this.setTexture(texture); },
+    Object.defineProperty(RendererComponent.prototype, "onBecameVisible$", {
+        get: function () { return this._onBecameVisible$.asObservable(); },
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(Sprite.prototype, "width", {
-        get: function () { return this.rect.width; },
+    Object.defineProperty(RendererComponent.prototype, "onBecameInvisible$", {
+        get: function () { return this._onBecameInvisible$.asObservable(); },
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(Sprite.prototype, "height", {
-        get: function () { return this.rect.height; },
-        enumerable: true,
-        configurable: true
-    });
-    Sprite.prototype.setTexture = function (texture) {
+    RendererComponent.prototype.start = function () {
+        _super.prototype.start.call(this);
+        this.transform = this.getComponent(TransformComponent_1.TransformComponent);
+    };
+    RendererComponent.prototype.preRender = function () {
+        _super.prototype.preRender.call(this);
+        this.calculateBounds();
+    };
+    RendererComponent.prototype.render = function () { return; };
+    RendererComponent.prototype.onBecameVisible = function (camera) {
+        this._onBecameVisible$.next(camera);
+    };
+    RendererComponent.prototype.onBecameInvisible = function (camera) {
+        this._onBecameInvisible$.next(camera);
+    };
+    RendererComponent.prototype.destroy = function () {
+        _super.prototype.destroy.call(this);
+        this._onBecameVisible$.complete();
+        this._onBecameInvisible$.complete();
+    };
+    RendererComponent.prototype.calculateBounds = function () {
         var _this = this;
-        if (this._texture === texture) {
-            return;
-        }
-        this._texture = texture;
-        if (this.textureLoaded) {
-            this.textureLoaded.unsubscribe();
-        }
-        this.textureLoaded = texture.isLoaded$.subscribe(function () {
-            return _this.onTextureLoaded();
+        var minX = Number.MAX_VALUE;
+        var minY = Number.MAX_VALUE;
+        var maxX = -Number.MAX_VALUE;
+        var maxY = -Number.MAX_VALUE;
+        var dx = this.canvas.width * 0.5;
+        var dy = this.canvas.height * 0.5;
+        [
+            Vector_1.Vector.Get(dx, dy),
+            Vector_1.Vector.Get(-dx, dy),
+            Vector_1.Vector.Get(-dx, -dy),
+            Vector_1.Vector.Get(dx, -dy)
+        ].forEach(function (p) {
+            _this.transform.toWorldMatrix.multiplyToPoint(p);
+            if (p.x < minX) {
+                minX = p.x;
+            }
+            if (p.x > maxX) {
+                maxX = p.x;
+            }
+            if (p.y < minY) {
+                minY = p.y;
+            }
+            if (p.y > maxY) {
+                maxY = p.y;
+            }
+            Vector_1.Vector.Put(p);
         });
+        this.bounds.reset(minX, minY, maxX, maxY);
     };
-    Sprite.prototype.onTextureLoaded = function () {
-        if (this.rect.width === 0 && this.rect.height === 0) {
-            this.rect.width = this._texture.width;
-            this.rect.height = this._texture.height;
-            this.canvas.width = this.rect.width;
-            this.canvas.height = this.rect.height;
-        }
-        if (this.textureLoaded) {
-            this.textureLoaded.unsubscribe();
-            delete this.textureLoaded;
-        }
-        this.ctx.clearRect(0, 0, this.rect.width, this.rect.height);
-        this.ctx.drawImage(this._texture.imageBitmap, this.rect.position.x, this.rect.position.y, this.rect.width, this.rect.height, 0, 0, this.rect.width, this.rect.height);
-    };
-    __decorate([
-        Inject_1.Inject(BrowserDelegate_1.BrowserDelegate),
-        __metadata("design:type", Object)
-    ], Sprite.prototype, "browser", void 0);
-    Sprite = __decorate([
-        Class_1.Class(),
-        __metadata("design:paramtypes", [Texture_1.Texture])
-    ], Sprite);
-    return Sprite;
-}());
-exports.Sprite = Sprite;
+    RendererComponent = __decorate([
+        RequireComponent_1.RequireComponent([TransformComponent_1.TransformComponent]),
+        __param(1, Inject_1.Inject(BrowserDelegate_1.BrowserDelegate)),
+        __metadata("design:paramtypes", [GameObject_1.GameObject, Object])
+    ], RendererComponent);
+    return RendererComponent;
+}(Component_1.Component));
+exports.RendererComponent = RendererComponent;
 
 
 /***/ }),
-/* 17 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.Screen = Symbol('Screen');
-
-
-/***/ }),
-/* 18 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.SceneManager = Symbol('SceneManager');
-
-
-/***/ }),
-/* 19 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.CollisionJumpTable = Symbol('CollisionJumpTable');
-
-
-/***/ }),
-/* 20 */
+/* 22 */,
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2113,43 +2243,239 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var RendererComponent_1 = __webpack_require__(24);
-var UniqueComponent_1 = __webpack_require__(15);
-var SpriteRendererComponent = (function (_super) {
-    __extends(SpriteRendererComponent, _super);
-    function SpriteRendererComponent() {
-        return _super !== null && _super.apply(this, arguments) || this;
+var Component_1 = __webpack_require__(13);
+var Vector_1 = __webpack_require__(1);
+var UniqueComponent_1 = __webpack_require__(19);
+var Matrix_1 = __webpack_require__(43);
+var TransformComponent = (function (_super) {
+    __extends(TransformComponent, _super);
+    function TransformComponent() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this._position = Vector_1.Vector.Get();
+        _this._localPosition = Vector_1.Vector.Get();
+        _this._scale = Vector_1.Vector.Get(1, 1);
+        _this._localScale = Vector_1.Vector.Get(1, 1);
+        _this.rotation = 0;
+        _this.localRotation = 0;
+        _this._toWorldMatrix = Matrix_1.Matrix.Get();
+        _this._toLocalMatrix = Matrix_1.Matrix.Get();
+        return _this;
     }
-    SpriteRendererComponent.prototype.update = function () {
-        _super.prototype.update.call(this);
-        if (this.sprite) {
-            var _a = this.sprite, width = _a.width, height = _a.height;
-            this.canvas.width = width;
-            this.canvas.height = height;
+    Object.defineProperty(TransformComponent.prototype, "position", {
+        get: function () { return this._position; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(TransformComponent.prototype, "localPosition", {
+        get: function () { return this._localPosition; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(TransformComponent.prototype, "scale", {
+        get: function () { return this._scale; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(TransformComponent.prototype, "localScale", {
+        get: function () { return this._localScale; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(TransformComponent.prototype, "toWorldMatrix", {
+        get: function () { return this._toWorldMatrix; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(TransformComponent.prototype, "toLocalMatrix", {
+        get: function () { return this._toLocalMatrix; },
+        enumerable: true,
+        configurable: true
+    });
+    TransformComponent.prototype.fixedUpdate = function () {
+        _super.prototype.fixedUpdate.call(this);
+        if (this.host.parent) {
+            var parentTransform = this.host.parent.transform;
+            this._position.copy(parentTransform._position);
+            this._position.add(this._localPosition);
+            this._scale.copy(parentTransform._scale);
+            this._scale.multiply(this._localScale);
+            this.rotation = parentTransform.rotation + this.localRotation;
         }
+        this._toWorldMatrix.reset();
+        this._toWorldMatrix.translate(this._position);
+        this._toWorldMatrix.rotate(this.rotation);
+        this._toWorldMatrix.scale(this._scale);
+        this._toLocalMatrix.invertFrom(this._toWorldMatrix);
     };
-    SpriteRendererComponent.prototype.render = function () {
-        if (!this.sprite) {
-            return;
-        }
-        var ctx = this.ctx;
-        var _a = this.canvas, width = _a.width, height = _a.height;
-        ctx.clearRect(0, 0, width, height);
-        ctx.save();
-        ctx.drawImage(this.sprite.canvas, 0, 0);
-        ctx.restore();
+    TransformComponent.prototype.reset = function () {
+        _super.prototype.reset.call(this);
+        this._position = Vector_1.Vector.Get();
+        this._localPosition = Vector_1.Vector.Get();
+        this._scale = Vector_1.Vector.Get(1, 1);
+        this._localScale = Vector_1.Vector.Get(1, 1);
+        this.rotation = 0;
+        this._toWorldMatrix = Matrix_1.Matrix.Get();
+        this._toLocalMatrix = Matrix_1.Matrix.Get();
     };
-    SpriteRendererComponent = __decorate([
+    TransformComponent.prototype.destroy = function () {
+        _super.prototype.destroy.call(this);
+        Vector_1.Vector.Put(this._position);
+        Vector_1.Vector.Put(this._localPosition);
+        Vector_1.Vector.Put(this._scale);
+        Vector_1.Vector.Put(this._localScale);
+        Matrix_1.Matrix.Put(this._toWorldMatrix);
+        Matrix_1.Matrix.Put(this._toLocalMatrix);
+        delete this._position;
+        delete this._localPosition;
+        delete this._scale;
+        delete this._localScale;
+        delete this._toWorldMatrix;
+        delete this._toLocalMatrix;
+    };
+    TransformComponent = __decorate([
         UniqueComponent_1.UniqueComponent()
-    ], SpriteRendererComponent);
-    return SpriteRendererComponent;
-}(RendererComponent_1.RendererComponent));
-exports.SpriteRendererComponent = SpriteRendererComponent;
+    ], TransformComponent);
+    return TransformComponent;
+}(Component_1.Component));
+exports.TransformComponent = TransformComponent;
 
 
 /***/ }),
-/* 21 */,
-/* 22 */
+/* 24 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.PointerInput = Symbol('PointerInput');
+
+
+/***/ }),
+/* 25 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var Vector_1 = __webpack_require__(1);
+var Bounds = (function () {
+    function Bounds() {
+        var args = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            args[_i] = arguments[_i];
+        }
+        this.center = Vector_1.Vector.Get();
+        this.extents = Vector_1.Vector.Get();
+        this._canRecycle = false;
+        if (args.length === 2) {
+            this.reset(args[0], args[1]);
+        }
+        else if (args.length === 4) {
+            this.reset(args[0], args[1], args[2], args[3]);
+        }
+    }
+    Object.defineProperty(Bounds.prototype, "canRecycle", {
+        get: function () { return this._canRecycle; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Bounds.prototype, "min", {
+        get: function () {
+            return this.center.clone().subtract(this.extents);
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Bounds.prototype, "max", {
+        get: function () {
+            return this.center.clone().add(this.extents);
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Bounds.prototype, "size", {
+        get: function () {
+            return this.extents.clone().multiply(2);
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Bounds.prototype, "top", {
+        get: function () { return this.center.y + this.extents.y; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Bounds.prototype, "bottom", {
+        get: function () { return this.center.y - this.extents.y; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Bounds.prototype, "right", {
+        get: function () { return this.center.x + this.extents.x; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Bounds.prototype, "left", {
+        get: function () { return this.center.x - this.extents.x; },
+        enumerable: true,
+        configurable: true
+    });
+    Bounds.prototype.containPoint = function (point) {
+        return point.greaterThanEqual(this.min) && point.lessThanEqual(this.max);
+    };
+    Bounds.prototype.intersects = function (bounds) {
+        var minA = this.min;
+        var maxA = this.max;
+        var minB = bounds.min;
+        var maxB = bounds.max;
+        if (maxA.x < minB.x || minA.x > maxB.x) {
+            return false;
+        }
+        if (maxA.y < minB.y || minA.y > maxB.y) {
+            return false;
+        }
+        return true;
+    };
+    Bounds.prototype.reset = function () {
+        var args = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            args[_i] = arguments[_i];
+        }
+        if (args.length === 2) {
+            this.center.copy(args[0]);
+            this.extents.copy(args[1]);
+        }
+        else if (args.length === 4) {
+            this.center.setTo((args[2] + args[0]) / 2, (args[3] + args[1]) / 2);
+            this.extents.setTo((args[2] - args[0]) / 2, (args[3] - args[1]) / 2);
+        }
+        else {
+            this.center.reset();
+            this.extents.reset();
+        }
+        return this;
+    };
+    Bounds.prototype.destroy = function () {
+        this._canRecycle = true;
+        this.center.destroy();
+        this.extents.destroy();
+        this.min.destroy();
+        this.max.destroy();
+        this.size.destroy();
+    };
+    Bounds.prototype.toString = function () {
+        return "Bounds (center: " + this.center + ", extents: " + this.extents + ")";
+    };
+    return Bounds;
+}());
+exports.Bounds = Bounds;
+
+
+/***/ }),
+/* 26 */,
+/* 27 */,
+/* 28 */,
+/* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2159,10 +2485,10 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var isFunction_1 = __webpack_require__(44);
-var Subscription_1 = __webpack_require__(37);
-var Observer_1 = __webpack_require__(61);
-var rxSubscriber_1 = __webpack_require__(46);
+var isFunction_1 = __webpack_require__(57);
+var Subscription_1 = __webpack_require__(41);
+var Observer_1 = __webpack_require__(69);
+var rxSubscriber_1 = __webpack_require__(59);
 /**
  * Implements the {@link Observer} interface and extends the
  * {@link Subscription} class. While the {@link Observer} is the public API for
@@ -2419,351 +2745,39 @@ var SafeSubscriber = (function (_super) {
 //# sourceMappingURL=Subscriber.js.map
 
 /***/ }),
-/* 23 */
+/* 30 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Engine = Symbol('Engine');
+exports.Logger = Symbol('Logger');
 
 
 /***/ }),
-/* 24 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __metadata = (this && this.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
-var __param = (this && this.__param) || function (paramIndex, decorator) {
-    return function (target, key) { decorator(target, key, paramIndex); }
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-var Subject_1 = __webpack_require__(29);
-var Component_1 = __webpack_require__(10);
-var GameObject_1 = __webpack_require__(2);
-var TransformComponent_1 = __webpack_require__(14);
-var Bounds_1 = __webpack_require__(30);
-var RequireComponent_1 = __webpack_require__(31);
-var BrowserDelegate_1 = __webpack_require__(5);
-var Vector_1 = __webpack_require__(1);
-var Inject_1 = __webpack_require__(0);
-var RendererComponent = (function (_super) {
-    __extends(RendererComponent, _super);
-    function RendererComponent(host, browserDelegate) {
-        var _this = _super.call(this, host) || this;
-        _this.bounds = new Bounds_1.Bounds();
-        _this._onBecameVisible$ = new Subject_1.Subject();
-        _this._onBecameInvisible$ = new Subject_1.Subject();
-        _this.isVisible = false;
-        _this.canvas = browserDelegate.createCanvas();
-        _this.ctx = browserDelegate.getContext(_this.canvas);
-        return _this;
-    }
-    Object.defineProperty(RendererComponent.prototype, "onBecameVisible$", {
-        get: function () { return this._onBecameVisible$.asObservable(); },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(RendererComponent.prototype, "onBecameInvisible$", {
-        get: function () { return this._onBecameInvisible$.asObservable(); },
-        enumerable: true,
-        configurable: true
-    });
-    RendererComponent.prototype.start = function () {
-        _super.prototype.start.call(this);
-        this.transform = this.getComponent(TransformComponent_1.TransformComponent);
-    };
-    RendererComponent.prototype.preRender = function () {
-        _super.prototype.preRender.call(this);
-        this.calculateBounds();
-    };
-    RendererComponent.prototype.render = function () { return; };
-    RendererComponent.prototype.onBecameVisible = function (camera) {
-        this.isVisible = true;
-        this._onBecameVisible$.next(camera);
-    };
-    RendererComponent.prototype.onBecameInvisible = function (camera) {
-        this.isVisible = false;
-        this._onBecameInvisible$.next(camera);
-    };
-    RendererComponent.prototype.destroy = function () {
-        _super.prototype.destroy.call(this);
-        this._onBecameVisible$.complete();
-        this._onBecameInvisible$.complete();
-    };
-    RendererComponent.prototype.calculateBounds = function () {
-        var _this = this;
-        var minX = Number.MAX_VALUE;
-        var minY = Number.MAX_VALUE;
-        var maxX = -Number.MAX_VALUE;
-        var maxY = -Number.MAX_VALUE;
-        var dx = this.canvas.width * 0.5;
-        var dy = this.canvas.height * 0.5;
-        [
-            Vector_1.Vector.Get(dx, dy),
-            Vector_1.Vector.Get(-dx, dy),
-            Vector_1.Vector.Get(-dx, -dy),
-            Vector_1.Vector.Get(dx, -dy)
-        ].forEach(function (p) {
-            _this.transform.toWorldMatrix.multiplyToPoint(p);
-            if (p.x < minX) {
-                minX = p.x;
-            }
-            if (p.x > maxX) {
-                maxX = p.x;
-            }
-            if (p.y < minY) {
-                minY = p.y;
-            }
-            if (p.y > maxY) {
-                maxY = p.y;
-            }
-            Vector_1.Vector.Put(p);
-        });
-        this.bounds.reset(minX, minY, maxX, maxY);
-    };
-    RendererComponent = __decorate([
-        RequireComponent_1.RequireComponent([TransformComponent_1.TransformComponent]),
-        __param(1, Inject_1.Inject(BrowserDelegate_1.BrowserDelegate)),
-        __metadata("design:paramtypes", [GameObject_1.GameObject, Object])
-    ], RendererComponent);
-    return RendererComponent;
-}(Component_1.Component));
-exports.RendererComponent = RendererComponent;
-
-
-/***/ }),
-/* 25 */
+/* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var ForceMode;
-(function (ForceMode) {
-    ForceMode[ForceMode["Force"] = 0] = "Force";
-    ForceMode[ForceMode["Acceleration"] = 1] = "Acceleration";
-    ForceMode[ForceMode["Impulse"] = 2] = "Impulse";
-    ForceMode[ForceMode["VelocityChange"] = 3] = "VelocityChange";
-})(ForceMode = exports.ForceMode || (exports.ForceMode = {}));
+exports.CollisionJumpTable = Symbol('CollisionJumpTable');
 
 
 /***/ }),
-/* 26 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __metadata = (this && this.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __generator = (this && this.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while (_) try {
-            if (f = 1, y && (t = y[op[0] & 2 ? "return" : op[0] ? "throw" : "next"]) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [0, t.value];
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop(); continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-    }
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-var Resource_1 = __webpack_require__(74);
-var DOM_1 = __webpack_require__(68);
-var BrowserDelegate_1 = __webpack_require__(5);
-var Inject_1 = __webpack_require__(0);
-var Texture = (function (_super) {
-    __extends(Texture, _super);
-    function Texture(path, imageData) {
-        var _this = _super.call(this) || this;
-        _this.path = path;
-        _this.canvas = _this.browser.document.createElement('canvas');
-        _this.ctx = _this.canvas.getContext('2d');
-        _this.isDirty = false;
-        if (imageData) {
-            _this.canvas.width = imageData.width;
-            _this.canvas.height = imageData.height;
-            _this.setImageData(imageData);
-        }
-        else {
-            _this.canvas.width = 0;
-            _this.canvas.height = 0;
-        }
-        return _this;
-    }
-    Object.defineProperty(Texture.prototype, "width", {
-        get: function () { return this.canvas.width; },
-        set: function (value) {
-            this.canvas.width = value;
-            this.markAsDirty();
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Texture.prototype, "height", {
-        get: function () { return this.canvas.height; },
-        set: function (value) {
-            this.canvas.height = value;
-            this.markAsDirty();
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Texture.prototype, "imageBitmap", {
-        get: function () { return this.canvas; },
-        enumerable: true,
-        configurable: true
-    });
-    Texture.prototype.load = function () {
-        return __awaiter(this, void 0, void 0, function () {
-            var _this = this;
-            return __generator(this, function (_a) {
-                if (this.isLoaded) {
-                    return [2, Promise.resolve()];
-                }
-                this.source = new Image();
-                this.source.src = this.path;
-                return [2, DOM_1.onceEvent(this.source, 'load').then(function (e) { return _this.draw(); })];
-            });
-        });
-    };
-    Texture.prototype.getImageData = function (sx, sy, sw, sh) {
-        if (sx === void 0) { sx = 0; }
-        if (sy === void 0) { sy = 0; }
-        if (sw === void 0) { sw = this.width; }
-        if (sh === void 0) { sh = this.height; }
-        return this.ctx.getImageData(sx, sy, sw, sh);
-    };
-    Texture.prototype.setImageData = function (imageData, dx, dy, dirtyX, dirtyY, dirtyWidth, dirtyHeight) {
-        if (dx === void 0) { dx = 0; }
-        if (dy === void 0) { dy = 0; }
-        if (dirtyX === void 0) { dirtyX = 0; }
-        if (dirtyY === void 0) { dirtyY = 0; }
-        if (dirtyWidth === void 0) { dirtyWidth = imageData.width; }
-        if (dirtyHeight === void 0) { dirtyHeight = imageData.height; }
-        this.ctx.putImageData(imageData, dx, dy, dirtyX, dirtyY, dirtyWidth, dirtyHeight);
-    };
-    Texture.prototype.clone = function () {
-        return new Texture(this.path, this.getImageData());
-    };
-    Texture.prototype.markAsDirty = function () {
-        var _this = this;
-        if (this.isDirty) {
-            return;
-        }
-        this.isDirty = true;
-        if (!this.isLoaded) {
-            return;
-        }
-        setTimeout(function () { return _this.draw(); });
-    };
-    Texture.prototype.draw = function () {
-        if (this.width === 0 && this.height === 0) {
-            this.canvas.width = this.source.width;
-            this.canvas.height = this.source.height;
-        }
-        this.ctx.drawImage(this.source, 0, 0, this.source.width, this.source.height, 0, 0, this.width, this.height);
-        this.isDirty = false;
-        if (!this.isLoaded) {
-            this._isLoaded.next(true);
-        }
-    };
-    __decorate([
-        Inject_1.Inject(BrowserDelegate_1.BrowserDelegate),
-        __metadata("design:type", Object)
-    ], Texture.prototype, "browser", void 0);
-    return Texture;
-}(Resource_1.Resource));
-exports.Texture = Texture;
-
-
-/***/ }),
-/* 27 */
+/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-__webpack_require__(78);
-__webpack_require__(103);
-__webpack_require__(104);
-__webpack_require__(105);
-__webpack_require__(107);
-__webpack_require__(108);
-__webpack_require__(109);
-__webpack_require__(110);
-__webpack_require__(111);
-__webpack_require__(112);
-__webpack_require__(113);
-__webpack_require__(114);
-__webpack_require__(115);
-__webpack_require__(117);
-__webpack_require__(118);
-__webpack_require__(119);
+exports.BroadPhaseCollisionResolver = Symbol('BroadPhaseCollisionResolver');
 
 
 /***/ }),
-/* 28 */
+/* 33 */,
+/* 34 */,
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2786,560 +2800,139 @@ exports.root = _root;
     }
 })();
 //# sourceMappingURL=root.js.map
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(58)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(66)))
 
 /***/ }),
-/* 29 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
-var Observable_1 = __webpack_require__(4);
-var Subscriber_1 = __webpack_require__(22);
-var Subscription_1 = __webpack_require__(37);
-var ObjectUnsubscribedError_1 = __webpack_require__(65);
-var SubjectSubscription_1 = __webpack_require__(106);
-var rxSubscriber_1 = __webpack_require__(46);
-/**
- * @class SubjectSubscriber<T>
- */
-var SubjectSubscriber = (function (_super) {
-    __extends(SubjectSubscriber, _super);
-    function SubjectSubscriber(destination) {
-        _super.call(this, destination);
-        this.destination = destination;
-    }
-    return SubjectSubscriber;
-}(Subscriber_1.Subscriber));
-exports.SubjectSubscriber = SubjectSubscriber;
-/**
- * @class Subject<T>
- */
-var Subject = (function (_super) {
-    __extends(Subject, _super);
-    function Subject() {
-        _super.call(this);
-        this.observers = [];
-        this.closed = false;
-        this.isStopped = false;
-        this.hasError = false;
-        this.thrownError = null;
-    }
-    Subject.prototype[rxSubscriber_1.rxSubscriber] = function () {
-        return new SubjectSubscriber(this);
-    };
-    Subject.prototype.lift = function (operator) {
-        var subject = new AnonymousSubject(this, this);
-        subject.operator = operator;
-        return subject;
-    };
-    Subject.prototype.next = function (value) {
-        if (this.closed) {
-            throw new ObjectUnsubscribedError_1.ObjectUnsubscribedError();
-        }
-        if (!this.isStopped) {
-            var observers = this.observers;
-            var len = observers.length;
-            var copy = observers.slice();
-            for (var i = 0; i < len; i++) {
-                copy[i].next(value);
-            }
-        }
-    };
-    Subject.prototype.error = function (err) {
-        if (this.closed) {
-            throw new ObjectUnsubscribedError_1.ObjectUnsubscribedError();
-        }
-        this.hasError = true;
-        this.thrownError = err;
-        this.isStopped = true;
-        var observers = this.observers;
-        var len = observers.length;
-        var copy = observers.slice();
-        for (var i = 0; i < len; i++) {
-            copy[i].error(err);
-        }
-        this.observers.length = 0;
-    };
-    Subject.prototype.complete = function () {
-        if (this.closed) {
-            throw new ObjectUnsubscribedError_1.ObjectUnsubscribedError();
-        }
-        this.isStopped = true;
-        var observers = this.observers;
-        var len = observers.length;
-        var copy = observers.slice();
-        for (var i = 0; i < len; i++) {
-            copy[i].complete();
-        }
-        this.observers.length = 0;
-    };
-    Subject.prototype.unsubscribe = function () {
-        this.isStopped = true;
-        this.closed = true;
-        this.observers = null;
-    };
-    Subject.prototype._trySubscribe = function (subscriber) {
-        if (this.closed) {
-            throw new ObjectUnsubscribedError_1.ObjectUnsubscribedError();
-        }
-        else {
-            return _super.prototype._trySubscribe.call(this, subscriber);
-        }
-    };
-    Subject.prototype._subscribe = function (subscriber) {
-        if (this.closed) {
-            throw new ObjectUnsubscribedError_1.ObjectUnsubscribedError();
-        }
-        else if (this.hasError) {
-            subscriber.error(this.thrownError);
-            return Subscription_1.Subscription.EMPTY;
-        }
-        else if (this.isStopped) {
-            subscriber.complete();
-            return Subscription_1.Subscription.EMPTY;
-        }
-        else {
-            this.observers.push(subscriber);
-            return new SubjectSubscription_1.SubjectSubscription(this, subscriber);
-        }
-    };
-    Subject.prototype.asObservable = function () {
-        var observable = new Observable_1.Observable();
-        observable.source = this;
-        return observable;
-    };
-    Subject.create = function (destination, source) {
-        return new AnonymousSubject(destination, source);
-    };
-    return Subject;
-}(Observable_1.Observable));
-exports.Subject = Subject;
-/**
- * @class AnonymousSubject<T>
- */
-var AnonymousSubject = (function (_super) {
-    __extends(AnonymousSubject, _super);
-    function AnonymousSubject(destination, source) {
-        _super.call(this);
-        this.destination = destination;
-        this.source = source;
-    }
-    AnonymousSubject.prototype.next = function (value) {
-        var destination = this.destination;
-        if (destination && destination.next) {
-            destination.next(value);
-        }
-    };
-    AnonymousSubject.prototype.error = function (err) {
-        var destination = this.destination;
-        if (destination && destination.error) {
-            this.destination.error(err);
-        }
-    };
-    AnonymousSubject.prototype.complete = function () {
-        var destination = this.destination;
-        if (destination && destination.complete) {
-            this.destination.complete();
-        }
-    };
-    AnonymousSubject.prototype._subscribe = function (subscriber) {
-        var source = this.source;
-        if (source) {
-            return this.source.subscribe(subscriber);
-        }
-        else {
-            return Subscription_1.Subscription.EMPTY;
-        }
-    };
-    return AnonymousSubject;
-}(Subject));
-exports.AnonymousSubject = AnonymousSubject;
-//# sourceMappingURL=Subject.js.map
-
-/***/ }),
-/* 30 */
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var Vector_1 = __webpack_require__(1);
-var Bounds = (function () {
-    function Bounds() {
-        var args = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            args[_i] = arguments[_i];
-        }
-        this.center = Vector_1.Vector.Get();
-        this.extents = Vector_1.Vector.Get();
-        this._canRecycle = false;
-        if (args.length === 2) {
-            this.reset(args[0], args[1]);
-        }
-        else if (args.length === 4) {
-            this.reset(args[0], args[1], args[2], args[3]);
-        }
-    }
-    Object.defineProperty(Bounds.prototype, "canRecycle", {
-        get: function () { return this._canRecycle; },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Bounds.prototype, "min", {
-        get: function () {
-            return this.center.clone().subtract(this.extents);
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Bounds.prototype, "max", {
-        get: function () {
-            return this.center.clone().add(this.extents);
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Bounds.prototype, "size", {
-        get: function () {
-            return this.extents.clone().multiply(2);
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Bounds.prototype, "top", {
-        get: function () { return this.center.y + this.extents.y; },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Bounds.prototype, "bottom", {
-        get: function () { return this.center.y - this.extents.y; },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Bounds.prototype, "right", {
-        get: function () { return this.center.x + this.extents.x; },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Bounds.prototype, "left", {
-        get: function () { return this.center.x - this.extents.x; },
-        enumerable: true,
-        configurable: true
-    });
-    Bounds.prototype.containPoint = function (point) {
-        return point.greaterThanEqual(this.min) && point.lessThanEqual(this.max);
-    };
-    Bounds.prototype.intersects = function (bounds) {
-        var minA = this.min;
-        var maxA = this.max;
-        var minB = bounds.min;
-        var maxB = bounds.max;
-        if (maxA.x < minB.x || minA.x > maxB.x) {
-            return false;
-        }
-        if (maxA.y < minB.y || minA.y > maxB.y) {
-            return false;
-        }
-        return true;
-    };
-    Bounds.prototype.reset = function () {
-        var args = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            args[_i] = arguments[_i];
-        }
-        if (args.length === 2) {
-            this.center.copy(args[0]);
-            this.extents.copy(args[1]);
-        }
-        else if (args.length === 4) {
-            this.center.setTo((args[2] + args[0]) / 2, (args[3] + args[1]) / 2);
-            this.extents.setTo((args[2] - args[0]) / 2, (args[3] - args[1]) / 2);
-        }
-    };
-    Bounds.prototype.destroy = function () {
-        this._canRecycle = true;
-        this.center.destroy();
-        this.extents.destroy();
-        this.min.destroy();
-        this.max.destroy();
-        this.size.destroy();
-    };
-    Bounds.prototype.toString = function () {
-        return "Bounds (center: " + this.center + ", extents: " + this.extents + ")";
-    };
-    return Bounds;
-}());
-exports.Bounds = Bounds;
+exports.Engine = Symbol('Engine');
 
 
 /***/ }),
-/* 31 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-var ArrayUtility_1 = __webpack_require__(7);
-function RequireComponent(RequireTypes) {
-    return function (ComponentType) {
-        var requireComponentTypes = Reflect.getMetadata('component:require', ComponentType) || [];
-        RequireTypes.forEach(function (RequireType) { return ArrayUtility_1.addToArray(requireComponentTypes, RequireType); });
-        Reflect.defineMetadata('component:require', requireComponentTypes, ComponentType);
-    };
-}
-exports.RequireComponent = RequireComponent;
-
-
-/***/ }),
-/* 32 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __metadata = (this && this.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
-var __param = (this && this.__param) || function (paramIndex, decorator) {
-    return function (target, key) { decorator(target, key, paramIndex); }
-};
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __generator = (this && this.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while (_) try {
-            if (f = 1, y && (t = y[op[0] & 2 ? "return" : op[0] ? "throw" : "next"]) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [0, t.value];
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop(); continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-    }
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-var BaseObject_1 = __webpack_require__(49);
-var Tree_1 = __webpack_require__(71);
-var Bundle_1 = __webpack_require__(120);
-var Camera_1 = __webpack_require__(75);
-var ArrayUtility_1 = __webpack_require__(7);
-var Inject_1 = __webpack_require__(0);
-var Class_1 = __webpack_require__(6);
-var BroadPhaseCollisionResolver_1 = __webpack_require__(42);
-var NarrowPhaseCollisionResolver_1 = __webpack_require__(73);
-var Vector_1 = __webpack_require__(1);
-var GameObjectInitializer_1 = __webpack_require__(39);
-var RenderProcess_1 = __webpack_require__(69);
-var runtime_1 = __webpack_require__(11);
-var Logger_1 = __webpack_require__(48);
-var Screen_1 = __webpack_require__(17);
-var BrowserDelegate_1 = __webpack_require__(5);
-var Time_1 = __webpack_require__(9);
-var Color_1 = __webpack_require__(8);
-var Scene = (function (_super) {
-    __extends(Scene, _super);
-    function Scene(broadPhaseCollisionResolver, narrowPhaseCollisionResolver, gameObjectInitializer, renderProcess, mainCamera, logger, screen, browser, time) {
-        var _this = _super.call(this) || this;
-        _this.broadPhaseCollisionResolver = broadPhaseCollisionResolver;
-        _this.narrowPhaseCollisionResolver = narrowPhaseCollisionResolver;
-        _this.gameObjectInitializer = gameObjectInitializer;
-        _this.renderProcess = renderProcess;
-        _this.mainCamera = mainCamera;
-        _this.logger = logger;
-        _this.screen = screen;
-        _this.browser = browser;
-        _this.time = time;
-        _this.resources = new Bundle_1.Bundle();
-        _this.gameObjects = new Tree_1.Tree(null);
-        _this.cameras = [];
-        _this.rightTop = new Vector_1.Vector();
-        _this.add(_this.mainCamera);
-        _this.resizeSubscription = browser.resize$.subscribe(function () { return _this.onResize(); });
-        _this.rightTop.setTo(_this.screen.width, 0);
-        return _this;
-    }
-    Object.defineProperty(Scene.prototype, "isLoaded", {
-        get: function () { return this.resources.isLoaded; },
-        enumerable: true,
-        configurable: true
-    });
-    Scene.prototype.add = function (gameObject, at) {
-        if (!this.gameObjects.add(gameObject.node)) {
-            return false;
-        }
-        if (!gameObject.hasStarted) {
-            gameObject.node.hide();
-        }
-        if (gameObject instanceof Camera_1.Camera) {
-            ArrayUtility_1.addToArray(this.cameras, gameObject);
-        }
-        if (at) {
-            gameObject.transform.position.copy(at);
-        }
-        return true;
-    };
-    Scene.prototype.remove = function (gameObject) {
-        gameObject.node.show();
-        if (!this.gameObjects.remove(gameObject.node)) {
-            return false;
-        }
-        if (gameObject instanceof Camera_1.Camera) {
-            ArrayUtility_1.removeFromArray(this.cameras, gameObject);
-        }
-        return true;
-    };
-    Scene.prototype.has = function (gameObject) {
-        return this.gameObjects.hasChild(gameObject.node);
-    };
-    Scene.prototype.load = function () {
-        return __awaiter(this, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4, this.resources.load()];
-                    case 1:
-                        _a.sent();
-                        return [2];
-                }
-            });
-        });
-    };
-    Scene.prototype.fixedUpdate = function (alpha) {
-        this.gameObjects.forEachChildren(function (gameObject) { return gameObject.fixedUpdate(alpha); });
-        this.broadPhaseCollisionResolver.fixedUpdate();
-        this.narrowPhaseCollisionResolver.resolve(this.broadPhaseCollisionResolver.pairs);
-    };
-    Scene.prototype.update = function () {
-        var _this = this;
-        this.gameObjects.forEachChildren(function (gameObject) { return gameObject.update(); });
-        this.broadPhaseCollisionResolver.update();
-        this.narrowPhaseCollisionResolver.resolve(this.broadPhaseCollisionResolver.pairs);
-        runtime_1.ifdef(runtime_1.DEBUG, function () { return _this.logger.update(); });
-    };
-    Scene.prototype.lateUpdate = function () {
-        this.gameObjects.forEachChildren(function (gameObject) { return gameObject.lateUpdate(); });
-    };
-    Scene.prototype.preRender = function () {
-        this.gameObjects.forEachChildren(function (gameObject) { return gameObject.preRender(); });
-    };
-    Scene.prototype.render = function (ctx, width, height) {
-        var _this = this;
-        this.renderProcess.useContext(ctx, width, height);
-        this.cameras.forEach(function (camera) { return _this.renderProcess.render(camera, _this.gameObjects); });
-        runtime_1.ifdef(runtime_1.DEBUG_PHYSICS, function () { return _this.cameras.forEach(function (camera) { return _this.broadPhaseCollisionResolver.debugRender(ctx, camera); }); });
-        runtime_1.ifdef(runtime_1.DEBUG, function () {
-            _this.logger.render(ctx);
-            _this.debugRender(ctx);
-        });
-    };
-    Scene.prototype.postRender = function () {
-        this.gameObjects.forEachChildren(function (gameObject) { return gameObject.postRender(); });
-        this.gameObjectInitializer.resolve();
-    };
-    Scene.prototype.reset = function () {
-        var _this = this;
-        this.reset();
-        this.resizeSubscription = this.browser.resize$.subscribe(function () { return _this.onResize(); });
-    };
-    Scene.prototype.destroy = function () {
-        _super.prototype.destroy.call(this);
-        this.gameObjects.forEachChildren(function (gameObject) { return gameObject.destroy(); });
-        this.resizeSubscription.unsubscribe();
-    };
-    Scene.prototype.toString = function () {
-        return "Scene(" + this.name + ")";
-    };
-    Scene.prototype.debugRender = function (ctx) {
-        var deltaTime = ((this.time.deltaTime * 100) | 0) * 0.01;
-        var fps = ((1000 / deltaTime * 100) | 0) * 0.01;
-        ctx.save();
-        ctx.fillStyle = Color_1.Color.White.toHexString();
-        var deltaTimeText = "deltaTime: " + deltaTime;
-        var deltaTimeWidth = ctx.measureText(deltaTimeText).width;
-        ctx.fillText(deltaTimeText, this.rightTop.x - deltaTimeWidth, this.rightTop.y + 12);
-        var fpsText = "fps: " + fps;
-        var fpsWidth = ctx.measureText(fpsText).width;
-        ctx.fillText(fpsText, this.rightTop.x - fpsWidth, this.rightTop.y + 30);
-        ctx.restore();
-    };
-    Scene.prototype.onResize = function () {
-        this.rightTop.setTo(this.screen.width, 0);
-    };
-    Scene = __decorate([
-        Class_1.Class(),
-        __param(0, Inject_1.Inject(BroadPhaseCollisionResolver_1.BroadPhaseCollisionResolver)),
-        __param(1, Inject_1.Inject(NarrowPhaseCollisionResolver_1.NarrowPhaseCollisionResolver)),
-        __param(2, Inject_1.Inject(GameObjectInitializer_1.GameObjectInitializer)),
-        __param(3, Inject_1.Inject(RenderProcess_1.RenderProcess)),
-        __param(4, Inject_1.Inject(Camera_1.MainCamera)),
-        __param(5, Inject_1.Inject(Logger_1.Logger)),
-        __param(6, Inject_1.Inject(Screen_1.Screen)),
-        __param(7, Inject_1.Inject(BrowserDelegate_1.BrowserDelegate)),
-        __param(8, Inject_1.Inject(Time_1.Time)),
-        __metadata("design:paramtypes", [Object, Object, Object, Object, Camera_1.Camera, Object, Object, Object, Object])
-    ], Scene);
-    return Scene;
-}(BaseObject_1.BaseObject));
-exports.Scene = Scene;
-
-
-/***/ }),
-/* 33 */,
-/* 34 */,
-/* 35 */,
-/* 36 */,
 /* 37 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-var isArray_1 = __webpack_require__(81);
-var isObject_1 = __webpack_require__(59);
-var isFunction_1 = __webpack_require__(44);
-var tryCatch_1 = __webpack_require__(60);
-var errorObject_1 = __webpack_require__(45);
-var UnsubscriptionError_1 = __webpack_require__(82);
+Object.defineProperty(exports, "__esModule", { value: true });
+var BaseObject = (function () {
+    function BaseObject() {
+        this._destroyed = true;
+        this.id = BaseObject.NextId++;
+        this.reset();
+    }
+    Object.defineProperty(BaseObject.prototype, "isActive", {
+        get: function () { return this._isActive; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(BaseObject.prototype, "canRecycle", {
+        get: function () { return this._destroyed; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(BaseObject.prototype, "isDestroyed", {
+        get: function () { return this._destroyed; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(BaseObject.prototype, "hasStarted", {
+        get: function () { return this._hasStarted; },
+        enumerable: true,
+        configurable: true
+    });
+    BaseObject.prototype.reset = function () {
+        if (!this._destroyed) {
+            this.destroy();
+        }
+        this.name = '';
+        this._isActive = false;
+        this._destroyed = false;
+        this._hasStarted = false;
+    };
+    BaseObject.prototype.start = function () {
+        this.activate();
+        this._hasStarted = true;
+    };
+    BaseObject.prototype.destroy = function () {
+        this._destroyed = true;
+        this._isActive = false;
+    };
+    BaseObject.prototype.activate = function () {
+        this._isActive = true;
+    };
+    BaseObject.prototype.deactivate = function () {
+        this._isActive = false;
+    };
+    BaseObject.prototype.fixedUpdate = function () { return; };
+    BaseObject.prototype.update = function () { return; };
+    BaseObject.prototype.lateUpdate = function () { return; };
+    BaseObject.prototype.preRender = function () { return; };
+    BaseObject.prototype.postRender = function () { return; };
+    BaseObject.NextId = 0;
+    return BaseObject;
+}());
+exports.BaseObject = BaseObject;
+
+
+/***/ }),
+/* 38 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var ForceMode;
+(function (ForceMode) {
+    ForceMode[ForceMode["Force"] = 0] = "Force";
+    ForceMode[ForceMode["Acceleration"] = 1] = "Acceleration";
+    ForceMode[ForceMode["Impulse"] = 2] = "Impulse";
+    ForceMode[ForceMode["VelocityChange"] = 3] = "VelocityChange";
+})(ForceMode = exports.ForceMode || (exports.ForceMode = {}));
+
+
+/***/ }),
+/* 39 */,
+/* 40 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+__webpack_require__(79);
+__webpack_require__(102);
+__webpack_require__(103);
+__webpack_require__(104);
+__webpack_require__(107);
+__webpack_require__(108);
+__webpack_require__(109);
+__webpack_require__(110);
+__webpack_require__(111);
+__webpack_require__(112);
+__webpack_require__(114);
+__webpack_require__(115);
+__webpack_require__(116);
+__webpack_require__(118);
+__webpack_require__(119);
+__webpack_require__(120);
+
+
+/***/ }),
+/* 41 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var isArray_1 = __webpack_require__(82);
+var isObject_1 = __webpack_require__(67);
+var isFunction_1 = __webpack_require__(57);
+var tryCatch_1 = __webpack_require__(68);
+var errorObject_1 = __webpack_require__(58);
+var UnsubscriptionError_1 = __webpack_require__(83);
 /**
  * Represents a disposable resource, such as the execution of an Observable. A
  * Subscription has one important method, `unsubscribe`, that takes no argument
@@ -3528,111 +3121,341 @@ function flattenUnsubscriptionErrors(errors) {
 //# sourceMappingURL=Subscription.js.map
 
 /***/ }),
-/* 38 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-var ArrayUtility_1 = __webpack_require__(7);
-var Pool = (function () {
-    function Pool(factory, max, initSize) {
-        if (max === void 0) { max = Infinity; }
-        if (initSize === void 0) { initSize = max <= 1024 ? max : 1024; }
-        this.factory = factory;
-        this.max = max;
-        this._actives = [];
-        this._inactives = [];
-        this.size = 0;
-        this.size = initSize;
-        for (var i = 0; i < this.size; i++) {
-            var instance = factory();
-            instance.destroy();
-            ArrayUtility_1.addToArray(this._inactives, instance);
-        }
-    }
-    Pool.prototype.get = function () {
-        var args = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            args[_i] = arguments[_i];
-        }
-        var instance = this._inactives.shift();
-        if (!instance) {
-            if (this.size < this.max) {
-                instance = this.factory.apply(this, args);
-                ArrayUtility_1.addToArray(this._actives, instance);
-                this.size++;
-            }
-        }
-        else {
-            instance.reset.apply(instance, args);
-        }
-        return instance;
-    };
-    Pool.prototype.put = function (instance) {
-        if (ArrayUtility_1.removeFromArray(this._actives, instance)) {
-            instance.destroy();
-            this._inactives.push(instance);
-            this.size--;
-        }
-    };
-    return Pool;
-}());
-exports.Pool = Pool;
-
-
-/***/ }),
-/* 39 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.GameObjectInitializer = Symbol('GameObjectInitializer');
-
-
-/***/ }),
-/* 40 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.KeyboardInput = Symbol('KeyboardInput');
-
-
-/***/ }),
-/* 41 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.PointerInput = Symbol('PointerInput');
-
-
-/***/ }),
 /* 42 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.BroadPhaseCollisionResolver = Symbol('BroadPhaseCollisionResolver');
+exports.SceneManager = Symbol('SceneManager');
 
 
 /***/ }),
-/* 43 */,
+/* 43 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var Vector_1 = __webpack_require__(1);
+var Pool_1 = __webpack_require__(54);
+var Matrix = (function () {
+    function Matrix(value) {
+        this._value = [
+            [1, 0, 0],
+            [0, 1, 0]
+        ];
+        this._save = [];
+        this._canRecycle = false;
+        if (value !== void 0) {
+            this._value[0][0] = value[0][0];
+            this._value[0][1] = value[0][1];
+            this._value[0][2] = value[0][2];
+            this._value[1][0] = value[1][0];
+            this._value[1][1] = value[1][1];
+            this._value[1][2] = value[1][2];
+        }
+        this.save();
+    }
+    Matrix.Get = function (value) {
+        return this.pool.get().reset(value);
+    };
+    Matrix.Put = function (matrix) { this.pool.put(matrix); };
+    Object.defineProperty(Matrix.prototype, 0, {
+        get: function () { return this._value[0]; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Matrix.prototype, 1, {
+        get: function () { return this._value[1]; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Matrix.prototype, "canRecycle", {
+        get: function () { return this._canRecycle; },
+        enumerable: true,
+        configurable: true
+    });
+    Matrix.prototype.save = function () {
+        this._save.push([
+            [this[0][0], this[0][1], this[0][2]],
+            [this[1][0], this[1][1], this[1][2]]
+        ]);
+        return this;
+    };
+    Matrix.prototype.restore = function () {
+        var last = this._save.pop();
+        if (last) {
+            this._value = last;
+        }
+        else {
+            this.reset();
+        }
+        return this;
+    };
+    Matrix.prototype.reset = function (value) {
+        this._save = [];
+        if (value !== void 0) {
+            this._value[0][0] = value[0][0];
+            this._value[0][1] = value[0][1];
+            this._value[0][2] = value[0][2];
+            this._value[1][0] = value[1][0];
+            this._value[1][1] = value[1][1];
+            this._value[1][2] = value[1][2];
+        }
+        else {
+            this._value = [
+                [1, 0, 0],
+                [0, 1, 0]
+            ];
+        }
+        return this;
+    };
+    Matrix.prototype.rotate = function (radian) {
+        var cos = Math.cos(radian) || 1;
+        var sin = Math.sin(radian);
+        return this.multiply([
+            [cos, -sin, 0],
+            [sin, cos, 0]
+        ]);
+    };
+    Matrix.prototype.translate = function (positionOrX, y) {
+        if (positionOrX instanceof Vector_1.Vector) {
+            return this.multiply([
+                [1, 0, positionOrX.x],
+                [0, 1, positionOrX.y]
+            ]);
+        }
+        else if (y !== void 0) {
+            return this.multiply([
+                [1, 0, positionOrX],
+                [0, 1, y]
+            ]);
+        }
+        return this;
+    };
+    Matrix.prototype.scale = function (magnificationOrX, y) {
+        if (magnificationOrX instanceof Vector_1.Vector) {
+            return this.multiply([
+                [magnificationOrX.x || 1, 0, 0],
+                [0, magnificationOrX.y || 1, 0]
+            ]);
+        }
+        else if (y !== void 0) {
+            return this.multiply([
+                [magnificationOrX || 1, 0, 0],
+                [0, y || 1, 0]
+            ]);
+        }
+        return this;
+    };
+    Matrix.prototype.multiply = function (other) {
+        var a1 = this._value[0][0];
+        var b1 = this._value[0][1];
+        var c1 = this._value[0][2];
+        var d1 = this._value[1][0];
+        var e1 = this._value[1][1];
+        var f1 = this._value[1][2];
+        var a2 = other[0][0];
+        var b2 = other[0][1];
+        var c2 = other[0][2];
+        var d2 = other[1][0];
+        var e2 = other[1][1];
+        var f2 = other[1][2];
+        this._value[0][0] = a1 * a2 + b1 * d2;
+        this._value[0][1] = a1 * b2 + b1 * e2;
+        this._value[0][2] = a1 * c2 + b1 * f2 + c1;
+        this._value[1][0] = d1 * a2 + e1 * d2;
+        this._value[1][1] = d1 * b2 + e1 * e2;
+        this._value[1][2] = d1 * c2 + e1 * f2 + f1;
+        return this;
+    };
+    Matrix.prototype.multiplyToPoint = function (point) {
+        var x = point.x;
+        var y = point.y;
+        point.reset(this._value[0][0] * x + this._value[0][1] * y + this._value[0][2] * 1, this._value[1][0] * x + this._value[1][1] * y + this._value[1][2] * 1);
+        return this;
+    };
+    Matrix.prototype.multiplyToVector = function (vector) {
+        var x = vector.x;
+        var y = vector.y;
+        vector.reset(this._value[0][0] * x + this._value[0][1] * y + 0 * 0, this._value[1][0] * x + this._value[1][1] * y + 0 * 0);
+        return this;
+    };
+    Matrix.prototype.equalTo = function (another) {
+        return this._value[0][0] === another[0][0] &&
+            this._value[0][1] === another[0][1] &&
+            this._value[0][2] === another[0][2] &&
+            this._value[1][0] === another[1][0] &&
+            this._value[1][1] === another[1][1] &&
+            this._value[1][2] === another[1][2];
+    };
+    Matrix.prototype.invertFrom = function (source) {
+        var a_minor = source[1][1] * 1 - source[1][2] * 0;
+        var b_minor = source[1][0] * 1 - source[1][2] * 0;
+        var c_minor = source[1][0] * 0 - source[1][1] * 0;
+        var d_minor = source[0][1] * 1 - source[0][2] * 0;
+        var e_minor = source[0][0] * 1 - source[0][2] * 0;
+        var g_minor = source[0][1] * source[1][2] - source[0][2] * source[1][1];
+        var h_minor = source[0][0] * source[1][2] - source[0][2] * source[1][0];
+        var inverseDeterminant = 1 / (source[0][0] * a_minor - source[0][1] * b_minor + source[0][2] * c_minor);
+        this._value[0][0] = inverseDeterminant * a_minor;
+        this._value[0][1] = inverseDeterminant * -d_minor;
+        this._value[0][2] = inverseDeterminant * g_minor;
+        this._value[1][0] = inverseDeterminant * -b_minor;
+        this._value[1][1] = inverseDeterminant * e_minor;
+        this._value[1][2] = inverseDeterminant * -h_minor;
+        return this;
+    };
+    Matrix.prototype.getInverse = function () {
+        return new Matrix().invertFrom(this);
+    };
+    Matrix.prototype.clone = function () {
+        return new Matrix(this._value);
+    };
+    Matrix.prototype.destroy = function () {
+        this._canRecycle = true;
+    };
+    Matrix.prototype.toString = function () {
+        var matrixString = "[" + this[0] + "][" + this[1] + "]";
+        return "Matrix " + matrixString;
+    };
+    Matrix.pool = new Pool_1.Pool(Matrix, Infinity, 64);
+    Matrix.Identity = new Matrix();
+    return Matrix;
+}());
+exports.Matrix = Matrix;
+
+
+/***/ }),
 /* 44 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-function isFunction(x) {
-    return typeof x === 'function';
-}
-exports.isFunction = isFunction;
-//# sourceMappingURL=isFunction.js.map
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+Object.defineProperty(exports, "__esModule", { value: true });
+var ArrayUtility_1 = __webpack_require__(10);
+var ReadonlyTree = (function () {
+    function ReadonlyTree(data, _children) {
+        if (_children === void 0) { _children = []; }
+        this.data = data;
+        this._children = _children;
+    }
+    Object.defineProperty(ReadonlyTree.prototype, "parent", {
+        get: function () { return this._parent; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(ReadonlyTree.prototype, "isRoot", {
+        get: function () { return !this._parent; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(ReadonlyTree.prototype, "isLeaf", {
+        get: function () { return this._children.length === 0; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(ReadonlyTree.prototype, "length", {
+        get: function () { return this._children.length; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(ReadonlyTree.prototype, "children", {
+        get: function () { return this._children; },
+        enumerable: true,
+        configurable: true
+    });
+    ReadonlyTree.prototype.hasChild = function (child) {
+        var stack = this._children.slice();
+        var current = stack.pop();
+        while (current) {
+            for (var i = current.children.length - 1; i > -1; i--) {
+                stack.push(current.children[i]);
+            }
+            if (current === child) {
+                return true;
+            }
+            current = stack.pop();
+        }
+        return false;
+    };
+    ReadonlyTree.prototype.forEachChildren = function (callback) {
+        var stack = this._children.slice();
+        var current = stack.pop();
+        while (current) {
+            for (var i = current.children.length - 1; i > -1; i--) {
+                stack.push(current.children[i]);
+            }
+            callback(current.data);
+            current = stack.pop();
+        }
+    };
+    ReadonlyTree.prototype.findParent = function (condition) {
+        var parent = this.parent;
+        while (parent) {
+            if (condition(parent.data)) {
+                return parent.data;
+            }
+            else {
+                parent = parent.parent;
+            }
+        }
+        return null;
+    };
+    return ReadonlyTree;
+}());
+exports.ReadonlyTree = ReadonlyTree;
+var Tree = (function (_super) {
+    __extends(Tree, _super);
+    function Tree() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    Tree.prototype.add = function (child) {
+        child._parent = this;
+        return ArrayUtility_1.addToArray(this._children, child);
+    };
+    Tree.prototype.remove = function (child) {
+        child._parent = undefined;
+        return ArrayUtility_1.removeFromArray(this._children, child);
+    };
+    Tree.prototype.hide = function () {
+        if (!this.parent) {
+            return false;
+        }
+        return ArrayUtility_1.removeFromArray(this.parent._children, this);
+    };
+    Tree.prototype.show = function () {
+        if (!this.parent) {
+            return false;
+        }
+        return ArrayUtility_1.addToArray(this.parent._children, this);
+    };
+    Tree.prototype.clear = function () {
+        var _this = this;
+        this._children.forEach(function (child) { return _this.remove(child); });
+        if (this._parent) {
+            this._parent.remove(this);
+        }
+    };
+    Tree.prototype.sort = function (callback) {
+        this._children.sort(callback);
+        this._children.forEach(function (child) { return child.sort(callback); });
+    };
+    return Tree;
+}(ReadonlyTree));
+exports.Tree = Tree;
+
 
 /***/ }),
 /* 45 */
@@ -3640,9 +3463,173 @@ exports.isFunction = isFunction;
 
 "use strict";
 
-// typeof any so that it we don't have to cast when comparing a result to the error object
-exports.errorObject = { e: {} };
-//# sourceMappingURL=errorObject.js.map
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var Observable_1 = __webpack_require__(7);
+var Subscriber_1 = __webpack_require__(29);
+var Subscription_1 = __webpack_require__(41);
+var ObjectUnsubscribedError_1 = __webpack_require__(105);
+var SubjectSubscription_1 = __webpack_require__(106);
+var rxSubscriber_1 = __webpack_require__(59);
+/**
+ * @class SubjectSubscriber<T>
+ */
+var SubjectSubscriber = (function (_super) {
+    __extends(SubjectSubscriber, _super);
+    function SubjectSubscriber(destination) {
+        _super.call(this, destination);
+        this.destination = destination;
+    }
+    return SubjectSubscriber;
+}(Subscriber_1.Subscriber));
+exports.SubjectSubscriber = SubjectSubscriber;
+/**
+ * @class Subject<T>
+ */
+var Subject = (function (_super) {
+    __extends(Subject, _super);
+    function Subject() {
+        _super.call(this);
+        this.observers = [];
+        this.closed = false;
+        this.isStopped = false;
+        this.hasError = false;
+        this.thrownError = null;
+    }
+    Subject.prototype[rxSubscriber_1.rxSubscriber] = function () {
+        return new SubjectSubscriber(this);
+    };
+    Subject.prototype.lift = function (operator) {
+        var subject = new AnonymousSubject(this, this);
+        subject.operator = operator;
+        return subject;
+    };
+    Subject.prototype.next = function (value) {
+        if (this.closed) {
+            throw new ObjectUnsubscribedError_1.ObjectUnsubscribedError();
+        }
+        if (!this.isStopped) {
+            var observers = this.observers;
+            var len = observers.length;
+            var copy = observers.slice();
+            for (var i = 0; i < len; i++) {
+                copy[i].next(value);
+            }
+        }
+    };
+    Subject.prototype.error = function (err) {
+        if (this.closed) {
+            throw new ObjectUnsubscribedError_1.ObjectUnsubscribedError();
+        }
+        this.hasError = true;
+        this.thrownError = err;
+        this.isStopped = true;
+        var observers = this.observers;
+        var len = observers.length;
+        var copy = observers.slice();
+        for (var i = 0; i < len; i++) {
+            copy[i].error(err);
+        }
+        this.observers.length = 0;
+    };
+    Subject.prototype.complete = function () {
+        if (this.closed) {
+            throw new ObjectUnsubscribedError_1.ObjectUnsubscribedError();
+        }
+        this.isStopped = true;
+        var observers = this.observers;
+        var len = observers.length;
+        var copy = observers.slice();
+        for (var i = 0; i < len; i++) {
+            copy[i].complete();
+        }
+        this.observers.length = 0;
+    };
+    Subject.prototype.unsubscribe = function () {
+        this.isStopped = true;
+        this.closed = true;
+        this.observers = null;
+    };
+    Subject.prototype._trySubscribe = function (subscriber) {
+        if (this.closed) {
+            throw new ObjectUnsubscribedError_1.ObjectUnsubscribedError();
+        }
+        else {
+            return _super.prototype._trySubscribe.call(this, subscriber);
+        }
+    };
+    Subject.prototype._subscribe = function (subscriber) {
+        if (this.closed) {
+            throw new ObjectUnsubscribedError_1.ObjectUnsubscribedError();
+        }
+        else if (this.hasError) {
+            subscriber.error(this.thrownError);
+            return Subscription_1.Subscription.EMPTY;
+        }
+        else if (this.isStopped) {
+            subscriber.complete();
+            return Subscription_1.Subscription.EMPTY;
+        }
+        else {
+            this.observers.push(subscriber);
+            return new SubjectSubscription_1.SubjectSubscription(this, subscriber);
+        }
+    };
+    Subject.prototype.asObservable = function () {
+        var observable = new Observable_1.Observable();
+        observable.source = this;
+        return observable;
+    };
+    Subject.create = function (destination, source) {
+        return new AnonymousSubject(destination, source);
+    };
+    return Subject;
+}(Observable_1.Observable));
+exports.Subject = Subject;
+/**
+ * @class AnonymousSubject<T>
+ */
+var AnonymousSubject = (function (_super) {
+    __extends(AnonymousSubject, _super);
+    function AnonymousSubject(destination, source) {
+        _super.call(this);
+        this.destination = destination;
+        this.source = source;
+    }
+    AnonymousSubject.prototype.next = function (value) {
+        var destination = this.destination;
+        if (destination && destination.next) {
+            destination.next(value);
+        }
+    };
+    AnonymousSubject.prototype.error = function (err) {
+        var destination = this.destination;
+        if (destination && destination.error) {
+            this.destination.error(err);
+        }
+    };
+    AnonymousSubject.prototype.complete = function () {
+        var destination = this.destination;
+        if (destination && destination.complete) {
+            this.destination.complete();
+        }
+    };
+    AnonymousSubject.prototype._subscribe = function (subscriber) {
+        var source = this.source;
+        if (source) {
+            return this.source.subscribe(subscriber);
+        }
+        else {
+            return Subscription_1.Subscription.EMPTY;
+        }
+    };
+    return AnonymousSubject;
+}(Subject));
+exports.AnonymousSubject = AnonymousSubject;
+//# sourceMappingURL=Subject.js.map
 
 /***/ }),
 /* 46 */
@@ -3650,15 +3637,9 @@ exports.errorObject = { e: {} };
 
 "use strict";
 
-var root_1 = __webpack_require__(28);
-var Symbol = root_1.root.Symbol;
-exports.rxSubscriber = (typeof Symbol === 'function' && typeof Symbol.for === 'function') ?
-    Symbol.for('rxSubscriber') : '@@rxSubscriber';
-/**
- * @deprecated use rxSubscriber instead
- */
-exports.$$rxSubscriber = exports.rxSubscriber;
-//# sourceMappingURL=rxSubscriber.js.map
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.RenderProcess = Symbol('RenderProcess');
+
 
 /***/ }),
 /* 47 */
@@ -3667,8 +3648,40 @@ exports.$$rxSubscriber = exports.rxSubscriber;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-__webpack_require__(64);
-var Type_1 = __webpack_require__(13);
+var ArrayUtility_1 = __webpack_require__(10);
+function RequireComponent(RequireTypes) {
+    return function (ComponentType) {
+        var requireComponentTypes = Reflect.getMetadata('component:require', ComponentType) || [];
+        RequireTypes.forEach(function (RequireType) { return ArrayUtility_1.addToArray(requireComponentTypes, RequireType); });
+        Reflect.defineMetadata('component:require', requireComponentTypes, ComponentType);
+    };
+}
+exports.RequireComponent = RequireComponent;
+
+
+/***/ }),
+/* 48 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.NarrowPhaseCollisionResolver = Symbol('NarrowPhaseCollisionResolver');
+
+
+/***/ }),
+/* 49 */,
+/* 50 */,
+/* 51 */,
+/* 52 */,
+/* 53 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+__webpack_require__(74);
+var Type_1 = __webpack_require__(8);
 var ProviderRegistry = (function () {
     function ProviderRegistry() {
         this.providers = new Map();
@@ -3736,81 +3749,117 @@ exports.providerRegistry = new ProviderRegistry();
 
 
 /***/ }),
-/* 48 */
+/* 54 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Logger = Symbol('Logger');
-
-
-/***/ }),
-/* 49 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-var BaseObject = (function () {
-    function BaseObject() {
-        this.name = '';
-        this._isActive = false;
-        this._destroyed = false;
-        this._hasStarted = false;
-        this.id = BaseObject.NextId++;
+var ProviderRegistry_1 = __webpack_require__(53);
+var Pool = (function () {
+    function Pool(EntityType, max, initSize) {
+        if (max === void 0) { max = Infinity; }
+        if (initSize === void 0) { initSize = max <= 1024 ? max : 1024; }
+        this.EntityType = EntityType;
+        this.max = max;
+        this.actives = new Set();
+        this.inactives = new Set();
+        this._size = 0;
+        this._size = initSize;
+        for (var i = 0; i < this._size; i++) {
+            var instance = ProviderRegistry_1.providerRegistry.instantiate(EntityType);
+            instance.destroy();
+            this.inactives.add(instance);
+        }
     }
-    Object.defineProperty(BaseObject.prototype, "isActive", {
-        get: function () { return this._isActive; },
+    Object.defineProperty(Pool.prototype, "size", {
+        get: function () { return this._size; },
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(BaseObject.prototype, "canRecycle", {
-        get: function () { return this._destroyed; },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(BaseObject.prototype, "isDestroyed", {
-        get: function () { return this._destroyed; },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(BaseObject.prototype, "hasStarted", {
-        get: function () { return this._hasStarted; },
-        enumerable: true,
-        configurable: true
-    });
-    BaseObject.prototype.activate = function () {
-        this._isActive = true;
+    Pool.prototype.get = function () {
+        if (this.inactives.size === 0) {
+            if (this._size < this.max) {
+                var instance = ProviderRegistry_1.providerRegistry.instantiate(this.EntityType);
+                this.actives.add(instance);
+                this._size++;
+                return instance;
+            }
+            else {
+                return;
+            }
+        }
+        else {
+            var instance = this.inactives.values().next().value;
+            this.inactives.delete(instance);
+            this.actives.add(instance);
+            return instance;
+        }
     };
-    BaseObject.prototype.deactivate = function () {
-        this._isActive = false;
+    Pool.prototype.put = function (instance) {
+        if (this.actives.has(instance)) {
+            instance.destroy();
+            this.actives.delete(instance);
+            this.inactives.add(instance);
+        }
     };
-    BaseObject.prototype.reset = function () {
-        this._destroyed = false;
-        this._isActive = true;
-    };
-    BaseObject.prototype.start = function () {
-        this.activate();
-        this._hasStarted = true;
-    };
-    BaseObject.prototype.fixedUpdate = function (alpha) { return; };
-    BaseObject.prototype.update = function () { return; };
-    BaseObject.prototype.lateUpdate = function () { return; };
-    BaseObject.prototype.preRender = function () { return; };
-    BaseObject.prototype.postRender = function () { return; };
-    BaseObject.prototype.destroy = function () {
-        this._destroyed = true;
-        this._isActive = false;
-    };
-    BaseObject.NextId = 0;
-    return BaseObject;
+    return Pool;
 }());
-exports.BaseObject = BaseObject;
+exports.Pool = Pool;
 
 
 /***/ }),
-/* 50 */
+/* 55 */,
+/* 56 */,
+/* 57 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+function isFunction(x) {
+    return typeof x === 'function';
+}
+exports.isFunction = isFunction;
+//# sourceMappingURL=isFunction.js.map
+
+/***/ }),
+/* 58 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+// typeof any so that it we don't have to cast when comparing a result to the error object
+exports.errorObject = { e: {} };
+//# sourceMappingURL=errorObject.js.map
+
+/***/ }),
+/* 59 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var root_1 = __webpack_require__(35);
+var Symbol = root_1.root.Symbol;
+exports.rxSubscriber = (typeof Symbol === 'function' && typeof Symbol.for === 'function') ?
+    Symbol.for('rxSubscriber') : '@@rxSubscriber';
+/**
+ * @deprecated use rxSubscriber instead
+ */
+exports.$$rxSubscriber = exports.rxSubscriber;
+//# sourceMappingURL=rxSubscriber.js.map
+
+/***/ }),
+/* 60 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.KeyboardInput = Symbol('KeyboardInput');
+
+
+/***/ }),
+/* 61 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3867,14 +3916,11 @@ exports.Ray = Ray;
 
 
 /***/ }),
-/* 51 */,
-/* 52 */,
-/* 53 */,
-/* 54 */,
-/* 55 */,
-/* 56 */,
-/* 57 */,
-/* 58 */
+/* 62 */,
+/* 63 */,
+/* 64 */,
+/* 65 */,
+/* 66 */
 /***/ (function(module, exports) {
 
 var g;
@@ -3901,7 +3947,7 @@ module.exports = g;
 
 
 /***/ }),
-/* 59 */
+/* 67 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3913,12 +3959,12 @@ exports.isObject = isObject;
 //# sourceMappingURL=isObject.js.map
 
 /***/ }),
-/* 60 */
+/* 68 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-var errorObject_1 = __webpack_require__(45);
+var errorObject_1 = __webpack_require__(58);
 var tryCatchTarget;
 function tryCatcher() {
     try {
@@ -3938,7 +3984,7 @@ exports.tryCatch = tryCatch;
 //# sourceMappingURL=tryCatch.js.map
 
 /***/ }),
-/* 61 */
+/* 69 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3952,12 +3998,12 @@ exports.empty = {
 //# sourceMappingURL=Observer.js.map
 
 /***/ }),
-/* 62 */
+/* 70 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-var root_1 = __webpack_require__(28);
+var root_1 = __webpack_require__(35);
 function getSymbolObservable(context) {
     var $$observable;
     var Symbol = context.Symbol;
@@ -3984,7 +4030,7 @@ exports.$$observable = exports.observable;
 //# sourceMappingURL=observable.js.map
 
 /***/ }),
-/* 63 */
+/* 71 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3996,7 +4042,127 @@ exports.isScheduler = isScheduler;
 //# sourceMappingURL=isScheduler.js.map
 
 /***/ }),
-/* 64 */
+/* 72 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var Subscriber_1 = __webpack_require__(29);
+/**
+ * We need this JSDoc comment for affecting ESDoc.
+ * @ignore
+ * @extends {Ignored}
+ */
+var OuterSubscriber = (function (_super) {
+    __extends(OuterSubscriber, _super);
+    function OuterSubscriber() {
+        _super.apply(this, arguments);
+    }
+    OuterSubscriber.prototype.notifyNext = function (outerValue, innerValue, outerIndex, innerIndex, innerSub) {
+        this.destination.next(innerValue);
+    };
+    OuterSubscriber.prototype.notifyError = function (error, innerSub) {
+        this.destination.error(error);
+    };
+    OuterSubscriber.prototype.notifyComplete = function (innerSub) {
+        this.destination.complete();
+    };
+    return OuterSubscriber;
+}(Subscriber_1.Subscriber));
+exports.OuterSubscriber = OuterSubscriber;
+//# sourceMappingURL=OuterSubscriber.js.map
+
+/***/ }),
+/* 73 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var root_1 = __webpack_require__(35);
+var isArrayLike_1 = __webpack_require__(90);
+var isPromise_1 = __webpack_require__(91);
+var isObject_1 = __webpack_require__(67);
+var Observable_1 = __webpack_require__(7);
+var iterator_1 = __webpack_require__(92);
+var InnerSubscriber_1 = __webpack_require__(93);
+var observable_1 = __webpack_require__(70);
+function subscribeToResult(outerSubscriber, result, outerValue, outerIndex) {
+    var destination = new InnerSubscriber_1.InnerSubscriber(outerSubscriber, outerValue, outerIndex);
+    if (destination.closed) {
+        return null;
+    }
+    if (result instanceof Observable_1.Observable) {
+        if (result._isScalar) {
+            destination.next(result.value);
+            destination.complete();
+            return null;
+        }
+        else {
+            return result.subscribe(destination);
+        }
+    }
+    else if (isArrayLike_1.isArrayLike(result)) {
+        for (var i = 0, len = result.length; i < len && !destination.closed; i++) {
+            destination.next(result[i]);
+        }
+        if (!destination.closed) {
+            destination.complete();
+        }
+    }
+    else if (isPromise_1.isPromise(result)) {
+        result.then(function (value) {
+            if (!destination.closed) {
+                destination.next(value);
+                destination.complete();
+            }
+        }, function (err) { return destination.error(err); })
+            .then(null, function (err) {
+            // Escaping the Promise trap: globally throw unhandled errors
+            root_1.root.setTimeout(function () { throw err; });
+        });
+        return destination;
+    }
+    else if (result && typeof result[iterator_1.iterator] === 'function') {
+        var iterator = result[iterator_1.iterator]();
+        do {
+            var item = iterator.next();
+            if (item.done) {
+                destination.complete();
+                break;
+            }
+            destination.next(item.value);
+            if (destination.closed) {
+                break;
+            }
+        } while (true);
+    }
+    else if (result && typeof result[observable_1.observable] === 'function') {
+        var obs = result[observable_1.observable]();
+        if (typeof obs.subscribe !== 'function') {
+            destination.error(new TypeError('Provided object does not correctly implement Symbol.observable'));
+        }
+        else {
+            return obs.subscribe(new InnerSubscriber_1.InnerSubscriber(outerSubscriber, outerValue, outerIndex));
+        }
+    }
+    else {
+        var value = isObject_1.isObject(result) ? 'an invalid object' : "'" + result + "'";
+        var msg = ("You provided " + value + " where a stream was expected.")
+            + ' You can provide an Observable, Promise, Array, or Iterable.';
+        destination.error(new TypeError(msg));
+    }
+    return null;
+}
+exports.subscribeToResult = subscribeToResult;
+//# sourceMappingURL=subscribeToResult.js.map
+
+/***/ }),
+/* 74 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(process, global) {/*! *****************************************************************************
@@ -5124,43 +5290,10 @@ var Reflect;
             Function("return this;")());
 })(Reflect || (Reflect = {}));
 //# sourceMappingURL=Reflect.js.map
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(102), __webpack_require__(58)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(101), __webpack_require__(66)))
 
 /***/ }),
-/* 65 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
-/**
- * An error thrown when an action is invalid because the object has been
- * unsubscribed.
- *
- * @see {@link Subject}
- * @see {@link BehaviorSubject}
- *
- * @class ObjectUnsubscribedError
- */
-var ObjectUnsubscribedError = (function (_super) {
-    __extends(ObjectUnsubscribedError, _super);
-    function ObjectUnsubscribedError() {
-        var err = _super.call(this, 'object unsubscribed');
-        this.name = err.name = 'ObjectUnsubscribedError';
-        this.stack = err.stack;
-        this.message = err.message;
-    }
-    return ObjectUnsubscribedError;
-}(Error));
-exports.ObjectUnsubscribedError = ObjectUnsubscribedError;
-//# sourceMappingURL=ObjectUnsubscribedError.js.map
-
-/***/ }),
-/* 66 */
+/* 75 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5170,7 +5303,7 @@ exports.MouseInput = Symbol('MouseInput');
 
 
 /***/ }),
-/* 67 */
+/* 76 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5180,432 +5313,15 @@ exports.TouchInput = Symbol('TouchInput');
 
 
 /***/ }),
-/* 68 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __generator = (this && this.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while (_) try {
-            if (f = 1, y && (t = y[op[0] & 2 ? "return" : op[0] ? "throw" : "next"]) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [0, t.value];
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop(); continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-    }
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-var Observable_1 = __webpack_require__(4);
-function onceEvent(node, eventName) {
-    return __awaiter(this, void 0, void 0, function () {
-        return __generator(this, function (_a) {
-            return [2, new Promise(function (resolve, reject) {
-                    var onEvent = function (e) {
-                        resolve(e);
-                        teardown();
-                    };
-                    var onError = function (e) {
-                        reject(e);
-                        teardown();
-                    };
-                    var teardown = function () {
-                        node.removeEventListener(eventName, onEvent);
-                        node.removeEventListener('error', onError);
-                    };
-                    node.addEventListener(eventName, onEvent);
-                    node.addEventListener('error', onError);
-                })];
-        });
-    });
-}
-exports.onceEvent = onceEvent;
-function observeEvent(node, eventName) {
-    return new Observable_1.Observable(function (subscriber) {
-        node.addEventListener(eventName, function (e) { return subscriber.next(e); });
-        var parentNode = node.parentNode;
-        if (parentNode) {
-            var observer = new MutationObserver(function (records) {
-                var shouldComplete = records
-                    .reduce(function (prev, curr) { return prev.concat(listToArray(curr.removedNodes)); }, [])
-                    .some(function (removeedNode) { return removeedNode === node; });
-                if (shouldComplete) {
-                    subscriber.complete();
-                }
-            });
-            observer.observe(parentNode, { childList: true });
-        }
-    });
-}
-exports.observeEvent = observeEvent;
-function listToArray(list) {
-    return Array.prototype.slice.call(list);
-}
-exports.listToArray = listToArray;
-
-
-/***/ }),
-/* 69 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.RenderProcess = Symbol('RenderProcess');
-
-
-/***/ }),
-/* 70 */
+/* 77 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
 var Vector_1 = __webpack_require__(1);
-var Pool_1 = __webpack_require__(38);
-var Matrix = (function () {
-    function Matrix(value) {
-        this._value = [
-            [1, 0, 0],
-            [0, 1, 0]
-        ];
-        this._save = [];
-        this._canRecycle = false;
-        if (value !== void 0) {
-            this._value[0][0] = value[0][0];
-            this._value[0][1] = value[0][1];
-            this._value[0][2] = value[0][2];
-            this._value[1][0] = value[1][0];
-            this._value[1][1] = value[1][1];
-            this._value[1][2] = value[1][2];
-        }
-        this.save();
-    }
-    Matrix.Get = function (value) {
-        return this.pool.get(value);
-    };
-    Matrix.Put = function (matrix) { this.pool.put(matrix); };
-    Object.defineProperty(Matrix.prototype, 0, {
-        get: function () { return this._value[0]; },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Matrix.prototype, 1, {
-        get: function () { return this._value[1]; },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Matrix.prototype, "canRecycle", {
-        get: function () { return this._canRecycle; },
-        enumerable: true,
-        configurable: true
-    });
-    Matrix.prototype.save = function () {
-        this._save.push([
-            [this[0][0], this[0][1], this[0][2]],
-            [this[1][0], this[1][1], this[1][2]]
-        ]);
-        return this;
-    };
-    Matrix.prototype.restore = function () {
-        var last = this._save.pop();
-        if (last) {
-            this._value = last;
-        }
-        else {
-            this.reset();
-        }
-        return this;
-    };
-    Matrix.prototype.reset = function (value) {
-        this._save = [];
-        if (value !== void 0) {
-            this._value[0][0] = value[0][0];
-            this._value[0][1] = value[0][1];
-            this._value[0][2] = value[0][2];
-            this._value[1][0] = value[1][0];
-            this._value[1][1] = value[1][1];
-            this._value[1][2] = value[1][2];
-        }
-        else {
-            this._value = [
-                [1, 0, 0],
-                [0, 1, 0]
-            ];
-        }
-        return this;
-    };
-    Matrix.prototype.setRotatation = function (radian) {
-        var cos = Math.cos(radian) || 1;
-        var sin = Math.sin(radian);
-        return this.multiply([
-            [cos, -sin, 0],
-            [sin, cos, 0]
-        ]);
-    };
-    Matrix.prototype.setTranslation = function (positionOrX, y) {
-        if (positionOrX instanceof Vector_1.Vector) {
-            return this.multiply([
-                [1, 0, positionOrX.x],
-                [0, 1, positionOrX.y]
-            ]);
-        }
-        else if (y !== void 0) {
-            return this.multiply([
-                [1, 0, positionOrX],
-                [0, 1, y]
-            ]);
-        }
-        return this;
-    };
-    Matrix.prototype.setScaling = function (magnificationOrX, y) {
-        if (magnificationOrX instanceof Vector_1.Vector) {
-            return this.multiply([
-                [magnificationOrX.x || 1, 0, 0],
-                [0, magnificationOrX.y || 1, 0]
-            ]);
-        }
-        else if (y !== void 0) {
-            return this.multiply([
-                [magnificationOrX || 1, 0, 0],
-                [0, y || 1, 0]
-            ]);
-        }
-        return this;
-    };
-    Matrix.prototype.multiply = function (other) {
-        var a1 = this._value[0][0];
-        var b1 = this._value[0][1];
-        var c1 = this._value[0][2];
-        var d1 = this._value[1][0];
-        var e1 = this._value[1][1];
-        var f1 = this._value[1][2];
-        var a2 = other[0][0];
-        var b2 = other[0][1];
-        var c2 = other[0][2];
-        var d2 = other[1][0];
-        var e2 = other[1][1];
-        var f2 = other[1][2];
-        this._value[0][0] = a1 * a2 + b1 * d2;
-        this._value[0][1] = a1 * b2 + b1 * e2;
-        this._value[0][2] = a1 * c2 + b1 * f2 + c1;
-        this._value[1][0] = d1 * a2 + e1 * d2;
-        this._value[1][1] = d1 * b2 + e1 * e2;
-        this._value[1][2] = d1 * c2 + e1 * f2 + f1;
-        return this;
-    };
-    Matrix.prototype.multiplyToPoint = function (point) {
-        var x = point.x;
-        var y = point.y;
-        point.reset(this._value[0][0] * x + this._value[0][1] * y + this._value[0][2] * 1, this._value[1][0] * x + this._value[1][1] * y + this._value[1][2] * 1);
-        return this;
-    };
-    Matrix.prototype.multiplyToVector = function (vector) {
-        var x = vector.x;
-        var y = vector.y;
-        vector.reset(this._value[0][0] * x + this._value[0][1] * y + 0 * 0, this._value[1][0] * x + this._value[1][1] * y + 0 * 0);
-        return this;
-    };
-    Matrix.prototype.equalTo = function (another) {
-        return this._value[0][0] === another[0][0] &&
-            this._value[0][1] === another[0][1] &&
-            this._value[0][2] === another[0][2] &&
-            this._value[1][0] === another[1][0] &&
-            this._value[1][1] === another[1][1] &&
-            this._value[1][2] === another[1][2];
-    };
-    Matrix.prototype.invertFrom = function (source) {
-        var a_minor = source[1][1] * 1 - source[1][2] * 0;
-        var b_minor = source[1][0] * 1 - source[1][2] * 0;
-        var c_minor = source[1][0] * 0 - source[1][1] * 0;
-        var d_minor = source[0][1] * 1 - source[0][2] * 0;
-        var e_minor = source[0][0] * 1 - source[0][2] * 0;
-        var g_minor = source[0][1] * source[1][2] - source[0][2] * source[1][1];
-        var h_minor = source[0][0] * source[1][2] - source[0][2] * source[1][0];
-        var inverseDeterminant = 1 / (source[0][0] * a_minor - source[0][1] * b_minor + source[0][2] * c_minor);
-        this._value[0][0] = inverseDeterminant * a_minor;
-        this._value[0][1] = inverseDeterminant * -d_minor;
-        this._value[0][2] = inverseDeterminant * g_minor;
-        this._value[1][0] = inverseDeterminant * -b_minor;
-        this._value[1][1] = inverseDeterminant * e_minor;
-        this._value[1][2] = inverseDeterminant * -h_minor;
-        return this;
-    };
-    Matrix.prototype.getInverse = function () {
-        return new Matrix().invertFrom(this);
-    };
-    Matrix.prototype.clone = function () {
-        return new Matrix(this._value);
-    };
-    Matrix.prototype.destroy = function () {
-        this._canRecycle = true;
-    };
-    Matrix.prototype.toString = function () {
-        var matrixString = "[" + this[0] + "][" + this[1] + "]";
-        return "Matrix " + matrixString;
-    };
-    Matrix.pool = new Pool_1.Pool(function (value) { return new Matrix(value); }, Infinity, 64);
-    Matrix.Identity = new Matrix();
-    return Matrix;
-}());
-exports.Matrix = Matrix;
-
-
-/***/ }),
-/* 71 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-Object.defineProperty(exports, "__esModule", { value: true });
-var ArrayUtility_1 = __webpack_require__(7);
-var ReadonlyTree = (function () {
-    function ReadonlyTree(data, _children) {
-        if (_children === void 0) { _children = []; }
-        this.data = data;
-        this._children = _children;
-        this._parent = null;
-    }
-    Object.defineProperty(ReadonlyTree.prototype, "parent", {
-        get: function () { return this._parent; },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(ReadonlyTree.prototype, "isRoot", {
-        get: function () { return !this._parent; },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(ReadonlyTree.prototype, "isLeaf", {
-        get: function () { return this._children.length === 0; },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(ReadonlyTree.prototype, "length", {
-        get: function () { return this._children.length; },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(ReadonlyTree.prototype, "children", {
-        get: function () { return this._children; },
-        enumerable: true,
-        configurable: true
-    });
-    ReadonlyTree.prototype.hasChild = function (child) {
-        var stack = this._children.slice();
-        var current = stack.pop();
-        while (current) {
-            for (var i = current.children.length - 1; i > -1; i--) {
-                stack.push(current.children[i]);
-            }
-            if (current === child) {
-                return true;
-            }
-            current = stack.pop();
-        }
-        return false;
-    };
-    ReadonlyTree.prototype.forEachChildren = function (callback) {
-        var stack = this._children.slice();
-        var current = stack.pop();
-        while (current) {
-            for (var i = current.children.length - 1; i > -1; i--) {
-                stack.push(current.children[i]);
-            }
-            callback(current.data);
-            current = stack.pop();
-        }
-    };
-    ReadonlyTree.prototype.findParent = function (condition) {
-        var parent = this.parent;
-        while (parent) {
-            if (condition(parent.data)) {
-                return parent.data;
-            }
-            else {
-                parent = parent.parent;
-            }
-        }
-        return null;
-    };
-    return ReadonlyTree;
-}());
-exports.ReadonlyTree = ReadonlyTree;
-var Tree = (function (_super) {
-    __extends(Tree, _super);
-    function Tree() {
-        return _super !== null && _super.apply(this, arguments) || this;
-    }
-    Tree.prototype.add = function (child) {
-        child._parent = this;
-        return ArrayUtility_1.addToArray(this._children, child);
-    };
-    Tree.prototype.remove = function (child) {
-        child._parent = null;
-        return ArrayUtility_1.removeFromArray(this._children, child);
-    };
-    Tree.prototype.hide = function () {
-        if (!this.parent) {
-            return false;
-        }
-        return ArrayUtility_1.removeFromArray(this.parent._children, this);
-    };
-    Tree.prototype.show = function () {
-        if (!this.parent) {
-            return false;
-        }
-        return ArrayUtility_1.addToArray(this.parent._children, this);
-    };
-    return Tree;
-}(ReadonlyTree));
-exports.Tree = Tree;
-
-
-/***/ }),
-/* 72 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-var Vector_1 = __webpack_require__(1);
-var Pool_1 = __webpack_require__(38);
-var ForceMode_1 = __webpack_require__(25);
+var Pool_1 = __webpack_require__(54);
+var ForceMode_1 = __webpack_require__(38);
 var CollisionContact = (function () {
     function CollisionContact(colliderA, colliderB, mtv, point, normal) {
         this.colliderA = colliderA;
@@ -5617,7 +5333,7 @@ var CollisionContact = (function () {
         this._resolved = false;
     }
     CollisionContact.Get = function (colliderA, colliderB, mtv, point, normal) {
-        return this.pool.get(colliderA, colliderB, mtv, point, normal);
+        return this.pool.get().reset(colliderA, colliderB, mtv, point, normal);
     };
     CollisionContact.Put = function (collisionContact) { this.pool.put(collisionContact); };
     Object.defineProperty(CollisionContact.prototype, "canRecycle", {
@@ -5655,6 +5371,17 @@ var CollisionContact = (function () {
             .subtract(relativeA.cross(-angularVelocityA));
         var rvDotNormal = relativeVelocity.dot(this.normal);
         if (rvDotNormal > 0) {
+            return;
+        }
+        var aIsTrigger = this.colliderA.isTigger;
+        var bIsTrigger = this.colliderB.isTigger;
+        if (aIsTrigger || bIsTrigger) {
+            if (aIsTrigger) {
+                this.colliderA.onTrigger(this.colliderB);
+            }
+            if (bIsTrigger) {
+                this.colliderB.onTrigger(this.colliderA);
+            }
             return;
         }
         var restitution = Math.min(this.colliderA.restitution, this.colliderB.restitution);
@@ -5707,292 +5434,40 @@ var CollisionContact = (function () {
             bodyB.addForce(frictionImpulse, ForceMode_1.ForceMode.Impulse);
             bodyB.addTorque(frictionImpulse.dot(t) * relativeB.cross(t), ForceMode_1.ForceMode.Impulse);
         }
-        if (this.colliderA.isTigger) {
-            this.colliderA.onTrigger(this.colliderB);
-        }
-        else {
-            this.colliderA.onCollide(this);
-        }
-        if (this.colliderB.isTigger) {
-            this.colliderB.onTrigger(this.colliderA);
-        }
-        else {
-            this.colliderB.onCollide(this);
-        }
+        this.colliderA.onCollide(this);
+        this.colliderB.onCollide(this);
     };
     CollisionContact.prototype.destroy = function () {
         this._canRecycle = true;
     };
     CollisionContact.prototype.reset = function (colliderA, colliderB, mtv, point, normal) {
-        this.colliderA = colliderA;
-        this.colliderB = colliderB;
-        this.mtv = mtv;
-        this.point = point;
-        this.normal = normal;
+        this.colliderA = colliderA || this.colliderA;
+        this.colliderB = colliderB || this.colliderB;
+        this.mtv = mtv || this.mtv;
+        this.point = point || this.point;
+        this.normal = normal || this.normal;
+        return this;
     };
-    CollisionContact.pool = new Pool_1.Pool(function (colliderA, colliderB, mtv, point, normal) { return new CollisionContact(colliderA, colliderB, mtv, point, normal); });
+    CollisionContact.pool = new Pool_1.Pool(CollisionContact, Infinity, 128);
     return CollisionContact;
 }());
 exports.CollisionContact = CollisionContact;
 
 
 /***/ }),
-/* 73 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.NarrowPhaseCollisionResolver = Symbol('NarrowPhaseCollisionResolver');
-
-
-/***/ }),
-/* 74 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-var BehaviorSubject_1 = __webpack_require__(121);
-var Resource = (function () {
-    function Resource() {
-        this._isLoaded = new BehaviorSubject_1.BehaviorSubject(false);
-    }
-    Object.defineProperty(Resource.prototype, "isLoaded", {
-        get: function () { return this._isLoaded.value; },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Resource.prototype, "isLoaded$", {
-        get: function () {
-            return this._isLoaded.asObservable()
-                .filter(function (isLoad) { return isLoad; })
-                .map(function () { return void 0; });
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Resource.prototype.destroy = function () {
-        this._isLoaded.complete();
-    };
-    return Resource;
-}());
-exports.Resource = Resource;
-
-
-/***/ }),
-/* 75 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __metadata = (this && this.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
-var __param = (this && this.__param) || function (paramIndex, decorator) {
-    return function (target, key) { decorator(target, key, paramIndex); }
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-var GameObject_1 = __webpack_require__(2);
-var Screen_1 = __webpack_require__(17);
-var GameObjectInitializer_1 = __webpack_require__(39);
-var Color_1 = __webpack_require__(8);
-var Bounds_1 = __webpack_require__(30);
-var Rect_1 = __webpack_require__(76);
-var Matrix_1 = __webpack_require__(70);
-var Type_1 = __webpack_require__(13);
-var BrowserDelegate_1 = __webpack_require__(5);
-var Service_1 = __webpack_require__(3);
-var Inject_1 = __webpack_require__(0);
-exports.MainCamera = Symbol('MainCamera');
-var Camera = (function (_super) {
-    __extends(Camera, _super);
-    function Camera(browser, screen, gameObjectInitializer) {
-        var _this = _super.call(this, gameObjectInitializer) || this;
-        _this.aspect = 16 / 9;
-        _this.backgroundColor = Color_1.Color.Black;
-        _this.toWorldMatrix = new Matrix_1.Matrix();
-        _this.toScreenMatrix = new Matrix_1.Matrix();
-        _this.cullingMask = Type_1.AllBuiltInLayer;
-        _this.eventMask = Type_1.AllBuiltInLayer;
-        _this.rect = new Rect_1.Rect();
-        _this.bounds = new Bounds_1.Bounds();
-        _this.setSize(screen.width, screen.height);
-        return _this;
-    }
-    Camera.prototype.setSize = function (width, height) {
-        this.toScreenMatrix.reset();
-        this.rect.width = width;
-        this.rect.height = height;
-        var halfWidth = width * 0.5;
-        var halfHeight = height * 0.5;
-        this.toScreenMatrix.setTranslation(halfWidth, halfHeight);
-        this.toScreenMatrix.setScaling(0, -1);
-        this.bounds.extents.setTo(halfWidth, halfHeight);
-    };
-    Camera.prototype.update = function () {
-        _super.prototype.update.call(this);
-        this.toScreenMatrix.save();
-        this.toScreenMatrix.setTranslation(-this.transform.position.x, -this.transform.position.y);
-        this.toScreenMatrix.setRotatation(this.transform.rotation);
-        this.toScreenMatrix.setScaling(this.transform.scale);
-        this.toWorldMatrix.invertFrom(this.toScreenMatrix);
-        this.bounds.center.copy(this.transform.position);
-    };
-    Camera.prototype.postRender = function () {
-        _super.prototype.postRender.call(this);
-        this.toScreenMatrix.restore();
-    };
-    Camera.prototype.screenToWorld = function (point) {
-        var result = point.clone();
-        this.toWorldMatrix.multiplyToPoint(result);
-        return result;
-    };
-    Camera.prototype.worldToScreen = function (point) {
-        var result = point.clone();
-        this.toScreenMatrix.multiplyToPoint(result);
-        return result;
-    };
-    Camera = __decorate([
-        Service_1.Service(exports.MainCamera),
-        __param(0, Inject_1.Inject(BrowserDelegate_1.BrowserDelegate)),
-        __param(1, Inject_1.Inject(Screen_1.Screen)),
-        __param(2, Inject_1.Inject(GameObjectInitializer_1.GameObjectInitializer)),
-        __metadata("design:paramtypes", [Object, Object, Object])
-    ], Camera);
-    return Camera;
-}(GameObject_1.GameObject));
-exports.Camera = Camera;
-
-
-/***/ }),
-/* 76 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-var Vector_1 = __webpack_require__(1);
-var Rect = (function () {
-    function Rect(position, width, height) {
-        if (position === void 0) { position = new Vector_1.Vector(); }
-        if (width === void 0) { width = 0; }
-        if (height === void 0) { height = 0; }
-        this.position = position;
-        this.width = width;
-        this.height = height;
-    }
-    Object.defineProperty(Rect.prototype, "center", {
-        get: function () {
-            return new Vector_1.Vector(this.position.x + this.width / 2, this.position.y + this.height / 2);
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Rect.prototype, "xMin", {
-        get: function () { return this.position.x; },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Rect.prototype, "xMax", {
-        get: function () { return this.position.x + this.width; },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Rect.prototype, "yMin", {
-        get: function () { return this.position.y; },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Rect.prototype, "yMax", {
-        get: function () { return this.position.y + this.height; },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Rect.prototype, "min", {
-        get: function () {
-            return new Vector_1.Vector(this.xMin, this.yMin);
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Rect.prototype, "max", {
-        get: function () {
-            return new Vector_1.Vector(this.xMax, this.yMax);
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Rect.prototype.contains = function (point) {
-        if (point.x < this.position.x) {
-            return false;
-        }
-        if (point.y < this.position.y) {
-            return false;
-        }
-        if (point.x > this.position.x + this.width) {
-            return false;
-        }
-        if (point.y > this.position.y + this.height) {
-            return false;
-        }
-        return true;
-    };
-    Rect.prototype.overlap = function (another) {
-        if (this.xMax < another.xMin || this.xMin > another.xMax) {
-            return false;
-        }
-        if (this.yMax < another.yMin || this.yMin > another.yMax) {
-            return false;
-        }
-        return true;
-    };
-    return Rect;
-}());
-exports.Rect = Rect;
-
-
-/***/ }),
-/* 77 */,
-/* 78 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-__webpack_require__(79);
-__webpack_require__(95);
-__webpack_require__(98);
-__webpack_require__(100);
-__webpack_require__(64);
-
-
-/***/ }),
+/* 78 */,
 /* 79 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-var Observable_1 = __webpack_require__(4);
-var merge_1 = __webpack_require__(83);
-Observable_1.Observable.merge = merge_1.merge;
-//# sourceMappingURL=merge.js.map
+Object.defineProperty(exports, "__esModule", { value: true });
+__webpack_require__(80);
+__webpack_require__(94);
+__webpack_require__(97);
+__webpack_require__(99);
+__webpack_require__(74);
+
 
 /***/ }),
 /* 80 */
@@ -6000,9 +5475,20 @@ Observable_1.Observable.merge = merge_1.merge;
 
 "use strict";
 
-var Subscriber_1 = __webpack_require__(22);
-var rxSubscriber_1 = __webpack_require__(46);
-var Observer_1 = __webpack_require__(61);
+var Observable_1 = __webpack_require__(7);
+var merge_1 = __webpack_require__(84);
+Observable_1.Observable.merge = merge_1.merge;
+//# sourceMappingURL=merge.js.map
+
+/***/ }),
+/* 81 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var Subscriber_1 = __webpack_require__(29);
+var rxSubscriber_1 = __webpack_require__(59);
+var Observer_1 = __webpack_require__(69);
 function toSubscriber(nextOrObserver, error, complete) {
     if (nextOrObserver) {
         if (nextOrObserver instanceof Subscriber_1.Subscriber) {
@@ -6021,7 +5507,7 @@ exports.toSubscriber = toSubscriber;
 //# sourceMappingURL=toSubscriber.js.map
 
 /***/ }),
-/* 81 */
+/* 82 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6030,7 +5516,7 @@ exports.isArray = Array.isArray || (function (x) { return x && typeof x.length =
 //# sourceMappingURL=isArray.js.map
 
 /***/ }),
-/* 82 */
+/* 83 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6061,25 +5547,25 @@ exports.UnsubscriptionError = UnsubscriptionError;
 //# sourceMappingURL=UnsubscriptionError.js.map
 
 /***/ }),
-/* 83 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-var merge_1 = __webpack_require__(84);
-exports.merge = merge_1.mergeStatic;
-//# sourceMappingURL=merge.js.map
-
-/***/ }),
 /* 84 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-var Observable_1 = __webpack_require__(4);
-var ArrayObservable_1 = __webpack_require__(85);
-var mergeAll_1 = __webpack_require__(88);
-var isScheduler_1 = __webpack_require__(63);
+var merge_1 = __webpack_require__(85);
+exports.merge = merge_1.mergeStatic;
+//# sourceMappingURL=merge.js.map
+
+/***/ }),
+/* 85 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var Observable_1 = __webpack_require__(7);
+var ArrayObservable_1 = __webpack_require__(86);
+var mergeAll_1 = __webpack_require__(89);
+var isScheduler_1 = __webpack_require__(71);
 /* tslint:enable:max-line-length */
 /**
  * Creates an output Observable which concurrently emits all values from every
@@ -6222,7 +5708,7 @@ exports.mergeStatic = mergeStatic;
 //# sourceMappingURL=merge.js.map
 
 /***/ }),
-/* 85 */
+/* 86 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6232,10 +5718,10 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var Observable_1 = __webpack_require__(4);
-var ScalarObservable_1 = __webpack_require__(86);
-var EmptyObservable_1 = __webpack_require__(87);
-var isScheduler_1 = __webpack_require__(63);
+var Observable_1 = __webpack_require__(7);
+var ScalarObservable_1 = __webpack_require__(87);
+var EmptyObservable_1 = __webpack_require__(88);
+var isScheduler_1 = __webpack_require__(71);
 /**
  * We need this JSDoc comment for affecting ESDoc.
  * @extends {Ignored}
@@ -6350,7 +5836,7 @@ exports.ArrayObservable = ArrayObservable;
 //# sourceMappingURL=ArrayObservable.js.map
 
 /***/ }),
-/* 86 */
+/* 87 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6360,7 +5846,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var Observable_1 = __webpack_require__(4);
+var Observable_1 = __webpack_require__(7);
 /**
  * We need this JSDoc comment for affecting ESDoc.
  * @extends {Ignored}
@@ -6414,7 +5900,7 @@ exports.ScalarObservable = ScalarObservable;
 //# sourceMappingURL=ScalarObservable.js.map
 
 /***/ }),
-/* 87 */
+/* 88 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6424,7 +5910,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var Observable_1 = __webpack_require__(4);
+var Observable_1 = __webpack_require__(7);
 /**
  * We need this JSDoc comment for affecting ESDoc.
  * @extends {Ignored}
@@ -6501,7 +5987,7 @@ exports.EmptyObservable = EmptyObservable;
 //# sourceMappingURL=EmptyObservable.js.map
 
 /***/ }),
-/* 88 */
+/* 89 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6511,8 +5997,8 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var OuterSubscriber_1 = __webpack_require__(89);
-var subscribeToResult_1 = __webpack_require__(90);
+var OuterSubscriber_1 = __webpack_require__(72);
+var subscribeToResult_1 = __webpack_require__(73);
 /**
  * Converts a higher-order Observable into a first-order Observable which
  * concurrently delivers all values that are emitted on the inner Observables.
@@ -6618,127 +6104,7 @@ exports.MergeAllSubscriber = MergeAllSubscriber;
 //# sourceMappingURL=mergeAll.js.map
 
 /***/ }),
-/* 89 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
-var Subscriber_1 = __webpack_require__(22);
-/**
- * We need this JSDoc comment for affecting ESDoc.
- * @ignore
- * @extends {Ignored}
- */
-var OuterSubscriber = (function (_super) {
-    __extends(OuterSubscriber, _super);
-    function OuterSubscriber() {
-        _super.apply(this, arguments);
-    }
-    OuterSubscriber.prototype.notifyNext = function (outerValue, innerValue, outerIndex, innerIndex, innerSub) {
-        this.destination.next(innerValue);
-    };
-    OuterSubscriber.prototype.notifyError = function (error, innerSub) {
-        this.destination.error(error);
-    };
-    OuterSubscriber.prototype.notifyComplete = function (innerSub) {
-        this.destination.complete();
-    };
-    return OuterSubscriber;
-}(Subscriber_1.Subscriber));
-exports.OuterSubscriber = OuterSubscriber;
-//# sourceMappingURL=OuterSubscriber.js.map
-
-/***/ }),
 /* 90 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-var root_1 = __webpack_require__(28);
-var isArrayLike_1 = __webpack_require__(91);
-var isPromise_1 = __webpack_require__(92);
-var isObject_1 = __webpack_require__(59);
-var Observable_1 = __webpack_require__(4);
-var iterator_1 = __webpack_require__(93);
-var InnerSubscriber_1 = __webpack_require__(94);
-var observable_1 = __webpack_require__(62);
-function subscribeToResult(outerSubscriber, result, outerValue, outerIndex) {
-    var destination = new InnerSubscriber_1.InnerSubscriber(outerSubscriber, outerValue, outerIndex);
-    if (destination.closed) {
-        return null;
-    }
-    if (result instanceof Observable_1.Observable) {
-        if (result._isScalar) {
-            destination.next(result.value);
-            destination.complete();
-            return null;
-        }
-        else {
-            return result.subscribe(destination);
-        }
-    }
-    else if (isArrayLike_1.isArrayLike(result)) {
-        for (var i = 0, len = result.length; i < len && !destination.closed; i++) {
-            destination.next(result[i]);
-        }
-        if (!destination.closed) {
-            destination.complete();
-        }
-    }
-    else if (isPromise_1.isPromise(result)) {
-        result.then(function (value) {
-            if (!destination.closed) {
-                destination.next(value);
-                destination.complete();
-            }
-        }, function (err) { return destination.error(err); })
-            .then(null, function (err) {
-            // Escaping the Promise trap: globally throw unhandled errors
-            root_1.root.setTimeout(function () { throw err; });
-        });
-        return destination;
-    }
-    else if (result && typeof result[iterator_1.iterator] === 'function') {
-        var iterator = result[iterator_1.iterator]();
-        do {
-            var item = iterator.next();
-            if (item.done) {
-                destination.complete();
-                break;
-            }
-            destination.next(item.value);
-            if (destination.closed) {
-                break;
-            }
-        } while (true);
-    }
-    else if (result && typeof result[observable_1.observable] === 'function') {
-        var obs = result[observable_1.observable]();
-        if (typeof obs.subscribe !== 'function') {
-            destination.error(new TypeError('Provided object does not correctly implement Symbol.observable'));
-        }
-        else {
-            return obs.subscribe(new InnerSubscriber_1.InnerSubscriber(outerSubscriber, outerValue, outerIndex));
-        }
-    }
-    else {
-        var value = isObject_1.isObject(result) ? 'an invalid object' : "'" + result + "'";
-        var msg = ("You provided " + value + " where a stream was expected.")
-            + ' You can provide an Observable, Promise, Array, or Iterable.';
-        destination.error(new TypeError(msg));
-    }
-    return null;
-}
-exports.subscribeToResult = subscribeToResult;
-//# sourceMappingURL=subscribeToResult.js.map
-
-/***/ }),
-/* 91 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6747,7 +6113,7 @@ exports.isArrayLike = (function (x) { return x && typeof x.length === 'number'; 
 //# sourceMappingURL=isArrayLike.js.map
 
 /***/ }),
-/* 92 */
+/* 91 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6759,12 +6125,12 @@ exports.isPromise = isPromise;
 //# sourceMappingURL=isPromise.js.map
 
 /***/ }),
-/* 93 */
+/* 92 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-var root_1 = __webpack_require__(28);
+var root_1 = __webpack_require__(35);
 function symbolIteratorPonyfill(root) {
     var Symbol = root.Symbol;
     if (typeof Symbol === 'function') {
@@ -6803,7 +6169,7 @@ exports.$$iterator = exports.iterator;
 //# sourceMappingURL=iterator.js.map
 
 /***/ }),
-/* 94 */
+/* 93 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6813,7 +6179,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var Subscriber_1 = __webpack_require__(22);
+var Subscriber_1 = __webpack_require__(29);
 /**
  * We need this JSDoc comment for affecting ESDoc.
  * @ignore
@@ -6845,28 +6211,28 @@ exports.InnerSubscriber = InnerSubscriber;
 //# sourceMappingURL=InnerSubscriber.js.map
 
 /***/ }),
+/* 94 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var Observable_1 = __webpack_require__(7);
+var fromEvent_1 = __webpack_require__(95);
+Observable_1.Observable.fromEvent = fromEvent_1.fromEvent;
+//# sourceMappingURL=fromEvent.js.map
+
+/***/ }),
 /* 95 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-var Observable_1 = __webpack_require__(4);
-var fromEvent_1 = __webpack_require__(96);
-Observable_1.Observable.fromEvent = fromEvent_1.fromEvent;
-//# sourceMappingURL=fromEvent.js.map
-
-/***/ }),
-/* 96 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-var FromEventObservable_1 = __webpack_require__(97);
+var FromEventObservable_1 = __webpack_require__(96);
 exports.fromEvent = FromEventObservable_1.FromEventObservable.create;
 //# sourceMappingURL=fromEvent.js.map
 
 /***/ }),
-/* 97 */
+/* 96 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6876,11 +6242,11 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var Observable_1 = __webpack_require__(4);
-var tryCatch_1 = __webpack_require__(60);
-var isFunction_1 = __webpack_require__(44);
-var errorObject_1 = __webpack_require__(45);
-var Subscription_1 = __webpack_require__(37);
+var Observable_1 = __webpack_require__(7);
+var tryCatch_1 = __webpack_require__(68);
+var isFunction_1 = __webpack_require__(57);
+var errorObject_1 = __webpack_require__(58);
+var Subscription_1 = __webpack_require__(41);
 var toString = Object.prototype.toString;
 function isNodeStyleEventEmitter(sourceObj) {
     return !!sourceObj && typeof sourceObj.addListener === 'function' && typeof sourceObj.removeListener === 'function';
@@ -7012,18 +6378,18 @@ exports.FromEventObservable = FromEventObservable;
 //# sourceMappingURL=FromEventObservable.js.map
 
 /***/ }),
-/* 98 */
+/* 97 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-var Observable_1 = __webpack_require__(4);
-var map_1 = __webpack_require__(99);
+var Observable_1 = __webpack_require__(7);
+var map_1 = __webpack_require__(98);
 Observable_1.Observable.prototype.map = map_1.map;
 //# sourceMappingURL=map.js.map
 
 /***/ }),
-/* 99 */
+/* 98 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7033,7 +6399,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var Subscriber_1 = __webpack_require__(22);
+var Subscriber_1 = __webpack_require__(29);
 /**
  * Applies a given `project` function to each value emitted by the source
  * Observable, and emits the resulting values as an Observable.
@@ -7116,18 +6482,18 @@ var MapSubscriber = (function (_super) {
 //# sourceMappingURL=map.js.map
 
 /***/ }),
-/* 100 */
+/* 99 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-var Observable_1 = __webpack_require__(4);
-var filter_1 = __webpack_require__(101);
+var Observable_1 = __webpack_require__(7);
+var filter_1 = __webpack_require__(100);
 Observable_1.Observable.prototype.filter = filter_1.filter;
 //# sourceMappingURL=filter.js.map
 
 /***/ }),
-/* 101 */
+/* 100 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7137,7 +6503,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var Subscriber_1 = __webpack_require__(22);
+var Subscriber_1 = __webpack_require__(29);
 /* tslint:enable:max-line-length */
 /**
  * Filter items emitted by the source Observable by only emitting those that
@@ -7225,7 +6591,7 @@ var FilterSubscriber = (function (_super) {
 //# sourceMappingURL=filter.js.map
 
 /***/ }),
-/* 102 */
+/* 101 */
 /***/ (function(module, exports) {
 
 // shim for using process in browser
@@ -7415,7 +6781,7 @@ process.umask = function() { return 0; };
 
 
 /***/ }),
-/* 103 */
+/* 102 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7469,13 +6835,13 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var Inject_1 = __webpack_require__(0);
-var Screen_1 = __webpack_require__(17);
-var SceneManager_1 = __webpack_require__(18);
-var BrowserDelegate_1 = __webpack_require__(5);
-var Time_1 = __webpack_require__(9);
+var Screen_1 = __webpack_require__(11);
+var SceneManager_1 = __webpack_require__(42);
+var BrowserDelegate_1 = __webpack_require__(2);
+var Time_1 = __webpack_require__(12);
 var Vector_1 = __webpack_require__(1);
-var Service_1 = __webpack_require__(3);
-var Engine_1 = __webpack_require__(23);
+var Service_1 = __webpack_require__(5);
+var Engine_1 = __webpack_require__(36);
 var EngineImplement = (function () {
     function EngineImplement(screen, time, sceneManager, browser) {
         this.screen = screen;
@@ -7496,17 +6862,16 @@ var EngineImplement = (function () {
         enumerable: true,
         configurable: true
     });
-    EngineImplement.prototype.initialize = function () {
+    EngineImplement.prototype.initialize = function (initialScene) {
         return __awaiter(this, void 0, void 0, function () {
             var _this = this;
-            var _a, width, height, err_1;
+            var _a, width, height;
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0:
                         if (this.isInitialized) {
                             throw new Error('Repeated engine initialization.');
                         }
-                        this.check();
                         this.isInitialized = true;
                         _a = this.screen, width = _a.width, height = _a.height;
                         this.canvas.width = width;
@@ -7514,19 +6879,10 @@ var EngineImplement = (function () {
                         this.browser.document.body.appendChild(this.canvas);
                         this.browser.resize$.subscribe(function (e) { return _this.onResize(e); });
                         this.sceneManager.sceneLoaded$.subscribe(function (s) { return _this.onSceneLoaded(s); });
-                        _b.label = 1;
+                        return [4, this.sceneManager.switchTo(initialScene)];
                     case 1:
-                        _b.trys.push([1, 3, , 4]);
-                        return [4, this.sceneManager.currentScene.load()];
-                    case 2:
                         _b.sent();
-                        return [3, 4];
-                    case 3:
-                        err_1 = _b.sent();
-                        console.error(err_1);
-                        return [3, 4];
-                    case 4:
-                        this.currentScene = this.sceneManager.currentScene;
+                        this.currentScene = initialScene;
                         this.resume();
                         return [2];
                 }
@@ -7540,11 +6896,6 @@ var EngineImplement = (function () {
         this._isPaused = false;
         requestAnimationFrame(this.bindedmainloop);
     };
-    EngineImplement.prototype.check = function () {
-        if (!this.sceneManager.currentScene) {
-            throw new Error('No active scene');
-        }
-    };
     EngineImplement.prototype.mainloop = function (timestamp) {
         if (this._isPaused) {
             return;
@@ -7556,12 +6907,14 @@ var EngineImplement = (function () {
             this.accumulator = 200;
         }
         while (this.accumulator > this.time.fixedDeltaTime) {
-            this.time.tick(frameTime);
-            this.currentScene.fixedUpdate(1);
+            this.time.fixedUpdate(frameTime, 1);
+            this.currentScene.fixedUpdate();
             this.accumulator -= this.time.fixedDeltaTime;
         }
-        this.currentScene.fixedUpdate(this.accumulator / this.time.fixedDeltaTime);
+        this.time.fixedUpdate(frameTime, this.accumulator / this.time.fixedDeltaTime);
+        this.currentScene.fixedUpdate();
         this.accumulator = 0;
+        this.time.update(frameTime);
         this.currentScene.update();
         this.currentScene.lateUpdate();
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -7592,7 +6945,7 @@ exports.EngineImplement = EngineImplement;
 
 
 /***/ }),
-/* 104 */
+/* 103 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7604,8 +6957,9 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var Service_1 = __webpack_require__(3);
-var GameObjectInitializer_1 = __webpack_require__(39);
+var GameObject_1 = __webpack_require__(3);
+var Service_1 = __webpack_require__(5);
+var GameObjectInitializer_1 = __webpack_require__(20);
 var GameObjectInitializerImplement = (function () {
     function GameObjectInitializerImplement() {
         this.queue = [];
@@ -7621,7 +6975,7 @@ var GameObjectInitializerImplement = (function () {
     GameObjectInitializerImplement.prototype.resolve = function () {
         var gameObject = this.queue.shift();
         while (gameObject) {
-            gameObject.initialize();
+            GameObject_1.GameObject.Initialize(gameObject);
             gameObject = this.queue.shift();
         }
     };
@@ -7634,7 +6988,7 @@ exports.GameObjectInitializerImplement = GameObjectInitializerImplement;
 
 
 /***/ }),
-/* 105 */
+/* 104 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7681,13 +7035,12 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var Subject_1 = __webpack_require__(29);
-var ArrayUtility_1 = __webpack_require__(7);
-var Service_1 = __webpack_require__(3);
-var SceneManager_1 = __webpack_require__(18);
+var Subject_1 = __webpack_require__(45);
+var Service_1 = __webpack_require__(5);
+var SceneManager_1 = __webpack_require__(42);
 var SceneManagerImplement = (function () {
     function SceneManagerImplement() {
-        this.scenes = [];
+        this.scenes = new Set();
         this._isLoading = false;
         this.sceneLoaded = new Subject_1.Subject();
         this.sceneUnloaded = new Subject_1.Subject();
@@ -7725,42 +7078,51 @@ var SceneManagerImplement = (function () {
         configurable: true
     });
     SceneManagerImplement.prototype.add = function (scene) {
-        if (!ArrayUtility_1.addToArray(this.scenes, scene)) {
+        if (!this.scenes.has(scene)) {
             return false;
         }
-        if (!this._currentScene) {
-            this._currentScene = scene;
-        }
+        this.scenes.add(scene);
         return true;
     };
     SceneManagerImplement.prototype.remove = function (scene) {
         if (this._currentScene === scene) {
             throw new Error('Cannot remove current scene.');
         }
-        return ArrayUtility_1.removeFromArray(this.scenes, scene);
+        return this.scenes.delete(scene);
     };
     SceneManagerImplement.prototype.switchTo = function (scene) {
         return __awaiter(this, void 0, void 0, function () {
-            var _this = this;
             return __generator(this, function (_a) {
-                if (!ArrayUtility_1.includeInArray(this.scenes, scene)) {
-                    this.add(scene);
+                switch (_a.label) {
+                    case 0:
+                        if (this._isLoading) {
+                            throw new Error('Cannot switch scene while loading');
+                        }
+                        if (!this.scenes.has(scene)) {
+                            this.add(scene);
+                        }
+                        if (this._currentScene === scene) {
+                            return [2];
+                        }
+                        if (!!scene.isLoaded) return [3, 2];
+                        this._isLoading = true;
+                        this.sceneWillLoad.next(scene);
+                        return [4, scene.load()];
+                    case 1:
+                        _a.sent();
+                        _a.label = 2;
+                    case 2:
+                        if (this._currentScene) {
+                            this.sceneWillUnload.next(this._currentScene);
+                            this._currentScene.deactivate();
+                            this.sceneUnloaded.next(this._currentScene);
+                        }
+                        this._isLoading = false;
+                        this._currentScene = scene;
+                        scene.start();
+                        this.sceneLoaded.next(scene);
+                        return [2];
                 }
-                if (this._currentScene === scene) {
-                    return [2, Promise.resolve()];
-                }
-                this._isLoading = true;
-                if (this._currentScene) {
-                    this.sceneWillUnload.next(this._currentScene);
-                }
-                this.sceneWillLoad.next(scene);
-                return [2, (scene.isLoaded ? Promise.resolve() : scene.load()).then(function () {
-                        _this._currentScene.deactivate();
-                        _this.sceneUnloaded.next(_this._currentScene);
-                        _this._currentScene = scene;
-                        _this._isLoading = false;
-                        _this.sceneLoaded.next(_this._currentScene);
-                    })];
             });
         });
     };
@@ -7773,6 +7135,39 @@ exports.SceneManagerImplement = SceneManagerImplement;
 
 
 /***/ }),
+/* 105 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+/**
+ * An error thrown when an action is invalid because the object has been
+ * unsubscribed.
+ *
+ * @see {@link Subject}
+ * @see {@link BehaviorSubject}
+ *
+ * @class ObjectUnsubscribedError
+ */
+var ObjectUnsubscribedError = (function (_super) {
+    __extends(ObjectUnsubscribedError, _super);
+    function ObjectUnsubscribedError() {
+        var err = _super.call(this, 'object unsubscribed');
+        this.name = err.name = 'ObjectUnsubscribedError';
+        this.stack = err.stack;
+        this.message = err.message;
+    }
+    return ObjectUnsubscribedError;
+}(Error));
+exports.ObjectUnsubscribedError = ObjectUnsubscribedError;
+//# sourceMappingURL=ObjectUnsubscribedError.js.map
+
+/***/ }),
 /* 106 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -7783,7 +7178,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var Subscription_1 = __webpack_require__(37);
+var Subscription_1 = __webpack_require__(41);
 /**
  * We need this JSDoc comment for affecting ESDoc.
  * @ignore
@@ -7837,11 +7232,11 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var Service_1 = __webpack_require__(3);
-var Logger_1 = __webpack_require__(48);
-var Color_1 = __webpack_require__(8);
+var Service_1 = __webpack_require__(5);
+var Logger_1 = __webpack_require__(30);
+var Color_1 = __webpack_require__(6);
 var Inject_1 = __webpack_require__(0);
-var Time_1 = __webpack_require__(9);
+var Time_1 = __webpack_require__(12);
 var LoggerImplement = (function () {
     function LoggerImplement(time) {
         this.time = time;
@@ -7911,9 +7306,9 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var BrowserDelegate_1 = __webpack_require__(5);
-var Service_1 = __webpack_require__(3);
-var Screen_1 = __webpack_require__(17);
+var BrowserDelegate_1 = __webpack_require__(2);
+var Service_1 = __webpack_require__(5);
+var Screen_1 = __webpack_require__(11);
 var Inject_1 = __webpack_require__(0);
 var ScreenImplement = (function () {
     function ScreenImplement(browserDelegate) {
@@ -7976,9 +7371,9 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var BrowserDelegate_1 = __webpack_require__(5);
-var Service_1 = __webpack_require__(3);
-var KeyboardInput_1 = __webpack_require__(40);
+var BrowserDelegate_1 = __webpack_require__(2);
+var Service_1 = __webpack_require__(5);
+var KeyboardInput_1 = __webpack_require__(60);
 var Inject_1 = __webpack_require__(0);
 var KeyboardInputImplement = (function () {
     function KeyboardInputImplement(browserDelegate) {
@@ -8023,9 +7418,9 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var BrowserDelegate_1 = __webpack_require__(5);
-var Service_1 = __webpack_require__(3);
-var MouseInput_1 = __webpack_require__(66);
+var BrowserDelegate_1 = __webpack_require__(2);
+var Service_1 = __webpack_require__(5);
+var MouseInput_1 = __webpack_require__(75);
 var Inject_1 = __webpack_require__(0);
 var MouseInputImplement = (function () {
     function MouseInputImplement(browserDelegate) {
@@ -8085,9 +7480,9 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var BrowserDelegate_1 = __webpack_require__(5);
-var Service_1 = __webpack_require__(3);
-var TouchInput_1 = __webpack_require__(67);
+var BrowserDelegate_1 = __webpack_require__(2);
+var Service_1 = __webpack_require__(5);
+var TouchInput_1 = __webpack_require__(76);
 var Inject_1 = __webpack_require__(0);
 var TouchInputImplement = (function () {
     function TouchInputImplement(browserDelegate) {
@@ -8142,18 +7537,26 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var Observable_1 = __webpack_require__(4);
-var MouseInput_1 = __webpack_require__(66);
-var TouchInput_1 = __webpack_require__(67);
-var DOM_1 = __webpack_require__(68);
+var Observable_1 = __webpack_require__(7);
+var MouseInput_1 = __webpack_require__(75);
+var TouchInput_1 = __webpack_require__(76);
+var DOM_1 = __webpack_require__(113);
 var Vector_1 = __webpack_require__(1);
-var Service_1 = __webpack_require__(3);
-var PointerInput_1 = __webpack_require__(41);
+var Service_1 = __webpack_require__(5);
+var PointerInput_1 = __webpack_require__(24);
 var Inject_1 = __webpack_require__(0);
 var PointerInputImplement = (function () {
     function PointerInputImplement(mouseInput, touchInput) {
+        var _this = this;
         this.mouseInput = mouseInput;
         this.touchInput = touchInput;
+        this.lastPointerPosition = new Vector_1.Vector();
+        Observable_1.Observable.merge(this.pointerStart$, this.pointerMove$, this.pointerEnd$).subscribe(function (e) {
+            if (e.locations.length > 0) {
+                var p = e.locations[0];
+                _this.lastPointerPosition.copy(p);
+            }
+        });
     }
     Object.defineProperty(PointerInputImplement.prototype, "pointerStart$", {
         get: function () {
@@ -8220,6 +7623,96 @@ exports.PointerInputImplement = PointerInputImplement;
 
 "use strict";
 
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __generator = (this && this.__generator) || function (thisArg, body) {
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    function verb(n) { return function (v) { return step([n, v]); }; }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while (_) try {
+            if (f = 1, y && (t = y[op[0] & 2 ? "return" : op[0] ? "throw" : "next"]) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [0, t.value];
+            switch (op[0]) {
+                case 0: case 1: t = op; break;
+                case 4: _.label++; return { value: op[1], done: false };
+                case 5: _.label++; y = op[1]; op = [0]; continue;
+                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop(); continue;
+            }
+            op = body.call(thisArg, _);
+        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+    }
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var Observable_1 = __webpack_require__(7);
+function onceEvent(node, eventName) {
+    return __awaiter(this, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            return [2, new Promise(function (resolve, reject) {
+                    var onEvent = function (e) {
+                        resolve(e);
+                        teardown();
+                    };
+                    var onError = function (e) {
+                        reject(e);
+                        teardown();
+                    };
+                    var teardown = function () {
+                        node.removeEventListener(eventName, onEvent);
+                        node.removeEventListener('error', onError);
+                    };
+                    node.addEventListener(eventName, onEvent);
+                    node.addEventListener('error', onError);
+                })];
+        });
+    });
+}
+exports.onceEvent = onceEvent;
+function observeEvent(node, eventName) {
+    return new Observable_1.Observable(function (subscriber) {
+        node.addEventListener(eventName, function (e) { return subscriber.next(e); });
+        var parentNode = node.parentNode;
+        if (parentNode) {
+            var observer = new MutationObserver(function (records) {
+                var shouldComplete = records
+                    .reduce(function (prev, curr) { return prev.concat(listToArray(curr.removedNodes)); }, [])
+                    .some(function (removeedNode) { return removeedNode === node; });
+                if (shouldComplete) {
+                    subscriber.complete();
+                }
+            });
+            observer.observe(parentNode, { childList: true });
+        }
+    });
+}
+exports.observeEvent = observeEvent;
+function listToArray(list) {
+    return Array.prototype.slice.call(list);
+}
+exports.listToArray = listToArray;
+
+
+/***/ }),
+/* 114 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -8233,19 +7726,19 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var RenderProcess_1 = __webpack_require__(69);
-var RendererComponent_1 = __webpack_require__(24);
-var Service_1 = __webpack_require__(3);
+var RenderProcess_1 = __webpack_require__(46);
+var RendererComponent_1 = __webpack_require__(21);
+var Service_1 = __webpack_require__(5);
 var Vector_1 = __webpack_require__(1);
-var runtime_1 = __webpack_require__(11);
+var runtime_1 = __webpack_require__(9);
 var Inject_1 = __webpack_require__(0);
-var BrowserDelegate_1 = __webpack_require__(5);
+var BrowserDelegate_1 = __webpack_require__(2);
 var RenderProcessImplement = (function () {
     function RenderProcessImplement(browserDelegate) {
         this.browserDelegate = browserDelegate;
         this.width = 0;
         this.height = 0;
-        this.caches = new Map();
+        this.caches = new WeakMap();
     }
     RenderProcessImplement.prototype.useContext = function (ctx, width, height) {
         this.ctx = ctx;
@@ -8270,27 +7763,33 @@ var RenderProcessImplement = (function () {
         cache.ctx.save();
         gameObjects.forEachChildren(function (gameObject) {
             if (gameObject.layer & camera.cullingMask) {
-                _this.renderGameObject(cache.ctx, camera, gameObject);
+                _this.renderGameObject(cache, camera, gameObject);
             }
         });
         cache.ctx.restore();
         var _b = camera.rect.position, x = _b.x, y = _b.y;
         ctx.drawImage(cache.canvas, 0, 0, width, height, x, y, width, height);
     };
-    RenderProcessImplement.prototype.renderGameObject = function (ctx, camera, gameObject) {
+    RenderProcessImplement.prototype.renderGameObject = function (cache, camera, gameObject) {
         var _this = this;
+        var ctx = cache.ctx, visibility = cache.visibility;
         var renderers = gameObject.getComponents(RendererComponent_1.RendererComponent);
         var _a = gameObject.transform, rotation = _a.rotation, scale = _a.scale, worldPosition = _a.position;
         var position = Vector_1.Vector.Get().copy(worldPosition);
         camera.toScreenMatrix.multiplyToPoint(position);
         renderers.forEach(function (renderer) {
+            if (!renderer.isActive) {
+                return;
+            }
             if (!camera.bounds.intersects(renderer.bounds)) {
-                if (renderer.isVisible) {
+                if (visibility.has(renderer)) {
+                    visibility.delete(renderer);
                     renderer.onBecameInvisible(camera);
                 }
                 return;
             }
-            if (!renderer.isVisible) {
+            if (!visibility.has(renderer)) {
+                visibility.add(renderer);
                 renderer.onBecameVisible(camera);
             }
             renderer.render();
@@ -8326,7 +7825,8 @@ var RenderProcessImplement = (function () {
         if (!cache) {
             var canvas = this.browserDelegate.createCanvas();
             var ctx = this.browserDelegate.getContext(canvas);
-            cache = { canvas: canvas, ctx: ctx };
+            var visibility = new WeakSet();
+            cache = { canvas: canvas, ctx: ctx, visibility: visibility };
             this.caches.set(camera, cache);
         }
         return cache;
@@ -8342,7 +7842,7 @@ exports.RenderProcessImplement = RenderProcessImplement;
 
 
 /***/ }),
-/* 114 */
+/* 115 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8354,9 +7854,9 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var Service_1 = __webpack_require__(3);
-var CollisionContact_1 = __webpack_require__(72);
-var CollisionJumpTable_1 = __webpack_require__(19);
+var Service_1 = __webpack_require__(5);
+var CollisionContact_1 = __webpack_require__(77);
+var CollisionJumpTable_1 = __webpack_require__(31);
 var CollisionJumpTableImplement = (function () {
     function CollisionJumpTableImplement() {
     }
@@ -8485,7 +7985,7 @@ exports.CollisionJumpTableImplement = CollisionJumpTableImplement;
 
 
 /***/ }),
-/* 115 */
+/* 116 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8497,13 +7997,13 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var ArrayUtility_1 = __webpack_require__(7);
-var Pair_1 = __webpack_require__(116);
-var Service_1 = __webpack_require__(3);
-var BroadPhaseCollisionResolver_1 = __webpack_require__(42);
+var ArrayUtility_1 = __webpack_require__(10);
+var Pair_1 = __webpack_require__(117);
+var Service_1 = __webpack_require__(5);
+var BroadPhaseCollisionResolver_1 = __webpack_require__(32);
 var Vector_1 = __webpack_require__(1);
-var Color_1 = __webpack_require__(8);
-var Ray_1 = __webpack_require__(50);
+var Color_1 = __webpack_require__(6);
+var Ray_1 = __webpack_require__(61);
 var BroadPhaseCollisionResolverImplement = (function () {
     function BroadPhaseCollisionResolverImplement() {
         this.awakeColliders = [];
@@ -8647,20 +8147,20 @@ exports.BroadPhaseCollisionResolverImplement = BroadPhaseCollisionResolverImplem
 
 
 /***/ }),
-/* 116 */
+/* 117 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var Pool_1 = __webpack_require__(38);
+var Pool_1 = __webpack_require__(54);
 var Pair = (function () {
     function Pair(_bodyA, _bodyB) {
         this._bodyA = _bodyA;
         this._bodyB = _bodyB;
     }
     Pair.Get = function (colliderA, colliderB) {
-        return this.Instances.get(colliderA, colliderB);
+        return this.Instances.get().reset(colliderA, colliderB);
     };
     Pair.Put = function (pair) { this.Instances.put(pair); };
     Object.defineProperty(Pair.prototype, "canRecycle", {
@@ -8679,20 +8179,21 @@ var Pair = (function () {
         configurable: true
     });
     Pair.prototype.reset = function (bodyA, bodyB) {
-        this._bodyA = bodyA;
-        this._bodyB = bodyB;
+        this._bodyA = bodyA || this._bodyA;
+        this._bodyB = bodyB || this._bodyB;
+        return this;
     };
     Pair.prototype.destroy = function () {
         this._canRecycle = true;
     };
-    Pair.Instances = new Pool_1.Pool(function (a, b) { return new Pair(a, b); });
+    Pair.Instances = new Pool_1.Pool(Pair, Infinity, 128);
     return Pair;
 }());
 exports.Pair = Pair;
 
 
 /***/ }),
-/* 117 */
+/* 118 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8704,9 +8205,9 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var Service_1 = __webpack_require__(3);
-var NarrowPhaseCollisionResolver_1 = __webpack_require__(73);
-var CollisionContact_1 = __webpack_require__(72);
+var Service_1 = __webpack_require__(5);
+var NarrowPhaseCollisionResolver_1 = __webpack_require__(48);
+var CollisionContact_1 = __webpack_require__(77);
 var NarrowPhaseCollisionResolverImplement = (function () {
     function NarrowPhaseCollisionResolverImplement() {
     }
@@ -8731,7 +8232,7 @@ exports.NarrowPhaseCollisionResolverImplement = NarrowPhaseCollisionResolverImpl
 
 
 /***/ }),
-/* 118 */
+/* 119 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8743,16 +8244,42 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var Service_1 = __webpack_require__(3);
-var Time_1 = __webpack_require__(9);
+var Service_1 = __webpack_require__(5);
+var Time_1 = __webpack_require__(12);
 var TimeImplement = (function () {
     function TimeImplement() {
-        this.deltaTime = 0;
-        this.fixedDeltaTime = 1000 / 60;
-        this.fixedDeltaTimeInSecond = 1 / 60;
+        this._deltaTime = 0;
+        this._deltaTimeInSecond = 0;
+        this._fixedDeltaTime = 1000 / 60;
+        this._fixedDeltaTimeInSecond = 1 / 60;
     }
-    TimeImplement.prototype.tick = function (deltaTime) {
-        this.deltaTime = deltaTime;
+    Object.defineProperty(TimeImplement.prototype, "deltaTime", {
+        get: function () { return this._deltaTime; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(TimeImplement.prototype, "deltaTimeInSecond", {
+        get: function () { return this._deltaTimeInSecond; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(TimeImplement.prototype, "fixedDeltaTime", {
+        get: function () { return this._fixedDeltaTime; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(TimeImplement.prototype, "fixedDeltaTimeInSecond", {
+        get: function () { return this._fixedDeltaTimeInSecond; },
+        enumerable: true,
+        configurable: true
+    });
+    TimeImplement.prototype.fixedUpdate = function (deltaTime, alpha) {
+        this._fixedDeltaTime = deltaTime * alpha;
+        this._fixedDeltaTimeInSecond = this._fixedDeltaTime * 0.001;
+    };
+    TimeImplement.prototype.update = function (frameTime) {
+        this._deltaTime = frameTime;
+        this._deltaTimeInSecond = frameTime * 0.001;
     };
     TimeImplement = __decorate([
         Service_1.Service(Time_1.Time)
@@ -8763,7 +8290,7 @@ exports.TimeImplement = TimeImplement;
 
 
 /***/ }),
-/* 119 */
+/* 120 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8778,9 +8305,9 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var Observable_1 = __webpack_require__(4);
-var Service_1 = __webpack_require__(3);
-var BrowserDelegate_1 = __webpack_require__(5);
+var Observable_1 = __webpack_require__(7);
+var Service_1 = __webpack_require__(5);
+var BrowserDelegate_1 = __webpack_require__(2);
 var BrowserDelegateImplement = (function () {
     function BrowserDelegateImplement() {
         this.window = window;
@@ -8802,12 +8329,25 @@ var BrowserDelegateImplement = (function () {
         this.document.body.style.width = '100%';
         this.document.body.style.height = '100%';
         this.document.body.style.overflow = 'hidden';
+        var meta = this.document.createElement('meta');
+        meta.name = 'viewport';
+        meta.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0';
+        this.document.head.appendChild(meta);
     }
     BrowserDelegateImplement.prototype.createCanvas = function () {
         return this.document.createElement('canvas');
     };
     BrowserDelegateImplement.prototype.getContext = function (canvas) {
         return canvas.getContext('2d');
+    };
+    BrowserDelegateImplement.prototype.getAudioContext = function () {
+        try {
+            var AudioContext_1 = window.AudioContext || window.webkitAudioContext;
+            return new AudioContext_1();
+        }
+        catch (err) {
+            throw new Error('Not support audio context');
+        }
     };
     BrowserDelegateImplement = __decorate([
         Service_1.Service(BrowserDelegate_1.BrowserDelegate),
@@ -8817,153 +8357,6 @@ var BrowserDelegateImplement = (function () {
 }());
 exports.BrowserDelegateImplement = BrowserDelegateImplement;
 
-
-/***/ }),
-/* 120 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __generator = (this && this.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while (_) try {
-            if (f = 1, y && (t = y[op[0] & 2 ? "return" : op[0] ? "throw" : "next"]) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [0, t.value];
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop(); continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-    }
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-var Resource_1 = __webpack_require__(74);
-var ArrayUtility_1 = __webpack_require__(7);
-var Bundle = (function (_super) {
-    __extends(Bundle, _super);
-    function Bundle(resources) {
-        if (resources === void 0) { resources = []; }
-        var _this = _super.call(this) || this;
-        _this.resources = resources;
-        return _this;
-    }
-    Bundle.prototype.add = function (resource) {
-        if (ArrayUtility_1.addToArray(this.resources, resource)) {
-            this._isLoaded.next(false);
-        }
-    };
-    Bundle.prototype.load = function () {
-        return __awaiter(this, void 0, void 0, function () {
-            var _this = this;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        if (this.isLoaded) {
-                            return [2];
-                        }
-                        return [4, Promise.all(this.resources.map(function (resource) { return __awaiter(_this, void 0, void 0, function () { return __generator(this, function (_a) {
-                                return [2, resource.load()];
-                            }); }); }))];
-                    case 1:
-                        _a.sent();
-                        this._isLoaded.next(true);
-                        return [2];
-                }
-            });
-        });
-    };
-    return Bundle;
-}(Resource_1.Resource));
-exports.Bundle = Bundle;
-
-
-/***/ }),
-/* 121 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
-var Subject_1 = __webpack_require__(29);
-var ObjectUnsubscribedError_1 = __webpack_require__(65);
-/**
- * @class BehaviorSubject<T>
- */
-var BehaviorSubject = (function (_super) {
-    __extends(BehaviorSubject, _super);
-    function BehaviorSubject(_value) {
-        _super.call(this);
-        this._value = _value;
-    }
-    Object.defineProperty(BehaviorSubject.prototype, "value", {
-        get: function () {
-            return this.getValue();
-        },
-        enumerable: true,
-        configurable: true
-    });
-    BehaviorSubject.prototype._subscribe = function (subscriber) {
-        var subscription = _super.prototype._subscribe.call(this, subscriber);
-        if (subscription && !subscription.closed) {
-            subscriber.next(this._value);
-        }
-        return subscription;
-    };
-    BehaviorSubject.prototype.getValue = function () {
-        if (this.hasError) {
-            throw this.thrownError;
-        }
-        else if (this.closed) {
-            throw new ObjectUnsubscribedError_1.ObjectUnsubscribedError();
-        }
-        else {
-            return this._value;
-        }
-    };
-    BehaviorSubject.prototype.next = function (value) {
-        _super.prototype.next.call(this, this._value = value);
-    };
-    return BehaviorSubject;
-}(Subject_1.Subject));
-exports.BehaviorSubject = BehaviorSubject;
-//# sourceMappingURL=BehaviorSubject.js.map
 
 /***/ })
 /******/ ]);

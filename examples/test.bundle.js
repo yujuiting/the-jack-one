@@ -1,100 +1,67 @@
 webpackJsonp([4],{
 
-/***/ 124:
+/***/ 123:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
 };
-var __metadata = (this && this.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+var __generator = (this && this.__generator) || function (thisArg, body) {
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    function verb(n) { return function (v) { return step([n, v]); }; }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while (_) try {
+            if (f = 1, y && (t = y[op[0] & 2 ? "return" : op[0] ? "throw" : "next"]) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [0, t.value];
+            switch (op[0]) {
+                case 0: case 1: t = op; break;
+                case 4: _.label++; return { value: op[1], done: false };
+                case 5: _.label++; y = op[1]; op = [0]; continue;
+                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop(); continue;
+            }
+            op = body.call(thisArg, _);
+        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+    }
 };
-var __param = (this && this.__param) || function (paramIndex, decorator) {
-    return function (target, key) { decorator(target, key, paramIndex); }
-};
+var _this = this;
 Object.defineProperty(exports, "__esModule", { value: true });
-__webpack_require__(27);
-var runtime_1 = __webpack_require__(11);
-runtime_1.def(runtime_1.DEBUG);
-runtime_1.def(runtime_1.DEBUG_RENDERER);
-var GameObject_1 = __webpack_require__(2);
-var Scene_1 = __webpack_require__(32);
-var SceneManager_1 = __webpack_require__(18);
-var Class_1 = __webpack_require__(6);
-var KeyboardInput_1 = __webpack_require__(40);
-var SpriteSheetRendererComponent_1 = __webpack_require__(56);
-var Sprite_1 = __webpack_require__(16);
-var SpriteSheet_1 = __webpack_require__(57);
-var Texture_1 = __webpack_require__(26);
-var Inject_1 = __webpack_require__(0);
-var Logger_1 = __webpack_require__(48);
-var Subject = (function (_super) {
-    __extends(Subject, _super);
-    function Subject() {
-        var _this = _super !== null && _super.apply(this, arguments) || this;
-        _this.renderer = _this.addComponent(SpriteSheetRendererComponent_1.SpriteSheetRendererComponent);
-        return _this;
-    }
-    Subject = __decorate([
-        Class_1.Class()
-    ], Subject);
-    return Subject;
-}(GameObject_1.GameObject));
-var World = (function () {
-    function World(sceneManager, keyboardInput, logger) {
-        var scene = runtime_1.instantiate(Scene_1.Scene);
-        sceneManager.add(scene);
-        var texture = new Texture_1.Texture('/Assets/flappy-bird/bird.png');
-        var sprite = new Sprite_1.Sprite(texture);
-        sprite.rect.position.reset(0, 0);
-        sprite.rect.width = 210;
-        sprite.rect.height = 200;
-        var spritesheet = new SpriteSheet_1.SpriteSheet(texture, [
-            { x: 0, y: 0, width: 210, height: 200 },
-            { x: 210, y: 0, width: 210, height: 200 },
-            { x: 420, y: 0, width: 210, height: 200 }
-        ], 6);
-        scene.resources.add(texture);
-        var subject = runtime_1.instantiate(Subject);
-        subject.renderer.spriteSheet = spritesheet;
-        scene.add(subject);
-        var onKeyDown$ = keyboardInput.keyDown$.map(function (e) { return e.key; });
-        onKeyDown$.filter(function (code) { return code === 'w'; }).subscribe(function () { return subject.transform.position.y += 10; });
-        onKeyDown$.filter(function (code) { return code === 's'; }).subscribe(function () { return subject.transform.position.y -= 10; });
-        onKeyDown$.filter(function (code) { return code === 'd'; }).subscribe(function () { return subject.transform.position.x += 10; });
-        onKeyDown$.filter(function (code) { return code === 'a'; }).subscribe(function () { return subject.transform.position.x -= 10; });
-        onKeyDown$.filter(function (code) { return code === 'q'; }).subscribe(function () { return subject.transform.rotation += Math.PI / 6; });
-        onKeyDown$.filter(function (code) { return code === 'e'; }).subscribe(function () { return subject.transform.rotation -= Math.PI / 6; });
-        onKeyDown$.filter(function (code) { return code === 'c'; }).subscribe(function () { return subject.transform.scale.add(0.1); });
-        onKeyDown$.filter(function (code) { return code === 'z'; }).subscribe(function () { return subject.transform.scale.add(-0.1); });
-        onKeyDown$.subscribe(function (key) { return logger.log("key down: " + key); });
-    }
-    World = __decorate([
-        Class_1.Class(),
-        __param(0, Inject_1.Inject(SceneManager_1.SceneManager)),
-        __param(1, Inject_1.Inject(KeyboardInput_1.KeyboardInput)),
-        __param(2, Inject_1.Inject(Logger_1.Logger)),
-        __metadata("design:paramtypes", [Object, Object, Object])
-    ], World);
-    return World;
-}());
-runtime_1.instantiate(World);
-runtime_1.bootstrap().catch(console.error);
+__webpack_require__(40);
+var Sound_1 = __webpack_require__(65);
+var runtime_1 = __webpack_require__(9);
+var AudioPlayerComponent_1 = __webpack_require__(56);
+var sound = new Sound_1.Sound('./assets/nyan.wav');
+var audioPlayer = window.audioPlayer = runtime_1.instantiate(AudioPlayerComponent_1.AudioPlayerComponent);
+audioPlayer.source = sound;
+audioPlayer.volume = 0.1;
+audioPlayer.playbackRate = 1;
+(function () { return __awaiter(_this, void 0, void 0, function () {
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0: return [4, sound.load()];
+            case 1:
+                _a.sent();
+                audioPlayer.play();
+                return [2];
+        }
+    });
+}); })();
 
 
 /***/ }),
@@ -123,132 +90,276 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-var SpriteRendererComponent_1 = __webpack_require__(20);
-var Time_1 = __webpack_require__(9);
-var UniqueComponent_1 = __webpack_require__(15);
 var Inject_1 = __webpack_require__(0);
-var SpriteSheetRendererComponent = (function (_super) {
-    __extends(SpriteSheetRendererComponent, _super);
-    function SpriteSheetRendererComponent() {
-        var _this = _super !== null && _super.apply(this, arguments) || this;
-        _this.currentIndex = 0;
-        _this.accumulator = 0;
+var BrowserDelegate_1 = __webpack_require__(2);
+var Component_1 = __webpack_require__(13);
+var GameObject_1 = __webpack_require__(3);
+var Type_1 = __webpack_require__(8);
+Type_1.forwardRef(function () { return GameObject_1.GameObject; });
+var AudioPlayerComponent = (function (_super) {
+    __extends(AudioPlayerComponent, _super);
+    function AudioPlayerComponent(host, browser) {
+        var _this = _super.call(this, host) || this;
+        _this.browser = browser;
+        _this._volume = 1;
+        _this._loop = false;
+        _this._isPaused = false;
+        _this._isPlaying = false;
+        _this._lastCalculatedAt = 0;
+        _this._elapsedTime = 0;
+        _this._playbackRate = 1;
         return _this;
     }
-    Object.defineProperty(SpriteSheetRendererComponent.prototype, "spriteSheet", {
-        get: function () { return this._spriteSheet; },
-        set: function (value) { this.setSpriteSheep(value); },
+    Object.defineProperty(AudioPlayerComponent.prototype, "isPaused", {
+        get: function () { return this._isPaused; },
         enumerable: true,
         configurable: true
     });
-    SpriteSheetRendererComponent.prototype.play = function (key) {
-        if (key === void 0) { key = 'default'; }
-        this.currentIndex = 0;
-        this.sheetKey = key;
-        this.accumulator = 0;
-        this.sprites = this._spriteSheet.getSprites(this.sheetKey);
-    };
-    SpriteSheetRendererComponent.prototype.update = function () {
-        this.accumulator += this.time.deltaTime;
-        if (this.accumulator > this._spriteSheet.frameTime) {
-            var times = (this.accumulator / this._spriteSheet.frameTime) | 0;
-            this.accumulator %= this._spriteSheet.frameTime;
-            this.currentIndex += times;
-            if (this.currentIndex >= this.sprites.length) {
-                this.currentIndex = 0;
-            }
-        }
-        this.sprite = this.sprites[this.currentIndex];
-        _super.prototype.update.call(this);
-    };
-    SpriteSheetRendererComponent.prototype.setSpriteSheep = function (spriteSheet) {
-        this._spriteSheet = spriteSheet;
-        if (!this.sprites) {
-            this.play();
-        }
-    };
-    __decorate([
-        Inject_1.Inject(Time_1.Time),
-        __metadata("design:type", Object)
-    ], SpriteSheetRendererComponent.prototype, "time", void 0);
-    SpriteSheetRendererComponent = __decorate([
-        UniqueComponent_1.UniqueComponent()
-    ], SpriteSheetRendererComponent);
-    return SpriteSheetRendererComponent;
-}(SpriteRendererComponent_1.SpriteRendererComponent));
-exports.SpriteSheetRendererComponent = SpriteSheetRendererComponent;
-
-
-/***/ }),
-
-/***/ 57:
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-var Sprite_1 = __webpack_require__(16);
-var SpriteSheet = (function () {
-    function SpriteSheet(texture, cellMapOrCells, _fps) {
-        if (_fps === void 0) { _fps = 24; }
-        var _this = this;
-        this.texture = texture;
-        this.cellMapOrCells = cellMapOrCells;
-        this._fps = _fps;
-        this.sprites = new Map();
-        if (Array.isArray(cellMapOrCells)) {
-            var sprites = this.makeSprites(texture, cellMapOrCells);
-            var key = 'default';
-            this.sprites.set(key, sprites);
-        }
-        else {
-            var keys = Object.keys(cellMapOrCells);
-            keys.forEach(function (key) {
-                var cells = cellMapOrCells[key];
-                var sprites = _this.makeSprites(texture, cells);
-                _this.sprites.set(key, sprites);
-            });
-        }
-        this.frameTime = 1000 / _fps;
-    }
-    Object.defineProperty(SpriteSheet.prototype, "fps", {
-        get: function () { return this._fps; },
+    Object.defineProperty(AudioPlayerComponent.prototype, "isPlaying", {
+        get: function () { return this._isPlaying; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(AudioPlayerComponent.prototype, "playbackRate", {
+        get: function () { return this._playbackRate; },
+        set: function (value) { this.setPlaybackRate(value); },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(AudioPlayerComponent.prototype, "volume", {
+        get: function () { return this._volume; },
+        set: function (value) { this.setVolume(value); },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(AudioPlayerComponent.prototype, "loop", {
+        get: function () { return this._loop; },
+        set: function (value) { this.setLoop(value); },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(AudioPlayerComponent.prototype, "source", {
+        get: function () { return this._source; },
         set: function (value) {
-            this._fps = value;
-            this.frameTime = 1000 / value;
+            this._source = value;
         },
         enumerable: true,
         configurable: true
     });
-    SpriteSheet.prototype.getSprites = function (key) {
-        return this.sprites.get(key) || [];
-    };
-    SpriteSheet.prototype.getSprite = function (key, index) {
-        var sprites = this.sprites.get(key);
-        if (!sprites) {
+    AudioPlayerComponent.prototype.reset = function () {
+        _super.prototype.reset.call(this);
+        if (!this._source) {
             return;
         }
-        var correctedIndex = index % sprites.length;
-        return sprites[correctedIndex];
+        this.createBufferSource(this._source.context, this._source.data);
     };
-    SpriteSheet.prototype.makeSprites = function (texture, cells) {
-        var sprites = [];
-        cells.forEach(function (cell) {
-            var sprite = new Sprite_1.Sprite(texture);
-            sprite.rect.position.setTo(cell.x || 0, cell.y || 0);
-            sprite.rect.width = cell.width;
-            sprite.rect.height = cell.height;
-            sprites.push(sprite);
+    AudioPlayerComponent.prototype.resume = function () {
+        if (!this._source || !this._source.isLoaded) {
+            return;
+        }
+        if (!this._isPaused) {
+            return;
+        }
+        this.createBufferSource(this._source.context, this._source.data);
+        this.bufferSource.start(0, this._elapsedTime & this._source.duration);
+        this._isPaused = false;
+        this._isPlaying = true;
+    };
+    AudioPlayerComponent.prototype.pause = function () {
+        if (!this._isPlaying) {
+            return;
+        }
+        this.calculatePlayedTime();
+        this._isPaused = true;
+        this.bufferSource.stop(0);
+    };
+    AudioPlayerComponent.prototype.play = function () {
+        if (!this._source || !this._source.isLoaded) {
+            return;
+        }
+        if (this._isPaused) {
+            this.resume();
+            return;
+        }
+        if (this._isPlaying) {
+            return;
+        }
+        this.createBufferSource(this._source.context, this._source.data);
+        this.bufferSource.start(0);
+        this._isPaused = false;
+        this._isPlaying = true;
+        this._lastCalculatedAt = Date.now();
+    };
+    AudioPlayerComponent.prototype.stop = function () {
+        if (!this._isPlaying) {
+            return;
+        }
+        this._elapsedTime = 0;
+        this._isPaused = false;
+        this.bufferSource.stop(0);
+    };
+    AudioPlayerComponent.prototype.setPlaybackRate = function (value) {
+        this._playbackRate = value;
+        if (this.bufferSource) {
+            this.bufferSource.playbackRate.value = value;
+        }
+    };
+    AudioPlayerComponent.prototype.setVolume = function (value) {
+        this._volume = value;
+        if (this.gainNode) {
+            this.gainNode.gain.value = value;
+        }
+    };
+    AudioPlayerComponent.prototype.setLoop = function (value) {
+        this._loop = value;
+        if (this.bufferSource) {
+            this.bufferSource.loop = value;
+        }
+    };
+    AudioPlayerComponent.prototype.calculatePlayedTime = function () {
+        var now = Date.now();
+        this._elapsedTime += (now - this._lastCalculatedAt) / this._playbackRate * 0.001;
+        this._lastCalculatedAt = now;
+    };
+    AudioPlayerComponent.prototype.createBufferSource = function (ctx, buffer) {
+        var _this = this;
+        if (!this.gainNode) {
+            this.gainNode = ctx.createGain();
+            this.gainNode.connect(ctx.destination);
+        }
+        this.gainNode.gain.value = this._volume;
+        if (this.bufferSource) {
+            this.bufferSource.stop();
+        }
+        this.bufferSource = ctx.createBufferSource();
+        this.bufferSource.connect(this.gainNode);
+        this.bufferSource.buffer = buffer;
+        this.bufferSource.loop = this._loop;
+        this.bufferSource.playbackRate.value = this._playbackRate;
+        this.bufferSource.onended = function (e) { return _this.onBufferSourceEnd(e); };
+    };
+    AudioPlayerComponent.prototype.onBufferSourceEnd = function (e) {
+        this._isPlaying = false;
+    };
+    AudioPlayerComponent = __decorate([
+        __param(1, Inject_1.Inject(BrowserDelegate_1.BrowserDelegate)),
+        __metadata("design:paramtypes", [GameObject_1.GameObject, Object])
+    ], AudioPlayerComponent);
+    return AudioPlayerComponent;
+}(Component_1.Component));
+exports.AudioPlayerComponent = AudioPlayerComponent;
+
+
+/***/ }),
+
+/***/ 65:
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __generator = (this && this.__generator) || function (thisArg, body) {
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    function verb(n) { return function (v) { return step([n, v]); }; }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while (_) try {
+            if (f = 1, y && (t = y[op[0] & 2 ? "return" : op[0] ? "throw" : "next"]) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [0, t.value];
+            switch (op[0]) {
+                case 0: case 1: t = op; break;
+                case 4: _.label++; return { value: op[1], done: false };
+                case 5: _.label++; y = op[1]; op = [0]; continue;
+                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop(); continue;
+            }
+            op = body.call(thisArg, _);
+        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+    }
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var Resource_1 = __webpack_require__(15);
+var Inject_1 = __webpack_require__(0);
+var BrowserDelegate_1 = __webpack_require__(2);
+var Sound = (function (_super) {
+    __extends(Sound, _super);
+    function Sound(path) {
+        var _this = _super.call(this, path) || this;
+        _this._duration = 0;
+        _this.context = _this.browser.getAudioContext();
+        _this._responseType = 'arraybuffer';
+        return _this;
+    }
+    Object.defineProperty(Sound.prototype, "duration", {
+        get: function () { return this._duration; },
+        enumerable: true,
+        configurable: true
+    });
+    Sound.prototype.processData = function (data) {
+        return __awaiter(this, void 0, void 0, function () {
+            var _this = this;
+            return __generator(this, function (_a) {
+                return [2, new Promise(function (resolve, reject) {
+                        if (!_this.context) {
+                            reject(new Error('Fail to create audio context'));
+                            return;
+                        }
+                        _this.context.decodeAudioData(data, function (audioBuffer) {
+                            _this._duration = audioBuffer.duration;
+                            resolve(audioBuffer);
+                        }, reject);
+                    })];
+            });
         });
-        return sprites;
     };
-    return SpriteSheet;
-}());
-exports.SpriteSheet = SpriteSheet;
+    __decorate([
+        Inject_1.Inject(BrowserDelegate_1.BrowserDelegate),
+        __metadata("design:type", Object)
+    ], Sound.prototype, "browser", void 0);
+    return Sound;
+}(Resource_1.Resource));
+exports.Sound = Sound;
 
 
 /***/ })
 
-},[124]);
+},[123]);
 //# sourceMappingURL=test.bundle.js.map
