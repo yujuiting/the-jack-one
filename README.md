@@ -15,6 +15,8 @@ Dedicated to Jack.
 `The Jack One` is an [ECS](https://en.wikipedia.org/wiki/Entity–component–system) game engine.
 This project focus on custom engine development, game is a side project for quick concept and function testing.
 
+Aim to create a highly modularized and elegant game engine.
+
 ## Examples
 
 - physics [[src](https://github.com/yujuiting/the-jack-one/blob/master/src/Examples/physics.ts)][[demo](https://yujuiting.github.io/the-jack-one/examples/physics.html)]
@@ -23,23 +25,27 @@ This project focus on custom engine development, game is a side project for quic
 
 - control camera [[src](https://github.com/yujuiting/the-jack-one/blob/master/src/Examples/control-camera.ts)][[demo](https://yujuiting.github.io/the-jack-one/examples/control-camera.html)]
 
+- Flappy Bird [[src](https://github.com/yujuiting/the-jack-one/tree/master/src/Examples/flappy-bird)][[demo](https://yujuiting.github.io/the-jack-one/examples/flappy-bird.html)]
+
 ## Installation
 [node-canvas](https://github.com/Automattic/node-canvas#installation)
 
-## Roadmap
+## Roadmap & Notes
 - Engine
   - ~~Physics~~
     - ~~PolygonCollider~~
     - ~~Oriented rigid bodies~~
       - Add force at specific point should cause torque.
     - ~~Sleep mechanism~~
+    - Check formula
     - Constraints
-  - Camera Manipulation
+  - ~~Camera Manipulation~~
+    - Rect control
   - ParticleSystem
-  - Animation
-- Game
-  - Design: Seems Jack like to play raiden-like genre. This infomation is helpful.
-  - Art: Doing research.
+  - Refactor lifecycle system
+  - ~~Audio~~
+    - Seems audio can not play without user action.
+  - Animation??
 
 ## Dependencies
 - `rxjs`: For events manipulation.

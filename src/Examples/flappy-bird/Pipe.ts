@@ -17,14 +17,10 @@ class PipeObject extends GameObject {
 
   public collider: BoxColliderComponent;
 
-  public reset(): void {
-    super.reset();
-    this.renderer = this.addComponent(SpriteRendererComponent);
-    this.collider = this.addComponent(BoxColliderComponent);
-  }
-
   public start(): void {
     super.start();
+    this.renderer = this.addComponent(SpriteRendererComponent);
+    this.collider = this.addComponent(BoxColliderComponent);
     this.renderer.sprite = new Sprite(texture_pipe);
     this.collider.size.setTo(138, 1000);
   }
@@ -48,12 +44,12 @@ export class Pipe extends GameObject {
     super.reset();
     this.upper = instantiate(PipeObject);
     this.lower = instantiate(PipeObject);
-    this.body = this.addComponent(RigidbodyComponent);
     this.scored = false;
   }
 
   public start(): void {
     super.start();
+    this.body = this.addComponent(RigidbodyComponent);
     this.upper.transform.localScale.setTo(1, -1);
     this.upper.transform.position.setTo(0, 325);
     this.lower.transform.position.setTo(0, -325);

@@ -51,6 +51,13 @@ export class EngineImplement implements Engine {
     this.canvas.height = height;
     this.browser.document.body.appendChild(this.canvas);
 
+    this.canvas.style.marginLeft = `-${width / 2}px`;
+    this.canvas.style.marginTop = `-${height / 2}px`;
+    this.canvas.style.position = 'absolute';
+    this.canvas.style.left = '50%';
+    this.canvas.style.top = '50%';
+    this.browser.document.body.style.backgroundColor = '#000';
+
     this.browser.resize$.subscribe(e => this.onResize(e));
 
     this.sceneManager.sceneLoaded$.subscribe(s => this.onSceneLoaded(s));

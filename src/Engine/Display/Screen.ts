@@ -19,4 +19,6 @@ export interface Screen {
 
   setFullScreen(enable: boolean): void;
 
+  setSize(width: number, height: number): void;
+
 }

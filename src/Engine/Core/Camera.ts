@@ -51,6 +51,7 @@ export class Camera extends GameObject {
               @Inject(Screen) screen: Screen,
               @Inject(GameObjectInitializer) gameObjectInitializer: GameObjectInitializer) {
     super(gameObjectInitializer);
+    // Default set to full screen.
     this.setSize(screen.width, screen.height);
   }
 

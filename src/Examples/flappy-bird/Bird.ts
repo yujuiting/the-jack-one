@@ -5,14 +5,13 @@ import { CircleColliderComponent } from 'Engine/Physics//CircleColliderComponent
 import { Vector } from 'Engine/Math/Vector';
 import { SpriteSheetRendererComponent } from 'Engine/Render/SpriteSheetRendererComponent';
 import { SpriteSheet } from 'Engine/Display/SpriteSheet';
-
-import { texture_bird, sfx_wing, sfx_hit } from './resource';
 import { ForceMode } from 'Engine/Physics/ForceMode';
 import { Observable } from 'rxjs/Observable';
-import { Camera } from 'Engine/Core/Camera';
 import { AudioPlayerComponent } from 'Engine/Media/AudioPlayerComponent';
 import { Inject } from 'Engine/Decorator/Inject';
 import { Screen } from 'Engine/Display/Screen';
+
+import { texture_bird, sfx_wing, sfx_hit } from './resource';
 
 @Class()
 export class Bird extends GameObject {
@@ -64,7 +63,6 @@ export class Bird extends GameObject {
     super.start();
 
     this.collider.radius = 60;
-    // this.collider.isTigger = true;
 
     this.renderer.spriteSheet = new SpriteSheet(
       texture_bird,

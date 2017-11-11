@@ -3,13 +3,13 @@ import { Class } from 'Engine/Decorator/Class';
 import { GameObject } from 'Engine/Core/GameObject';
 import { SpriteRendererComponent } from 'Engine/Render/SpriteRendererComponent';
 import { Sprite } from 'Engine/Display/Sprite';
-
-import { texture_sky, texture_ground } from './resource';
+import { BoxColliderComponent } from 'Engine/Physics/BoxColliderComponent';
+import { Time } from 'Engine/Time/Time';
 import { instantiate } from 'Engine/runtime';
 import { Inject } from 'Engine/Decorator/Inject';
 import { Screen } from 'Engine/Display/Screen';
-import { Time } from 'Engine/Time/Time';
-import { BoxColliderComponent } from 'Engine/Physics/BoxColliderComponent';
+
+import { texture_sky, texture_ground } from './resource';
 
 @Class()
 export class Background extends GameObject {
