@@ -1,6 +1,6 @@
 webpackJsonp([4],{
 
-/***/ 123:
+/***/ 124:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -51,11 +51,31 @@ var audioPlayer = window.audioPlayer = runtime_1.instantiate(AudioPlayerComponen
 audioPlayer.source = sound;
 audioPlayer.volume = 0.1;
 audioPlayer.playbackRate = 1;
+function sleep(seconds) {
+    return __awaiter(this, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4, new Promise(function (resolve) { return setTimeout(resolve, seconds * 1000); })];
+                case 1:
+                    _a.sent();
+                    return [2];
+            }
+        });
+    });
+}
 (function () { return __awaiter(_this, void 0, void 0, function () {
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0: return [4, sound.load()];
             case 1:
+                _a.sent();
+                audioPlayer.play();
+                return [4, sleep(2)];
+            case 2:
+                _a.sent();
+                audioPlayer.stop();
+                return [4, sleep(2)];
+            case 3:
                 _a.sent();
                 audioPlayer.play();
                 return [2];
@@ -232,9 +252,6 @@ var AudioPlayerComponent = (function (_super) {
             this.gainNode.connect(ctx.destination);
         }
         this.gainNode.gain.value = this._volume;
-        if (this.bufferSource) {
-            this.bufferSource.stop();
-        }
         this.bufferSource = ctx.createBufferSource();
         this.bufferSource.connect(this.gainNode);
         this.bufferSource.buffer = buffer;
@@ -361,5 +378,5 @@ exports.Sound = Sound;
 
 /***/ })
 
-},[123]);
+},[124]);
 //# sourceMappingURL=test.bundle.js.map

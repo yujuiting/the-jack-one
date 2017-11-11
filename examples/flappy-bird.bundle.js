@@ -200,7 +200,6 @@ var Texture = (function (_super) {
                 }
                 return [2, new Promise(function (resolve) {
                         var request = new Image();
-                        request.src = _this.path;
                         request.onprogress = _this.onprogress;
                         request.onerror = _this.onerror;
                         request.onloadstart = _this.onloadstart;
@@ -227,6 +226,7 @@ var Texture = (function (_super) {
                                 }
                             });
                         }); };
+                        request.src = _this.path;
                     })];
             });
         });
@@ -891,7 +891,7 @@ exports.Camera = Camera;
 
 Object.defineProperty(exports, "__esModule", { value: true });
 var Texture_1 = __webpack_require__(16);
-var Font_1 = __webpack_require__(135);
+var Font_1 = __webpack_require__(136);
 var Sound_1 = __webpack_require__(65);
 var Bundle_1 = __webpack_require__(26);
 exports.texture_bird = new Texture_1.Texture('./assets/flappy-bird/bird.png');
@@ -923,7 +923,6 @@ exports.bundle = new Bundle_1.Bundle('game resources', [
     exports.texture_medal_silver,
     exports.sfx_point,
     exports.sfx_wing,
-    exports.sfx_hit,
     exports.sfx_hit,
     exports.sfx_die
 ]);
@@ -1268,7 +1267,6 @@ var TextRendererComponent = (function (_super) {
     function TextRendererComponent() {
         var _this = _super !== null && _super.apply(this, arguments) || this;
         _this.text = '';
-        _this.maxWidth = Number.MAX_VALUE;
         _this.fillColor = Color_1.Color.White;
         _this.fontSize = 16;
         _this.lineWidth = 1;
@@ -1282,8 +1280,11 @@ var TextRendererComponent = (function (_super) {
     TextRendererComponent.prototype.update = function () {
         _super.prototype.update.call(this);
         this.ctx.font = (this.fontStyle + " " + this.fontVariant + " " + this.fontWeight + " " + this.fontSize + "px " + this.fontFamily).trim();
+        if (!this.text) {
+            this.text = ' ';
+        }
         this.actualWidth = this.ctx.measureText(this.text).width;
-        this.canvas.width = this.actualWidth;
+        this.canvas.width = Math.ceil(this.actualWidth);
         this.canvas.height = this.fontSize;
     };
     TextRendererComponent.prototype.render = function () {
@@ -1292,12 +1293,12 @@ var TextRendererComponent = (function (_super) {
         this.ctx.font = this.fontStyle + " " + this.fontVariant + " " + this.fontWeight + " " + this.fontSize + "px " + this.fontFamily;
         if (this.fillColor) {
             ctx.fillStyle = this.fillColor.toHexString();
-            ctx.fillText(this.text, 0, this.fontSize, this.maxWidth);
+            ctx.fillText(this.text, 0, this.fontSize);
         }
         if (this.strokeColor) {
             ctx.strokeStyle = this.strokeColor.toHexString();
             ctx.lineWidth = this.lineWidth;
-            ctx.strokeText(this.text, 0, this.fontSize, this.maxWidth);
+            ctx.strokeText(this.text, 0, this.fontSize);
         }
     };
     TextRendererComponent = __decorate([
@@ -2027,9 +2028,6 @@ var AudioPlayerComponent = (function (_super) {
             this.gainNode.connect(ctx.destination);
         }
         this.gainNode.gain.value = this._volume;
-        if (this.bufferSource) {
-            this.bufferSource.stop();
-        }
         this.bufferSource = ctx.createBufferSource();
         this.bufferSource.connect(this.gainNode);
         this.bufferSource.buffer = buffer;
@@ -2056,172 +2054,7 @@ exports.AudioPlayerComponent = AudioPlayerComponent;
 /* 60 */,
 /* 61 */,
 /* 62 */,
-/* 63 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __metadata = (this && this.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-var Service_1 = __webpack_require__(5);
-var BITMASK32 = 0xFFFFFFFF;
-var Random = (function () {
-    function Random(seed) {
-        if (seed === void 0) { seed = Date.now(); }
-        this.seed = seed;
-        this._lowerMask = 0x7FFFFFFF;
-        this._upperMask = 0x80000000;
-        this._w = 32;
-        this._n = 624;
-        this._m = 397;
-        this._a = 0x9908B0DF;
-        this._u = 11;
-        this._s = 7;
-        this._b = 0x9d2c5680;
-        this._t = 15;
-        this._c = 0xefc60000;
-        this._l = 18;
-        this._f = 1812433253;
-        this._mt = new Array(this._n);
-        this._mt[0] = seed >>> 0;
-        for (var i = 1; i < this._n; i++) {
-            var s = this._mt[i - 1] ^ (this._mt[i - 1] >>> (this._w - 2));
-            this._mt[i] = (((this._f * ((s & 0xFFFF0000) >>> 16)) << 16) + (this._f * (s & 0xFFFF)) + i) >>> 0;
-        }
-        this._index = this._n;
-    }
-    Random.prototype._twist = function () {
-        var mag01 = [0x0, this._a];
-        var y = 0;
-        for (var i = 0; i < this._n - this._m; i++) {
-            y = (this._mt[i] & this._upperMask) | (this._mt[i + 1] & this._lowerMask);
-            this._mt[i] = this._mt[i + this._m] ^ (y >>> 1) ^ mag01[y & 0x1] & BITMASK32;
-        }
-        for (; i < this._n - 1; i++) {
-            y = (this._mt[i] & this._upperMask) | (this._mt[i + 1] & this._lowerMask);
-            this._mt[i] = this._mt[i + (this._m - this._n)] ^ (y >>> 1) ^ mag01[y & 0x1] & BITMASK32;
-        }
-        y = (this._mt[this._n - 1] & this._upperMask) | (this._mt[0] & this._lowerMask);
-        this._mt[this._n - 1] = this._mt[this._m - 1] ^ (y >>> 1) ^ mag01[y & 0x1] & BITMASK32;
-        this._index = 0;
-    };
-    Random.prototype.nextInt = function () {
-        if (this._index >= this._n) {
-            this._twist();
-        }
-        var y = this._mt[this._index++];
-        y ^= y >>> this._u;
-        y ^= ((y << this._s) & this._b);
-        y ^= ((y << this._t) & this._c);
-        y ^= (y >>> this._l);
-        return y >>> 0;
-    };
-    Random.prototype.next = function () {
-        return this.nextInt() * (1.0 / 4294967296.0);
-    };
-    Random.prototype.floating = function (min, max) {
-        return (max - min) * this.next() + min;
-    };
-    Random.prototype.integer = function (min, max) {
-        return Math.floor((max - min + 1) * this.next() + min);
-    };
-    Random.prototype.bool = function (likelihood) {
-        if (likelihood === void 0) { likelihood = .5; }
-        return this.next() <= likelihood;
-    };
-    Random.prototype.pickOne = function (array) {
-        return array[this.integer(0, array.length - 1)];
-    };
-    Random.prototype.pickSet = function (array, numPicks, allowDuplicates) {
-        if (allowDuplicates === void 0) { allowDuplicates = false; }
-        if (allowDuplicates) {
-            return this._pickSetWithDuplicates(array, numPicks);
-        }
-        else {
-            return this._pickSetWithoutDuplicates(array, numPicks);
-        }
-    };
-    Random.prototype._pickSetWithoutDuplicates = function (array, numPicks) {
-        if (numPicks > array.length || numPicks < 0) {
-            throw new Error('Invalid number of elements to pick, must pick a value 0 < n <= length');
-        }
-        if (numPicks === array.length) {
-            return array;
-        }
-        var result = new Array(numPicks);
-        var currentPick = 0;
-        var tempArray = array.slice(0);
-        while (currentPick < numPicks) {
-            var index = this.integer(0, tempArray.length - 1);
-            result[currentPick++] = tempArray[index];
-            tempArray.splice(index, 1);
-        }
-        return result;
-    };
-    Random.prototype._pickSetWithDuplicates = function (array, numPicks) {
-        if (numPicks < 0) {
-            throw new Error('Invalid number of elements to pick, must pick a value 0 <= n < MAX_INT');
-        }
-        var result = new Array(numPicks);
-        for (var i = 0; i < numPicks; i++) {
-            result.push(this.pickOne(array));
-        }
-        return result;
-    };
-    Random.prototype.shuffle = function (array) {
-        var tempArray = array.slice(0);
-        var swap = null;
-        for (var i = 0; i < tempArray.length - 2; i++) {
-            var randomIndex = this.integer(i, tempArray.length - 1);
-            swap = tempArray[i];
-            tempArray[i] = tempArray[randomIndex];
-            tempArray[randomIndex] = swap;
-        }
-        return tempArray;
-    };
-    Random.prototype.range = function (length, min, max) {
-        var result = new Array(length);
-        for (var i = 0; i < length; i++) {
-            result[i] = this.integer(min, max);
-        }
-        return result;
-    };
-    Random.prototype.d4 = function () {
-        return this.integer(1, 4);
-    };
-    Random.prototype.d6 = function () {
-        return this.integer(1, 6);
-    };
-    Random.prototype.d8 = function () {
-        return this.integer(1, 8);
-    };
-    Random.prototype.d10 = function () {
-        return this.integer(1, 10);
-    };
-    Random.prototype.d12 = function () {
-        return this.integer(1, 12);
-    };
-    Random.prototype.d20 = function () {
-        return this.integer(1, 20);
-    };
-    Random = __decorate([
-        Service_1.Service(),
-        __metadata("design:paramtypes", [Number])
-    ], Random);
-    return Random;
-}());
-exports.Random = Random;
-
-
-/***/ }),
+/* 63 */,
 /* 64 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -2399,7 +2232,8 @@ exports.Sound = Sound;
 /* 121 */,
 /* 122 */,
 /* 123 */,
-/* 124 */
+/* 124 */,
+/* 125 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2408,7 +2242,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 __webpack_require__(40);
 var runtime_1 = __webpack_require__(9);
 runtime_1.def(runtime_1.DEBUG);
-var MainScene_1 = __webpack_require__(125);
+var MainScene_1 = __webpack_require__(126);
 var resource_1 = __webpack_require__(28);
 var mainScene = runtime_1.instantiate(MainScene_1.MainScene);
 mainScene.resources.add(resource_1.bundle);
@@ -2416,7 +2250,7 @@ runtime_1.bootstrap(mainScene);
 
 
 /***/ }),
-/* 125 */
+/* 126 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2442,14 +2276,14 @@ var Class_1 = __webpack_require__(4);
 var runtime_1 = __webpack_require__(9);
 var Scene_1 = __webpack_require__(33);
 var Vector_1 = __webpack_require__(1);
-var GameManager_1 = __webpack_require__(126);
-var Background_1 = __webpack_require__(136);
-var Splash_1 = __webpack_require__(137);
-var Score_1 = __webpack_require__(138);
-var Pipe_1 = __webpack_require__(139);
-var Bird_1 = __webpack_require__(140);
+var GameManager_1 = __webpack_require__(127);
+var Background_1 = __webpack_require__(137);
+var Splash_1 = __webpack_require__(138);
+var Score_1 = __webpack_require__(139);
+var Pipe_1 = __webpack_require__(140);
+var Bird_1 = __webpack_require__(141);
 var Type_1 = __webpack_require__(8);
-var ScoreBoard_1 = __webpack_require__(143);
+var ScoreBoard_1 = __webpack_require__(144);
 var MainScene = (function (_super) {
     __extends(MainScene, _super);
     function MainScene() {
@@ -2497,7 +2331,7 @@ exports.MainScene = MainScene;
 
 
 /***/ }),
-/* 126 */
+/* 127 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2522,7 +2356,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-__webpack_require__(127);
+__webpack_require__(128);
 var Observable_1 = __webpack_require__(7);
 var GameObject_1 = __webpack_require__(3);
 var Class_1 = __webpack_require__(4);
@@ -2531,7 +2365,7 @@ var KeyboardInput_1 = __webpack_require__(60);
 var Inject_1 = __webpack_require__(0);
 var Vector_1 = __webpack_require__(1);
 var Screen_1 = __webpack_require__(11);
-var Random_1 = __webpack_require__(63);
+var Random_1 = __webpack_require__(62);
 var AudioPlayerComponent_1 = __webpack_require__(56);
 var resource_1 = __webpack_require__(28);
 var SceneManager_1 = __webpack_require__(42);
@@ -2663,7 +2497,7 @@ var GameManager = (function (_super) {
     ], GameManager.prototype, "keyboardInput", void 0);
     __decorate([
         Inject_1.Inject(Random_1.Random),
-        __metadata("design:type", Random_1.Random)
+        __metadata("design:type", Object)
     ], GameManager.prototype, "random", void 0);
     __decorate([
         Inject_1.Inject(SceneManager_1.SceneManager),
@@ -2682,18 +2516,18 @@ exports.GameManager = GameManager;
 
 
 /***/ }),
-/* 127 */
+/* 128 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 var Observable_1 = __webpack_require__(7);
-var throttleTime_1 = __webpack_require__(128);
+var throttleTime_1 = __webpack_require__(129);
 Observable_1.Observable.prototype.throttleTime = throttleTime_1.throttleTime;
 //# sourceMappingURL=throttleTime.js.map
 
 /***/ }),
-/* 128 */
+/* 129 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2704,8 +2538,8 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var Subscriber_1 = __webpack_require__(29);
-var async_1 = __webpack_require__(129);
-var throttle_1 = __webpack_require__(134);
+var async_1 = __webpack_require__(130);
+var throttle_1 = __webpack_require__(135);
 /**
  * Emits a value from the source Observable, then ignores subsequent source
  * values for `duration` milliseconds, then repeats this process.
@@ -2815,13 +2649,13 @@ function dispatchNext(arg) {
 //# sourceMappingURL=throttleTime.js.map
 
 /***/ }),
-/* 129 */
+/* 130 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-var AsyncAction_1 = __webpack_require__(130);
-var AsyncScheduler_1 = __webpack_require__(132);
+var AsyncAction_1 = __webpack_require__(131);
+var AsyncScheduler_1 = __webpack_require__(133);
 /**
  *
  * Async Scheduler
@@ -2868,7 +2702,7 @@ exports.async = new AsyncScheduler_1.AsyncScheduler(AsyncAction_1.AsyncAction);
 //# sourceMappingURL=async.js.map
 
 /***/ }),
-/* 130 */
+/* 131 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2879,7 +2713,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var root_1 = __webpack_require__(35);
-var Action_1 = __webpack_require__(131);
+var Action_1 = __webpack_require__(132);
 /**
  * We need this JSDoc comment for affecting ESDoc.
  * @ignore
@@ -3016,7 +2850,7 @@ exports.AsyncAction = AsyncAction;
 //# sourceMappingURL=AsyncAction.js.map
 
 /***/ }),
-/* 131 */
+/* 132 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3066,7 +2900,7 @@ exports.Action = Action;
 //# sourceMappingURL=Action.js.map
 
 /***/ }),
-/* 132 */
+/* 133 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3076,7 +2910,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var Scheduler_1 = __webpack_require__(133);
+var Scheduler_1 = __webpack_require__(134);
 var AsyncScheduler = (function (_super) {
     __extends(AsyncScheduler, _super);
     function AsyncScheduler() {
@@ -3123,7 +2957,7 @@ exports.AsyncScheduler = AsyncScheduler;
 //# sourceMappingURL=AsyncScheduler.js.map
 
 /***/ }),
-/* 133 */
+/* 134 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3178,7 +3012,7 @@ exports.Scheduler = Scheduler;
 //# sourceMappingURL=Scheduler.js.map
 
 /***/ }),
-/* 134 */
+/* 135 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3326,7 +3160,7 @@ var ThrottleSubscriber = (function (_super) {
 //# sourceMappingURL=throttle.js.map
 
 /***/ }),
-/* 135 */
+/* 136 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3428,7 +3262,7 @@ exports.Font = Font;
 
 
 /***/ }),
-/* 136 */
+/* 137 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3549,7 +3383,7 @@ var Ground = (function (_super) {
 
 
 /***/ }),
-/* 137 */
+/* 138 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3597,7 +3431,7 @@ exports.Splash = Splash;
 
 
 /***/ }),
-/* 138 */
+/* 139 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3648,7 +3482,7 @@ exports.Score = Score;
 
 
 /***/ }),
-/* 139 */
+/* 140 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3739,7 +3573,7 @@ exports.Pipe = Pipe;
 
 
 /***/ }),
-/* 140 */
+/* 141 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3769,8 +3603,8 @@ var Class_1 = __webpack_require__(4);
 var RigidbodyComponent_1 = __webpack_require__(22);
 var CircleColliderComponent_1 = __webpack_require__(52);
 var Vector_1 = __webpack_require__(1);
-var SpriteSheetRendererComponent_1 = __webpack_require__(141);
-var SpriteSheet_1 = __webpack_require__(142);
+var SpriteSheetRendererComponent_1 = __webpack_require__(142);
+var SpriteSheet_1 = __webpack_require__(143);
 var resource_1 = __webpack_require__(28);
 var ForceMode_1 = __webpack_require__(38);
 var AudioPlayerComponent_1 = __webpack_require__(56);
@@ -3853,7 +3687,7 @@ exports.Bird = Bird;
 
 
 /***/ }),
-/* 141 */
+/* 142 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3939,7 +3773,7 @@ exports.SpriteSheetRendererComponent = SpriteSheetRendererComponent;
 
 
 /***/ }),
-/* 142 */
+/* 143 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4005,7 +3839,7 @@ exports.SpriteSheet = SpriteSheet;
 
 
 /***/ }),
-/* 143 */
+/* 144 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4142,5 +3976,5 @@ var Score = (function (_super) {
 
 
 /***/ })
-],[124]);
+],[125]);
 //# sourceMappingURL=flappy-bird.bundle.js.map

@@ -1,6 +1,6 @@
 webpackJsonp([2],{
 
-/***/ 121:
+/***/ 122:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -40,7 +40,7 @@ var Bounds_1 = __webpack_require__(25);
 var Texture_1 = __webpack_require__(16);
 var Vector_1 = __webpack_require__(1);
 var SpriteRendererComponent_1 = __webpack_require__(18);
-var LineRendererComponent_1 = __webpack_require__(62);
+var LineRendererComponent_1 = __webpack_require__(63);
 var TextRendererComponent_1 = __webpack_require__(39);
 var PointerInput_1 = __webpack_require__(24);
 var RigidbodyComponent_1 = __webpack_require__(22);
@@ -410,7 +410,6 @@ var Texture = (function (_super) {
                 }
                 return [2, new Promise(function (resolve) {
                         var request = new Image();
-                        request.src = _this.path;
                         request.onprogress = _this.onprogress;
                         request.onerror = _this.onerror;
                         request.onloadstart = _this.onloadstart;
@@ -437,6 +436,7 @@ var Texture = (function (_super) {
                                 }
                             });
                         }); };
+                        request.src = _this.path;
                     })];
             });
         });
@@ -1381,7 +1381,6 @@ var TextRendererComponent = (function (_super) {
     function TextRendererComponent() {
         var _this = _super !== null && _super.apply(this, arguments) || this;
         _this.text = '';
-        _this.maxWidth = Number.MAX_VALUE;
         _this.fillColor = Color_1.Color.White;
         _this.fontSize = 16;
         _this.lineWidth = 1;
@@ -1395,8 +1394,11 @@ var TextRendererComponent = (function (_super) {
     TextRendererComponent.prototype.update = function () {
         _super.prototype.update.call(this);
         this.ctx.font = (this.fontStyle + " " + this.fontVariant + " " + this.fontWeight + " " + this.fontSize + "px " + this.fontFamily).trim();
+        if (!this.text) {
+            this.text = ' ';
+        }
         this.actualWidth = this.ctx.measureText(this.text).width;
-        this.canvas.width = this.actualWidth;
+        this.canvas.width = Math.ceil(this.actualWidth);
         this.canvas.height = this.fontSize;
     };
     TextRendererComponent.prototype.render = function () {
@@ -1405,12 +1407,12 @@ var TextRendererComponent = (function (_super) {
         this.ctx.font = this.fontStyle + " " + this.fontVariant + " " + this.fontWeight + " " + this.fontSize + "px " + this.fontFamily;
         if (this.fillColor) {
             ctx.fillStyle = this.fillColor.toHexString();
-            ctx.fillText(this.text, 0, this.fontSize, this.maxWidth);
+            ctx.fillText(this.text, 0, this.fontSize);
         }
         if (this.strokeColor) {
             ctx.strokeStyle = this.strokeColor.toHexString();
             ctx.lineWidth = this.lineWidth;
-            ctx.strokeText(this.text, 0, this.fontSize, this.maxWidth);
+            ctx.strokeText(this.text, 0, this.fontSize);
         }
     };
     TextRendererComponent = __decorate([
@@ -1423,7 +1425,7 @@ exports.TextRendererComponent = TextRendererComponent;
 
 /***/ }),
 
-/***/ 62:
+/***/ 63:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1534,5 +1536,5 @@ exports.LineRendererComponent = LineRendererComponent;
 
 /***/ })
 
-},[121]);
+},[122]);
 //# sourceMappingURL=manage-cameras.bundle.js.map
