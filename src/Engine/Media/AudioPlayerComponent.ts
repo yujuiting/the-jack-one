@@ -167,9 +167,14 @@ export class AudioPlayerComponent extends Component {
 
     this.gainNode.gain.value = this._volume;
 
-    if (this.bufferSource) {
-      this.bufferSource.stop();
-    }
+    /**
+     * No need to stop here.
+     * `createBufferSource` should always called after checking play status.
+     * Repeatly stop buffer source will throw InvalidStateError in safari.
+     */
+    // if (this.bufferSource) {
+    //   this.bufferSource.stop();
+    // }
 
     this.bufferSource = ctx.createBufferSource();
 

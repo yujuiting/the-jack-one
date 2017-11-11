@@ -44,7 +44,6 @@ export class Texture extends Resource<HTMLCanvasElement> {
 
     return new Promise<void>(resolve => {
       const request = new Image();
-      request.src = this.path;
       request.onprogress = this.onprogress;
       request.onerror = this.onerror;
       request.onloadstart = this.onloadstart;
@@ -58,6 +57,7 @@ export class Texture extends Resource<HTMLCanvasElement> {
         }
         resolve();
       };
+      request.src = this.path;
     });
   }
 

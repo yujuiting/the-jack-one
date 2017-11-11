@@ -121,7 +121,11 @@ export class RenderProcessImplement implements RenderProcess {
 
       ctx.scale(scale.x, scale.y);
       // TODO: use pivot
-      ctx.drawImage(image, -width * 0.5, -height * 0.5, width, height);
+      try {
+        ctx.drawImage(image, -width * 0.5, -height * 0.5, width, height);
+      } catch (err) {
+        console.warn(err);
+      }
 
       ctx.restore();
 

@@ -7,8 +7,6 @@ export class TextRendererComponent extends RendererComponent {
 
   public text = '';
 
-  public maxWidth = Number.MAX_VALUE;
-
   public strokeColor: Color|undefined;
 
   public fillColor: Color|undefined = Color.White;
@@ -33,9 +31,16 @@ export class TextRendererComponent extends RendererComponent {
     // Set font for measure text width.
     this.ctx.font = `${this.fontStyle} ${this.fontVariant} ${this.fontWeight} ${this.fontSize}px ${this.fontFamily}`.trim();
 
+    if (!this.text) {
+      /**
+       * In will throw `InvalidStateError` in Safari if measure a empty text.
+       */
+      this.text = ' ';
+    }
+
     this.actualWidth = this.ctx.measureText(this.text).width;
 
-    this.canvas.width = this.actualWidth;
+    this.canvas.width = Math.ceil(this.actualWidth);
 
     // TODO: Ensure descender line of font can display
     this.canvas.height = this.fontSize;
@@ -50,13 +55,13 @@ export class TextRendererComponent extends RendererComponent {
 
     if (this.fillColor) {
       ctx.fillStyle = this.fillColor.toHexString();
-      ctx.fillText(this.text, 0, this.fontSize, this.maxWidth);
+      ctx.fillText(this.text, 0, this.fontSize);
     }
 
     if (this.strokeColor) {
       ctx.strokeStyle = this.strokeColor.toHexString();
       ctx.lineWidth = this.lineWidth;
-      ctx.strokeText(this.text, 0, this.fontSize, this.maxWidth);
+      ctx.strokeText(this.text, 0, this.fontSize);
     }
   }
 

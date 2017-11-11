@@ -42,6 +42,18 @@ export class ProviderRegistry {
     const provider = this.resolve(resolvedToken);
 
     if (!provider) {
+      /**
+       * If you get error here:
+       * - Please ensure has imported `Engine/preset`.
+       * - Or check your custom provider has been provided.
+       * - Finally check your inject token is correct.
+       */
+      // throw new Error(`Not found service ${token}`);
+      /**
+       * TODO: I don't know why always has problem here...
+       * When inject `Random` service, token will turning to `Number` sa object, and most strange, I got `Random` service anyway!!!
+       */
+      console.warn(`Not found service ${token.toString()}`);
       return;
     }
 

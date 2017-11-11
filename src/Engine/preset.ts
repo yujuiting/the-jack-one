@@ -21,3 +21,5 @@ import 'Engine/Physics/NarrowPhaseCollisionResolverImplement';
 import 'Engine/Time/TimeImplement';
 
 import 'Engine/Utility/BrowserDelegateImplement';
+
+import 'Engine/Math/RandomImplement';

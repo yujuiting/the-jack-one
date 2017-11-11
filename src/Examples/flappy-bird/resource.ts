@@ -49,6 +49,5 @@ export const bundle = new Bundle('game resources', [
   sfx_point,
   sfx_wing,
   sfx_hit,
-  sfx_hit,
   sfx_die
 ]);

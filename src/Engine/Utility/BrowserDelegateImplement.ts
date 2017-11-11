@@ -1,6 +1,7 @@
 import { Observable } from 'rxjs/Observable';
 import { Service } from 'Engine/Decorator/Service';
 import { BrowserDelegate } from 'Engine/Utility/BrowserDelegate';
+import { Type } from 'Engine/Utility/Type';
 
 @Service(BrowserDelegate)
 export class BrowserDelegateImplement implements BrowserDelegate {
@@ -61,7 +62,8 @@ export class BrowserDelegateImplement implements BrowserDelegate {
 
   public getAudioContext(): AudioContext {
     try {
-      return new (AudioContext || (<any>window).webkitAudioContext)();
+      const AudioContext: Type<AudioContext> = (<any>window).AudioContext || (<any>window).webkitAudioContext;
+      return new AudioContext();
     } catch (err) {
       throw new Error('Not support audio context');
     }
