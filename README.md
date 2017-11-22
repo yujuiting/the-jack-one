@@ -57,6 +57,8 @@ Aim to create a highly modularized and elegant game engine.
 [Grafferon Games](https://gafferongames.com)
 
 ### Physics
+- [Coding Math Youtube Channel](https://www.youtube.com/user/codingmath/videos)
+
 - [How to create a custom 2d physics engine: the basics and impluse resolution](http://gamedevelopment.tutsplus.com/tutorials/how-to-create-a-custom-2d-physics-engine-the-basics-and-impulse-resolution--gamedev-6331)
 - [How to create a custom 2d physics engine: the core engine](https://gamedevelopment.tutsplus.com/tutorials/how-to-create-a-custom-2d-physics-engine-the-core-engine--gamedev-7493)
 - [How to create a custom 2d physics engine: friction, scene and jump table](http://gamedevelopment.tutsplus.com/tutorials/how-to-create-a-custom-2d-physics-engine-friction-scene-and-jump-table--gamedev-7756)
